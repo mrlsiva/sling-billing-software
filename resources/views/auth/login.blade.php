@@ -1,7 +1,7 @@
 @extends('layouts.login')
 
 @section('title')
-	<title>{{ config('app.name')}} | Home</title>
+	<title>{{ config('app.name')}} | Vasantham Login</title>
 @endsection
 
 @section('body')
