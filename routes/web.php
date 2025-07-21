@@ -1,11 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\EnsureCompanyIsValid;
+
+//Controller
+use App\Http\Controllers\auth\loginController;
 
 Route::get('/', function () {
     return view('home');
 });
+
+Route::post('/sign_in',[loginController::class, 'sign_in'])->name('sign_in');
 
 if (request()->segment(1) === 'admin') 
 {
@@ -13,21 +17,31 @@ if (request()->segment(1) === 'admin')
 } 
 else 
 {
-    Route::middleware(['company'])->group(function () {
+    Route::middleware(['is_company_valid'])->group(function () {
 
         Route::prefix('{company}')->group(function () {
 
             Route::get('/', function () {
                 return view('users.home');
-            });
+            })->name('home');
 
             Route::get('/login', function () {
                 return view('auth.login');
-            });
+            })->name('login');
 
-            Route::get('/dashboard', function () {
-                return view('users.dashboard');
-            })->name('dashboard');
+            Route::group(['middleware' => ['auth']], function () {
+
+                Route::get('/dashboard', function () {
+                    return view('users.dashboard');
+                })->name('dashboard');
+
+                Route::group(['middleware' => ['role:HO']], function () {
+                });
+
+                Route::group(['middleware' => ['role:Branch']], function () {
+                });
+
+            });
 
         });
     });
