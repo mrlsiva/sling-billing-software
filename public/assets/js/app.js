@@ -546,7 +546,7 @@ class ThemeLayout {
 
     setSwitchFromConfig() {
 
-        sessionStorage.setItem('__METOR_CONFIG__', JSON.stringify(this.config));
+        sessionStorage.setItem('__Sling_CONFIG__', JSON.stringify(this.config));
 
         document.querySelectorAll('.settings-bar input[type=radio]').forEach(function (checkbox) {
             checkbox.checked = false;

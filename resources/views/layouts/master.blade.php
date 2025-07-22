@@ -37,8 +37,8 @@
 
                 <ul class="navbar-nav" id="navbar-nav">
 
-                        <li class="menu-item pt-2">
-                            <a class="menu-link" href="#">
+                        <li class="menu-item active pt-2">
+                            <a class="menu-link active" href="#">
                                 <span class="nav-icon">
                                     <i class="ri-dashboard-2-line"></i>
                                 </span>
@@ -46,7 +46,14 @@
                                 <span class="badge bg-success badge-pill text-end">9+</span>
                             </a>
                         </li>
-
+						<li class="menu-item">
+                            <a class="menu-link" href="#">
+                                <span class="nav-icon">
+                                    <i class="ri-store-line"></i>
+                                </span>
+                                <span class="nav-text"> Add Shop </span>
+                            </a>
+                        </li>
                         <li class="menu-item">
                             <a class="menu-link" href="#">
                                 <span class="nav-icon">
@@ -217,9 +224,9 @@
                             <div class="dropdown topbar-item">
                                 <a type="button" class="topbar-button p-0" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span class="d-flex align-items-center gap-2">
-                                            <img class="rounded-circle" width="32" src="assets/images/users/avatar-1.jpg" alt="user-image">
+                                            <img class="rounded-circle" width="32" src="../assets/images/users/avatar-1.jpg" alt="user-image">
                                             <span class="d-lg-flex flex-column gap-1 d-none">
-                                                <h5 class="my-0 fs-13 text-uppercase text-reset fw-bold">Doris Lietz</h5>
+                                                <h5 class="my-0 fs-13 text-uppercase text-reset fw-bold">Sling</h5>
                                             </span>
                                     </span>
                                 </a>
@@ -263,7 +270,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-12 text-center">
-                            <script>document.write(new Date().getFullYear())</script> &copy; Metor. All rights reserved by FoxPixel</a>
+                            <script>document.write(new Date().getFullYear())</script> &copy; Sling. All rights reserved</a>
                         </div>
                     </div>
                 </div>

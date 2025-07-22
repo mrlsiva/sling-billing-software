@@ -1,5 +1,5 @@
 /**
-* Theme: Metor- Responsive Bootstrap 5 Admin Dashboard
+* Theme: Sling- Responsive Bootstrap 5 Admin Dashboard
 * Author: FoxPixel
 * Module/App: Theme Config Js
 */
@@ -7,7 +7,7 @@
 
 (function () {
 
-     var savedConfig = sessionStorage.getItem("__METOR_CONFIG__");
+     var savedConfig = sessionStorage.getItem("__Sling_CONFIG__");
 
      var html = document.getElementsByTagName("html")[0];
 

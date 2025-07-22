@@ -15426,7 +15426,7 @@ textarea.form-control-lg {
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  padding: 40px 16px;
+  padding: 16px;
   padding-bottom: 0;
 }
 
