@@ -109,16 +109,6 @@
                                 <span class="nav-text"> Customers </span>
                             </a>
                         </li>
-
-                        <li class="menu-item">
-                            <a class="menu-link" href="#">
-                                <span class="nav-icon">
-                                    <i class="ri-restaurant-line"></i>
-                                </span>
-                                <span class="nav-text"> Menu Cards </span>
-                            </a>
-                        </li>
-
                         <li class="menu-item">
                             <a class="menu-link" href="#">
                                 <span class="nav-icon">
