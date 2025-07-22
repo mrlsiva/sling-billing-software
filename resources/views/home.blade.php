@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.landing')
 
 @section('title')
 	<title>{{ config('app.name')}} | Home</title>
