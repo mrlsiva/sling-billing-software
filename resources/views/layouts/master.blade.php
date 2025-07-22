@@ -286,5 +286,7 @@
     <script src="{{ asset('assets/js/app.js') }}"></script>
 	<!-- Dashboard Js -->
     <script src="{{ asset('assets/js/pages/dashboard.js') }}"></script>
+	<!-- Page Js -->
+    <script src="{{ asset('assets/js/pages/categories.js') }}"></script>
 </body>
 </html>

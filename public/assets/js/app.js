@@ -156,7 +156,7 @@ class FormAdvanced {
             var choiceData = {};
             var isChoicesVal = item.attributes;
             if (isChoicesVal["data-choices-groups"]) {
-                choiceData.placeholderValue = "This is a placeholder set in the config";
+                choiceData.placeholderValue = "Choose an option";
             }
             if (isChoicesVal["data-choices-search-false"]) {
                 choiceData.searchEnabled = false;
