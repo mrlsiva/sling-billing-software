@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Session;
 
 class loginController extends Controller
 {
@@ -55,5 +56,19 @@ class loginController extends Controller
         {
             return redirect()->back()->with('error_alert', 'Invalid Credential');
         }
+    }
+
+    public function logout(Request $request){
+        
+        if (Auth::check()) {
+
+            Auth::logout(); // Log the user out
+
+            $request->session()->invalidate(); 
+            $request->session()->regenerateToken(); 
+
+            return redirect('/');
+        }
+
     }
 }

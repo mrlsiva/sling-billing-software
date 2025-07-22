@@ -1,16 +1,22 @@
 @extends('layouts.login')
 
 @section('title')
-	<title>{{ config('app.name')}} | Vasantham Login</title>
+	<title>{{ config('app.name')}} | Login</title>
 @endsection
 
 @section('body')
   <div class="container-fluid login-container">
     <div class="row h-100">
       <!-- Left Side Logo -->
-      <div class="col-md-6 logo-section text-center" style="background: #ccc;">
-        <img src="{{asset('assets/images/company/vasantham/logo.png')}}" alt="user-image" class="img-fluid user-avtar">
-      </div>
+      @if(request()->segment(1) === 'admin') 
+        <div class="col-md-6 logo-section text-center"  style="background: #080e1c;">
+          <img src="{{asset('assets/images/sling-logo.png')}}" alt="user-image" class="img-fluid user-avtar">
+        </div>
+      @else
+        <div class="col-md-6 logo-section text-center" style="background: #ccc;">
+          <img src="{{asset('assets/images/company/vasantham/logo.png')}}" alt="user-image" class="img-fluid user-avtar">
+        </div>
+      @endif
       <!-- Right Side Login Form -->
       <div class="col-md-6 d-flex align-items-center justify-content-center">
         <div class="w-75">
