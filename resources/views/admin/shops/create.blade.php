@@ -102,27 +102,25 @@
                                 </div>
                             </form>
                         </div>
+                        
                         <div class="col-lg-4">
                             <form>
                                 <div class="mb-3">
-                                    <label for="crater" class="form-label">Create</label>
-                                    <select class="form-control" id="crater" data-choices data-choices-groups data-placeholder="Only Head Office">
-                                            <option value="Seller">Only Head Office</option>
-                                            <option value="Admin">with Branches</option>
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-lg-4">
-                            <form>
-                                <div class="mb-3">
-                                    <label for="product-stock" class="form-label">No Of Branches</label>
-                                    <input type="number" id="product-stock" class="form-control" placeholder="Quantity">
+                                    <label for="product-stock" class="form-label">Primary Color</label>
+                                    <input type="text" id="category-name" class="form-control" placeholder="Enter Color code">
                                 </div>
 
                             </form>
                         </div>
-                        
+                        <div class="col-lg-4">
+                            <form>
+                                <div class="mb-3">
+                                    <label for="product-stock" class="form-label">Secondary Color</label>
+                                    <input type="text" id="category-name" class="form-control" placeholder="Enter Color code">
+                                </div>
+
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
