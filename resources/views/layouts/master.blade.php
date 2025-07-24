@@ -54,6 +54,7 @@
                                 <span class="nav-text"> Shop </span>
                             </a>
                         </li>
+                        
                     </ul>
                 @endif
                 @if(Auth::user()->hasRole('HO'))
