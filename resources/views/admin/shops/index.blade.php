@@ -38,11 +38,11 @@
 										<td><span class="badge badge-soft-warning">Overdue</span></td>
 										<td>15-02-2024</td>
 										<td>
-												<div class="d-flex gap-3">
-													<a href="#!" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-													<a href="#!" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
-													<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
-												</div>
+											<div class="d-flex gap-3">
+												<a href="{{route('admin.shop.view')}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
+												<a href="{{route('admin.shop.edit')}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
+												<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
+											</div>
 										</td>
 									</tr>
 									<tr>
@@ -53,11 +53,11 @@
 										<td><span class="badge badge-soft-warning">Overdue</span></td>
 										<td>15-02-2024</td>
 										<td>
-												<div class="d-flex gap-3">
-													<a href="#!" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-													<a href="#!" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
-													<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
-												</div>
+											<div class="d-flex gap-3">
+												<a href="{{route('admin.shop.view')}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
+												<a href="{{route('admin.shop.edit')}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
+												<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
+											</div>
 										</td>
 									</tr>
 									<tr>
@@ -69,8 +69,8 @@
 										<td>15-02-2024</td>
 										<td>
 												<div class="d-flex gap-3">
-													<a href="#!" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-													<a href="#!" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
+													<a href="{{route('admin.shop.view')}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
+													<a href="{{route('admin.shop.edit')}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
 													<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
 												</div>
 										</td>
@@ -84,8 +84,8 @@
 										<td>15-02-2026</td>
 										<td>
 												<div class="d-flex gap-3">
-													<a href="#!" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-													<a href="#!" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
+													<a href="{{route('admin.shop.view')}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
+													<a href="{{route('admin.shop.edit')}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
 													<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
 												</div>
 										</td>

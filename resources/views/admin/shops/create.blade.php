@@ -6,14 +6,14 @@
 
 @section('body')
      <div class="row">
-        <div class="col-xl-12 col-lg-12">
+        <div class="col-xl-12 col-md-12">
             <div class="card">
                 <div class="card-header pb-0">
                     <h4 class="card-title">Add New Shop</h4>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-xl-12 col-lg-12 mb-3">
+                        <div class="col-xl-12 col-md-12 mb-3">
                             <label for="category-name" class="form-label">Upload Shop Logo</label>
                             <div class="dropzone bg-light-subtle ">
                                 <div class="fallback">
@@ -53,7 +53,7 @@
                                     </li>
                             </ul>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Shop Name</label>
@@ -62,7 +62,7 @@
                             </form>
                         </div>
                         
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Mobile Number 1</label>
@@ -70,7 +70,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Mobile Number 2</label>
@@ -78,7 +78,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Address</label>
@@ -86,7 +86,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Email</label>
@@ -94,7 +94,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Company GSTin</label>
@@ -103,7 +103,7 @@
                             </form>
                         </div>
                         
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="product-stock" class="form-label">Primary Color</label>
@@ -112,7 +112,7 @@
 
                             </form>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="product-stock" class="form-label">Secondary Color</label>
@@ -131,7 +131,7 @@
                 <div class="card-body">
                     <div class="row">
                        
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Bank Name</label>
@@ -140,7 +140,7 @@
                             </form>
                         </div>
                         
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Enter A/C No</label>
@@ -148,7 +148,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Confirm A/C No </label>
@@ -156,7 +156,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">Branch</label>
@@ -164,7 +164,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-md-4">
                             <form>
                                 <div class="mb-3">
                                     <label for="category-name" class="form-label">IFSC Code</label>
@@ -177,10 +177,10 @@
             </div>
             <div class="p-3 mb-3 rounded">
                 <div class="row justify-content-end g-2">
-                    <div class="col-lg-3">
+                    <div class="col-md-3">
                             <a href="#!" class="btn btn-outline-secondary w-100"><i class="ri-save-line"></i> Save Change</a>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-md-2">
                             <a href="#!" class="btn btn-primary w-100"><i class="ri-close-circle-line"></i> Cancel</a>
                     </div>
                 </div>
