@@ -22,6 +22,14 @@ Route::group(['middleware' => ['auth','role:Super Admin']], function () {
 			Route::get('/create', function () {
 				return view('admin.shops.create');
 			})->name('create');
+
+			Route::get('/view', function () {
+				return view('admin.shops.view');
+			})->name('view');
+
+			Route::get('/edit', function () {
+				return view('admin.shops.edit');
+			})->name('edit');
 		});
 	});
 
