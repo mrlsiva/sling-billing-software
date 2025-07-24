@@ -73,7 +73,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Bank Info</h4>
                     <div class="d-flex gap-3">
-                        <a class="link-dark"><i class="ri-file-copy-line align-middle fs-14"></i></a>
+                        <a class="link-dark"  data-toast data-toast-text="Bank Details Copied Successfully!" data-toast-gravity="bottom" data-toast-position="center" data-toast-duration="3000" data-toast-close="close" ><i class="ri-file-copy-line align-middle fs-14"></i> Copy</a>
                     </div>
                 </div>
                 <div class="card-body">
