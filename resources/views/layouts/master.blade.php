@@ -257,7 +257,7 @@
             @yield('body')
 			</div>
             <!-- ========== Footer Start ========== -->
-            <footer class="footer">
+            <!-- <footer class="footer">
                 <div class="container">
                     <div class="row">
                         <div class="col-12 text-center">
@@ -265,7 +265,7 @@
                         </div>
                     </div>
                 </div>
-            </footer>
+            </footer> -->
             <!-- ========== Footer End ========== -->
         </div>
         <!-- End Page Content -->
