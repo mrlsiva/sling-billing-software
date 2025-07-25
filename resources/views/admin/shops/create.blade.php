@@ -62,7 +62,6 @@
                                 
                                 <div class="mb-3">
                                     <label for="address" class="form-label">Address</label>
-                                    <span class="text-danger">*</span>
                                     <input type="text" id="address" name="address" value="{{old('address')}}" class="form-control" placeholder="Enter Address">
                                 </div>
                                 
@@ -110,7 +109,6 @@
                                 
                                 <div class="mb-3">
                                     <label for="gst" class="form-label">Company GSTin</label>
-                                    <span class="text-danger">*</span>
                                     <input type="text" id="gst" name="gst" class="form-control" placeholder="Enter Gst" value="{{old('email')}}">
                                 </div>
                                 
