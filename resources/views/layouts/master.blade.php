@@ -59,32 +59,16 @@
                 @endif
                 @if(Auth::user()->hasRole('HO'))
                     <ul class="navbar-nav" id="navbar-nav">
+
                         <li class="menu-item">
-                            <a class="menu-link" href="#">
+                            <a class="menu-link" href="{{route('dashboard')}}">
                                 <span class="nav-icon">
-                                    <i class="ri-shopping-cart-line"></i>
+                                    <i class="ri-dashboard-2-line"></i>
                                 </span>
-                                <span class="nav-text"> Orders </span>
+                                <span class="nav-text"> Dashboard </span>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a class="menu-link menu-arrow" href="#sidebarProduct" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProduct">
-                                <span class="nav-icon">
-                                    <i class="ri-shopping-basket-2-line"></i>
-                                </span>
-                                <span class="nav-text"> Products </span>
-                            </a>
-                            <div class="collapse" id="sidebarProduct">
-                                <ul class="sub-menu-nav">
-                                    <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="#">Listing</a>
-                                    </li>
-                                    <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="#">Add/Edit Product</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+
                         <li class="menu-item">
                             <a class="menu-link menu-arrow" href="#sidebarCategories" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarCategories">
                                 <span class="nav-icon">
@@ -95,30 +79,68 @@
                             <div class="collapse" id="sidebarCategories">
                                 <ul class="sub-menu-nav">
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="#">Listing</a>
+                                        <a class="sub-menu-link" href="{{route('category.index')}}">Category</a>
                                     </li>
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="#">Add/Edit Categories</a>
+                                        <a class="sub-menu-link" href="{{route('sub_category.index')}}">Sub Category</a>
                                     </li>
                                 </ul>
                             </div>
                         </li>
+
+                        <li class="menu-item">
+                            <a class="menu-link menu-arrow" href="#sidebarProduct" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProduct">
+                                <span class="nav-icon">
+                                    <i class="ri-shopping-basket-2-line"></i>
+                                </span>
+                                <span class="nav-text"> Products </span>
+                            </a>
+                            <div class="collapse" id="sidebarProduct">
+                                <ul class="sub-menu-nav">
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link" href="{{route('product.index')}}">Listing</a>
+                                    </li>
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link" href="{{route('inventory.index')}}">Inventory</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
                         <li class="menu-item">
                             <a class="menu-link" href="#">
+                                <span class="nav-icon">
+                                    <i class="ri-shopping-cart-line"></i>
+                                </span>
+                                <span class="nav-text"> Orders </span>
+                            </a>
+                        </li>
+                        
+
+                    </ul>
+                @endif
+
+                @if(Auth::user()->hasRole('Branch'))
+                    <ul class="navbar-nav" id="navbar-nav">
+
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('dashboard')}}">
+                                <span class="nav-icon">
+                                    <i class="ri-dashboard-2-line"></i>
+                                </span>
+                                <span class="nav-text"> Dashboard </span>
+                            </a>
+                        </li>
+
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('customers.index')}}">
                                 <span class="nav-icon">
                                     <i class="ri-group-2-line"></i>
                                 </span>
                                 <span class="nav-text"> Customers </span>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a class="menu-link" href="#">
-                                <span class="nav-icon">
-                                    <i class="ri-mac-line"></i>
-                                </span>
-                                <span class="nav-text"> POS </span>
-                            </a>
-                        </li>
+                        
 
                     </ul>
                 @endif

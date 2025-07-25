@@ -31,9 +31,9 @@ class shopController extends Controller
             'phone' => 'required|digits:10',
             'phone1' => 'nullable|digits:10',
             'password' => 'required|min:6|confirmed', // optional confirmation
-            'address' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
             'slug_name' => 'required|alpha_dash|unique:users,slug_name',
-            'gst' => 'required|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
+            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
 
             'bank' => 'nullable|string|max:50',
             'account_number' => 'nullable|digits:16',
