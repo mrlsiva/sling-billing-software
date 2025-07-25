@@ -5,13 +5,14 @@
 @endsection
 
 @section('body')
-     <div class="row">
+    
+     <div class="row d-none">
         <div class="col-xl-12 col-md-12">
             <div class="card">
                 <div class="card-header pb-0">
                     <h4 class="card-title">Add New Shop</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-2">
                     <div class="row">
                         <div class="col-xl-12 col-md-12 mb-3">
                             <label for="category-name" class="form-label">Upload Shop Logo</label>
@@ -128,7 +129,7 @@
                 <div class="card-header pb-0">
                     <h4 class="card-title">Bank details</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-2">
                     <div class="row">
                        
                         <div class="col-md-4">
