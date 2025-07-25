@@ -5,8 +5,8 @@
 @endsection
 
 @section('body')
-    <div class="row">
-        <div class="col-lg-8">
+    	<div class="row">
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between border-0">
                     <h4 class="card-title mb-0">Explore Our Best Menu</h4>
@@ -337,95 +337,161 @@
                 </nav>
             </div>
         </div>
+		 <div class="col-md-4">
+			<div class="card">
+                <div class="card-body pt-0">
+			<h5 class="card-title mb-4">Tabs Justified</h5>
+
+			<ul class="nav nav-tabs nav-justified">
+				<li class="nav-item">
+					<a href="#homeTabsJustified" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+						<span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
+						<span class="d-none d-sm-block">Home</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="#profileTabsJustified" data-bs-toggle="tab" aria-expanded="true" class="nav-link active">
+						<span class="d-block d-sm-none"><i class="bx bx-user"></i></span>
+						<span class="d-none d-sm-block">Profile</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="#messagesTabsJustified" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+						<span class="d-block d-sm-none"><i class="bx bx-envelope"></i></span>
+						<span class="d-none d-sm-block">Messages</span>
+					</a>
+				</li>
+			</ul>
+			<div class="tab-content pt-2 text-muted">
+				<div class="tab-pane" id="homeTabsJustified">
+					<p class="mb-0">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
+						totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+						Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui
+						ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
+						velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem?
+					</p>
+				</div>
+				<div class="tab-pane show active" id="profileTabsJustified">
+					<p class="mb-0">Li Europan lingues es membres del sam familie. Lor separat existentie es un myth. Por scientie, musica, sport etc,
+						litot Europa usa li sam vocabular. Li lingues differe solmen in li grammatica, li pronunciation e li plu commun vocabules.
+						Omnicos directe al desirabilite de un nov lingua franca: On refusa continuar payar custosi traductores. At solmen va esser
+						necessi far uniform grammatica, pronunciation e plu sommun paroles. Ma quande lingues coalesce, li grammatica del resultant
+						lingue es plu simplic e regulari quam ti del coalescent lingues. Li nov lingua franca va esser plu simplic e regulari quam
+						li existent Europan lingues.
+					</p>
+				</div>
+				<div class="tab-pane" id="messagesTabsJustified">
+					<p class="mb-0">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
+						totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+						Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui
+						ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
+						velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem?
+					</p>
+				</div>
+			</div>
+			</div>
+			</div>
+		</div>
         <div class="col-lg-4">
             <div class="card">
-                <div class="card-header d-flex align-items-center justify-content-between border-0">
-                    <div>
-                        <h4 class="card-title">Order Summary</h4>
-                        <p class="mb-0">#ORD-2239</p>
-                    </div>
-                    <h5 class="fw-semibold">Total Items <span class="text-muted">(04)</span></h5>
-                </div>
-                <div class="card-body pt-0">
+                <div class="card-body pt-0"  style="max-height: 280px; overflow-y: auto;">
                     <div class="border border-light  p-2 rounded">
-                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                <div>
-                                    <a href="#!" class="text-dark fs-15 fw-bold">Italian Burata Pizza</a>
-                                    <p class="fs-14 my-1">12-Inch</p>
-                                    <a href="#!" class="link-primary text-decoration-underline fw-semibold">View Details <i class="ri-arrow-right-up-line"></i></a>
-                                </div>
-                                <div class="ms-lg-auto">
-                                    <div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
-                                        <button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
-                                        <input type="number" class="text-dark text-center border-0 bg-body-secondary rounded h-100" value="1" min="0" max="100" readonly="">
-                                        <button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr>
-
-                            <div class="d-flex align-items-center justify-content-between px-1">
-                                <div>
-                                    <p class="text-dark fw-semibold fs-16 mb-0">$12.00 <small class="text-decoration-line-through text-muted ms-1">$15.00</small></p>
-                                </div>
-                                <div class="d-flex align-content-center gap-1">
-                                    <a href="#!" class="btn btn-soft-danger avatar-sm rounded d-flex align-items-center justify-content-center"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
-                                </div>
-                            </div>
+						<div class="d-flex flex-wrap align-items-center gap-3">
+							<div>
+								<a href="#!" class="text-dark fs-12 fw-bold">Italian Burata Pizza</a>
+								<p class="fs-10 my-1">12-Inch</p>
+							</div>
+							<div class="ms-lg-auto">
+								<div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
+									<button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
+									<input type="number" class="text-dark text-center border-0 bg-body-secondary rounded h-100" value="1" min="0" max="100" readonly="">
+									<button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
+								</div>
+							</div>
+						</div>
+						<div class="d-flex align-items-center justify-content-between px-1">
+							<div>
+								<p class="text-dark fw-semibold fs-16 mb-0">$12.00 </p>
+							</div>
+							<div class="d-flex align-content-center gap-1">
+								<a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center"><i class="ri-delete-bin-5-line align-middle fs-12"></i></a>
+							</div>
+						</div>
                     </div>
-                    <div class="mt-3 border border-light  p-2 rounded">
-                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                <div>
-                                    <a href="#!" class="text-dark fs-15 fw-bold">Meat Tacos</a>
-                                    <p class="fs-14 my-1">3 tacos</p>
-                                    <a href="#!" class="link-primary text-decoration-underline fw-semibold">View Details <i class="ri-arrow-right-up-line"></i></a>
-                                </div>
-                                <div class="ms-lg-auto">
-                                    <div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
-                                        <button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
-                                        <input type="number" class="text-dark text-center border-0 bg-body-secondary rounded h-100" value="2" min="0" max="100" readonly="">
-                                        <button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr>
-
-                            <div class="d-flex align-items-center justify-content-between px-1">
-                                <div>
-                                    <p class="text-dark fw-semibold fs-16 mb-0">$30.00 <small class="text-decoration-line-through text-muted ms-1">$34.00</small></p>
-                                </div>
-                                <div class="d-flex align-content-center gap-1">
-                                    <a href="#!" class="btn btn-soft-danger avatar-sm rounded d-flex align-items-center justify-content-center"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
-                                </div>
-                            </div>
+					<div class="border border-light mt-3 p-2 rounded">
+						<div class="d-flex flex-wrap align-items-center gap-3">
+							<div>
+								<a href="#!" class="text-dark fs-12 fw-bold">Italian Burata Pizza</a>
+								<p class="fs-10 my-1">12-Inch</p>
+							</div>
+							<div class="ms-lg-auto">
+								<div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
+									<button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
+									<input type="number" class="text-dark text-center border-0 bg-body-secondary rounded h-100" value="1" min="0" max="100" readonly="">
+									<button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
+								</div>
+							</div>
+						</div>
+						<div class="d-flex align-items-center justify-content-between px-1">
+							<div>
+								<p class="text-dark fw-semibold fs-16 mb-0">$12.00 </p>
+							</div>
+							<div class="d-flex align-content-center gap-1">
+								<a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center"><i class="ri-delete-bin-5-line align-middle fs-12"></i></a>
+							</div>
+						</div>
                     </div>
-                    <div class="mt-3 border border-light  p-2 rounded">
-                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                <div>
-                                    <a href="#!" class="text-dark fs-15 fw-bold">Veg Indian Thali</a>
-                                    <p class="fs-14 my-1">Single Person</p>
-                                    <a href="#!" class="link-primary text-decoration-underline fw-semibold">View Details <i class="ri-arrow-right-up-line"></i></a>
-                                </div>
-                                <div class="ms-lg-auto">
-                                    <div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
-                                        <button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
-                                        <input type="number" class="text-dark text-center border-0 bg-body-secondary rounded h-100" value="2" min="0" max="100" readonly="">
-                                        <button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr>
-
-                            <div class="d-flex align-items-center justify-content-between px-1">
-                                <div>
-                                    <p class="text-dark fw-semibold fs-16 mb-0">$38.00 <small class="text-decoration-line-through text-muted ms-1">$30.00</small></p>
-                                </div>
-                                <div class="d-flex align-content-center gap-1">
-                                    <a href="#!" class="btn btn-soft-danger avatar-sm rounded d-flex align-items-center justify-content-center"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
-                                </div>
-                            </div>
+					<div class="border border-light mt-3 p-2 rounded">
+						<div class="d-flex flex-wrap align-items-center gap-3">
+							<div>
+								<a href="#!" class="text-dark fs-12 fw-bold">Italian Burata Pizza</a>
+								<p class="fs-10 my-1">12-Inch</p>
+							</div>
+							<div class="ms-lg-auto">
+								<div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
+									<button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
+									<input type="number" class="text-dark text-center border-0 bg-body-secondary rounded h-100" value="1" min="0" max="100" readonly="">
+									<button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
+								</div>
+							</div>
+						</div>
+						<div class="d-flex align-items-center justify-content-between px-1">
+							<div>
+								<p class="text-dark fw-semibold fs-16 mb-0">$12.00 </p>
+							</div>
+							<div class="d-flex align-content-center gap-1">
+								<a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center"><i class="ri-delete-bin-5-line align-middle fs-12"></i></a>
+							</div>
+						</div>
                     </div>
-                    <div class="position-relative mt-3">
+					<div class="border border-light mt-3 p-2 rounded">
+						<div class="d-flex flex-wrap align-items-center gap-3">
+							<div>
+								<a href="#!" class="text-dark fs-12 fw-bold">Italian Burata Pizza</a>
+								<p class="fs-10 my-1">12-Inch</p>
+							</div>
+							<div class="ms-lg-auto">
+								<div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
+									<button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
+									<input type="number" class="text-dark text-center border-0 bg-body-secondary rounded h-100" value="1" min="0" max="100" readonly="">
+									<button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
+								</div>
+							</div>
+						</div>
+						<div class="d-flex align-items-center justify-content-between px-1">
+							<div>
+								<p class="text-dark fw-semibold fs-16 mb-0">$12.00 </p>
+							</div>
+							<div class="d-flex align-content-center gap-1">
+								<a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center"><i class="ri-delete-bin-5-line align-middle fs-12"></i></a>
+							</div>
+						</div>
+                    </div>
+                </div>
+            </div>
+			<div class="card"> 
+				<div class="card-body pt-0">
+					<div class="position-relative mt-3">
                             <div class="form-button">
                                 <form class="d-flex align-items-center justify-content-center">
                                     <input type="text" class="form-control border rounded" placeholder="Apply Coupon" required="" value="">
@@ -522,8 +588,8 @@
                             <a href="#!" class="btn btn-danger w-100"><i class="ri-close-circle-line"></i> Cancel</a>
                             <a href="#!" class="btn btn-primary w-100"><i class="ri-shopping-basket-2-line"></i> Order Placed</a>
                     </div>
-                </div>
-            </div>
+				</div>
+			</div>
         </div>
     </div>
 @endsection
