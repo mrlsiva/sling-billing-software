@@ -13,8 +13,11 @@
           <img src="{{asset('assets/images/sling-logo.png')}}" alt="user-image" class="img-fluid user-avtar">
         </div>
       @else
+        @php
+          $user = App\Models\User::where('user_name',request()->segment(1))->first();
+        @endphp
         <div class="col-md-6 logo-section text-center" style="background: #ccc;">
-          <img src="{{asset('assets/images/company/vasantham/logo.png')}}" alt="user-image" class="img-fluid user-avtar">
+          <img src="{{ asset('storage/' . $user->logo) }}" alt="user-image" class="img-fluid user-avtar">
         </div>
       @endif
       <!-- Right Side Login Form -->
@@ -39,11 +42,16 @@
           @endif
 
           <h2 class="mb-4 text-center">Login</h2>
-          <form class="row" action="{{route('sign_in')}}" method="post" enctype="multipart/form-data">
+          @if(request()->segment(1) === 'admin')
+            <form action="{{ route('admin.sign_in') }}" method="post" enctype="multipart/form-data">
+          @else
+            <form action="{{ route('sign_in', ['company' => request()->route('company')]) }}" method="post" enctype="multipart/form-data">
+          @endif
+
             @csrf
             <div class="mb-3">
-              <label for="email" class="form-label">Email address</label>
-              <input type="email" class="form-control" name="email" placeholder="Enter your email" required="">
+              <label for="user_name" class="form-label">Username</label>
+              <input type="text" class="form-control" name="user_name" placeholder="Enter your Username" required="">
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Password</label>

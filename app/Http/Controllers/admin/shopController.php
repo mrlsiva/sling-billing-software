@@ -3,19 +3,25 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Models\BankDetail;
 use App\Models\UserDetail;
+use App\Traits\common;
 use App\Models\User;
 use App\Traits\Log;
+use DB;
 
 class shopController extends Controller
 {
-    use Log;
+    use Log, common;
 
     public function index(Request $request)
     {
-        return view('admin.shops.index');
+        $shops = User::where([['role_id',2],['is_active',1]])->orderBy('id','desc')->paginate(30);
+        return view('admin.shops.index',compact('shops'));
     }
 
     public function create(Request $request)
@@ -28,11 +34,11 @@ class shopController extends Controller
         $request->validate([
             'logo' => 'required|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
-            'phone' => 'required|digits:10',
+            'phone' => 'required|digits:10|unique:users,phone',
             'phone1' => 'nullable|digits:10',
             'password' => 'required|min:6|confirmed', // optional confirmation
             'address' => 'nullable|string|max:255',
-            'slug_name' => 'required|alpha_dash|unique:users,slug_name',
+            'slug_name' => 'required|alpha_dash|unique:users,user_name',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
 
             'bank' => 'nullable|string|max:50',
@@ -70,15 +76,14 @@ class shopController extends Controller
 
         DB::beginTransaction();
 
-        $user = User::create([
+        $user = User::create([ 
             'role_id' => 2,
+            'unique_id' => $this->userUnique(),
             'name' => Str::ucfirst($request->name),
             'email' => $request->email,
-            'username' => $request->slug_name,
+            'user_name' => $request->slug_name,
             'phone' => $request->phone,
             'alt_phone' => $request->phone1,
-            'address' => $request->address,
-            'gst' => $request->gst,
             'password' => \Hash::make($request->password),
             'is_active' => 1,
             'is_lock' => 0,
@@ -89,34 +94,62 @@ class shopController extends Controller
             'created_by' => $user->id
         ]);
 
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . config('path.HO.logo');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            // Save to user
+            $user->logo = $filePath; // This is relative to storage/app/public
+            $user->save();
+        }
+
+
         $role = Role::where('id',2)->first()->name;
         $user->assignRole($role);
 
+        //Log
+        $this->addToLog($this->unique(),$user->id,'Shop Create','App/Models/User','users',$user->id,'Insert',null,$request,'Success','Shop Created Successfully');
+
         $user_detail = UserDetail::create([
             'user_id' => $user->id,
+            'address' => $request->address,
+            'gst' => $request->gst,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
         ]);
 
+        //Log
+        $this->addToLog($this->unique(),$user->id,'Shop Create','App/Models/UserDetail','user_details',$user_detail->id,'Insert',null,$request,'Success','Shop Created Successfully');
+
         $bank_detail = BankDetail::create([
             'user_id' => $user->id,
-            'name' => $request->name,
+            'name' => $request->bank,
             'branch' => $request->branch,
-            'account_no' => $request->account_no,
+            'account_no' => $request->account_number,
             'ifsc_code' => $request->ifsc_code,
         ]);
 
+        //Log
+        $this->addToLog($this->unique(),$user->id,'Shop Create','App/Models/BankDetail','bank_details',$bank_detail->id,'Insert',null,$request,'Success','Shop Created Successfully');
+
         DB::commit();
 
+        return redirect()->route('admin.shop.index')->with('toast_success', 'Shop created successfully.');
+
 
     }
 
-    public function view(Request $request)
+    public function view(Request $request,$id)
     {
-        return view('admin.shops.view');
+        $user = User::with(['user_detail', 'bank_detail'])->where('id', $id)->first();
+        return view('admin.shops.view',compact('user'));
     }
 
-    public function edit(Request $request)
+    public function edit(Request $request,$id)
     {
         return view('admin.shops.edit');
     }

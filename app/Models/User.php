@@ -44,4 +44,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function user_detail()
+    {
+        return $this->hasOne(UserDetail::class, 'user_id');
+    }
+
+    public function bank_detail()
+    {
+        return $this->hasOne(BankDetail::class, 'user_id');
+    }
 }

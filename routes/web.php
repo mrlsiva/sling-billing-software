@@ -15,8 +15,6 @@ Route::get('/', function () {
     return view('home');
 });
 
-Route::post('/sign_in',[loginController::class, 'sign_in'])->name('sign_in');
-
 if (request()->segment(1) === 'admin') 
 {
     require __DIR__.'/admin.php';
@@ -26,6 +24,8 @@ else
     Route::middleware(['is_company_valid'])->group(function () {
 
         Route::prefix('{company}')->group(function () {
+
+            Route::post('/sign_in',[loginController::class, 'sign_in'])->name('sign_in');
 
             Route::get('/', function () {
                 return view('users.home');
@@ -81,13 +81,20 @@ else
                         });
                     });
 
+                    Route::prefix('customers')->group(function () {
+                        Route::name('customer.')->group(function () {
+
+                            Route::get('/index',[customerController::class, 'index'])->name('index');
+                            Route::get('/create',[customerController::class, 'create'])->name('create');
+                            Route::get('/view',[customerController::class, 'view'])->name('view');
+                            Route::get('/edit',[customerController::class, 'edit'])->name('edit');
+                            
+                        });
+                    });
+
                 });
 
                 Route::group(['middleware' => ['role:Branch']], function () {
-
-                    Route::get('/dashboard', function () {
-                        return view('users.dashboard');
-                    })->name('dashboard');
 
                     Route::prefix('customers')->group(function () {
                         Route::name('customer.')->group(function () {
@@ -100,6 +107,8 @@ else
                         });
                     });
                 });
+
+                Route::get('/logout',[loginController::class, 'logout'])->name('logout');
 
             });
 

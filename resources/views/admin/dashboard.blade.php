@@ -8,67 +8,23 @@
     <div class="row">
         <div class="col-xl-12 col-md-12">
             <div class="row">
-                <div class="col-md-3 col-md-3">
-                    <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <p class="mb-3 card-title">Vasantham</p>
-                                        <h4 class="fw-bold d-flex align-items-center gap-2 mb-0">30 Orders</h4>
-                                    </div>
-                                    <div>
-                                        <a href="{{route('admin.shop.view')}}"> <i class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-md-3">
-                    <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <p class="mb-3 card-title">JN Textails</p>
-                                        <h4 class="fw-bold d-flex align-items-center gap-2 mb-0">30 Orders</h4>
-                                    </div>
-                                    <div>
-                                        <a href="{{route('admin.shop.view')}}"> <i class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>
+                @foreach($shops as $shop)
+                    <div class="col-md-3 col-md-3">
+                        <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <p class="mb-3 card-title">{{$shop->name}}</p>
+                                            <h4 class="fw-bold d-flex align-items-center gap-2 mb-0">30 Orders</h4>
+                                        </div>
+                                        <div>
+                                            <a href="{{route('admin.shop.view', ['id' => $shop->id])}}"> <i class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3 col-md-3">
-                    <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <p class="mb-3 card-title">Saravan Store</p>
-                                        <h4 class="fw-bold d-flex align-items-center gap-2 mb-0">30 Orders</h4>
-                                    </div>
-                                    <div>
-                                        <a href="{{route('admin.shop.view')}}"> <i class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-md-3">
-                    <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <p class="mb-3 card-title">Sathya Store</p>
-                                        <h4 class="fw-bold d-flex align-items-center gap-2 mb-0">30 Orders</h4>
-                                    </div>
-                                    <div>
-                                        <a href="{{route('admin.shop.view')}}"> <i class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-                
+                @endforeach
             </div>
         </div>
     </div>

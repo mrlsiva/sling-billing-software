@@ -17,94 +17,49 @@
 				</div>
 				<div class="">
 					<div class="table-responsive">
-							<table class="table align-middle mb-0 table-hover table-centered">
-								<thead class="bg-light-subtle">
+						<table class="table align-middle mb-0 table-hover table-centered">
+							<thead class="bg-light-subtle">
+								<tr>
+									<th>Shop Name</th>
+									<th>Slug Name</th>
+									<th>Mobile Number</th>
+									<th>Status</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach($shops as $shop)
 									<tr>
-										<th>Shop Name</th>
-										<th>Mobile Number</th>
-										<th>Address</th>
-										<th>No.Of Branches</th>
-										<th>Status</th>
-										<th>Next Payment</th>
-										<th>Action</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>Vasantham</td>
-										<td>9994090424</td>
-										<td>Madurai</td>
-										<td>4</td>
-										<td><span class="badge badge-soft-warning">Overdue</span></td>
-										<td>15-02-2024</td>
+										<td>{{$shop->name}}</td>
+										<td>{{$shop->user_name}}</td>
+										<td>{{$shop->phone}}</td>
+										<td>
+											@if($shop->is_lock == 1)
+												<span class="badge bg-soft-danger text-danger">Locked</span>
+											@elseif($shop->is_delete == 1)
+												<span class="badge bg-soft-danger text-danger">Deleted</span>
+											@elseif($shop->is_active == 0)
+												<span class="badge bg-soft-danger text-danger">In-active</span>
+											@else
+												<span class="badge bg-soft-success text-success">Active</span>
+											@endif
+										</td>
 										<td>
 											<div class="d-flex gap-3">
-												<a href="{{route('admin.shop.view')}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-												<a href="{{route('admin.shop.edit')}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
+												<a href="{{route('admin.shop.view', ['id' => $shop->id])}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
+												<a href="{{route('admin.shop.edit', ['id' => $shop->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
 												<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
 											</div>
 										</td>
 									</tr>
-									<tr>
-										<td>Saravana Store</td>
-										<td>9994090424</td>
-										<td>Madurai</td>
-										<td>1</td>
-										<td><span class="badge badge-soft-warning">Overdue</span></td>
-										<td>15-02-2024</td>
-										<td>
-											<div class="d-flex gap-3">
-												<a href="{{route('admin.shop.view')}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-												<a href="{{route('admin.shop.edit')}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
-												<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td>JN Textiles</td>
-										<td>9994090424</td>
-										<td>Chennai</td>
-										<td>4</td>
-										<td><span class="badge badge-soft-success">Active</span></td>
-										<td>15-02-2024</td>
-										<td>
-												<div class="d-flex gap-3">
-													<a href="{{route('admin.shop.view')}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-													<a href="{{route('admin.shop.edit')}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
-													<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
-												</div>
-										</td>
-									</tr>
-									<tr>
-										<td>Sathya</td>
-										<td>9994090424</td>
-										<td>Tuticorin</td>
-										<td>3</td>
-										<td><span class="badge badge-soft-danger">Inactive</span></td>
-										<td>15-02-2026</td>
-										<td>
-												<div class="d-flex gap-3">
-													<a href="{{route('admin.shop.view')}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-													<a href="{{route('admin.shop.edit')}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
-													<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
-												</div>
-										</td>
-									</tr>
-								</tbody>
-							</table>
+								@endforeach
+							</tbody>
+						</table>
 					</div>
 					<!-- end table-responsive -->
 				</div>
 				<div class="card-footer border-0">
-					<nav aria-label="Page navigation example">
-							<ul class="pagination justify-content-end mb-0">
-								<li class="page-item"><a class="page-link" href="javascript:void(0);"><i class="ri-arrow-left-s-line"></i></a></li>
-								<li class="page-item active"><a class="page-link" href="javascript:void(0);">1</a></li>
-								<li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
-								<li class="page-item"><a class="page-link" href="javascript:void(0);">3</a></li>
-								<li class="page-item"><a class="page-link" href="javascript:void(0);"><i class="ri-arrow-right-s-line"></i></a></li>
-							</ul>
-					</nav>
+					{!! $shops->withQueryString()->links('pagination::bootstrap-5') !!}
 				</div>
 			</div>
 		</div>

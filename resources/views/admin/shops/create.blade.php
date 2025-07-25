@@ -27,16 +27,17 @@
                         <div class="row">
                             <div class="col-xl-12 col-md-12 mb-3">
                                 <label for="name" class="form-label">Upload Shop Logo</label>
-                               <div class="input-group">
-                                    <input type="file" class="form-control">
+                                <div class="input-group">
+                                    <input type="file" name="logo" id="logo" class="form-control">
                                 </div>
+                                <div class="alert bg-soft-success m-2 secret" id="fileNameDisplay" role="alert"></div>
                             </div>
                             <div class="col-md-4">
                                 
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Shop Name</label>
                                     <span class="text-danger">*</span>
-                                    <input type="text" id="name" value="{{old('name')}}" class="form-control" placeholder="Enter Name">
+                                    <input type="text" name="name" id="name" value="{{old('name')}}" class="form-control" placeholder="Enter Name">
                                 </div>
                                 
                             </div>
@@ -46,7 +47,7 @@
                                 <div class="mb-3">
                                     <label for="phone" class="form-label">Mobile Number</label>
                                     <span class="text-danger">*</span>
-                                    <input type="tel" id="phone" value="{{old('phone')}}" class="form-control" placeholder="Enter Mobile Number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
+                                    <input type="tel" name="phone" id="phone" value="{{old('phone')}}"  class="form-control" placeholder="Enter Mobile Number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
                                 </div>
                                 
                             </div>
@@ -54,7 +55,7 @@
                                 
                                 <div class="mb-3">
                                     <label for="phone1" class="form-label">Alternate Mobile Number</label>
-                                    <input type="tel" id="phone1" class="form-control" value="{{old('phone1')}}" placeholder="Enter Alternate Mobile Number"  maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
+                                    <input type="tel" name="phone1" id="phone1" class="form-control" value="{{old('phone1')}}" placeholder="Enter Alternate Mobile Number"  maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
                                 </div>
                                 
                             </div>
@@ -70,7 +71,7 @@
                                 
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
-                                    <input type="email" id="email" value="{{old('email')}}" class="form-control" placeholder="Enter Email">
+                                    <input type="email" name="email" id="email" value="{{old('email')}}" class="form-control" placeholder="Enter Email">
                                 </div>
                                 
                             </div>
@@ -80,7 +81,7 @@
                                 <div class="mb-3">
                                     <label for="slug_name" class="form-label">Slug Name</label>
                                     <span class="text-danger">*</span>
-                                    <input type="text" id="slug_name" value="{{old('slug_name')}}" class="form-control" placeholder="Enter Slug Name">
+                                    <input type="text" id="slug_name" name="slug_name" value="{{old('slug_name')}}" class="form-control" placeholder="Enter Slug Name">
                                 </div>
                                 
                             </div>
@@ -90,7 +91,7 @@
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Password</label>
                                     <span class="text-danger">*</span>
-                                    <input type="password" id="password" value="{{old('password')}}" class="form-control" placeholder="Enter Password">
+                                    <input type="password" id="password" name="password" value="{{old('password')}}" class="form-control" placeholder="Enter Password">
                                 </div>
                                 
                             </div>
@@ -98,9 +99,9 @@
                             <div class="col-md-4">
                                 
                                 <div class="mb-3">
-                                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                                    <label for="password_confirmation" class="form-label">Confirm Password</label>
                                     <span class="text-danger">*</span>
-                                    <input type="password" name="confirm_password" id="confirm_password" value="{{old('confirm_password')}}" class="form-control" placeholder="Confirm Password">
+                                    <input type="password" name="password_confirmation" id="password_confirmation" value="{{old('password_confirmation')}}" class="form-control" placeholder="Confirm Password">
                                 </div>
                                 
                             </div>

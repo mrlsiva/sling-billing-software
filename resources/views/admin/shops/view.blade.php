@@ -10,20 +10,10 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
-                            <p class="card-title mb-0"> <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-dark me-1" alt="user-profile-image" height="24"> Vasantham</p>
+                        <p class="card-title mb-0"> <img src="{{ asset('storage/' . $user->logo) }}" class="logo-dark me-1" alt="user-profile-image" height="24">{{$user->name}}</p>
                     </div>
                     <div class="d-flex gap-3">
-                        <!-- <a href="{{route('admin.shop.edit')}}" class="btn btn-sm btn-primary"><i class="ri-edit-line align-middle fs-20"></i> Edit</a> -->
-                        <a href="{{route('admin.shop.edit')}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
-                        <!-- <div class="dropdown">
-                            <a href="#" class="dropdown-toggle btn btn-sm btn-outline-light rounded" data-bs-toggle="dropdown" aria-expanded="false">
-                                Reports
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a href="#!" class="dropdown-item">Export</a>
-                                <a href="#!" class="dropdown-item">Import</a>
-                            </div>
-                        </div> -->
+                        <a href="{{route('admin.shop.edit', ['id' => $user->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
                     </div>
                 </div>
             </div>
@@ -38,32 +28,36 @@
                 </div>
                 <div class="card-body">
                     <div class="pb-3 border-bottom">
-                            <h5 class="text-dark fs-12 text-uppercase fw-bold">Shop Name :</h5>
-                            <p class="fw-medium mb-0">Vasantham</p>
+                        <h5 class="text-dark fs-12 text-uppercase fw-bold">Shop Name :</h5>
+                        <p class="fw-medium mb-0">{{$user->name}}</p>
+                    </div>
+                    <div class="py-3 border-bottom">
+                        <h5 class="text-dark fs-12 text-uppercase fw-bold">Slug Name :</h5>
+                        <p class="fw-medium mb-0">{{$user->user_name}}</p>
                     </div>
                     <div class="py-3 border-bottom">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Phone Number :</h5>
-                            <p class="fw-medium mb-0">+91 9876543210 | +91 9876543210</p>
+                            <p class="fw-medium mb-0">{{$user->phone}} @if($user->alt_phone != null) | {{$user->alt_phone}} @endif</p>
                     </div>
                     <div class="py-3 border-bottom">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Address :</h5>
-                            <p class="fw-medium mb-0">Tuticorin</p>
+                            <p class="fw-medium mb-0">@if($user->address != null) {{$user->user_detail->address}} @else - @endif</p>
                     </div>
                     <div class="py-3 border-bottom">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Email :</h5>
-                            <p class="fw-medium mb-0">shop@email.com</p>
+                            <p class="fw-medium mb-0">@if($user->email != null) {{$user->user_detail->email}} @else - @endif</p>
                     </div>
                     <div class="py-3 border-bottom">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Company GSTin :</h5>
-                            <p class="fw-medium mb-0">DFAPM6788N</p>
+                            <p class="fw-medium mb-0">@if($user->user_detail->gst != null) {{$user->user_detail->gst}} @else - @endif</p>
                     </div>
                     <div class="pt-3">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Primary Color :</h5>
-                            <p class="fw-medium mb-0">#ffffff</p>
+                            <p class="fw-medium mb-0">@if($user->user_detail->primary_colour != null) {{$user->user_detail->primary_colour}} @else - @endif</p>
                     </div>
                     <div class="pt-3">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Secondary Color :</h5>
-                            <p class="fw-medium mb-0">#000000</p>
+                            <p class="fw-medium mb-0">@if($user->user_detail->secondary_colour != null) {{$user->user_detail->secondary_colour}} @else - @endif</p>
                     </div>
                 </div>
             </div>
@@ -77,13 +71,11 @@
                     </div>
                 </div>
                 <div class="card-body">
-
                     <div class="">
-                            <p class="fw-medium mb-0">Vasantham Company</p>
-                            <p class="fw-medium mb-0">SBI Bank</p>
-                            <p class="fw-medium mb-0">1000089328</p>
-                            <p class="fw-medium mb-0">Vembar</p>
-                            <p class="fw-medium mb-0">IFAB0006</p>
+                        <p class="fw-medium mb-0">@if($user->bank_detail->name != null) {{$user->bank_detail->name}} @else - @endif</p>
+                        <p class="fw-medium mb-0">@if($user->bank_detail->branch != null) {{$user->bank_detail->branch}} @else - @endif</p>
+                        <p class="fw-medium mb-0">@if($user->bank_detail->account_no != null) {{$user->bank_detail->account_no}} @else - @endif</p>
+                        <p class="fw-medium mb-0">@if($user->bank_detail->ifsc_code != null) {{$user->bank_detail->ifsc_code}} @else - @endif</p>
                     </div>
                 </div>
             </div>

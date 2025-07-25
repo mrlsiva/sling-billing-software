@@ -15,6 +15,13 @@
 	<link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
     <script src="{{ asset('assets/js/config.min.js') }}"></script>
+
+    <style type="text/css">
+        .secret{
+            display: none!important;
+        }
+    </style>
+
 </head>
 <body>
 	
@@ -61,7 +68,7 @@
                     <ul class="navbar-nav" id="navbar-nav">
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('dashboard')}}">
+                            <a class="menu-link" href="{{route('dashboard', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-dashboard-2-line"></i>
                                 </span>
@@ -79,10 +86,10 @@
                             <div class="collapse" id="sidebarCategories">
                                 <ul class="sub-menu-nav">
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="{{route('category.index')}}">Category</a>
+                                        <a class="sub-menu-link" href="{{route('category.index', ['company' => request()->route('company')])}}">Category</a>
                                     </li>
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="{{route('sub_category.index')}}">Sub Category</a>
+                                        <a class="sub-menu-link" href="{{route('sub_category.index', ['company' => request()->route('company')])}}">Sub Category</a>
                                     </li>
                                 </ul>
                             </div>
@@ -98,10 +105,10 @@
                             <div class="collapse" id="sidebarProduct">
                                 <ul class="sub-menu-nav">
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="{{route('product.index')}}">Listing</a>
+                                        <a class="sub-menu-link" href="{{route('product.index', ['company' => request()->route('company')])}}">Listing</a>
                                     </li>
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="{{route('inventory.index')}}">Inventory</a>
+                                        <a class="sub-menu-link" href="{{route('inventory.index', ['company' => request()->route('company')])}}">Inventory</a>
                                     </li>
                                 </ul>
                             </div>
@@ -113,6 +120,15 @@
                                     <i class="ri-shopping-cart-line"></i>
                                 </span>
                                 <span class="nav-text"> Orders </span>
+                            </a>
+                        </li>
+
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('customer.index', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-group-2-line"></i>
+                                </span>
+                                <span class="nav-text"> Customers </span>
                             </a>
                         </li>
                         
@@ -242,9 +258,15 @@
                                 <a class="dropdown-item" href="#">
                                     <i class="bx bx-lock fs-18 align-middle me-2"></i><span class="align-middle">Lock screen</span>
                                 </a>
-                                <a class="dropdown-item" href="{{route('admin.logout')}}">
-                                    <i class="bx bx-log-out fs-18 align-middle me-2"></i><span class="align-middle">Logout</span>
-                                </a>
+                                @if (request()->segment(1) === 'admin')
+                                    <a class="dropdown-item" href="{{route('admin.logout')}}">
+                                        <i class="bx bx-log-out fs-18 align-middle me-2"></i><span class="align-middle">Logout</span>
+                                    </a>
+                                @else
+                                    <a class="dropdown-item" href="{{route('logout', ['company' => request()->route('company')])}}">
+                                        <i class="bx bx-log-out fs-18 align-middle me-2"></i><span class="align-middle">Logout</span>
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -279,5 +301,39 @@
     <script src="{{ asset('assets/js/pages/dashboard.js') }}"></script>
 	<!-- Page Js -->
     <script src="{{ asset('assets/js/pages/categories.js') }}"></script>
+    <script>
+        document.addEventListener("toast", function (e) {
+            const d = e.detail;
+            Toastify({
+                text: d.text,
+                gravity: d.gravity,
+                position: d.position,
+                className: d.className,
+                duration: d.duration,
+                close: true,
+                style: d.style
+            }).showToast();
+        });
+    </script>
+
+    @if (session('toast_success'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const event = new CustomEvent("toast", {
+                    detail: {
+                        text: "{{ session('toast_success') }}",
+                        gravity: "top",      // top / bottom
+                        position: "right",   // left / center / right
+                        className: "success", // success, error, info, etc. depending on your toast lib
+                        duration: 10000,
+                        close: "close",
+                        style: "style"
+                    }
+                });
+                document.dispatchEvent(event);
+            });
+        </script>
+    @endif
+
 </body>
 </html>

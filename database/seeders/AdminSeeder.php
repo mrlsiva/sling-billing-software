@@ -20,13 +20,11 @@ class AdminSeeder extends Seeder
             DB::beginTransaction();
             $user = User::create([
                 'role_id' => 1,
-                'unique_id' => '10000',
+                'unique_id' => 'U-00001',
                 'name' => 'Super Admin',
                 'user_name' => 'super_admin',
                 'email' => 'super_admin@admin.com',
                 'phone' => '1234567890',
-                'address' => 'Tuticorin',
-                'gst' => '12345',
                 'password' => \Hash::make('Admin@2025'),
                 'is_active' => 1,
                 'is_lock' => 0,
