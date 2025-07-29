@@ -41,11 +41,11 @@
                     </div>
                     <div class="py-3 border-bottom">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Address :</h5>
-                            <p class="fw-medium mb-0">@if($user->address != null) {{$user->user_detail->address}} @else - @endif</p>
+                            <p class="fw-medium mb-0">@if($user->user_detail->address != null) {{$user->user_detail->address}} @else - @endif</p>
                     </div>
                     <div class="py-3 border-bottom">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Email :</h5>
-                            <p class="fw-medium mb-0">@if($user->email != null) {{$user->user_detail->email}} @else - @endif</p>
+                            <p class="fw-medium mb-0">@if($user->email != null) {{$user->email}} @else - @endif</p>
                     </div>
                     <div class="py-3 border-bottom">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Company GSTin :</h5>

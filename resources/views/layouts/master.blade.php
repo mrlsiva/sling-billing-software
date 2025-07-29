@@ -163,18 +163,33 @@
             </div>
         </div>
         <header class="topbar d-flex">
-
+            @php
+                $user = App\Models\User::where('user_name',request()->segment(1))->first();
+            @endphp
             <!-- Sidebar Logo -->
             <div class="logo-box">
-                <a href="#" class="logo-dark">
-                    <img src="assets/images/logo-sm.png" class="logo-sm" alt="logo sm">
-                    <img src="assets/images/logo-dark.png" class="logo-lg" alt="logo dark">
-                </a>
+                @if(request()->segment(1) === 'admin')
+                    <a href="#" class="logo-dark">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo dark">
+                    </a>
 
-                <a href="#" class="logo-light">
-                    <img src="assets/images/logo-sm.png" class="logo-sm" alt="logo sm">
-                    <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light">
-                </a>
+                    <a href="#" class="logo-light">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light">
+                    </a>
+                    
+                @else
+                    <a href="#" class="logo-dark">
+                        <img src="{{ asset('storage/' . $user->logo) }}" class="logo-sm" alt="logo sm">
+                        <img src="{{ asset('storage/' . $user->logo) }}" class="logo-lg" alt="logo dark">
+                    </a>
+
+                    <a href="#" class="logo-light">
+                        <img src="{{ asset('storage/' . $user->logo) }}" class="logo-sm" alt="logo sm">
+                        <img src="{{ asset('storage/' . $user->logo) }}" class="logo-lg" alt="logo light">
+                    </a>
+                @endif
             </div>
 
             <div class="container">
