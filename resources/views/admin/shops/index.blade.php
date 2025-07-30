@@ -23,6 +23,8 @@
 									<th>Shop Name</th>
 									<th>Slug Name</th>
 									<th>Mobile Number</th>
+									<th>Payment Method</th>
+									<th>Payment Date</th>
 									<th>Status</th>
 									<th>Action</th>
 								</tr>
@@ -33,6 +35,8 @@
 										<td>{{$shop->name}}</td>
 										<td>{{$shop->user_name}}</td>
 										<td>{{$shop->phone}}</td>
+										<td>Yearly</td>
+										<td>30-07-2026</td>
 										<td>
 											@if($shop->is_lock == 1)
 												<span class="badge bg-soft-danger text-danger">Locked</span>
@@ -48,6 +52,7 @@
 											<div class="d-flex gap-3">
 												<a href="{{route('admin.shop.view', ['id' => $shop->id])}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
 												<a href="{{route('admin.shop.edit', ['id' => $shop->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
+
 												<a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
 											</div>
 										</td>

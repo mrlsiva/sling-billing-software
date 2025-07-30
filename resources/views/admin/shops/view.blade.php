@@ -13,7 +13,10 @@
                         <p class="card-title mb-0"> <img src="{{ asset('storage/' . $user->logo) }}" class="logo-dark me-1" alt="user-profile-image" height="24">{{$user->name}}</p>
                     </div>
                     <div class="d-flex gap-3">
-                        <a href="{{route('admin.shop.edit', ['id' => $user->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
+                        <a href="#!" class="link-warning"><i class="ri-lock-line align-middle fs-20"></i> Shop Locked</a>
+                        <a href="#!" class="link-success"><i class="ri-lock-unlock-line align-middle fs-20"></i> Shop Active</a>
+                        <a href="{{route('admin.shop.edit', ['id' => $user->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i>Edit Shop</a>
+                        
                     </div>
                 </div>
             </div>

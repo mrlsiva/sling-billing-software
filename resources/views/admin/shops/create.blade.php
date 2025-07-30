@@ -133,6 +133,21 @@
 
                                 
                             </div>
+                            <div class="col-md-4">
+                                
+                                <div class="mb-3">
+                                    <label for="secondary_colour" class="form-label">Payment Method</label>
+                                    <select class="form-control" data-choices name="choices-single-default" id="choices-single-default">
+                                        <option value=""> Choose Payment</option>
+                                        <option value="Choice 1">Monthly</option>
+                                        <option value="Choice 2">Quarterly</option>
+                                        <option value="Choice 3">Semi-Yearly</option>
+                                        <option value="Yearly">Yearly</option>
+                                    </select>
+                                </div>
+
+                                
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -151,7 +166,14 @@
                                     </div>
                                 
                             </div>
-                            
+                            <div class="col-md-4">
+                                
+                                    <div class="mb-3">
+                                        <label for="bank" class="form-label">Account Holder Name</label>
+                                        <input type="text" id="bank" name="bank" class="form-control" placeholder="Enter Account Holder Name" value=" ">
+                                    </div>
+                                
+                            </div>
                             <div class="col-md-4">
                                 
                                     <div class="mb-3">
