@@ -125,28 +125,23 @@
                                 
                             </div>
                             <div class="col-md-4">
-                                
                                 <div class="mb-3">
                                     <label for="secondary_colour" class="form-label">Secondary Color</label>
                                     <input type="color" id="secondary_colour" name="secondary_colour" value="{{old('secondary_colour')}}" class="form-control" placeholder="Enter Secondary Color code">
                                 </div>
-
-                                
                             </div>
+                            
                             <div class="col-md-4">
-                                
                                 <div class="mb-3">
                                     <label for="secondary_colour" class="form-label">Payment Method</label>
-                                    <select class="form-control" data-choices name="choices-single-default" id="choices-single-default">
+                                    <select class="form-control" data-choices name="payment_method" id="payment_method">
                                         <option value=""> Choose Payment</option>
-                                        <option value="Choice 1">Monthly</option>
-                                        <option value="Choice 2">Quarterly</option>
-                                        <option value="Choice 3">Semi-Yearly</option>
-                                        <option value="Yearly">Yearly</option>
+                                        <option value="1">Monthly</option>
+                                        <option value="2">Quarterly</option>
+                                        <option value="3">Semi-Yearly</option>
+                                        <option value="4">Yearly</option>
                                     </select>
                                 </div>
-
-                                
                             </div>
                         </div>
                     </div>
@@ -170,7 +165,7 @@
                                 
                                     <div class="mb-3">
                                         <label for="bank" class="form-label">Account Holder Name</label>
-                                        <input type="text" id="bank" name="bank" class="form-control" placeholder="Enter Account Holder Name" value=" ">
+                                        <input type="text" id="holder_name" name="holder_name" class="form-control" placeholder="Enter Account Holder Name" value="{{old('holder_name')}}">
                                     </div>
                                 
                             </div>

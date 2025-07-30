@@ -21,7 +21,7 @@ class shopController extends Controller
 
     public function index(Request $request)
     {
-        $shops = User::where([['role_id',2],['is_active',1]])->orderBy('id','desc')->paginate(30);
+        $shops = User::with(['user_detail', 'bank_detail'])->where('role_id',2)->orderBy('id','desc')->paginate(30);
         return view('admin.shops.index',compact('shops'));
     }
 
@@ -42,8 +42,10 @@ class shopController extends Controller
             'address' => 'nullable|string|max:255',
             'slug_name' => 'required|alpha_dash|unique:users,user_name',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
+            'payment_method' => 'nullable|string|max:255',
 
             'bank' => 'nullable|string|max:50',
+            'name' => 'nullable|string|max:50',
             'account_number' => 'nullable|digits:16',
             'confirm_account_number' => 'nullable|same:account_number',
             'branch' => 'nullable|string|max:50',
@@ -120,6 +122,7 @@ class shopController extends Controller
             'user_id' => $user->id,
             'address' => $request->address,
             'gst' => $request->gst,
+            'payment_method' => $request->payment_method,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
         ]);
@@ -130,6 +133,7 @@ class shopController extends Controller
         $bank_detail = BankDetail::create([
             'user_id' => $user->id,
             'name' => $request->bank,
+            'holder_name' => $request->name,
             'branch' => $request->branch,
             'account_no' => $request->account_number,
             'ifsc_code' => $request->ifsc_code,
@@ -165,6 +169,7 @@ class shopController extends Controller
             'email' => 'nullable|email|unique:users,email,'.$request->id.',id',
             'phone' => 'required|digits:10|unique:users,phone,'.$request->id.',id',
             'phone1' => 'nullable|digits:10',
+            'password' => 'nullable|min:6|confirmed', // optional confirmation
             'address' => 'nullable|string|max:255',
             'slug_name' => 'required|alpha_dash|unique:users,user_name,'.$request->id.',id',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
@@ -183,6 +188,9 @@ class shopController extends Controller
             'phone.required' => 'Phone number is required.',
             'phone.digits' => 'Phone number must be exactly 10 digits.',
             'phone1.digits' => 'Alternate phone number must be exactly 10 digits.',
+
+            'password.min' => 'Password must be at least 6 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
             
             'address.required' => 'Address is required.',
             'slug_name.required' => 'Slug name is required.',
@@ -224,12 +232,21 @@ class shopController extends Controller
             ]);
         }
 
+        if($request->password != null)
+        {
+            $user->update([ 
+                'password' => \Hash::make($request->password),
+            ]);
+        }
+
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Shop Update','App/Models/User','users',$user->id,'Update',null,$request,'Success','Shop Updated Successfully');
 
         $user_detail->update([
             'address' => $request->address,
             'gst' => $request->gst,
+            'payment_method' => $request->payment_method,
+            'payment_date' => $request->payment_date,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
         ]);
@@ -239,6 +256,7 @@ class shopController extends Controller
 
         $bank_detail->update([
             'name' => $request->bank,
+            'holder_name' => $request->name,
             'branch' => $request->branch,
             'account_no' => $request->account_number,
             'ifsc_code' => $request->ifsc_code,
@@ -251,6 +269,42 @@ class shopController extends Controller
 
         return redirect()->back()->with('toast_success', 'Shop updated successfully.');
 
+    }
+
+    public function lock(Request $request,$id)
+    {
+        $user = User::find($id);
+
+        if ($user) {
+            $user->is_lock = $user->is_lock == 1 ? 0 : 1;
+            $user->save();
+        }
+
+        $user = User::find($id);
+
+        $statusText = $user->is_lock == 1 ? 'Shop locked Successfully' : 'Shop unlocked Successfully';
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Shop Update','App/Models/User','users',$id,'Update',null,null,'Success',$statusText);
+
+        return redirect()->back()->with('toast_success', $statusText);
+    }
+
+    public function delete(Request $request,$id)
+    {
+        $user = User::find($id);
+
+        if ($user) {
+            $user->is_delete = 1;
+            $user->save();
+        }
+
+        $user = User::find($id);
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Shop Delete','App/Models/User','users',$id,'Delete',null,null,'Success','Shop Deleted Successfully');
+
+        return redirect()->back()->with('toast_success', 'Shop Deleted Successfully');
     }
 
 }

@@ -25,6 +25,8 @@ Route::group(['middleware' => ['auth','role:Super Admin']], function () {
 	    	Route::get('/{id}/view',[shopController::class, 'view'])->name('view');
 	    	Route::get('/{id}/edit',[shopController::class, 'edit'])->name('edit');
 	    	Route::post('/update',[shopController::class, 'update'])->name('update');
+	    	Route::get('/{id}/lock',[shopController::class, 'lock'])->name('lock');
+	    	Route::get('/{id}/delete',[shopController::class, 'delete'])->name('delete');
 	    	
 		});
 	});
