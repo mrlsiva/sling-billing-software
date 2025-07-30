@@ -47,6 +47,9 @@ else
                         Route::name('category.')->group(function () {
 
                             Route::get('/index',[categoryController::class, 'index'])->name('index');
+                            Route::post('/store',[categoryController::class, 'store'])->name('store');
+                            Route::get('/edit',[categoryController::class, 'edit'])->name('edit');
+                            Route::post('/update',[categoryController::class, 'update'])->name('update');
                             
                         });
                     });

@@ -309,7 +309,7 @@
     </div>
 	@yield('modal')
 
-	@yield('script')
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ asset('assets/js/vendor.js') }}"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
 	<!-- Dashboard Js -->
@@ -351,5 +351,6 @@
     @endif
 
     <script src="{{ asset('assets/js/pages/pos.js') }}"></script>
+    @yield('script')
 </body>
 </html>

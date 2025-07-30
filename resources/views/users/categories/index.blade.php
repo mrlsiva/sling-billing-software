@@ -10,16 +10,28 @@
 			<div class="card">
 				<div class="card-header d-flex justify-content-between align-items-center">
 					<div>
-							<p class="card-title">All Category</p>
+						<p class="card-title">All Category</p>
 					</div>
-					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#exampleModalCenteredScrollable"><i class='bx bxs-folder-plus'></i> Create Category</a>
+					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#categoryAdd"><i class='bx bxs-folder-plus'></i> Create Category</a>
 				</div>
+
+				@if ($errors->any())
+		            <div class="alert alert-danger">
+		                <strong>Whoops!</strong> There were some problems with your input.<br><br>
+		                <ul>
+		                    @foreach ($errors->all() as $error)
+		                        <li>{{ $error }}</li>
+		                    @endforeach
+		                </ul>
+		            </div>
+		        @endif
+
 				<div class="">
 					<div class="table-responsive">
 						<table class="table align-middle mb-0 table-hover table-centered">
 							<thead class="bg-light-subtle">
 								<tr>
-									<th>Category ID</th>
+									<th>S.No</th>
 									<th>Category Name</th>
 									<th>No.Of sub Category</th>
 									<th>Status</th>
@@ -27,21 +39,27 @@
 								</tr>
 							</thead>
 							<tbody>
+									@foreach($categories as $category)
 									<tr>
-										<td>1</td>
-										<td>-</td>
-										<td>10</td>
 										<td>
-											<span class="badge bg-soft-success text-success">Active</span>
+											{{ ($categories->currentPage() - 1) * $categories->perPage() + $loop->iteration }}
+										</td>
+										<td>{{$category->name}}</td>
+										<td>{{$category->sub_categories->count()}}</td>
+										<td>
+											@if($category->is_active == 1)
+												<span class="badge bg-soft-success text-success">Active</span>
+											@else
+												<span class="badge bg-soft-danger text-danger">In-Active</span>
+											@endif
 										</td>
 										<td>
 											<div class="d-flex gap-3">
-												<a href="" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-												<a href="" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
-												<a href="" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
+												<a href="#!" onclick="category_edit(this)" class="link-dark" data-system_id="{{$category->id}}"><i class="ri-edit-line align-middle fs-20"></i></a>
 											</div>
 										</td>
 									</tr>
+									@endforeach
 							</tbody>
 						</table>
 					</div>
@@ -51,30 +69,65 @@
 			</div>
 		</div>
 	</div>
-    <div class="modal fade" id="exampleModalCenteredScrollable" tabindex="-1" aria-labelledby="exampleModalCenteredScrollableTitle" aria-hidden="true">
+
+    <div class="modal fade" id="categoryAdd" tabindex="-1" aria-labelledby="categoryAdd" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" >
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add Category</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                   <div class="row">
-                    <div class="col-md-12">
-                        
-                        <div class="mb-3">
-                            <label for="choices-single-groups" class="form-label text-muted">Category Name</label>
-                            <input type="text" id="simpleinput" class="form-control">
-                        </div>
-                    </div>
-                    
-                   </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
+                <form class="row" action="{{route('category.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                	@csrf
+	                <div class="modal-body">
+	                   <div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Category Name</label>
+		                            <input type="text" id="category" name="category" class="form-control">
+		                        </div>
+		                    </div>
+	                   </div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	                    <button type="submit" class="btn btn-primary">Save changes</button>
+	                </div>
+                </form>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="categoryEdit" tabindex="-1" aria-labelledby="categoryEdit" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Edit Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="row" action="{{route('category.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                	@csrf
+	                <div class="modal-body">
+	                   <div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Category Name</label>
+		                            <input type="text" id="category_name" name="category_name" class="form-control">
+		                            <input type="hidden" name="category_id" id="category_id">
+		                        </div>
+		                    </div>
+	                   </div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	                    <button type="submit" class="btn btn-primary">Save changes</button>
+	                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('script')
+<script src="{{asset('assets/js/users/category.js')}}"></script>
 @endsection
