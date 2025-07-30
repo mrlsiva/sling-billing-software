@@ -82,4 +82,23 @@ class categoryController extends Controller
 
         return redirect()->back()->with('toast_success', 'Category updated successfully.');
     }
+
+    public function status(Request $request)
+    {
+        $category = Category::find($request->id);
+
+        if ($category) {
+            $category->is_active = $category->is_active == 1 ? 0 : 1;
+            $category->save();
+        }
+
+        $category = Category::find($request->id);
+
+        $statusText = $category->is_active == 1 ? 'Category changed to active state' : 'Category changed to in-active state';
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Category Status Update','App/Models/Category','categories',$request->id,'Update',null,null,'Success',$statusText);
+
+        return redirect()->back()->with('toast_success', "Category Status Changed");
+    }
 }

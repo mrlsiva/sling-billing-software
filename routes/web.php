@@ -50,6 +50,7 @@ else
                             Route::post('/store',[categoryController::class, 'store'])->name('store');
                             Route::get('/edit',[categoryController::class, 'edit'])->name('edit');
                             Route::post('/update',[categoryController::class, 'update'])->name('update');
+                            Route::post('/status',[categoryController::class, 'status'])->name('status');
                             
                         });
                     });
@@ -58,6 +59,10 @@ else
                         Route::name('sub_category.')->group(function () {
 
                             Route::get('/index',[subCategoryController::class, 'index'])->name('index');
+                            Route::post('/store',[subCategoryController::class, 'store'])->name('store');
+                            Route::get('/edit',[subCategoryController::class, 'edit'])->name('edit');
+                            Route::post('/update',[subCategoryController::class, 'update'])->name('update');
+                            Route::post('/status',[subCategoryController::class, 'status'])->name('status');
                             
                         });
                     });

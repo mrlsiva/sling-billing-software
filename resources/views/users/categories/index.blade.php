@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-<title>{{ config('app.name')}} | Shop Create</title>
+<title>{{ config('app.name')}} | Category Create</title>
 @endsection
 
 @section('body')
@@ -34,6 +34,7 @@
 									<th>S.No</th>
 									<th>Category Name</th>
 									<th>No.Of sub Category</th>
+									<th>Active / In-Active</th>
 									<th>Status</th>
 									<th>Action</th>
 								</tr>
@@ -46,6 +47,15 @@
 										</td>
 										<td>{{$category->name}}</td>
 										<td>{{$category->sub_categories->count()}}</td>
+										<td>
+											<form action="{{ route('category.status', ['company' => request()->route('company')]) }}" method="post">
+												@csrf
+												<input type="hidden" name="id" value="{{$category->id}}">
+											    <div class="form-check form-switch">
+											        <input class="form-check-input" type="checkbox" name="is_active" onchange="this.form.submit()" {{ $category->is_active == 1 ? 'checked' : '' }}>
+											    </div>
+											</form>
+										</td>
 										<td>
 											@if($category->is_active == 1)
 												<span class="badge bg-soft-success text-success">Active</span>
