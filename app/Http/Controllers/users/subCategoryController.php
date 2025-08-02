@@ -39,6 +39,7 @@ class subCategoryController extends Controller
         DB::beginTransaction();
 
         $sub_category = SubCategory::create([ 
+            'user_id' => Auth::user()->id,
             'category_id' => $request->category,
             'name' => Str::ucfirst($request->sub_category),
             'is_active' => 1,

@@ -33,6 +33,7 @@ class categoryController extends Controller
         DB::beginTransaction();
 
         $category = Category::create([ 
+            'user_id' => Auth::user()->id,
             'name' => Str::ucfirst($request->category),
             'is_active' => 1,
         ]);

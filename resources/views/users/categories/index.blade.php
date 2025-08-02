@@ -83,6 +83,9 @@
 					</div>
 					<!-- end table-responsive -->
 				</div>
+				<div class="card-footer border-0">
+					{!! $categories->withQueryString()->links('pagination::bootstrap-5') !!}
+				</div>
 				
 			</div>
 		</div>

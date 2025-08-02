@@ -85,6 +85,10 @@
 					</div>
 					<!-- end table-responsive -->
 				</div>
+
+				<div class="card-footer border-0">
+					{!! $sub_categories->withQueryString()->links('pagination::bootstrap-5') !!}
+				</div>
 				
 			</div>
 		</div>
@@ -115,7 +119,7 @@
 	                	<div class="row">
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">Sub Category</label>
+		                            <label for="choices-single-groups" class="form-label text-muted">Category</label>
 		                            <select class="form-control" data-choices name="category" id="category">
                                         <option value=""> Select </option>
                                         @foreach($categories as $category)
