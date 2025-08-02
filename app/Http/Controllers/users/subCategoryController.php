@@ -27,10 +27,13 @@ class subCategoryController extends Controller
         $request->validate([
             'category' => 'required',
             'sub_category' => 'required',
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
         ], 
         [
             'category.required' => 'Category is required.',
             'sub_category.required' => 'Sub Category is required.',
+            'image.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
+            'image.max' => 'Logo size must not exceed 2MB.',
         ]);
 
         DB::beginTransaction();
@@ -40,6 +43,19 @@ class subCategoryController extends Controller
             'name' => Str::ucfirst($request->sub_category),
             'is_active' => 1,
         ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.sub_category');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            // Save to user
+            $sub_category->image = $filePath; // This is relative to storage/app/public
+            $sub_category->save();
+        }
 
         DB::commit();
 
@@ -65,12 +81,15 @@ class subCategoryController extends Controller
     public function update(Request $request)
     {
         $request->validate([
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'category_id' => 'required',
             'sub_category_name' => 'required',
         ], 
         [
             'category_id.required' => 'Category is required.',
             'sub_category_name.required' => 'Sub Category is required.',
+            'image.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
+            'image.max' => 'Logo size must not exceed 2MB.',
         ]);
 
         DB::beginTransaction();
@@ -81,6 +100,19 @@ class subCategoryController extends Controller
             'category_id' => $request->category_id,
             'name' => Str::ucfirst($request->sub_category_name),
         ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.sub_category');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            // Save to user
+            $sub_category->image = $filePath; // This is relative to storage/app/public
+            $sub_category->save();
+        }
 
         DB::commit();
 

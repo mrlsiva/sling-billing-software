@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -36,6 +37,19 @@ class categoryController extends Controller
             'is_active' => 1,
         ]);
 
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.category');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            // Save to user
+            $category->image = $filePath; // This is relative to storage/app/public
+            $category->save();
+        }
+
         DB::commit();
 
         //Log
@@ -60,11 +74,14 @@ class categoryController extends Controller
     public function update(Request $request)
     {
         $request->validate([
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'category_name' => 'required|string|max:50',
             'category_id' => 'required',
         ], 
         [
             'category_name.required' => 'Name is required.',
+            'image.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
+            'image.max' => 'Logo size must not exceed 2MB.',
         ]);
 
         DB::beginTransaction();
@@ -74,6 +91,19 @@ class categoryController extends Controller
         $category->update([ 
             'name' => Str::ucfirst($request->category_name)
         ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.category');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            // Save to user
+            $category->image = $filePath; // This is relative to storage/app/public
+            $category->save();
+        }
 
         DB::commit();
 

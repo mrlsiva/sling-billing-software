@@ -101,7 +101,7 @@ class shopController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . config('path.HO.logo');
+            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.logo');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');

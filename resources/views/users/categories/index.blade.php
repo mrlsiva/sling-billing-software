@@ -32,6 +32,7 @@
 							<thead class="bg-light-subtle">
 								<tr>
 									<th>S.No</th>
+									<th>Image</th>
 									<th>Category Name</th>
 									<th>No.Of sub Category</th>
 									<th>Active / In-Active</th>
@@ -44,6 +45,13 @@
 									<tr>
 										<td>
 											{{ ($categories->currentPage() - 1) * $categories->perPage() + $loop->iteration }}
+										</td>
+										<td>
+											@if($category->image != null)
+												<img src="{{ asset('storage/' . $category->image) }}" class="logo-dark me-1" alt="category" height="30">
+											@else
+												<img src="{{ asset('assets/images/category.jpg') }}" class="logo-dark me-1" alt="category" height="30">
+											@endif
 										</td>
 										<td>{{$category->name}}</td>
 										<td>{{$category->sub_categories->count()}}</td>
@@ -90,14 +98,25 @@
                 <form class="row" action="{{route('category.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
                 	@csrf
 	                <div class="modal-body">
-	                   <div class="row">
+
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="name" class="form-label">Upload Category Image</label>
+	                                <div class="input-group">
+	                                    <input type="file" name="image" id="image" class="form-control">
+	                                </div>
+		                        </div>
+		                    </div>
+	                   	</div>
+	                   	<div class="row">
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Category Name</label>
 		                            <input type="text" id="category" name="category" class="form-control">
 		                        </div>
 		                    </div>
-	                   </div>
+	                   	</div>
 	                </div>
 	                <div class="modal-footer">
 	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -118,6 +137,18 @@
                 <form class="row" action="{{route('category.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
                 	@csrf
 	                <div class="modal-body">
+
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="name" class="form-label">Upload Category Image</label>
+	                                <div class="input-group">
+	                                    <input type="file" name="image" id="image" class="form-control">
+	                                </div>
+		                        </div>
+		                    </div>
+	                   </div>
+
 	                   <div class="row">
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
@@ -127,6 +158,7 @@
 		                        </div>
 		                    </div>
 	                   </div>
+	                   
 	                </div>
 	                <div class="modal-footer">
 	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

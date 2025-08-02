@@ -32,6 +32,7 @@
 							<thead class="bg-light-subtle">
 								<tr>
 									<th>S.No</th>
+									<th>Image</th>
 									<th>Category</th>
 									<th>Sub Category</th>
 									<th>Active / In-Active</th>
@@ -44,6 +45,13 @@
 									<tr>
 										<td>
 											{{ ($sub_categories->currentPage() - 1) * $sub_categories->perPage() + $loop->iteration }}
+										</td>
+										<td>
+											@if($sub_category->image != null)
+												<img src="{{ asset('storage/' . $sub_category->image) }}" class="logo-dark me-1" alt="sub_category" height="30">
+											@else
+												<img src="{{ asset('assets/images/category.jpg') }}" class="logo-dark me-1" alt="sub_category" height="30">
+											@endif
 										</td>
 										<td>{{$sub_category->category->name}}</td>
 
@@ -92,6 +100,18 @@
                 <form class="row" action="{{route('sub_category.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
                 	@csrf
 	                <div class="modal-body">
+
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="name" class="form-label">Upload Sub Category Image</label>
+	                                <div class="input-group">
+	                                    <input type="file" name="image" id="image" class="form-control">
+	                                </div>
+		                        </div>
+		                    </div>
+	                   	</div>
+
 	                	<div class="row">
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
@@ -133,6 +153,18 @@
                 <form class="row" action="{{route('sub_category.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
                 	@csrf
 	                <div class="modal-body">
+
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="name" class="form-label">Upload Sub Category Image</label>
+	                                <div class="input-group">
+	                                    <input type="file" name="image" id="image" class="form-control">
+	                                </div>
+		                        </div>
+		                    </div>
+	                   	</div>
+	                   	
 	                	<div class="row">
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
