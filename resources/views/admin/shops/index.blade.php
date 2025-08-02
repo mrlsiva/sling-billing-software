@@ -24,7 +24,7 @@
 									<th>Slug Name</th>
 									<th>Mobile Number</th>
 									<th>Payment Method</th>
-									<th>Payment Date</th>
+									<th>Expiry Date</th>
 									<th>Status</th>
 									<th>Action</th>
 								</tr>
@@ -48,7 +48,31 @@
 												-
 											@endif
 										</td>
-										<td>@if($shop->user_detail->payment_date != null) {{ \Carbon\Carbon::parse($shop->user_detail->payment_date)->format('d M Y') }} @else - @endif</td>
+
+										@php
+
+					                        $paymentDate = \Carbon\Carbon::parse($shop->user_detail->payment_date);
+					                        $paymentMethod = $shop->user_detail->payment_method;
+
+					                        switch ($paymentMethod) {
+					                            case 1:
+					                                $nextPaymentDate = $paymentDate->copy()->addMonth();
+					                                break;
+					                            case 2:
+					                                $nextPaymentDate = $paymentDate->copy()->addMonths(3);
+					                                break;
+					                            case 3:
+					                                $nextPaymentDate = $paymentDate->copy()->addMonths(6);
+					                                break;
+					                            case 4:
+					                                $nextPaymentDate = $paymentDate->copy()->addYear();
+					                                break;
+					                            default:
+					                                $nextPaymentDate = null;
+					                        }
+                    					@endphp
+
+										<td>{{ $nextPaymentDate ? $nextPaymentDate->format('d M Y') : '-' }}</td>
 										<td>
 											@if($shop->is_lock == 1)
 												<span class="badge bg-soft-danger text-danger">Locked</span>
