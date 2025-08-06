@@ -51,9 +51,9 @@ class productController extends Controller
             'price' => 'required|numeric|min:0',
             'tax' => 'required',
             'metric' => 'required',
-
             'discount_type' => 'nullable|required_with:discount',
             'discount' => 'nullable|required_with:discount_type|numeric|min:0',
+            'quantity' => 'numeric|min:0',
         ], 
         [
             'image.mimes' => 'Image must be a JPG, JPEG, PNG, or GIF file.',
@@ -73,6 +73,8 @@ class productController extends Controller
             'discount.required_with' => 'Discount value is required when discount type is provided.',
             'discount.numeric' => 'Discount must be a number.',
             'discount.min' => 'Discount cannot be negative.',
+            'quantity.numeric' => 'Quantity must be a number.',
+            'quantity.min' => 'Quantity cannot be negative.',
         ]);
 
 
@@ -91,6 +93,7 @@ class productController extends Controller
             'metric_id' => $request->metric,
             'discount_type' => $request->discount_type,
             'discount' => $request->discount,
+            'quantity' => $request->quantity,
             'is_active' => 1,
         ]);
 
@@ -116,9 +119,91 @@ class productController extends Controller
         
     }
 
-    public function edit(Request $request)
+    public function edit(Request $request,$company,$id)
     {
-        return view('users.products.edit');
+        $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
+        $product = Product::find($id);
+        $taxes = Tax::where('is_active',1)->get();
+        $metrics = Metric::where('is_active',1)->get();
+        return view('users.products.edit',compact('product','categories','taxes','metrics'));
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // up to 2MB
+            'category_id' => 'required',
+            'sub_category' => 'required',
+            'name' => 'required|string|max:50',
+            'code' => 'required|string|max:50',
+            'price' => 'required|numeric|min:0',
+            'tax' => 'required',
+            'metric' => 'required',
+            'discount_type' => 'nullable|required_with:discount',
+            'discount' => 'nullable|required_with:discount_type|numeric|min:0',
+            'quantity' => 'numeric|min:0',
+        ], 
+        [
+            'image.mimes' => 'Image must be a JPG, JPEG, PNG, or GIF file.',
+            'image.max' => 'Image size must not exceed 2MB.',
+
+            'category_id.required' => 'Category is required.',
+            'sub_category.required' => 'Sub Category is required.',
+            'name.required' => 'Product Name is required.',
+            'code.required' => 'Product Code is required.',
+            'price.required' => 'Price is required.',
+            'price.numeric' => 'Price must be a number.',
+            'price.numeric' => 'Price must be a number.',
+            'price.min' => 'Price cannot be negative.',
+            'tax.required' => 'Tax is required.',
+            'metric.required' => 'Metric is required.',
+            'discount_type.required_with' => 'Discount type is required when discount is provided.',
+            'discount.required_with' => 'Discount value is required when discount type is provided.',
+            'discount.numeric' => 'Discount must be a number.',
+            'discount.min' => 'Discount cannot be negative.',
+            'quantity.numeric' => 'Quantity must be a number.',
+            'quantity.min' => 'Quantity cannot be negative.',
+        ]);
+
+
+        DB::beginTransaction();
+
+        $product = Product::find($request->id);
+
+        $product->update([ 
+            'category_id' => $request->category_id,
+            'sub_category_id' => $request->sub_category,
+            'name' => Str::ucfirst($request->name),
+            'description' => $request->description,
+            'code' => $request->code,
+            'hsn_code' => $request->hsn_code,
+            'price' => $request->price,
+            'tax_id' => $request->tax,
+            'metric_id' => $request->metric,
+            'discount_type' => $request->discount_type,
+            'discount' => $request->discount,
+            'quantity' => $request->quantity,
+        ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.product');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            // Save to user
+            $product->image = $filePath; // This is relative to storage/app/public
+            $product->save();
+        }
+
+        DB::commit();
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Product Update','App/Models/Product','products',$product->id,'Update',null,$request,'Success','Product Updated Successfully');
+
+        return redirect()->back()->with('toast_success', 'Product updated successfully.');
     }
 
     public function status(Request $request)

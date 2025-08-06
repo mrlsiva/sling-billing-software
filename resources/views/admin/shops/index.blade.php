@@ -20,11 +20,10 @@
 						<table class="table align-middle mb-0 table-hover table-centered">
 							<thead class="bg-light-subtle">
 								<tr>
+									<th>Image</th>
 									<th>Shop Name</th>
 									<th>Slug Name</th>
 									<th>Mobile Number</th>
-									<th>Payment Method</th>
-									<th>Expiry Date</th>
 									<th>Status</th>
 									<th>Action</th>
 								</tr>
@@ -32,47 +31,12 @@
 							<tbody>
 								@foreach($shops as $shop)
 									<tr>
+										<td>
+											<img src="{{ asset('storage/' . $shop->logo) }}" class="logo-dark me-1" alt="Shop" height="30">
+										</td>
 										<td>{{$shop->name}}</td>
 										<td>{{$shop->user_name}}</td>
 										<td>{{$shop->phone}}</td>
-										<td>
-											@if($shop->user_detail->payment_method == 1)
-												<span class="badge bg-soft-primary text-primary">Monthly</span>
-											@elseif($shop->user_detail->payment_method == 2)
-												<span class="badge bg-soft-primary text-primary">Quarterly</span>
-											@elseif($shop->user_detail->payment_method == 3)
-												<span class="badge bg-soft-primary text-primary">Semi-Yearly</span>
-											@elseif($shop->user_detail->payment_method == 4)
-												<span class="badge bg-soft-primary text-primary">Yearly</span>
-											@else
-												-
-											@endif
-										</td>
-
-										@php
-
-					                        $paymentDate = \Carbon\Carbon::parse($shop->user_detail->payment_date);
-					                        $paymentMethod = $shop->user_detail->payment_method;
-
-					                        switch ($paymentMethod) {
-					                            case 1:
-					                                $nextPaymentDate = $paymentDate->copy()->addMonth();
-					                                break;
-					                            case 2:
-					                                $nextPaymentDate = $paymentDate->copy()->addMonths(3);
-					                                break;
-					                            case 3:
-					                                $nextPaymentDate = $paymentDate->copy()->addMonths(6);
-					                                break;
-					                            case 4:
-					                                $nextPaymentDate = $paymentDate->copy()->addYear();
-					                                break;
-					                            default:
-					                                $nextPaymentDate = null;
-					                        }
-                    					@endphp
-
-										<td>{{ $nextPaymentDate ? $nextPaymentDate->format('d M Y') : '-' }}</td>
 										<td>
 											@if($shop->is_lock == 1)
 												<span class="badge bg-soft-danger text-danger">Locked</span>

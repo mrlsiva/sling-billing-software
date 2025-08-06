@@ -27,13 +27,13 @@
                         <div class="row">
 
                             <input type="hidden" name="id" value="{{$user->id}}">
+                            <input type="hidden" name="user_detail" value="{{$user->user_detail->id}}">
 
                             <div class="col-xl-12 col-md-12 mb-3">
                                 <label for="name" class="form-label">Upload Shop Logo</label>
                                 <div class="input-group">
                                     <input type="file" name="logo" id="logo" class="form-control">
                                 </div>
-                                <div class="alert bg-soft-success m-2 secret" id="fileNameDisplay" role="alert"></div>
                             </div>
 
                             <div class="p-4">
@@ -117,26 +117,6 @@
                                 <div class="mb-3">
                                     <label for="secondary_colour" class="form-label">Secondary Color</label>
                                     <input type="color" id="secondary_colour" name="secondary_colour" value="{{ $user->user_detail->secondary_colour }}" class="form-control" placeholder="Enter Secondary Color code">
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="secondary_colour" class="form-label">Payment Method</label>
-                                    <select class="form-control" data-choices name="payment_method" id="payment_method">
-                                        <option value=""> Choose Payment</option>
-                                        <option value="1"  {{$user->user_detail->payment_method == 1 ? 'selected' : '' }}>Monthly</option>
-                                        <option value="2" {{$user->user_detail->payment_method == 2 ? 'selected' : '' }}>Quarterly</option>
-                                        <option value="3" {{$user->user_detail->payment_method == 3 ? 'selected' : '' }}>Semi-Yearly</option>
-                                        <option value="4" {{$user->user_detail->payment_method == 4 ? 'selected' : '' }}>Yearly</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="payment_date" class="form-label">Payment Date</label>
-                                    <input type="date" id="payment_date" name="payment_date" value="{{ $user->user_detail->payment_date }}" class="form-control" placeholder="Enter Payment Date">
                                 </div>
                             </div>
 

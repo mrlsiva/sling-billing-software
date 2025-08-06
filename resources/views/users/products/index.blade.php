@@ -24,7 +24,7 @@
 									<th>Image</th>
 									<th>Name</th>
 									<th>Code</th>
-									<th>Price</th>
+									<th>Price (₹)</th>
 									<th>Active / In-Active</th>
 									<th>Status</th>
 									<th>Action</th>
@@ -64,7 +64,7 @@
 										</td>
 										<td>
 											<div class="d-flex gap-3">
-												<a href="{{ route('product.edit', ['company' => request()->route('company')]) }}"  class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
+												<a href="{{ route('product.edit', ['company' => request()->route('company'),'id' => $product->id ]) }}"  class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
 											</div>
 										</td>
 									</tr>

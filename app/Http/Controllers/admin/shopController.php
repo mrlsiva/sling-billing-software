@@ -35,14 +35,13 @@ class shopController extends Controller
         $request->validate([
             'logo' => 'required|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
-            'email' => 'nullable|email|unique:users,email',
-            'phone' => 'required|digits:10|unique:users,phone',
+            'email' => 'nullable|email',
+            'phone' => 'required|digits:10',
             'phone1' => 'nullable|digits:10',
             'password' => 'required|min:6|confirmed', // optional confirmation
             'address' => 'nullable|string|max:255',
             'slug_name' => 'required|alpha_dash|unique:users,user_name',
-            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
-            'payment_method' => 'nullable|string|max:255',
+            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i|unique:user_details,gst',
 
             'bank' => 'nullable|string|max:50',
             'name' => 'nullable|string|max:50',
@@ -122,7 +121,6 @@ class shopController extends Controller
             'user_id' => $user->id,
             'address' => $request->address,
             'gst' => $request->gst,
-            'payment_method' => $request->payment_method,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
         ]);
@@ -133,7 +131,7 @@ class shopController extends Controller
         $bank_detail = BankDetail::create([
             'user_id' => $user->id,
             'name' => $request->bank,
-            'holder_name' => $request->name,
+            'holder_name' => $request->holder_name,
             'branch' => $request->branch,
             'account_no' => $request->account_number,
             'ifsc_code' => $request->ifsc_code,
@@ -166,13 +164,13 @@ class shopController extends Controller
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
-            'email' => 'nullable|email|unique:users,email,'.$request->id.',id',
-            'phone' => 'required|digits:10|unique:users,phone,'.$request->id.',id',
+            'email' => 'nullable|email',
+            'phone' => 'required|digits:10',
             'phone1' => 'nullable|digits:10',
             'password' => 'nullable|min:6|confirmed', // optional confirmation
             'address' => 'nullable|string|max:255',
             'slug_name' => 'required|alpha_dash|unique:users,user_name,'.$request->id.',id',
-            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
+            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i|unique:user_details,gst,'.$request->user_detail.',id',
 
             'bank' => 'nullable|string|max:50',
             'account_number' => 'nullable|digits:16',
@@ -245,8 +243,6 @@ class shopController extends Controller
         $user_detail->update([
             'address' => $request->address,
             'gst' => $request->gst,
-            'payment_method' => $request->payment_method,
-            'payment_date' => $request->payment_date,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
         ]);
@@ -256,7 +252,7 @@ class shopController extends Controller
 
         $bank_detail->update([
             'name' => $request->bank,
-            'holder_name' => $request->name,
+            'holder_name' => $request->holder_name,
             'branch' => $request->branch,
             'account_no' => $request->account_number,
             'ifsc_code' => $request->ifsc_code,

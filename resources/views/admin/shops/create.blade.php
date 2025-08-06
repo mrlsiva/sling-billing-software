@@ -110,7 +110,7 @@
                                 
                                 <div class="mb-3">
                                     <label for="gst" class="form-label">Company GSTin</label>
-                                    <input type="text" id="gst" name="gst" class="form-control" placeholder="Enter Gst" value="{{old('email')}}">
+                                    <input type="text" id="gst" name="gst" class="form-control" placeholder="Enter Gst" value="{{old('gst')}}">
                                 </div>
                                 
                             </div>
@@ -128,19 +128,6 @@
                                 <div class="mb-3">
                                     <label for="secondary_colour" class="form-label">Secondary Color</label>
                                     <input type="color" id="secondary_colour" name="secondary_colour" value="{{old('secondary_colour')}}" class="form-control" placeholder="Enter Secondary Color code">
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="secondary_colour" class="form-label">Payment Method</label>
-                                    <select class="form-control" data-choices name="payment_method" id="payment_method">
-                                        <option value=""> Choose Payment</option>
-                                        <option value="1">Monthly</option>
-                                        <option value="2">Quarterly</option>
-                                        <option value="3">Semi-Yearly</option>
-                                        <option value="4">Yearly</option>
-                                    </select>
                                 </div>
                             </div>
                         </div>

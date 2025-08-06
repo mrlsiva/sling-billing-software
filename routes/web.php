@@ -74,7 +74,7 @@ else
                             Route::get('/create',[productController::class, 'create'])->name('create');
                             Route::post('/store',[productController::class, 'store'])->name('store');
                             Route::get('/view',[productController::class, 'view'])->name('view');
-                            Route::get('/edit',[productController::class, 'edit'])->name('edit');
+                            Route::get('{id}/edit',[productController::class, 'edit'])->name('edit');
                             Route::post('/update',[productController::class, 'update'])->name('update');
                             Route::post('/status',[productController::class, 'status'])->name('status');
                             Route::get('/get_sub_category',[productController::class, 'get_sub_category'])->name('get_sub_category');

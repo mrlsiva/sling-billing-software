@@ -25,6 +25,8 @@
                         @endif
                         
                         <a href="{{route('admin.shop.edit', ['id' => $user->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i>Edit Shop</a>
+
+                        <a href="#" class="link-dark"><i class="ri-add-circle-line align-middle fs-20"></i>Add New Branch</a>
                         
                     </div>
                 </div>
@@ -63,54 +65,6 @@
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Company GSTin :</h5>
                             <p class="fw-medium mb-0">@if($user->user_detail->gst != null) {{$user->user_detail->gst}} @else - @endif</p>
                     </div>
-                    <div class="py-3 border-bottom">
-                        <h5 class="text-dark fs-12 text-uppercase fw-bold">Payment Method:</h5>
-                        @if($user->user_detail->payment_method == 1)
-                            <span class="badge bg-soft-primary text-primary">Monthly</span>
-                        @elseif($user->user_detail->payment_method == 2)
-                            <span class="badge bg-soft-primary text-primary">Quarterly</span>
-                        @elseif($user->user_detail->payment_method == 3)
-                            <span class="badge bg-soft-primary text-primary">Semi-Yearly</span>
-                        @elseif($user->user_detail->payment_method == 4)
-                            <span class="badge bg-soft-primary text-primary">Yearly</span>
-                        @else
-                            -
-                        @endif
-                    </div>
-                    <div class="py-3 border-bottom">
-                            <h5 class="text-dark fs-12 text-uppercase fw-bold">Payment Date:</h5>
-                            <p class="fw-medium mb-0">@if($user->user_detail->payment_date != null) {{ \Carbon\Carbon::parse($user->user_detail->payment_date)->format('d M Y') }} @else - @endif</p>
-                    </div>
-
-                    @php
-                        use Carbon\Carbon;
-
-                        $paymentDate = Carbon::parse($user->user_detail->payment_date);
-                        $paymentMethod = $user->user_detail->payment_method;
-
-                        switch ($paymentMethod) {
-                            case 1:
-                                $nextPaymentDate = $paymentDate->copy()->addMonth();
-                                break;
-                            case 2:
-                                $nextPaymentDate = $paymentDate->copy()->addMonths(3);
-                                break;
-                            case 3:
-                                $nextPaymentDate = $paymentDate->copy()->addMonths(6);
-                                break;
-                            case 4:
-                                $nextPaymentDate = $paymentDate->copy()->addYear();
-                                break;
-                            default:
-                                $nextPaymentDate = null;
-                        }
-                    @endphp
-
-                    <div class="py-3 border-bottom">
-                            <h5 class="text-dark fs-12 text-uppercase fw-bold">Next Payment Date:</h5>
-                            <p class="fw-medium mb-0">{{ $nextPaymentDate ? $nextPaymentDate->format('d M Y') : '-' }}</p>
-                    </div>
-
                     <div class="pt-3">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Primary Color :</h5>
                             <p class="fw-medium mb-0">@if($user->user_detail->primary_colour != null) {{$user->user_detail->primary_colour}} @else - @endif</p>
@@ -127,12 +81,13 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Bank Info</h4>
                     <div class="d-flex gap-3">
-                        <a class="link-dark"  data-toast data-toast-text="Bank Details Copied Successfully!" data-toast-gravity="bottom" data-toast-position="center" data-toast-duration="3000" data-toast-close="close" ><i class="ri-file-copy-line align-middle fs-14"></i> Copy</a>
+                        <a class="link-dark"  data-toast data-toast-text="Bank Details Copied Successfully!" data-toast-gravity="bottom" data-toast-position="center" data-toast-duration="3000" data-toast-close="close" href="javascript:void(0);" onclick="copyBankDetails()" ><i class="ri-file-copy-line align-middle fs-14"></i> Copy</a>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="">
+                    <div class="" id="bank-details">
                         <p class="fw-medium mb-0">@if($user->bank_detail->name != null) {{$user->bank_detail->name}} @else - @endif</p>
+                        <p class="fw-medium mb-0">@if($user->bank_detail->holder_name != null) {{$user->bank_detail->holder_name}} @else - @endif</p>
                         <p class="fw-medium mb-0">@if($user->bank_detail->branch != null) {{$user->bank_detail->branch}} @else - @endif</p>
                         <p class="fw-medium mb-0">@if($user->bank_detail->account_no != null) {{$user->bank_detail->account_no}} @else - @endif</p>
                         <p class="fw-medium mb-0">@if($user->bank_detail->ifsc_code != null) {{$user->bank_detail->ifsc_code}} @else - @endif</p>
@@ -141,4 +96,8 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('script')
+<script src="{{asset('assets/js/admins/shop.js')}}"></script>
 @endsection
