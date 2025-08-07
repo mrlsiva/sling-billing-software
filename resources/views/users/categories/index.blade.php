@@ -56,14 +56,17 @@
 										<td>{{$category->name}}</td>
 										<td>{{$category->sub_categories->count()}}</td>
 										<td>
-											<form action="{{ route('category.status', ['company' => request()->route('company')]) }}" method="post">
-												@csrf
-												<input type="hidden" name="id" value="{{$category->id}}">
-											    <div class="form-check form-switch">
-											        <input class="form-check-input" type="checkbox" name="is_active" onchange="this.form.submit()" {{ $category->is_active == 1 ? 'checked' : '' }}>
-											    </div>
-											</form>
+										    <form action="{{ route('category.status', ['company' => request()->route('company')]) }}" method="post">
+										        @csrf
+										        <input type="hidden" name="id" value="{{ $category->id }}">
+										        <div class="form-check form-switch">
+										            <input class="form-check-input" type="checkbox" name="is_active"
+										                onchange="if(confirm('Are you sure you want to change the category status?')) { this.form.submit(); } else { this.checked = !this.checked; }"
+										                {{ $category->is_active == 1 ? 'checked' : '' }}>
+										        </div>
+										    </form>
 										</td>
+
 										<td>
 											@if($category->is_active == 1)
 												<span class="badge bg-soft-success text-success">Active</span>

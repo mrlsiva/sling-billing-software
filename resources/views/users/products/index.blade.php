@@ -47,14 +47,17 @@
 										<td>{{$product->code}}</td>
 										<td>{{$product->price}}</td>
 										<td>
-											<form action="{{ route('product.status', ['company' => request()->route('company')]) }}" method="post">
-												@csrf
-												<input type="hidden" name="id" value="{{$product->id}}">
-											    <div class="form-check form-switch">
-											        <input class="form-check-input" type="checkbox" name="is_active" onchange="this.form.submit()" {{ $product->is_active == 1 ? 'checked' : '' }}>
-											    </div>
-											</form>
+										    <form action="{{ route('product.status', ['company' => request()->route('company')]) }}" method="post" onsubmit="return confirm('Are you sure you want to change the product status?')">
+										        @csrf
+										        <input type="hidden" name="id" value="{{ $product->id }}">
+										        <div class="form-check form-switch">
+										            <input class="form-check-input" type="checkbox" name="is_active"
+										                onchange="if(confirm('Are you sure you want to change the product status?')) { this.form.submit(); } else { this.checked = !this.checked; }"
+										                {{ $product->is_active == 1 ? 'checked' : '' }}>
+										        </div>
+										    </form>
 										</td>
+
 										<td>
 											@if($product->is_active == 1)
 												<span class="badge bg-soft-success text-success">Active</span>

@@ -16,9 +16,9 @@
                         @if($user->is_delete == 0)
 
                             @if($user->is_lock == 0)
-                                <a href="{{route('admin.shop.lock', ['id' => $user->id])}}" class="link-success"><i class="ri-lock-unlock-line align-middle fs-20"></i> Shop Active</a>
+                                <a href="{{route('admin.shop.lock', ['id' => $user->id])}}" class="link-success" onclick="return confirm('Are you sure you want to change the shop status?')"><i class="ri-lock-unlock-line align-middle fs-20"></i> Shop Active</a>
                             @else
-                                <a href="{{route('admin.shop.lock', ['id' => $user->id])}}" class="link-warning"><i class="ri-lock-line align-middle fs-20"></i> Shop Locked</a>
+                                <a href="{{route('admin.shop.lock', ['id' => $user->id])}}" class="link-warning" onclick="return confirm('Are you sure you want to change the shop status?')"><i class="ri-lock-line align-middle fs-20"></i> Shop Locked</a>
                             @endif
                         @else
                             <a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i> Deleted </a>   
