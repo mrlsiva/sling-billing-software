@@ -36,16 +36,16 @@ class shopController extends Controller
             'logo' => 'required|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => 'nullable|email',
-            'phone' => 'required|digits:10',
-            'phone1' => 'nullable|digits:10',
-            'password' => 'required|min:6|confirmed', // optional confirmation
-            'address' => 'nullable|string|max:255',
-            'slug_name' => 'required|alpha_dash|unique:users,user_name',
+            'phone' => 'required|digits:10|different:phone1',
+            'phone1' => 'nullable|digits:10|different:phone',
+            'password' => 'required|min:6|max:20|confirmed', // optional confirmation
+            'address' => 'nullable|string|max:100',
+            'slug_name' => 'required|alpha_dash|unique:users,user_name|min:20',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i|unique:user_details,gst',
 
             'bank' => 'nullable|string|max:50',
             'name' => 'nullable|string|max:50',
-            'account_number' => 'nullable|digits:16',
+            'account_number' => 'nullable|numeric|digits_between:9,18|same:confirm_account_number',
             'confirm_account_number' => 'nullable|same:account_number',
             'branch' => 'nullable|string|max:50',
             'ifsc_code' => 'nullable|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/i',
@@ -59,6 +59,8 @@ class shopController extends Controller
             'phone.required' => 'Phone number is required.',
             'phone.digits' => 'Phone number must be exactly 10 digits.',
             'phone1.digits' => 'Alternate phone number must be exactly 10 digits.',
+            'phone.different' => 'Phone number and alternate phone number must be different.',
+            'phone1.different' => 'Alternate phone number and phone number must be different.',
             
             'password.required' => 'Password is required.',
             'password.min' => 'Password must be at least 6 characters.',
@@ -72,8 +74,9 @@ class shopController extends Controller
             'gst.required' => 'GST number is required.',
             'gst.regex' => 'GST number format is invalid.',
 
-            'account_number.digits_between' => 'Account number must be exactly 16 digits.',
-            'confirm_account_number.same' => 'Confirm account number must match the account number.',
+            'account_number.digits_between' => 'Account number must be between 9 to 18 digits.',
+            'account_number.same' => 'Account numbers do not match.',
+            'confirm_account_number.same' => 'Account numbers do not match.',
             'ifsc_code.regex' => 'Invalid IFSC code format.',
         ]);
 
