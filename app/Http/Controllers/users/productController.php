@@ -48,7 +48,7 @@ class productController extends Controller
             'sub_category' => 'required',
             'name' => 'required|string|max:50',
             'code' => 'required|string|max:50',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:1',
             'tax' => 'required',
             'metric' => 'required',
             'discount_type' => 'nullable|required_with:discount',
@@ -65,8 +65,7 @@ class productController extends Controller
             'code.required' => 'Product Code is required.',
             'price.required' => 'Price is required.',
             'price.numeric' => 'Price must be a number.',
-            'price.numeric' => 'Price must be a number.',
-            'price.min' => 'Price cannot be negative.',
+            'price.min' => 'Price should be greater than 1.',
             'tax.required' => 'Tax is required.',
             'metric.required' => 'Metric is required.',
             'discount_type.required_with' => 'Discount type is required when discount is provided.',
@@ -100,7 +99,7 @@ class productController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.product');
+            $path = config('path.root') . '/' . request()->route('company') . '/' . config('path.product');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');
@@ -136,12 +135,12 @@ class productController extends Controller
             'sub_category' => 'required',
             'name' => 'required|string|max:50',
             'code' => 'required|string|max:50',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:1',
             'tax' => 'required',
             'metric' => 'required',
             'discount_type' => 'nullable|required_with:discount',
             'discount' => 'nullable|required_with:discount_type|numeric|min:0',
-            'quantity' => 'numeric|min:0',
+            'quantity' => 'nullable|numeric|min:0',
         ], 
         [
             'image.mimes' => 'Image must be a JPG, JPEG, PNG, or GIF file.',
@@ -153,8 +152,7 @@ class productController extends Controller
             'code.required' => 'Product Code is required.',
             'price.required' => 'Price is required.',
             'price.numeric' => 'Price must be a number.',
-            'price.numeric' => 'Price must be a number.',
-            'price.min' => 'Price cannot be negative.',
+            'price.min' => 'Price should be greater than 1.',
             'tax.required' => 'Tax is required.',
             'metric.required' => 'Metric is required.',
             'discount_type.required_with' => 'Discount type is required when discount is provided.',
@@ -188,7 +186,7 @@ class productController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.product');
+            $path = config('path.root') . '/' . request()->route('company') . '/' . config('path.product');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');

@@ -134,7 +134,7 @@
 	                	<div class="row">
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">Category</label>
+		                            <label for="choices-single-groups" class="form-label text-muted">Sub Category</label>
 		                            <input type="text" id="sub_category" name="sub_category" class="form-control">
 		                        </div>
 		                    </div>
@@ -142,7 +142,7 @@
 	                </div>
 	                <div class="modal-footer">
 	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	                    <button type="submit" class="btn btn-primary">Save changes</button>
+	                    <button type="submit" class="btn btn-primary">Save</button>
 	                </div>
                 </form>
             </div>

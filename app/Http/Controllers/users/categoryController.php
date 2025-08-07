@@ -17,13 +17,14 @@ class categoryController extends Controller
 
     public function index(Request $request)
     {
-        $categories = Category::with(['sub_categories'])->orderBy('id','desc')->paginate(30);
+        $categories = Category::with(['sub_categories'])->where('user_id',Auth::user()->id)->orderBy('id','desc')->paginate(30);
         return view('users.categories.index',compact('categories'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // up to 2MB
             'category' => 'required|string|max:50',
         ], 
         [
@@ -41,7 +42,7 @@ class categoryController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.category');
+            $path = config('path.root') . '/' . request()->route('company') . '/' . config('path.category');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');
@@ -96,7 +97,7 @@ class categoryController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.category');
+            $path = config('path.root') . '/' . request()->route('company') . '/' . config('path.category');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');

@@ -26,7 +26,7 @@
                         
                         <a href="{{route('admin.shop.edit', ['id' => $user->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i>Edit Shop</a>
 
-                        <a href="#" class="link-dark"><i class="ri-add-circle-line align-middle fs-20"></i>Add New Branch</a>
+                        <a href="{{route('admin.branch.create', ['id' => $user->id])}}" class="link-dark"><i class="ri-add-circle-line align-middle fs-20"></i>Add New Branch</a>
                         
                     </div>
                 </div>
@@ -35,7 +35,7 @@
     </div>
 	<div class="row">
         
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title mb-0">Shop Info</h4>
@@ -76,7 +76,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Bank Info</h4>
@@ -91,6 +91,68 @@
                         <p class="fw-medium mb-0">@if($user->bank_detail->branch != null) {{$user->bank_detail->branch}} @else - @endif</p>
                         <p class="fw-medium mb-0">@if($user->bank_detail->account_no != null) {{$user->bank_detail->account_no}} @else - @endif</p>
                         <p class="fw-medium mb-0">@if($user->bank_detail->ifsc_code != null) {{$user->bank_detail->ifsc_code}} @else - @endif</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    @php
+                        $branch_count = App\Models\User::where('parent_id', $user->id)->count();
+                    @endphp
+
+                    <h4 class="card-title mb-0">Branches <span class="badge bg-success badge-pill text-end">{{$branch_count}}</span></h4>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0 table-hover table-centered">
+                            <thead class="bg-light-subtle">
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Branch Name</th>
+                                    <th>Slug Name</th>
+                                    <th>Mobile Number</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($branches as $branch)
+                                    <tr>
+                                        <td>
+                                            <img src="{{ asset('storage/'.$branch->logo) }}" class="logo-dark me-1" alt="Branch" height="30">
+                                        </td>
+                                        <td>{{$branch->name}}</td>
+                                        <td>{{$branch->user_name}}</td>
+                                        <td>{{$branch->phone}}</td>
+                                        <td>
+                                            @if($branch->is_lock == 1)
+                                                <span class="badge bg-soft-danger text-danger">Locked</span>
+                                            @elseif($branch->is_delete == 1)
+                                                <span class="badge bg-soft-danger text-danger">Deleted</span>
+                                            @elseif($branch->is_active == 0)
+                                                <span class="badge bg-soft-danger text-danger">In-active</span>
+                                            @else
+                                                <span class="badge bg-soft-success text-success">Active</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-3">
+                                                <a href="{{route('admin.branch.view', ['id' => $branch->id])}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
+                                                <!-- <a href="{{route('admin.branch.edit', ['id' => $branch->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a> -->
+
+                                                @if($branch->is_delete == 0)
+                                                <a href="{{route('admin.branch.delete', ['id' => $branch->id])}}" class="link-danger"  onclick="return confirm('Are you sure you want to delete this branch?');"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer border-0">
+                        {!! $branches->withQueryString()->links('pagination::bootstrap-5') !!}
                     </div>
                 </div>
             </div>

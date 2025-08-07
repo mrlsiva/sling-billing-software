@@ -35,12 +35,12 @@ class shopController extends Controller
         $request->validate([
             'logo' => 'required|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
-            'email' => 'nullable|email',
-            'phone' => 'required|digits:10|different:phone1',
-            'phone1' => 'nullable|digits:10|different:phone',
-            'password' => 'required|min:6|max:20|confirmed', // optional confirmation
+            'email' => 'nullable|email|unique:users',
+            'phone' => 'required|digits:10|different:phone1|unique:users',
+            'phone1' => 'nullable|digits:10|different:phone|unique:users,alt_phone',
+            'password' => 'required|min:6|max:20|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/', // optional confirmation
             'address' => 'nullable|string|max:100',
-            'slug_name' => 'required|alpha_dash|unique:users,user_name|min:20',
+            'slug_name' => 'required|alpha_dash|unique:users,user_name|max:50',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i|unique:user_details,gst',
 
             'bank' => 'nullable|string|max:50',
@@ -103,7 +103,7 @@ class shopController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.logo');
+            $path = config('path.root') . '/' . $request->slug_name . '/' . config('path.logo');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');
@@ -153,7 +153,8 @@ class shopController extends Controller
     public function view(Request $request,$id)
     {
         $user = User::with(['user_detail', 'bank_detail'])->where('id', $id)->first();
-        return view('admin.shops.view',compact('user'));
+        $branches = User::with(['user_detail', 'bank_detail'])->where('parent_id', $id)->paginate(5);
+        return view('admin.shops.view',compact('user','branches'));
     }
 
     public function edit(Request $request,$id)
@@ -164,19 +165,21 @@ class shopController extends Controller
 
     public function update(Request $request)
     {
+
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
-            'email' => 'nullable|email',
-            'phone' => 'required|digits:10',
-            'phone1' => 'nullable|digits:10',
-            'password' => 'nullable|min:6|confirmed', // optional confirmation
-            'address' => 'nullable|string|max:255',
-            'slug_name' => 'required|alpha_dash|unique:users,user_name,'.$request->id.',id',
+            'email' => 'nullable|email|unique:users,email,'.$request->id.',id',
+            'phone' => 'required|digits:10|different:phone1|unique:users,phone,'.$request->id.',id',
+            'phone1' => 'nullable|digits:10|different:phone|unique:users,alt_phone,'.$request->id.',id',
+            'password' => 'nullable|min:6|max:20|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/', // optional confirmation
+            'address' => 'nullable|string|max:100',
+            'slug_name' => 'required|alpha_dash|unique:users,user_name,'.$request->id.',id|max:50',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i|unique:user_details,gst,'.$request->user_detail.',id',
 
             'bank' => 'nullable|string|max:50',
-            'account_number' => 'nullable|digits:16',
+            'name' => 'nullable|string|max:50',
+            'account_number' => 'nullable|numeric|digits_between:9,18|same:confirm_account_number',
             'confirm_account_number' => 'nullable|same:account_number',
             'branch' => 'nullable|string|max:50',
             'ifsc_code' => 'nullable|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/i',
@@ -189,7 +192,9 @@ class shopController extends Controller
             'phone.required' => 'Phone number is required.',
             'phone.digits' => 'Phone number must be exactly 10 digits.',
             'phone1.digits' => 'Alternate phone number must be exactly 10 digits.',
-
+            'phone.different' => 'Phone number and alternate phone number must be different.',
+            'phone1.different' => 'Alternate phone number and phone number must be different.',
+            
             'password.min' => 'Password must be at least 6 characters.',
             'password.confirmed' => 'Password confirmation does not match.',
             
@@ -201,8 +206,9 @@ class shopController extends Controller
             'gst.required' => 'GST number is required.',
             'gst.regex' => 'GST number format is invalid.',
 
-            'account_number.digits_between' => 'Account number must be exactly 16 digits.',
-            'confirm_account_number.same' => 'Confirm account number must match the account number.',
+            'account_number.digits_between' => 'Account number must be between 9 to 18 digits.',
+            'account_number.same' => 'Account numbers do not match.',
+            'confirm_account_number.same' => 'Account numbers do not match.',
             'ifsc_code.regex' => 'Invalid IFSC code format.',
         ]);
 
@@ -223,7 +229,7 @@ class shopController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . config('path.HO.logo');
+            $path = config('path.root') . '/' . $request->slug_name . '/' . config('path.logo');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');

@@ -5,6 +5,7 @@ use App\Http\Controllers\auth\loginController;
 use App\Http\Controllers\admin\adminController;
 
 use App\Http\Controllers\admin\shopController;
+use App\Http\Controllers\admin\branchController;
 
 Route::get('/', function () {
 	return view('auth.login');
@@ -29,6 +30,20 @@ Route::group(['middleware' => ['auth','role:Super Admin']], function () {
 	    	Route::get('/{id}/delete',[shopController::class, 'delete'])->name('delete');
 	    	
 		});
+	});
+
+	Route::prefix('branches')->group(function () {
+	    Route::name('branch.')->group(function () {
+
+	    	Route::get('/{id}/create',[branchController::class, 'create'])->name('create');
+	    	Route::post('/store',[branchController::class, 'store'])->name('store');
+	    	Route::get('/{id}/view',[branchController::class, 'view'])->name('view');
+	    	Route::get('/{id}/edit',[branchController::class, 'edit'])->name('edit');
+	    	Route::post('/update',[branchController::class, 'update'])->name('update');
+	    	Route::get('/{id}/lock',[branchController::class, 'lock'])->name('lock');
+	    	Route::get('/{id}/delete',[branchController::class, 'delete'])->name('delete');
+
+	    });
 	});
 
 	Route::get('/logout',[loginController::class, 'logout'])->name('logout');

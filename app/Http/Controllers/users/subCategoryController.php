@@ -17,8 +17,8 @@ class subCategoryController extends Controller
 
     public function index(Request $request)
     {
-        $categories = Category::where('is_active',1)->get();
-        $sub_categories = SubCategory::orderBy('id','desc')->paginate(30);
+        $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
+        $sub_categories = SubCategory::where('user_id',Auth::user()->id)->orderBy('id','desc')->paginate(30);
         return view('users.sub_categories.index',compact('sub_categories','categories'));
     }
 
@@ -48,7 +48,7 @@ class subCategoryController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.sub_category');
+            $path = config('path.root') . '/' . request()->route('company') . '/' . config('path.sub_category');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');
@@ -105,7 +105,7 @@ class subCategoryController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = config('path.root') . '/' . config('path.HO.head_office') . '/' . request()->route('company') . '/' . config('path.HO.sub_category');
+            $path = config('path.root') . '/' . request()->route('company') . '/' . config('path.sub_category');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');

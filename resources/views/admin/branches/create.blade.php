@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-    <title>{{ config('app.name')}} | Shop Edit</title>
+    <title>{{ config('app.name')}} | Branch Create</title>
 @endsection
 
 @section('body')
@@ -17,20 +17,26 @@
             </div>
         @endif
         <div class="col-xl-12 col-md-12">
-            <form class="row" action="{{route('admin.shop.update')}}" method="post" enctype="multipart/form-data">
+            <form class="row" action="{{route('admin.branch.store')}}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="card">
                     <div class="card-header pb-0">
-                        <h4 class="card-title">Update Shop</h4>
+                        <h4 class="card-title">Add New Branch</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
 
-                            <input type="hidden" name="id" value="{{$user->id}}">
-                            <input type="hidden" name="user_detail" value="{{$user->user_detail->id}}">
+                            <input type="hidden" name="parent_id" value="{{$user->id}}">
+
+                            @php
+							    $parent_count = App\Models\User::where('parent_id', $user->id)->count() + 1;
+							    $slug_name = $user->user_name .'_'. $parent_count;
+							@endphp
+
+							<input type="hidden" name="slug_name" value="{{ $slug_name }}">
 
                             <div class="col-xl-12 col-md-12 mb-3">
-                                <label for="name" class="form-label">Upload Shop Logo</label>
+                                <label for="logo" class="form-label">Upload Branch Logo</label>
                                 <div class="input-group">
                                     <input type="file" name="logo" id="logo" class="form-control">
                                 </div>
@@ -43,7 +49,7 @@
                             <div class="col-md-4">
                                 
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">Shop Name</label>
+                                    <label for="name" class="form-label">Branch Name</label>
                                     <span class="text-danger">*</span>
                                     <input type="text" name="name" id="name" value="{{$user->name}}" class="form-control" placeholder="Enter Name">
                                 </div>
@@ -87,30 +93,45 @@
                             <div class="col-md-4">
                                 
                                 <div class="mb-3">
-                                    <label for="slug_name" class="form-label">Slug Name</label>
-                                    <span class="text-danger">*</span>
-                                    <input type="text" id="slug_name" name="slug_name" value="{{$user->user_name}}" class="form-control" placeholder="Enter Slug Name">
-                                </div>
-                                
-                            </div>
-
-                            <div class="col-md-4">
-                                
-                                <div class="mb-3">
                                     <label for="gst" class="form-label">Company GSTin</label>
                                     <input type="text" id="gst" name="gst" class="form-control" placeholder="Enter Gst" value="{{$user->user_detail->gst}}">
-                                </div>
-                                
+                                </div> 
                             </div>
 
                             <div class="col-md-4">
-                                
+                                <div class="mb-3">
+                                    <label for="payment_method" class="form-label">Payment Method</label>
+                                    <select class="form-control" data-choices name="payment_method" id="payment_method">
+                                        <option value=""> Choose Payment</option>
+                                        <option value="1">Monthly</option>
+                                        <option value="2">Quarterly</option>
+                                        <option value="3">Semi-Yearly</option>
+                                        <option value="4">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="password" id="password" name="password" value="{{old('password')}}" class="form-control" placeholder="Enter Password">
+                                </div>  
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="password_confirmation" class="form-label">Confirm Password</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="password" name="password_confirmation" id="password_confirmation" value="{{old('password_confirmation')}}" class="form-control" placeholder="Confirm Password">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="primary_colour" class="form-label">Primary Color</label>
                                     <input type="color" id="primary_colour" name="primary_colour" value="{{ $user->user_detail->primary_colour }}" class="form-control">
-                                </div>
-
-                                
+                                </div> 
                             </div>
 
                             <div class="col-md-4">
@@ -119,27 +140,6 @@
                                     <input type="color" id="secondary_colour" name="secondary_colour" value="{{ $user->user_detail->secondary_colour }}" class="form-control" placeholder="Enter Secondary Color code">
                                 </div>
                             </div>
-
-                            <div class="col-md-4">
-                                
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <span class="text-danger">*</span>
-                                    <input type="password" id="password" name="password" value="{{old('password')}}" class="form-control" placeholder="Enter Password">
-                                </div>
-                                
-                            </div>
-
-                            <div class="col-md-4">
-                                
-                                <div class="mb-3">
-                                    <label for="password_confirmation" class="form-label">Confirm Password</label>
-                                    <span class="text-danger">*</span>
-                                    <input type="password" name="password_confirmation" id="password_confirmation" value="{{old('password_confirmation')}}" class="form-control" placeholder="Confirm Password">
-                                </div>
-                                
-                            </div>
-
                         </div>
                     </div>
                 </div>
@@ -209,7 +209,7 @@
                             <button type="submit" class="btn btn-primary w-100"><i class="ri-save-line"></i> Save Change</button>
                         </div>
                         <div class="col-md-2">
-                            <a href="{{route('admin.shop.index')}}" class="btn btn-outline-secondary w-100"><i class="ri-close-circle-line"></i> Cancel</a>
+                            <a href="{{route('admin.shop.view', ['id' => $user->id])}}" class="btn btn-outline-secondary w-100"><i class="ri-close-circle-line"></i> Cancel</a>
                         </div>
                     </div>
                 </div>
