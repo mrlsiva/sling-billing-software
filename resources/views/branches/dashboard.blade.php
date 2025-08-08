@@ -5,5 +5,4 @@
 @endsection
 
 @section('body')
-
 @endsection

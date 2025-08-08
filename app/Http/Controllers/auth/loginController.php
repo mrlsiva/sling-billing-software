@@ -24,7 +24,7 @@ class loginController extends Controller
             'password.required' => 'Please enter your password.',
         ]);
 
-        if (Auth::attempt(['user_name' => $request->user_name, 'password' => $request->password]))
+        if (Auth::attempt(['user_name' => $request->user_name, 'password' => $request->password, 'slug_name' => $request->slug_name]))
         {
             //Active/Inactive
             $user = User::where([['id',auth()->user()->id],['is_active',0]])->first();
@@ -53,13 +53,23 @@ class loginController extends Controller
 
                 return redirect('admin/dashboard'); 
             }
-            else
+            else if (auth()->user()->role_id == 2)
             {
                 //Log
                 $this->addToLog($this->unique(),auth()->user()->id,'Login','App/Models/User','users',auth()->user()->id,'Login',null,null,'Success','Login Successfully');
 
                 $company = request()->route('company');
+
                 return redirect()->route('dashboard', ['company' => $company]);
+            }
+            else if (auth()->user()->role_id == 3)
+            {
+                //Log
+                $this->addToLog($this->unique(),auth()->user()->id,'Login','App/Models/User','users',auth()->user()->id,'Login',null,null,'Success','Login Successfully');
+
+                $company = request()->route('company');
+
+                return redirect()->route('branch.dashboard', ['company' => $company]);
             }
         }
         else 

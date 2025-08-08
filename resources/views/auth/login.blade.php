@@ -49,6 +49,14 @@
           @endif
 
             @csrf
+
+            @if(request()->segment(1) === 'admin')
+              <input type="hidden" name="slug_name" value="super_admin">
+            @else
+              <input type="hidden" name="slug_name" value="{{request()->route('company')}}">
+            @endif
+
+
             <div class="mb-3">
               <label for="user_name" class="form-label">Username</label>
               <input type="text" class="form-control" name="user_name" placeholder="Enter your Username" required="">

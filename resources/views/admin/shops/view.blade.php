@@ -47,6 +47,10 @@
                     </div>
                     <div class="py-3 border-bottom">
                         <h5 class="text-dark fs-12 text-uppercase fw-bold">Slug Name :</h5>
+                        <p class="fw-medium mb-0">{{$user->slug_name}}</p>
+                    </div>
+                    <div class="py-3 border-bottom">
+                        <h5 class="text-dark fs-12 text-uppercase fw-bold">User Name :</h5>
                         <p class="fw-medium mb-0">{{$user->user_name}}</p>
                     </div>
                     <div class="py-3 border-bottom">
@@ -111,6 +115,7 @@
                                     <th>Image</th>
                                     <th>Branch Name</th>
                                     <th>Slug Name</th>
+                                    <th>User Name</th>
                                     <th>Mobile Number</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -123,6 +128,7 @@
                                             <img src="{{ asset('storage/'.$branch->logo) }}" class="logo-dark me-1" alt="Branch" height="30">
                                         </td>
                                         <td>{{$branch->name}}</td>
+                                        <td>{{$branch->slug_name}}</td>
                                         <td>{{$branch->user_name}}</td>
                                         <td>{{$branch->phone}}</td>
                                         <td>
@@ -139,7 +145,7 @@
                                         <td>
                                             <div class="d-flex gap-3">
                                                 <a href="{{route('admin.branch.view', ['id' => $branch->id])}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
-                                                <!-- <a href="{{route('admin.branch.edit', ['id' => $branch->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a> -->
+                                                <a href="{{route('admin.branch.edit', ['id' => $branch->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
 
                                                 @if($branch->is_delete == 0)
                                                 <a href="{{route('admin.branch.delete', ['id' => $branch->id])}}" class="link-danger"  onclick="return confirm('Are you sure you want to delete this branch?');"><i class="ri-delete-bin-5-line align-middle fs-20"></i></a>

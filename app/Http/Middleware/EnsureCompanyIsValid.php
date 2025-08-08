@@ -16,9 +16,9 @@ class EnsureCompanyIsValid
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user_name = request()->segment(1);
+        $slug_name = request()->segment(1);
 
-        $user = User::where([['role_id','!=',1],['user_name',$user_name]])->first();
+        $user = User::where([['role_id','!=',1],['slug_name',$slug_name]])->first();
         if(!$user)
         {
             abort(404, 'Invalid Company.');

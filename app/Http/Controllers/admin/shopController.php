@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\BankDetail;
@@ -40,7 +41,8 @@ class shopController extends Controller
             'phone1' => 'nullable|digits:10|different:phone|unique:users,alt_phone',
             'password' => 'required|min:6|max:20|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/', // optional confirmation
             'address' => 'nullable|string|max:100',
-            'slug_name' => 'required|alpha_dash|unique:users,user_name|max:50',
+            'slug_name' => 'required|alpha_dash|unique:users,slug_name|max:50',
+            'user_name' => 'required|alpha_dash|max:20',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i|unique:user_details,gst',
 
             'bank' => 'nullable|string|max:50',
@@ -70,6 +72,9 @@ class shopController extends Controller
             'slug_name.required' => 'Slug name is required.',
             'slug_name.alpha_dash' => 'Slug name may only contain letters, numbers, dashes and underscores.',
             'slug_name.unique' => 'This slug name is already taken.',
+
+            'user_name.required' => 'User name is required.',
+            'user_name.alpha_dash' => 'User name may only contain letters, numbers, dashes and underscores.',
             
             'gst.required' => 'GST number is required.',
             'gst.regex' => 'GST number format is invalid.',
@@ -87,7 +92,8 @@ class shopController extends Controller
             'unique_id' => $this->userUnique(),
             'name' => Str::ucfirst($request->name),
             'email' => $request->email,
-            'user_name' => $request->slug_name,
+            'slug_name' => $request->slug_name,
+            'user_name' => $request->user_name,
             'phone' => $request->phone,
             'alt_phone' => $request->phone1,
             'password' => \Hash::make($request->password),
@@ -165,17 +171,52 @@ class shopController extends Controller
 
     public function update(Request $request)
     {
+        $ownerId = $request->id;
 
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
-            'email' => 'nullable|email|unique:users,email,'.$request->id.',id',
-            'phone' => 'required|digits:10|different:phone1|unique:users,phone,'.$request->id.',id',
-            'phone1' => 'nullable|digits:10|different:phone|unique:users,alt_phone,'.$request->id.',id',
+            'email' => ['nullable','email',
+                Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
+                    $query->whereNotIn('id', function ($sub) use ($ownerId) {
+                        $sub->select('id')->from('users')->where('id', $ownerId)->orWhere('parent_id', $ownerId);
+                    });
+                })->ignore($request->id)
+            ],
+            'phone' => ['required','digits:10','different:phone1',
+                Rule::unique('users', 'phone')->where(function ($query) use ($ownerId) {
+                    $query->whereNotIn('id', function ($sub) use ($ownerId) {
+                        $sub->select('id')->from('users')->where('id', $ownerId)->orWhere('parent_id', $ownerId);
+                    });
+                })->ignore($request->id)
+            ],
+            'phone1' => ['nullable','digits:10','different:phone',
+                Rule::unique('users', 'alt_phone')->where(function ($query) use ($ownerId) {
+                    $query->whereNotIn('id', function ($sub) use ($ownerId) {
+                        $sub->select('id')->from('users')->where('id', $ownerId)->orWhere('parent_id', $ownerId);
+                    });
+                })->ignore($request->id)
+            ],
+            'gst' => ['nullable','regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
+                Rule::unique('user_details', 'gst')->where(function ($query) use ($ownerId) {
+                    $query->whereNotIn('user_id', function ($sub) use ($ownerId) {
+                        $sub->select('id')->from('users')->where('id', $ownerId)->orWhere('parent_id', $ownerId);
+                    });
+                })->ignore($request->user_detail)
+            ],
             'password' => 'nullable|min:6|max:20|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/', // optional confirmation
             'address' => 'nullable|string|max:100',
-            'slug_name' => 'required|alpha_dash|unique:users,user_name,'.$request->id.',id|max:50',
-            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i|unique:user_details,gst,'.$request->user_detail.',id',
+            'slug_name' => 'required|alpha_dash|unique:users,slug_name,'.$request->id.',id|max:50',
+
+            'user_name' => ['required','alpha_dash','max:20',
+                Rule::unique('users', 'user_name')->where(function ($query) use ($ownerId) 
+                {
+                    $query->where(function ($q) use ($ownerId) {
+                        $q->where('id', $ownerId)
+                          ->orWhere('parent_id', $ownerId);
+                    });
+                })->ignore($request->id) // Ignore current record
+            ],
 
             'bank' => 'nullable|string|max:50',
             'name' => 'nullable|string|max:50',
@@ -202,6 +243,8 @@ class shopController extends Controller
             'slug_name.required' => 'Slug name is required.',
             'slug_name.alpha_dash' => 'Slug name may only contain letters, numbers, dashes and underscores.',
             'slug_name.unique' => 'This slug name is already taken.',
+            'user_name.required' => 'User name is required.',
+            'user_name.alpha_dash' => 'User name may only contain letters, numbers, dashes and underscores.',
             
             'gst.required' => 'GST number is required.',
             'gst.regex' => 'GST number format is invalid.',
@@ -221,7 +264,8 @@ class shopController extends Controller
         $user->update([ 
             'name' => Str::ucfirst($request->name),
             'email' => $request->email,
-            'user_name' => $request->slug_name,
+            'slug_name' => $request->slug_name,
+            'user_name' => $request->user_name,
             'phone' => $request->phone,
             'alt_phone' => $request->phone1,
         ]);
@@ -247,7 +291,7 @@ class shopController extends Controller
         }
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Shop Update','App/Models/User','users',$user->id,'Update',null,$request,'Success','Shop Updated Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Branch Update','App/Models/Branch','users',$user->id,'Update',null,$request,'Success','Branch Updated Successfully');
 
         $user_detail->update([
             'address' => $request->address,
@@ -257,7 +301,7 @@ class shopController extends Controller
         ]);
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Shop Update','App/Models/UserDetail','user_details',$user_detail->id,'Update',null,$request,'Success','Shop Updated Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Branch Update','App/Models/UserDetail','user_details',$user_detail->id,'Update',null,$request,'Success','Branch Updated Successfully');
 
         $bank_detail->update([
             'name' => $request->bank,
@@ -268,11 +312,11 @@ class shopController extends Controller
         ]);
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Shop Update','App/Models/BankDetail','bank_details',$bank_detail->id,'Update',null,$request,'Success','Shop Updated Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Branch Update','App/Models/BankDetail','bank_details',$bank_detail->id,'Update',null,$request,'Success','Branch Updated Successfully');
 
         DB::commit();
 
-        return redirect()->back()->with('toast_success', 'Shop updated successfully.');
+        return redirect()->back()->with('toast_success', 'Branch updated successfully.');
 
     }
 

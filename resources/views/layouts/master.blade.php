@@ -140,7 +140,7 @@
                     <ul class="navbar-nav" id="navbar-nav">
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('dashboard')}}">
+                            <a class="menu-link" href="{{route('branch.dashboard', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-dashboard-2-line"></i>
                                 </span>
@@ -149,11 +149,20 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('customers.index')}}">
+                            <a class="menu-link" href="{{route('branch.customer.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-group-2-line"></i>
                                 </span>
                                 <span class="nav-text"> Customers </span>
+                            </a>
+                        </li>
+
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('branch.billing', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-shopping-cart-line"></i>
+                                </span>
+                                <span class="nav-text"> Billing </span>
                             </a>
                         </li>
                         

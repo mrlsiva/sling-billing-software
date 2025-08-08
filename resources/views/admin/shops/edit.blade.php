@@ -84,14 +84,20 @@
                                 
                             </div>
 
-                            <div class="col-md-4">
-                                
+                            <div class="col-md-4">                                
                                 <div class="mb-3">
                                     <label for="slug_name" class="form-label">Slug Name</label>
                                     <span class="text-danger">*</span>
-                                    <input type="text" id="slug_name" name="slug_name" value="{{$user->user_name}}" class="form-control" placeholder="Enter Slug Name">
+                                    <input type="text" id="slug_name" name="slug_name" value="{{$user->slug_name}}" class="form-control" placeholder="Enter Slug Name">
                                 </div>
-                                
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="user_name" class="form-label">User Name</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" id="user_name" name="user_name" value="{{$user->user_name}}" class="form-control" placeholder="Enter User Name">
+                                </div>
                             </div>
 
                             <div class="col-md-4">

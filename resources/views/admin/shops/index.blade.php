@@ -23,6 +23,7 @@
 									<th>Image</th>
 									<th>Shop Name</th>
 									<th>Slug Name</th>
+									<th>User Name</th>
 									<th>Mobile Number</th>
 									<th>Status</th>
 									<th>Action</th>
@@ -35,6 +36,7 @@
 											<img src="{{ asset('storage/' . $shop->logo) }}" class="logo-dark me-1" alt="Shop" height="30">
 										</td>
 										<td>{{$shop->name}}</td>
+										<td>{{$shop->slug_name}}</td>
 										<td>{{$shop->user_name}}</td>
 										<td>{{$shop->phone}}</td>
 										<td>

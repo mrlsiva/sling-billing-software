@@ -93,6 +93,15 @@
                             <div class="col-md-4">
                                 
                                 <div class="mb-3">
+                                    <label for="user_name" class="form-label">User Name</label>
+                                    <input type="user_name" name="user_name" id="user_name" value="{{old('user_name')}}" class="form-control" placeholder="Enter User Name">
+                                </div>
+                                
+                            </div>
+
+                            <div class="col-md-4">
+                                
+                                <div class="mb-3">
                                     <label for="gst" class="form-label">Company GSTin</label>
                                     <input type="text" id="gst" name="gst" class="form-control" placeholder="Enter Gst" value="{{$user->user_detail->gst}}">
                                 </div> 

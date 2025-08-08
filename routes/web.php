@@ -108,17 +108,33 @@ else
 
                 Route::group(['middleware' => ['role:Branch']], function () {
 
-                    Route::prefix('customers')->group(function () {
-                        Route::name('customer.')->group(function () {
+                    Route::prefix('branches')->group(function () {
+                        Route::name('branch.')->group(function () {
 
-                            Route::get('/index',[customerController::class, 'index'])->name('index');
-                            Route::get('/create',[customerController::class, 'create'])->name('create');
-                            Route::get('/view',[customerController::class, 'view'])->name('view');
-                            Route::get('/edit',[customerController::class, 'edit'])->name('edit');
-                            
+                            Route::get('/dashboard', function () {
+                                return view('branches.dashboard');
+                            })->name('dashboard');
+
+                            Route::prefix('customers')->group(function () {
+                                Route::name('customer.')->group(function () {
+
+                                    Route::get('/index',[customerController::class, 'index'])->name('index');
+                                    Route::post('/store',[customerController::class, 'store'])->name('store');
+                                    Route::get('/view',[customerController::class, 'view'])->name('view');
+                                    Route::get('/edit',[customerController::class, 'edit'])->name('edit');
+                                    
+                                });
+                            });
+
+
+                            Route::get('/billing', function () {
+                                return view('branches.billing');
+                            })->name('billing');
                         });
                     });
                 });
+
+                
 
                 Route::get('/logout',[loginController::class, 'logout'])->name('logout');
 

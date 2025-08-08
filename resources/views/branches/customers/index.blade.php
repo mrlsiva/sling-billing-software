@@ -1,0 +1,176 @@
+@extends('layouts.master')
+
+@section('title')
+<title>{{ config('app.name')}} | Customers</title>
+@endsection
+
+@section('body')
+	<div class="row">
+		<div class="col-xl-12">
+			<div class="card">
+				<div class="card-header d-flex justify-content-between align-items-center">
+					<div>
+						<p class="card-title">All Customer</p>
+					</div>
+
+					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#customerAdd"><i class='bx bxs-folder-plus'></i> Create Customer</a>
+				</div>
+
+				@if ($errors->any())
+		            <div class="alert alert-danger">
+		                <strong>Whoops!</strong> There were some problems with your input.<br><br>
+		                <ul>
+		                    @foreach ($errors->all() as $error)
+		                        <li>{{ $error }}</li>
+		                    @endforeach
+		                </ul>
+		            </div>
+		        @endif
+
+				<div class="">
+					<div class="table-responsive">
+						<table class="table align-middle mb-0 table-hover table-centered">
+							<thead class="bg-light-subtle">
+								<tr>
+									<th>S.No</th>
+									<th>Name</th>
+									<th>Phone</th>
+									<th>Alternate Phone</th>
+									<th>Address</th>
+									<th>City</th>
+									<th>Pincode</th>
+									<th>Order History</th>
+								</tr>
+							</thead>
+							<tbody>
+									@foreach($users as $user)
+									<tr>
+										<td>
+											{{ ($users->currentPage() - 1) * $users->perPage() + $loop->iteration }}
+										</td>
+										<td>{{$user->name}}</td>
+										<td>{{$user->phone}}</td>
+										<td>
+											@if($user->alt_phone != null)
+												{{$user->alt_phone}}
+											@else
+												-
+											@endif
+										</td>
+										<td>
+											@if($user->address != null)
+												{{$user->address}}
+											@else
+												-
+											@endif
+										</td>
+										<td>
+											@if($user->city != null)
+												{{$user->city}}
+											@else
+												-
+											@endif
+										</td>
+										<td>
+											@if($user->pincode != null)
+												{{$user->pincode}}
+											@else
+												-
+											@endif
+										</td>
+										<td>
+											<div class="d-flex gap-3">
+												<a href="#" class="text-muted" title="Order History"><i class="ri-eye-line align-middle fs-20"></i></a>
+											</div>
+										</td>
+									</tr>
+									@endforeach
+							</tbody>
+						</table>
+					</div>
+					<!-- end table-responsive -->
+				</div>
+				<div class="card-footer border-0">
+					{!! $users->withQueryString()->links('pagination::bootstrap-5') !!}
+				</div>
+				
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="customerAdd" tabindex="-1" aria-labelledby="customerAdd" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="row" action="{{route('branch.customer.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                	@csrf
+	                <div class="modal-body">
+
+	                   	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Name</label>
+		                            <input type="text" id="name" name="name" class="form-control" required="">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                   	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Phone</label>
+		                            <input type="number" id="phone" name="phone" class="form-control" min="1" required="">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                   	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Alternate Phone</label>
+		                            <input type="number" id="alt_phone" name="alt_phone" class="form-control" min="1">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                   	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Address</label>
+		                            <input type="text" id="address" name="address" class="form-control">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+		                <div class="row">
+		                	<div class="col-md-12">
+		                		<div class="mb-3">
+		                			<label for="choices-single-groups" class="form-label text-muted">City</label>
+		                			<input type="text" id="city" name="city" class="form-control">
+		                		</div>
+		                	</div>
+		                </div>
+
+		                <div class="row">
+		                	<div class="col-md-12">
+		                		<div class="mb-3">
+		                			<label for="choices-single-groups" class="form-label text-muted">Pincode</label>
+		                			<input type="number" id="pincode" name="pincode" class="form-control" min="1">
+		                		</div>
+		                	</div>
+		                </div>
+
+		            </div>
+
+		            <div class="modal-footer">
+		            	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		            	<button type="submit" class="btn btn-primary">Submit</button>
+		            </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
