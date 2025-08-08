@@ -265,6 +265,26 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Select Unit</label>
+                                <select class="form-control" data-choices name="product" id="product">
+                                    <option value=""> Select </option>
+                                    <option value="1">PCS</option>
+                                    <option value="1">KG</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Available</label>
+                                <input readonly type="text" id="category" name="category" class="form-control" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
                                 <label for="choices-single-groups" class="form-label text-muted">Select Quantity</label>
                                 <input type="text" id="category" name="category" class="form-control">
                             </div>
