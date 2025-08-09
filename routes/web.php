@@ -84,10 +84,11 @@ else
                     Route::prefix('inventories')->group(function () {
                         Route::name('inventory.')->group(function () {
 
-                            Route::get('/index',[inventoryController::class, 'index'])->name('index');
-                            Route::get('/create',[inventoryController::class, 'create'])->name('create');
-                            Route::get('/view',[inventoryController::class, 'view'])->name('view');
-                            Route::get('/edit',[inventoryController::class, 'edit'])->name('edit');
+                            Route::get('/{shop}/{branch}/transfer',[inventoryController::class, 'transfer'])->name('transfer');
+                            Route::get('/get_sub_category',[inventoryController::class, 'get_sub_category'])->name('get_sub_category');
+                            Route::get('/get_product',[inventoryController::class, 'get_product'])->name('get_product');
+                            Route::get('/get_product_detail',[inventoryController::class, 'get_product_detail'])->name('get_product_detail');
+                            Route::post('/transfer',[inventoryController::class, 'transfered'])->name('transfered');
                             
                         });
                     });

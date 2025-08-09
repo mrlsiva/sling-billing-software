@@ -96,19 +96,25 @@
                         </li>
 
                         <li class="menu-item {{ request()->is(request()->route('company') . '/products*') ? 'active' : '' }}">
-                            <a class="menu-link menu-arrow" href="#sidebarProduct" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProduct">
+                            <a class="menu-link" href="{{route('product.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
-                                    <i class="ri-shopping-basket-2-line"></i>
+                                    <i class="ri-shopping-basket-line"></i>
                                 </span>
                                 <span class="nav-text"> Products </span>
                             </a>
-                            <div class="collapse {{ request()->is(request()->route('company') . '/products*') ? 'show' : '' }}" id="sidebarProduct">
+                        </li>
+
+                        <li class="menu-item ">
+                            <a class="menu-link menu-arrow" href="#sidebarProduct" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProduct">
+                                <span class="nav-icon">
+                                    <i class="ri-hand-coin-fill"></i>
+                                </span>
+                                <span class="nav-text"> Inventory </span>
+                            </a>
+                            <div class="collapse" id="sidebarProduct">
                                 <ul class="sub-menu-nav">
-                                    <li class="sub-menu-item {{ request()->is(request()->route('company') . '/products*') ? 'active' : '' }}">
-                                        <a class="sub-menu-link {{ request()->is(request()->route('company') . '/products*') ? 'active' : '' }}" href="{{route('product.index', ['company' => request()->route('company')])}}">Listing</a>
-                                    </li>
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="{{route('inventory.index', ['company' => request()->route('company')])}}">Inventory</a>
+                                        <a class="sub-menu-link" href="{{route('inventory.transfer', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}">Product Transfer</a>
                                     </li>
                                 </ul>
                             </div>
@@ -126,7 +132,7 @@
                         <li class="menu-item">
                             <a class="menu-link" href="{{route('customer.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
-                                    <i class="ri-group-2-line"></i>
+                                    <i class="ri-group-line"></i>
                                 </span>
                                 <span class="nav-text"> Customers </span>
                             </a>
