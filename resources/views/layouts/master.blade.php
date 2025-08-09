@@ -179,7 +179,7 @@
         </div>
         <header class="topbar d-flex">
             @php
-                $user = App\Models\User::where('user_name',request()->segment(1))->first();
+                $user = App\Models\User::where('slug_name',request()->segment(1))->first();
             @endphp
             <!-- Sidebar Logo -->
             <div class="logo-box">

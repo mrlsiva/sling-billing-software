@@ -14,7 +14,7 @@
         </div>
       @else
         @php
-          $user = App\Models\User::where('user_name',request()->segment(1))->first();
+          $user = App\Models\User::where('slug_name',request()->segment(1))->first();
         @endphp
         <div class="col-md-6 logo-section text-center" style="background: #ccc;">
           <img src="{{ asset('storage/' . $user->logo) }}" alt="user-image" class="img-fluid user-avtar">
