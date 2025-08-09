@@ -93,17 +93,6 @@ else
                         });
                     });
 
-                    Route::prefix('customers')->group(function () {
-                        Route::name('customer.')->group(function () {
-
-                            Route::get('/index',[customerController::class, 'index'])->name('index');
-                            Route::get('/create',[customerController::class, 'create'])->name('create');
-                            Route::get('/view',[customerController::class, 'view'])->name('view');
-                            Route::get('/edit',[customerController::class, 'edit'])->name('edit');
-                            
-                        });
-                    });
-
                 });
 
                 Route::group(['middleware' => ['role:Branch']], function () {

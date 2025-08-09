@@ -91,7 +91,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form class="row" action="{{route('inventory.transfered', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
-
+            	@csrf
                 <div class="modal-body">
 
                     <div class="row">
@@ -166,7 +166,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Clear</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Transfer</button>
                 </div>
             </form>

@@ -130,7 +130,7 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('customer.index', ['company' => request()->route('company')])}}">
+                            <a class="menu-link" href="#">
                                 <span class="nav-icon">
                                     <i class="ri-group-line"></i>
                                 </span>
@@ -355,6 +355,25 @@
                         gravity: "top",      // top / bottom
                         position: "right",   // left / center / right
                         className: "success", // success, error, info, etc. depending on your toast lib
+                        duration: 10000,
+                        close: "close",
+                        style: "style"
+                    }
+                });
+                document.dispatchEvent(event);
+            });
+        </script>
+    @endif
+
+    @if (session('toast_error'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const event = new CustomEvent("toast", {
+                    detail: {
+                        text: "{{ session('toast_error') }}",
+                        gravity: "top",      // top / bottom
+                        position: "right",   // left / center / right
+                        className: "danger", // success, error, info, etc. depending on your toast lib
                         duration: 10000,
                         close: "close",
                         style: "style"
