@@ -51,7 +51,7 @@
             @csrf
 
             @if(request()->segment(1) === 'admin')
-              <input type="hidden" name="slug_name" value="super_admin">
+              <input type="hidden" name="slug_name" value="admin">
             @else
               <input type="hidden" name="slug_name" value="{{request()->route('company')}}">
             @endif

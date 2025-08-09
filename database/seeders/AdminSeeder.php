@@ -23,6 +23,7 @@ class AdminSeeder extends Seeder
                 'unique_id' => 'U-00001',
                 'name' => 'Super Admin',
                 'user_name' => 'super_admin',
+                'slug_name' => 'admin',
                 'email' => 'super_admin@admin.com',
                 'phone' => '1234567890',
                 'password' => \Hash::make('Admin@2025'),
