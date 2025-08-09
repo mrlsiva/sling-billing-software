@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 //Controller
 use App\Http\Controllers\auth\loginController;
+use App\Http\Controllers\auth\homeController;
 use App\Http\Controllers\users\categoryController;
 use App\Http\Controllers\users\subCategoryController;
 use App\Http\Controllers\users\productController;
@@ -27,9 +28,7 @@ else
 
             Route::post('/sign_in',[loginController::class, 'sign_in'])->name('sign_in');
 
-            Route::get('/', function () {
-                return view('users.home');
-            })->name('home');
+            Route::get('/',[homeController::class, 'home'])->name('home');
 
             Route::get('/login', function () {
                 return view('auth.login');
