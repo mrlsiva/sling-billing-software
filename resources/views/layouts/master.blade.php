@@ -164,7 +164,7 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('branch.billing', ['company' => request()->route('company')])}}">
+                            <a class="menu-link" href="{{route('branch.billing.pos', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-shopping-cart-line"></i>
                                 </span>

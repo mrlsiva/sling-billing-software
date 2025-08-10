@@ -9,7 +9,10 @@ use App\Http\Controllers\users\categoryController;
 use App\Http\Controllers\users\subCategoryController;
 use App\Http\Controllers\users\productController;
 use App\Http\Controllers\users\inventoryController;
-use App\Http\Controllers\users\customerController;
+
+
+use App\Http\Controllers\branches\customerController;
+use App\Http\Controllers\branches\billingController;
 
 
 Route::get('/', function () {
@@ -115,10 +118,12 @@ else
                                 });
                             });
 
-
-                            Route::get('/billing', function () {
-                                return view('branches.billing');
-                            })->name('billing');
+                            Route::prefix('billing')->group(function () {
+                                Route::name('billing.')->group(function () {
+                                    Route::get('/pos',[billingController::class, 'billing'])->name('pos');
+                                    Route::get('/get_sub_category',[billingController::class, 'get_sub_category'])->name('get_sub_category');
+                                });
+                            });
                         });
                     });
                 });
