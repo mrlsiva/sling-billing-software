@@ -9,10 +9,12 @@ use App\Http\Controllers\users\categoryController;
 use App\Http\Controllers\users\subCategoryController;
 use App\Http\Controllers\users\productController;
 use App\Http\Controllers\users\inventoryController;
+use App\Http\Controllers\users\dashboardController;
 
 
 use App\Http\Controllers\branches\customerController;
 use App\Http\Controllers\branches\billingController;
+use App\Http\Controllers\branches\branchDashboardController;
 
 
 Route::get('/', function () {
@@ -41,9 +43,7 @@ else
 
                 Route::group(['middleware' => ['role:HO']], function () {
 
-                    Route::get('/dashboard', function () {
-                        return view('users.dashboard');
-                    })->name('dashboard');
+                    Route::get('/dashboard',[dashboardController::class, 'index'])->name('dashboard');
 
                     Route::prefix('categories')->group(function () {
                         Route::name('category.')->group(function () {
@@ -103,9 +103,7 @@ else
                     Route::prefix('branches')->group(function () {
                         Route::name('branch.')->group(function () {
 
-                            Route::get('/dashboard', function () {
-                                return view('branches.dashboard');
-                            })->name('dashboard');
+                            Route::get('/dashboard',[branchDashboardController::class, 'index'])->name('dashboard');
 
                             Route::prefix('customers')->group(function () {
                                 Route::name('customer.')->group(function () {
