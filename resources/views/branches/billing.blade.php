@@ -11,332 +11,137 @@
 			<div class="card-header d-flex align-items-center justify-content-between border-0">
 				<h4 class="card-title mb-0">Explore Our Best Menu</h4>
 				<div>
-					<a href="#!" class="btn btn-primary btn-sm"><i class="ri-eye-line"></i> View All</a>
+					<a href="{{route('branch.billing.pos', ['company' => request()->route('company')])}}" class="btn btn-primary btn-sm"><i class="ri-eye-line"></i> View All</a>
 				</div>
 			</div>
 		</div>
-		<div class="form-check mb-3">
-			<input type="checkbox" class="form-check-input" id="checkbox-veg">
-			<label class="form-check-label" for="checkbox-veg">Available Quantity</label>
-		</div>
+		<form id="filterForm" method="GET" action="{{ route('branch.billing.pos', ['company' => request()->route('company')]) }}">
+
+			<div class="row">
+
+				<div class="col-md-4">
+					<div class="mb-3">
+						<label for="choices-single-groups" class="form-label text-muted">Category</label>
+						<select class="form-control" name="category" id="category">
+							<option value=""> Select </option>
+							@foreach($categories as $category)
+							<option value="{{$category->id}}" {{ request('category') == $category->id ? 'selected' : '' }}>{{$category->name}}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="mb-3">
+						<label for="choices-single-groups" class="form-label text-muted">Sub Category</label>
+						<select class="form-control" name="sub_category" id="sub_category">
+
+							@if(request('sub_category'))
+								@php
+									$sub_categories = App\Models\SubCategory::where([['category_id',request('category')],['is_active',1]])->get();
+								@endphp
+
+								@foreach($sub_categories as $sub_category)
+									<option value=""> Select </option>
+									<option value="{{$sub_category->id}}" {{ request('sub_category') == $sub_category->id ? 'selected' : '' }}>{{$sub_category->name}}</option>
+								@endforeach
+							@else
+								<option value=""> Select </option>
+							@endif
+						</select>
+					</div>
+				</div>
+				
+				<div class="col-md-4">
+		    		<input type="hidden" name="filter" id="filterInput" value="{{ request('filter', 0) }}">
+				    <div class="form-check mb-3">
+				        <input type="checkbox" 
+				               class="form-check-input" 
+				               id="checkbox-veg" 
+				               {{ request('filter') == 1 ? 'checked' : '' }}
+				               onchange="document.getElementById('filterInput').value = this.checked ? 1 : 0; document.getElementById('filterForm').submit();">
+				        <label class="form-check-label" for="checkbox-veg">
+				            Show in stock products only
+				        </label>
+				    </div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="d-flex justify-content-end">
+					<button class="btn btn-primary btn-sm"><i class="ri-search-line"></i> Search</button>
+				</div>
+			</div>
+
+		</form>
 		<div class="row">
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
+			@foreach($stocks as $stock)
+
+				@if($stock->quantity === 0)
+					<div class="col-xl-3 col-lg-3 col-md-4">
+						<div class="card bg-soft-danger">
+							<div class="card-body p-2">
+								<div class="d-flex flex-column">
+									<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">{{$stock->product->category->name}} - {{$stock->product->sub_category->name}}</a>
+									<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">{{$stock->product->name}}</a>
+								</div>
+								<div class="d-flex align-items-center justify-content-between mt-2">
+									<div>
+										<p class="text-dark fw-semibold fs-12 mb-0">Rs {{$stock->product->price}}</p>
+									</div>
+									<div class="d-flex align-content-center gap-1">
+										<p class="mb-0 fs-12">{{$stock->quantity}}</p>
+										<p class="badge bg-danger fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
+				@elseif($stock->quantity <= 5)
+					<div class="col-xl-3 col-lg-3 col-md-4">
+						<div class="card bg-soft-warning">
+							<div class="card-body p-2">
+								<div class="d-flex flex-column">
+									<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">{{$stock->product->category->name}} - {{$stock->product->sub_category->name}}</a>
+									<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">{{$stock->product->name}}</a>
+								</div>
+								<div class="d-flex align-items-center justify-content-between mt-2">
+									<div>
+										<p class="text-dark fw-semibold fs-12 mb-0">Rs {{$stock->product->price}}</p>
+									</div>
+									<div class="d-flex align-content-center gap-1">
+										<p class="mb-0 fs-12">{{$stock->quantity}}</p>
+										<p class="badge bg-warning fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
+				@else
+					<div class="col-xl-3 col-lg-3 col-md-4">
+						<div class="card">
+							<div class="card-body p-2">
+								<div class="d-flex flex-column">
+									<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">{{$stock->product->category->name}} - {{$stock->product->sub_category->name}}</a>
+									<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">{{$stock->product->name}}</a>
+								</div>
+								<div class="d-flex align-items-center justify-content-between mt-2">
+									<div>
+										<p class="text-dark fw-semibold fs-12 mb-0">Rs {{$stock->product->price}}</p>
+									</div>
+									<div class="d-flex align-content-center gap-1">
+										<p class="mb-0 fs-12">{{$stock->quantity}}</p>
+										<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card bg-soft-warning">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">2</p>
-								<p class="badge bg-warning fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card bg-soft-danger">
-					<div class="card-body p-2 ">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">0</p>
-								<p class="badge bg-danger fs-10 mb-1 text-white py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3 col-lg-3 col-md-4">
-				<div class="card">
-					<div class="card-body p-2">
-						<div class="d-flex flex-column">
-							<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">Washing Machine</a>
-							<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">Sony</a>
-						</div>
-						<div class="d-flex align-items-center justify-content-between mt-2">
-							<div>
-								<p class="text-dark fw-semibold fs-12 mb-0">Rs 1200</p>
-							</div>
-							<div class="d-flex align-content-center gap-1">
-								<p class="mb-0 fs-12">100</p>
-								<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+				@endif
+			@endforeach
 		</div>
 		<div class="mb-3">
-			<nav aria-label="Page navigation example">
-				<ul class="pagination justify-content-end mb-0">
-					<li class="page-item"><a class="page-link" href="javascript:void(0);"><i
-								class="ri-arrow-left-s-line"></i></a></li>
-					<li class="page-item active"><a class="page-link" href="javascript:void(0);">1</a></li>
-					<li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
-					<li class="page-item"><a class="page-link" href="javascript:void(0);">3</a></li>
-					<li class="page-item"><a class="page-link" href="javascript:void(0);"><i
-								class="ri-arrow-right-s-line"></i></a></li>
-				</ul>
-			</nav>
+			{!! $stocks->withQueryString()->links('pagination::bootstrap-5') !!}
 		</div>
 	</div>
 	<div class="col-md-4">
@@ -704,4 +509,8 @@
 		</div>
 	</div>
 </div>
+@endsection
+
+@section('script')
+<script src="{{asset('assets/js/branches/billing.js')}}"></script>
 @endsection

@@ -9,7 +9,12 @@ use App\Http\Controllers\users\categoryController;
 use App\Http\Controllers\users\subCategoryController;
 use App\Http\Controllers\users\productController;
 use App\Http\Controllers\users\inventoryController;
-use App\Http\Controllers\users\customerController;
+use App\Http\Controllers\users\dashboardController;
+
+
+use App\Http\Controllers\branches\customerController;
+use App\Http\Controllers\branches\billingController;
+use App\Http\Controllers\branches\branchDashboardController;
 
 
 Route::get('/', function () {
@@ -38,9 +43,7 @@ else
 
                 Route::group(['middleware' => ['role:HO']], function () {
 
-                    Route::get('/dashboard', function () {
-                        return view('users.dashboard');
-                    })->name('dashboard');
+                    Route::get('/dashboard',[dashboardController::class, 'index'])->name('dashboard');
 
                     Route::prefix('categories')->group(function () {
                         Route::name('category.')->group(function () {
@@ -84,21 +87,11 @@ else
                     Route::prefix('inventories')->group(function () {
                         Route::name('inventory.')->group(function () {
 
-                            Route::get('/index',[inventoryController::class, 'index'])->name('index');
-                            Route::get('/create',[inventoryController::class, 'create'])->name('create');
-                            Route::get('/view',[inventoryController::class, 'view'])->name('view');
-                            Route::get('/edit',[inventoryController::class, 'edit'])->name('edit');
-                            
-                        });
-                    });
-
-                    Route::prefix('customers')->group(function () {
-                        Route::name('customer.')->group(function () {
-
-                            Route::get('/index',[customerController::class, 'index'])->name('index');
-                            Route::get('/create',[customerController::class, 'create'])->name('create');
-                            Route::get('/view',[customerController::class, 'view'])->name('view');
-                            Route::get('/edit',[customerController::class, 'edit'])->name('edit');
+                            Route::get('/{shop}/{branch}/transfer',[inventoryController::class, 'transfer'])->name('transfer');
+                            Route::get('/get_sub_category',[inventoryController::class, 'get_sub_category'])->name('get_sub_category');
+                            Route::get('/get_product',[inventoryController::class, 'get_product'])->name('get_product');
+                            Route::get('/get_product_detail',[inventoryController::class, 'get_product_detail'])->name('get_product_detail');
+                            Route::post('/transfer',[inventoryController::class, 'transfered'])->name('transfered');
                             
                         });
                     });
@@ -110,9 +103,7 @@ else
                     Route::prefix('branches')->group(function () {
                         Route::name('branch.')->group(function () {
 
-                            Route::get('/dashboard', function () {
-                                return view('branches.dashboard');
-                            })->name('dashboard');
+                            Route::get('/dashboard',[branchDashboardController::class, 'index'])->name('dashboard');
 
                             Route::prefix('customers')->group(function () {
                                 Route::name('customer.')->group(function () {
@@ -120,15 +111,18 @@ else
                                     Route::get('/index',[customerController::class, 'index'])->name('index');
                                     Route::post('/store',[customerController::class, 'store'])->name('store');
                                     Route::get('/view',[customerController::class, 'view'])->name('view');
-                                    Route::get('/edit',[customerController::class, 'edit'])->name('edit');
+                                    Route::get('/{id}/edit',[customerController::class, 'edit'])->name('edit');
+                                    Route::post('/update',[customerController::class, 'update'])->name('update');
                                     
                                 });
                             });
 
-
-                            Route::get('/billing', function () {
-                                return view('branches.billing');
-                            })->name('billing');
+                            Route::prefix('billing')->group(function () {
+                                Route::name('billing.')->group(function () {
+                                    Route::get('/pos',[billingController::class, 'billing'])->name('pos');
+                                    Route::get('/get_sub_category',[billingController::class, 'get_sub_category'])->name('get_sub_category');
+                                });
+                            });
                         });
                     });
                 });

@@ -96,19 +96,25 @@
                         </li>
 
                         <li class="menu-item {{ request()->is(request()->route('company') . '/products*') ? 'active' : '' }}">
-                            <a class="menu-link menu-arrow" href="#sidebarProduct" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProduct">
+                            <a class="menu-link" href="{{route('product.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
-                                    <i class="ri-shopping-basket-2-line"></i>
+                                    <i class="ri-shopping-basket-line"></i>
                                 </span>
                                 <span class="nav-text"> Products </span>
                             </a>
-                            <div class="collapse {{ request()->is(request()->route('company') . '/products*') ? 'show' : '' }}" id="sidebarProduct">
+                        </li>
+
+                        <li class="menu-item ">
+                            <a class="menu-link menu-arrow" href="#sidebarProduct" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProduct">
+                                <span class="nav-icon">
+                                    <i class="ri-hand-coin-fill"></i>
+                                </span>
+                                <span class="nav-text"> Inventory </span>
+                            </a>
+                            <div class="collapse" id="sidebarProduct">
                                 <ul class="sub-menu-nav">
-                                    <li class="sub-menu-item {{ request()->is(request()->route('company') . '/products*') ? 'active' : '' }}">
-                                        <a class="sub-menu-link {{ request()->is(request()->route('company') . '/products*') ? 'active' : '' }}" href="{{route('product.index', ['company' => request()->route('company')])}}">Listing</a>
-                                    </li>
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="{{route('inventory.index', ['company' => request()->route('company')])}}">Inventory</a>
+                                        <a class="sub-menu-link" href="{{route('inventory.transfer', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}">Product Transfer</a>
                                     </li>
                                 </ul>
                             </div>
@@ -124,9 +130,9 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('customer.index', ['company' => request()->route('company')])}}">
+                            <a class="menu-link" href="#">
                                 <span class="nav-icon">
-                                    <i class="ri-group-2-line"></i>
+                                    <i class="ri-group-line"></i>
                                 </span>
                                 <span class="nav-text"> Customers </span>
                             </a>
@@ -158,7 +164,7 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('branch.billing', ['company' => request()->route('company')])}}">
+                            <a class="menu-link" href="{{route('branch.billing.pos', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-shopping-cart-line"></i>
                                 </span>
@@ -173,7 +179,7 @@
         </div>
         <header class="topbar d-flex">
             @php
-                $user = App\Models\User::where('user_name',request()->segment(1))->first();
+                $user = App\Models\User::where('slug_name',request()->segment(1))->first();
             @endphp
             <!-- Sidebar Logo -->
             <div class="logo-box">
@@ -349,6 +355,25 @@
                         gravity: "top",      // top / bottom
                         position: "right",   // left / center / right
                         className: "success", // success, error, info, etc. depending on your toast lib
+                        duration: 10000,
+                        close: "close",
+                        style: "style"
+                    }
+                });
+                document.dispatchEvent(event);
+            });
+        </script>
+    @endif
+
+    @if (session('toast_error'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const event = new CustomEvent("toast", {
+                    detail: {
+                        text: "{{ session('toast_error') }}",
+                        gravity: "top",      // top / bottom
+                        position: "right",   // left / center / right
+                        className: "danger", // success, error, info, etc. depending on your toast lib
                         duration: 10000,
                         close: "close",
                         style: "style"

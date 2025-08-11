@@ -37,9 +37,10 @@
 									<th>Phone</th>
 									<th>Alternate Phone</th>
 									<th>Address</th>
-									<th>City</th>
-									<th>Pincode</th>
+									<th>Gender</th>
+									<th>DOB</th>
 									<th>Order History</th>
+									<th>Action</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -63,17 +64,21 @@
 											@else
 												-
 											@endif
+											<br>
+											@if($user->pincode != null)
+												{{$user->pincode}}
+											@endif
 										</td>
 										<td>
-											@if($user->city != null)
-												{{$user->city}}
+											@if($user->gender_id != null)
+												{{$user->gender->name}}
 											@else
 												-
 											@endif
 										</td>
 										<td>
-											@if($user->pincode != null)
-												{{$user->pincode}}
+											@if($user->dob != null)
+												{{ \Carbon\Carbon::parse($user->dob)->format('d M Y') }}
 											@else
 												-
 											@endif
@@ -82,6 +87,9 @@
 											<div class="d-flex gap-3">
 												<a href="#" class="text-muted" title="Order History"><i class="ri-eye-line align-middle fs-20"></i></a>
 											</div>
+										</td>
+										<td>
+											<a href="{{ route('branch.customer.edit', ['company' => request()->route('company'),'id' => $user->id ]) }}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
 										</td>
 									</tr>
 									@endforeach
@@ -113,6 +121,7 @@
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Name</label>
+		                            <span class="text-danger">*</span>
 		                            <input type="text" id="name" name="name" class="form-control" required="">
 		                        </div>
 		                    </div>
@@ -122,6 +131,7 @@
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Phone</label>
+		                            <span class="text-danger">*</span>
 		                            <input type="number" id="phone" name="phone" class="form-control" min="1" required="">
 		                        </div>
 		                    </div>
@@ -140,7 +150,8 @@
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Address</label>
-		                            <input type="text" id="address" name="address" class="form-control">
+		                            <span class="text-danger">*</span>
+		                            <input type="text" id="address" name="address" class="form-control" required="">
 		                        </div>
 		                    </div>
 	                   	</div>
@@ -148,8 +159,8 @@
 		                <div class="row">
 		                	<div class="col-md-12">
 		                		<div class="mb-3">
-		                			<label for="choices-single-groups" class="form-label text-muted">City</label>
-		                			<input type="text" id="city" name="city" class="form-control">
+		                			<label for="choices-single-groups" class="form-label text-muted">Pincode</label>
+		                			<input type="number" id="pincode" name="pincode" class="form-control" min="1">
 		                		</div>
 		                	</div>
 		                </div>
@@ -157,8 +168,22 @@
 		                <div class="row">
 		                	<div class="col-md-12">
 		                		<div class="mb-3">
-		                			<label for="choices-single-groups" class="form-label text-muted">Pincode</label>
-		                			<input type="number" id="pincode" name="pincode" class="form-control" min="1">
+		                			 <label for="payment_method" class="form-label">Gender</label>
+                                    <select class="form-control" data-choices name="gender" id="gender">
+                                        <option value="">Select</option>
+                                        @foreach($genders as $gender)
+                                        	<option value="{{$gender->id}}">{{$gender->name}}</option>
+                                        @endforeach
+                                    </select>
+		                		</div>
+		                	</div>
+		                </div>
+
+		                <div class="row">
+		                	<div class="col-md-12">
+		                		<div class="mb-3">
+		                			<label for="choices-single-groups" class="form-label text-muted">DOB</label>
+		                			<input type="date" id="dob" name="dob" class="form-control" max="{{ date('Y-m-d') }}">
 		                		</div>
 		                	</div>
 		                </div>

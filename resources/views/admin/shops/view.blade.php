@@ -25,9 +25,6 @@
                         @endif
                         
                         <a href="{{route('admin.shop.edit', ['id' => $user->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i>Edit Shop</a>
-
-                        <a href="{{route('admin.branch.create', ['id' => $user->id])}}" class="link-dark"><i class="ri-add-circle-line align-middle fs-20"></i>Add New Branch</a>
-                        
                     </div>
                 </div>
             </div>
@@ -99,12 +96,18 @@
                 </div>
             </div>
             <div class="card">
+
+
+
+
                 <div class="card-header d-flex justify-content-between align-items-center">
                     @php
                         $branch_count = App\Models\User::where('parent_id', $user->id)->count();
                     @endphp
-
-                    <h4 class="card-title mb-0">Branches <span class="badge bg-success badge-pill text-end">{{$branch_count}}</span></h4>
+                    <div>
+                        <h4 class="card-title mb-0">Branches <span class="badge bg-success badge-pill text-end">{{$branch_count}}</span></h4>
+                    </div>
+                    <a href="{{route('admin.branch.create', ['id' => $user->id])}}" class="link-dark"><i class="ri-add-circle-line align-middle fs-20"></i>Add New Branch</a>
                 </div>
 
                 <div class="card-body">

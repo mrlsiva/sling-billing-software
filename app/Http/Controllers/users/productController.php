@@ -11,6 +11,7 @@ use App\Models\SubCategory;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Metric;
+use App\Models\Stock;
 use App\Traits\common;
 use App\Traits\Log;
 use App\Models\Tax;
@@ -108,6 +109,18 @@ class productController extends Controller
             $product->image = $filePath; // This is relative to storage/app/public
             $product->save();
         }
+
+        $stock = Stock::create([ 
+            'shop_id' => Auth::user()->id,
+            'category_id' => $request->category,
+            'sub_category_id' => $request->sub_category,
+            'product_id' => $product->id,
+            'quantity' => $request->quantity,
+            'is_active' => 1,
+        ]);
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Stock Added','App/Models/Stock','stocks',$stock->id,'Insert',null,$request,'Success','Stock Added for this product');
 
         DB::commit();
 
