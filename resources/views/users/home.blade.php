@@ -1,4 +1,7 @@
 <div class="card">
+   
+<a href="{{ route('login', ['company' => request()->route('company')]) }}" >
+<button type="button" class="btn btn-primary w-100"><i class="ri-save-line"></i> Login</button></a>
                 <div class="card-header">
                     <h4 class="card-title mb-0">Shop Info</h4>
                 </div>
@@ -50,6 +53,3 @@
                     
                 </div>
             </div>
-<br>
-<a href="{{ route('login', ['company' => request()->route('company')]) }}" >
-<button type="button" class="btn btn-primary w-100"><i class="ri-save-line"></i> Login</button></a>
