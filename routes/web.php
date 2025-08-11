@@ -111,7 +111,8 @@ else
                                     Route::get('/index',[customerController::class, 'index'])->name('index');
                                     Route::post('/store',[customerController::class, 'store'])->name('store');
                                     Route::get('/view',[customerController::class, 'view'])->name('view');
-                                    Route::get('/edit',[customerController::class, 'edit'])->name('edit');
+                                    Route::get('/{id}/edit',[customerController::class, 'edit'])->name('edit');
+                                    Route::post('/update',[customerController::class, 'update'])->name('update');
                                     
                                 });
                             });
