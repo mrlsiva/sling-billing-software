@@ -5,6 +5,7 @@
 @endsection
 
 @section('body')
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <div class="row">
 	<div class="col-md-8">
 		<div class="card">
@@ -112,6 +113,8 @@
 									<div class="d-flex align-content-center gap-1">
 										<p class="mb-0 fs-12">{{$stock->quantity}}</p>
 										<p class="badge bg-warning fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
+										<button type="button" class=" bg-light text-dark border-0 rounded fs-20 lh-1 h-100" onclick="add_to_cart(this)"data-system_id="{{$stock->product_id}}"> + </button>
+
 									</div>
 								</div>
 							</div>
@@ -132,6 +135,8 @@
 									<div class="d-flex align-content-center gap-1">
 										<p class="mb-0 fs-12">{{$stock->quantity}}</p>
 										<p class="badge bg-soft-success fs-10 mb-1 text-dark py-1 px-2"> Qty</p>
+										<button type="button" class="bg-light text-dark border-0 rounded fs-20 lh-1 h-100" onclick="add_to_cart(this)"data-system_id="{{$stock->product_id}}"> + </button>
+
 									</div>
 								</div>
 							</div>
@@ -171,128 +176,12 @@
 
 				</ul>
 				<div class="tab-content pt-2 text-muted">
+
 					<div class="tab-pane show active" id="homeTabsJustified">
 						<h5 class="fw-semibold my-3">Order Summery</h5>
 						<div class="" data-simplebar style="max-height: 200px;">
-							<div class="border border-light  p-2 rounded">
-								<div class="d-flex flex-wrap align-items-center gap-3">
-									<div>
-										<a href="#!" class="text-dark fs-12 fw-bold">Italian Burata Pizza</a>
-										<p class="fs-10 my-1">12-Inch</p>
-									</div>
-									<div class="ms-lg-auto">
-										<div
-											class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
-											<button type="button"
-												class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
-											<input type="number"
-												class="text-dark text-center border-0 bg-body-secondary rounded h-100"
-												value="1" min="0" max="100" readonly="">
-											<button type="button"
-												class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
-										</div>
-									</div>
-								</div>
-								<div class="d-flex align-items-center justify-content-between px-1">
-									<div>
-										<p class="text-dark fw-semibold fs-16 mb-0">$12.00 </p>
-									</div>
-									<div class="d-flex align-content-center gap-1">
-										<a href="#!"
-											class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center"><i
-												class="ri-delete-bin-5-line align-middle fs-12"></i></a>
-									</div>
-								</div>
-							</div>
-							<div class="border border-light mt-3 p-2 rounded">
-								<div class="d-flex flex-wrap align-items-center gap-3">
-									<div>
-										<a href="#!" class="text-dark fs-12 fw-bold">Italian Burata Pizza</a>
-										<p class="fs-10 my-1">12-Inch</p>
-									</div>
-									<div class="ms-lg-auto">
-										<div
-											class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
-											<button type="button"
-												class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
-											<input type="number"
-												class="text-dark text-center border-0 bg-body-secondary rounded h-100"
-												value="1" min="0" max="100" readonly="">
-											<button type="button"
-												class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
-										</div>
-									</div>
-								</div>
-								<div class="d-flex align-items-center justify-content-between px-1">
-									<div>
-										<p class="text-dark fw-semibold fs-16 mb-0">$12.00 </p>
-									</div>
-									<div class="d-flex align-content-center gap-1">
-										<a href="#!"
-											class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center"><i
-												class="ri-delete-bin-5-line align-middle fs-12"></i></a>
-									</div>
-								</div>
-							</div>
-							<div class="border border-light mt-3 p-2 rounded">
-								<div class="d-flex flex-wrap align-items-center gap-3">
-									<div>
-										<a href="#!" class="text-dark fs-12 fw-bold">Italian Burata Pizza</a>
-										<p class="fs-10 my-1">12-Inch</p>
-									</div>
-									<div class="ms-lg-auto">
-										<div
-											class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
-											<button type="button"
-												class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
-											<input type="number"
-												class="text-dark text-center border-0 bg-body-secondary rounded h-100"
-												value="1" min="0" max="100" readonly="">
-											<button type="button"
-												class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
-										</div>
-									</div>
-								</div>
-								<div class="d-flex align-items-center justify-content-between px-1">
-									<div>
-										<p class="text-dark fw-semibold fs-16 mb-0">$12.00 </p>
-									</div>
-									<div class="d-flex align-content-center gap-1">
-										<a href="#!"
-											class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center"><i
-												class="ri-delete-bin-5-line align-middle fs-12"></i></a>
-									</div>
-								</div>
-							</div>
-							<div class="border border-light mt-3 p-2 rounded">
-								<div class="d-flex flex-wrap align-items-center gap-3">
-									<div>
-										<a href="#!" class="text-dark fs-12 fw-bold">Italian Burata Pizza</a>
-										<p class="fs-10 my-1">12-Inch</p>
-									</div>
-									<div class="ms-lg-auto">
-										<div
-											class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
-											<button type="button"
-												class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
-											<input type="number"
-												class="text-dark text-center border-0 bg-body-secondary rounded h-100"
-												value="1" min="0" max="100" readonly="">
-											<button type="button"
-												class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">+</button>
-										</div>
-									</div>
-								</div>
-								<div class="d-flex align-items-center justify-content-between px-1">
-									<div>
-										<p class="text-dark fw-semibold fs-16 mb-0">$12.00 </p>
-									</div>
-									<div class="d-flex align-content-center gap-1">
-										<a href="#!"
-											class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center"><i
-												class="ri-delete-bin-5-line align-middle fs-12"></i></a>
-									</div>
-								</div>
+							<div id="cart_item">
+								
 							</div>
 						</div>
 						<div class="table-responsive">
@@ -302,94 +191,44 @@
 										<td>
 											<p class="d-flex mb-0 align-items-center gap-1">Items : </p>
 										</td>
-										<td class="text-end text-dark fw-medium">5 (Items)</td>
+										<td class="text-end text-dark fw-medium" id="total_item">0 (Items)</td>
 									</tr>
 									<tr>
 										<td>
 											<p class="d-flex mb-0 align-items-center gap-1"> Subtotal : </p>
 										</td>
-										<td class="text-end text-dark fw-medium">$80.00</td>
+										<td class="text-end text-dark fw-medium" id="sub_total">₹0.00</td>
 									</tr>
 									<tr>
 										<td>
 											<p class="d-flex mb-0 align-items-center gap-1"> Delivery Charge : </p>
 										</td>
-										<td class="text-end text-dark fw-medium">$00.00</td>
+										<td class="text-end text-dark fw-medium">₹0.00</td>
 									</tr>
 									<tr>
 										<td>
-											<p class="d-flex mb-0 align-items-center gap-1"> Estimated Tax (12.5%) :
+											<p class="d-flex mb-0 align-items-center gap-1"> Estimated Tax :
 											</p>
 										</td>
-										<td class="text-end text-dark fw-medium">$9.00</td>
+										<td class="text-end text-dark fw-medium" id="tax">₹0.00</td>
 									</tr>
 									<tr>
 										<td>
 											<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-danger">
 												Payable Amount : </p>
 										</td>
-										<td class="text-end text-success fw-semibold">$89.00</td>
+										<td class="text-end text-success fw-semibold" id="amount">$0.00</td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
 						<div class=" gap-1 hstack mt-3">
-							<a href="#!" class="btn btn-danger w-100"><i class="ri-close-circle-line"></i> Clear</a>
-							<a href="#!" class="btn btn-primary w-100"><i class="ri-shopping-basket-2-line"></i>
-								Proceed</a>
+							<a href="#!" class="btn btn-danger w-100" id="clear_cart"><i class="ri-close-circle-line"></i> Clear</a>
+							<a href="#!" id="next_tab_user_info" class="btn btn-primary w-100"><i class="ri-arrow-right-circle-line"></i>
+								Next</a>
 						</div>
 					</div>
 					<div class="tab-pane" id="messagesTabsJustified">
-						<h5 class="fw-semibold my-3">Customer Info </h5>
-						<div class="row">
-
-							<div class="col-md-12">
-
-								<div class="mb-3">
-									<label for="account_number" class="form-label">Mobile No</label>
-									<input type="text" id="account_number" name="account_number" class="form-control"
-										placeholder="Enter Customer Mobile Number" inputmode="numeric" pattern="[0-9]*"
-										maxlength="16" value="{{old('account_number')}}">
-								</div>
-
-							</div>
-							<div class="col-md-12">
-
-								<div class="mb-3">
-									<label for="category-name" class="form-label">Alternate Mobile No </label>
-									<input type="text" id="confirm_account_number" name="confirm_account_number"
-										class="form-control" placeholder="Alternate Mobile No" inputmode="numeric"
-										pattern="[0-9]*" maxlength="16" value="{{old('confirm_account_number')}}">
-								</div>
-
-							</div>
-							<div class="col-md-12">
-
-								<div class="mb-3">
-									<label for="bank" class="form-label">Customer Name</label>
-									<input type="text" id="bank" name="bank" class="form-control"
-										placeholder="Enter Customer Name" value="{{old('bank')}}">
-								</div>
-
-							</div>
-							<div class="col-md-12">
-
-								<div class="mb-3">
-									<label for="branch" class="form-label">Address</label>
-									<input type="text" id="branch" name="branch" class="form-control"
-										placeholder="Enter Address" value="{{old('branch')}}">
-								</div>
-
-							</div>
-
-						</div>
-						<div class=" gap-1 hstack mt-3">
-							<!-- <a href="#!" class="btn btn-danger w-100"><i class="ri-close-circle-line"></i> Clear</a> -->
-							<a href="#!" class="btn btn-primary w-100"><i class="ri-shopping-basket-2-line"></i>
-								Proceed</a>
-						</div>
-					</div>
-					<div class="tab-pane" id="profileTabsJustified">
 						<div class="mt-3">
 							<div class="table-responsive">
 								<table class="table table-bordered bg-light-subtle">
@@ -400,13 +239,86 @@
 												<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-danger">
 													Payable Amount : </p>
 											</td>
-											<td class="text-end text-success fw-semibold">$89.00</td>
+											<td class="text-end text-success fw-semibold" id="amount_text">₹0.00</td>
 										</tr>
 									</tbody>
 								</table>
 							</div>
 						</div>
-						<!-- <h5 class="fw-semibold my-3">Payment Method</h5> -->
+
+						<div class="d-flex justify-content-between align-items-center">
+						    <h5 class="fw-semibold my-3 mb-0">Customer Info</h5>
+						    <!-- <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#customerAdd">
+						        <i class="ri-add-line"></i> Customer
+						    </button> -->
+
+						</div>
+
+						<div class="row">
+
+							<div class="col-md-12">
+								<div class="mb-3">
+									<label for="phone" class="form-label">Phone</label>
+									<span class="text-danger">*</span>
+									<input type="tel" name="phone" id="phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" placeholder="Phone">
+								</div>
+							</div>
+
+							<input type="hidden" name="customer" id="customer">
+
+							<div class="col-md-12">
+								<div class="mb-3">
+									<label for="alt_phone" class="form-label">Alternate Phone</label>
+									<input type="tel" name="alt_phone" id="alt_phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"  placeholder="Alternate Phone">
+								</div>
+							</div>
+
+							<div class="col-md-12">
+								<div class="mb-3">
+									<label for="name" class="form-label">Name</label>
+									<span class="text-danger">*</span>
+		                            <input type="text" id="name" name="name" class="form-control"  placeholder="Name">
+								</div>
+							</div>
+
+							<div class="col-md-12">
+								<div class="mb-3">
+									<label for="address" class="form-label">Address</label>
+									<span class="text-danger">*</span>
+									<input type="text" id="address" name="address" class="form-control" placeholder="Address" >
+								</div>
+							</div>
+
+							<div class="col-md-12">
+								<div class="mb-3">
+									<label for="payment_method" class="form-label">Gender</label>
+                                    <select class="form-control" name="gender" id="gender">
+                                        <option value="">Select</option>
+                                        @foreach($genders as $gender)
+                                        	<option value="{{$gender->id}}">{{$gender->name}}</option>
+                                        @endforeach
+                                    </select>
+								</div>
+							</div>
+
+							<div class="col-md-12">
+								<div class="mb-3">
+									<label for="dod" class="form-label">DOB</label>
+									<input type="date" id="dob" name="dob" class="form-control" placeholder="DOB">
+								</div>
+							</div>
+
+						</div>
+
+						<div class=" gap-1 hstack mt-3">
+							<a href="#!" class="btn btn-danger w-100" id="previous_tab_home_info"><i class="ri-close-circle-line"></i> Previous</a>
+							<a href="#!" id="next_tab_payment_info" class="btn btn-primary w-100"><i class="ri-arrow-right-circle-line"></i>
+								Next</a>
+						</div>
+						
+					</div>
+					<div class="tab-pane" id="profileTabsJustified">
+						<h5 class="fw-semibold my-3">Payment Method</h5>
 						<div class="row g-2">
 							<div class="col-md-4">
 								<div class="form-check form-checkbox-success ps-0">
@@ -454,51 +366,104 @@
 									</label>
 								</div>
 							</div>
+							<div class="col-md-4">
+								<div class="form-check form-checkbox-success ps-0">
+									<label for="exchange-payment" class="w-100">
+										<div class="d-flex align-items-center p-3 rounded gap-2 border">
+											<div class="d-flex align-items-center gap-2">
+												<h5 class="mb-0"><i class="ri-exchange-funds-line text-success"></i> Exchange</h5>
+											</div>
+											<div class="ms-auto">
+												<input class="form-check-input float-end" type="radio" name="shipping"
+													id="exchange-payment">
+											</div>
+										</div>
+									</label>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-check form-checkbox-success ps-0">
+									<label for="finanace-payment" class="w-100">
+										<div class="d-flex align-items-center p-3 rounded gap-2 border">
+											<div class="d-flex align-items-center gap-2">
+												<h5 class="mb-0"><i class="ri-wallet-fill text-success"></i> Finanace</h5>
+											</div>
+											<div class="ms-auto">
+												<input class="form-check-input float-end" type="radio" name="shipping"
+													id="finanace-payment">
+											</div>
+										</div>
+									</label>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-check form-checkbox-success ps-0">
+									<label for="credit-payment" class="w-100">
+										<div class="d-flex align-items-center p-3 rounded gap-2 border">
+											<div class="d-flex align-items-center gap-2">
+												<h5 class="mb-0"><i class="ri-hand-coin-fill text-success"></i> Credit</h5>
+											</div>
+											<div class="ms-auto">
+												<input class="form-check-input float-end" type="radio" name="shipping"
+													id="credit-payment">
+											</div>
+										</div>
+									</label>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-check form-checkbox-success ps-0">
+									<label for="cheque-payment" class="w-100">
+										<div class="d-flex align-items-center p-3 rounded gap-2 border">
+											<div class="d-flex align-items-center gap-2">
+												<h5 class="mb-0"><i class="ri-cash-line text-success"></i> Cheque</h5>
+											</div>
+											<div class="ms-auto">
+												<input class="form-check-input float-end" type="radio" name="shipping"
+													id="cheque-payment">
+											</div>
+										</div>
+									</label>
+								</div>
+							</div>
 						</div>
 						<h5 class="fw-semibold my-3">Payment info</h5>
-						<div class="row">
-							<div class="col-md-12">
-
-								<div class="mb-3">
-									<label for="bank" class="form-label">Bank Name</label>
-									<input type="text" id="bank" name="bank" class="form-control"
-										placeholder="Enter Bank Name" value="{{old('bank')}}">
-								</div>
-
-							</div>
-							<div class="col-md-12">
-
-								<div class="mb-3">
-									<label for="account_number" class="form-label">Enter A/C No</label>
-									<input type="text" id="account_number" name="account_number" class="form-control"
-										placeholder="Enter Account Number" inputmode="numeric" pattern="[0-9]*"
-										maxlength="16" value="{{old('account_number')}}">
-								</div>
-
-							</div>
-							<div class="col-md-12">
-
-								<div class="mb-3">
-									<label for="category-name" class="form-label">Confirm A/C No </label>
-									<input type="text" id="confirm_account_number" name="confirm_account_number"
-										class="form-control" placeholder="Confirm Account Number" inputmode="numeric"
-										pattern="[0-9]*" maxlength="16" value="{{old('confirm_account_number')}}">
-								</div>
-
-							</div>
-							<div class="col-md-12">
-
-								<div class="mb-3">
-									<label for="branch" class="form-label">Branch</label>
-									<input type="text" id="branch" name="branch" class="form-control"
-										placeholder="Enter Branch" value="{{old('branch')}}">
-								</div>
-
-							</div>
-
+						<div class="table-responsive">
+							<table class="table table-bordered bg-light-subtle">
+								<thead>
+									<tr>
+										<td class="fw-semibold">Method</td>
+										<td class="fw-semibold">Amount</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Cash</td>
+										<td>₹0.00</td>
+									</tr>
+									<tr>
+										<td>Card</td>
+										<td>₹0.00</td>
+									</tr>
+									<tr>
+										<td>UPI</td>
+										<td>₹0.00</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td>
+											<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-success">Total Cash: </p>
+										</td>
+										<td>
+											<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-success" id="amount_text1">Payable Amount: </p>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
 						</div>
 						<div class=" gap-1 hstack mt-3">
-							<!-- <a href="#!" class="btn btn-danger w-100"><i class="ri-close-circle-line"></i> Clear</a> -->
+							<a href="#!" class="btn btn-danger w-100" id="previous_tab_user_info"><i class="ri-close-circle-line"></i> Previous</a>
 							<a href="#!" class="btn btn-primary w-100"><i class="ri-shopping-basket-2-line"></i>
 								Proceed</a>
 						</div>
@@ -509,8 +474,103 @@
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="customerAdd" tabindex="-1" aria-labelledby="customerAdd" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+		<div class="modal-content" >
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add Customer</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form class="row" id="customer_add">
+				@csrf
+				<div class="modal-body">
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="choices-single-groups" class="form-label text-muted">Name</label>
+								<span class="text-danger">*</span>
+								<input type="text" id="name" name="name" class="form-control" required="">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="choices-single-groups" class="form-label text-muted">Phone</label>
+								<span class="text-danger">*</span>
+								<input type="tel" name="phone" id="phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" required="">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="choices-single-groups" class="form-label text-muted">Alternate Phone</label>
+								<input type="tel" id="alt_phone" name="alt_phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="choices-single-groups" class="form-label text-muted">Address</label>
+								<span class="text-danger">*</span>
+								<input type="text" id="address" name="address" class="form-control" required="">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="choices-single-groups" class="form-label text-muted">Pincode</label>
+								<input type="number" id="pincode" name="pincode" class="form-control" min="1">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="payment_method" class="form-label">Gender</label>
+								<select class="form-control" data-choices name="gender" id="gender">
+									<option value="">Select</option>
+									@foreach($genders as $gender)
+									<option value="{{$gender->id}}">{{$gender->name}}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="choices-single-groups" class="form-label text-muted">DOB</label>
+								<input type="date" id="dob" name="dob" class="form-control" max="{{ date('Y-m-d') }}">
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary">Submit</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
 @endsection
 
 @section('script')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script src="{{asset('assets/js/branches/billing.js')}}"></script>
 @endsection

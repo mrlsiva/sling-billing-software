@@ -121,6 +121,10 @@ else
                                 Route::name('billing.')->group(function () {
                                     Route::get('/pos',[billingController::class, 'billing'])->name('pos');
                                     Route::get('/get_sub_category',[billingController::class, 'get_sub_category'])->name('get_sub_category');
+                                     Route::get('/get_product_detail',[billingController::class, 'get_product_detail'])->name('get_product_detail');
+                                     Route::get('/suggest-customer-phone', [billingController::class, 'suggestPhone'])->name('suggestPhone');
+                                     Route::get('/get_customer_detail',[billingController::class, 'get_customer_detail'])->name('get_customer_detail');
+                                     Route::post('/customer_store',[billingController::class, 'customer_store'])->name('customer_store');
                                 });
                             });
                         });
