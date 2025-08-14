@@ -15,15 +15,18 @@
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
                                             <p class="mb-3 card-title">{{$shop->name}}</p>
-                                            <h4 class="fw-bold d-flex align-items-center gap-2 mb-0">3 <span class="fs-10 mt-2"> Branches</span></h4>
+                                            @php
+                                                $branch_count = App\Models\User::where('parent_id', $shop->id)->count();
+                                            @endphp
+                                            <h4 class="fw-bold d-flex align-items-center gap-2 mb-0">{{$branch_count}} <span class="fs-10 mt-2"> Branches</span></h4>
                                         </div>
                                         <div class="d-flex flex-column align-items-center justify-content-center gap-2">
                                             <div class="d-flex align-items-center gap-2 pt-2">
-                                                @if($user->user_detail->primary_colour)
-                                                <div class="box" style="background-color: {{ $user->user_detail->primary_colour }};"></div>
+                                                @if($shop->user_detail->primary_colour)
+                                                <div class="box" style="background-color: {{ $shop->user_detail->primary_colour }};"></div>
                                                 @endif
-                                                @if($user->user_detail->secondary_colour)
-                                                    <div class="box" style="background-color: {{ $user->user_detail->secondary_colour }};"></div>
+                                                @if($shop->user_detail->secondary_colour)
+                                                    <div class="box" style="background-color: {{ $shop->user_detail->secondary_colour }};"></div>
                                                 @endif
 
                                             </div>
