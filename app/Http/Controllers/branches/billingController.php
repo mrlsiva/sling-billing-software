@@ -49,6 +49,27 @@ class billingController extends Controller
         return $sub_categories = SubCategory::where([['category_id',$request->id],['is_active',1]])->get();
     }
 
+    public function get_product(Request $request)
+    {
+        $stocks = Stock::with(['product.category', 'product.sub_category'])
+            ->where('branch_id', Auth::id())
+            ->where('is_active', 1)
+            ->when($request->category, fn($q, $category) => $q->where('category_id', $category))
+            ->when($request->sub_category, fn($q, $subCategory) => $q->where('sub_category_id', $subCategory))
+            ->when($request->filter == 1, fn($q) => $q->where('quantity', '>', 0))
+            ->paginate(28);
+
+        // If AJAX request → return JSON
+        return response()->json([
+            'data' => $stocks->items(),
+            'pagination' => (string) $stocks->links('pagination::bootstrap-4') // or tailwind
+        ]);
+
+        // Else load Blade normally
+        return view('branches.billing', compact('stocks'));
+    }
+
+
     public function get_product_detail(Request $request)
     {
         return $products = Product::with(['sub_category','category','stock' => function ($query) use ($request) {

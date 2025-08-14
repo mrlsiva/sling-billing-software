@@ -26,6 +26,115 @@ jQuery(document).ready(function ()
 	});
 });
 
+$(document).on('click', '#pagination a', function (e) {
+    e.preventDefault();
+    let page = $(this).attr('href').split('page=')[1];
+    loadProducts(page);
+});
+
+function loadProducts(page = 1) {
+    let sub_category = jQuery('select[name="sub_category"]').val();
+    let category = jQuery("#category").val();
+    let filter = jQuery("#filterInput").val();
+
+    jQuery.ajax({
+        url: 'get_product',
+        type: 'GET',
+        dataType: 'json',
+        data: {
+            page: page,
+            category: category,
+            sub_category: sub_category,
+            filter: filter
+        },
+        success: function (response) {
+
+            let html = '<div class="row">';
+            response.data.forEach(function (stock) {
+                let cardClass = '';
+                let badgeClass = '';
+
+                if (stock.quantity === 0) {
+                    cardClass = 'bg-soft-danger';
+                    badgeClass = 'bg-danger';
+                } else if (stock.quantity <= 5) {
+                    cardClass = 'bg-soft-warning';
+                    badgeClass = 'bg-warning';
+                } else {
+                    badgeClass = 'bg-soft-success';
+                }
+
+                html += `
+                    <div class="col-xl-3 col-lg-3 col-md-4">
+                        <div class="card ${cardClass}">
+                            <div class="card-body p-2">
+                                <div class="d-flex flex-column">
+                                    <a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">
+                                        ${stock.product.category.name} - ${stock.product.sub_category.name}
+                                    </a>
+                                    <a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">
+                                        ${stock.product.name}
+                                    </a>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mt-2">
+                                    <div>
+                                        <p class="text-dark fw-semibold fs-12 mb-0">Rs ${stock.product.price}</p>
+                                    </div>
+                                    <div class="d-flex align-content-center gap-1">
+                                        <p class="mb-0 fs-12">${stock.quantity}</p>
+                                        <p class="badge ${badgeClass} fs-10 mb-1 text-dark py-1 px-2">Qty</p>
+                                        ${stock.quantity > 0 ? `
+                                            <button type="button" 
+                                                class="bg-light text-dark border-0 rounded fs-20 lh-1 h-100"
+                                                onclick="add_to_cart(this)"
+                                                data-system_id="${stock.product_id}">
+                                                +
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+
+            $("#productContainer").html(html);
+            $("#pagination").html(response.pagination);
+        }
+    });
+}
+
+$(document).ready(function () {
+    let currentPage = 1;
+
+    $('select[name="sub_category"]').on('change', function () {
+        currentPage = 1;
+        loadProducts(currentPage);
+    });
+
+    $('#category').on('change', function () {
+        currentPage = 1;
+        loadProducts(currentPage);
+    });
+
+    $('#checkbox-veg').on('change', function () {
+        currentPage = 1;
+        loadProducts(currentPage);
+    });
+
+    $(document).on('click', '#pagination a', function (e) {
+        e.preventDefault();
+        let page = $(this).attr('href').split('page=')[1];
+        currentPage = page;
+        loadProducts(currentPage);
+    });
+
+    loadProducts(currentPage);
+});
+
+
 // Add product to cart or increase quantity
 function add_to_cart(element) {
     var system_id = $(element).data("system_id");
