@@ -19,8 +19,13 @@
                                         </div>
                                         <div class="d-flex flex-column align-items-center justify-content-center gap-2">
                                             <div class="d-flex align-items-center gap-2 pt-2">
-                                                <div class="box" style="background-color: #000;"></div>
-                                                <div class="box" style="background-color: #000;"></div>
+                                                @if($user->user_detail->primary_colour)
+                                                <div class="box" style="background-color: {{ $user->user_detail->primary_colour }};"></div>
+                                                @endif
+                                                @if($user->user_detail->secondary_colour)
+                                                    <div class="box" style="background-color: {{ $user->user_detail->secondary_colour }};"></div>
+                                                @endif
+
                                             </div>
                                             <a href="{{route('admin.shop.view', ['id' => $shop->id])}}"> <i class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>
                                         </div>
