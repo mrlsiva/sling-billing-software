@@ -25,3 +25,299 @@ jQuery(document).ready(function ()
 		}
 	});
 });
+
+// Add product to cart or increase quantity
+function add_to_cart(element) {
+    var system_id = $(element).data("system_id");
+
+    // Check if already in cart
+    var $existingItem = $('#cart_item').find('[data-product-id="' + system_id + '"]');
+
+    if ($existingItem.length) {
+        var $qtyInput = $existingItem.find('.qty-input');
+        var currentQty = parseInt($qtyInput.val());
+        var maxQty = parseInt($existingItem.data('stock-qty'));
+
+        if (currentQty < maxQty) {
+            $qtyInput.val(currentQty + 1);
+            updateCartSummary();
+        } else {
+            alert("Cannot add more. Stock limit reached (" + maxQty + ").");
+        }
+    } else {
+        // Fetch product details
+        $.ajax({
+            url: 'get_product_detail',
+            type: 'GET',
+            dataType: 'json',
+            data: { id: system_id },
+            success: function(data) {
+                var maxQty = parseInt(data.stock.quantity);
+
+                if (maxQty <= 0) {
+                    alert("This product is out of stock.");
+                    return;
+                }
+
+                $("#cart_item").append(`
+                    <div class="border border-light mt-3 p-2 rounded" 
+                         data-product-id="${data.id}" 
+                         data-price="${data.price}" 
+                         data-tax-id="${data.tax_id}" 
+                         data-stock-qty="${maxQty}">
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <div>
+                                <a class="text-dark fs-12 fw-bold">${data.category.name} - ${data.sub_category.name}</a>
+                                <p class="fs-10 my-1">${data.name}</p>
+                            </div>
+                            <div class="ms-lg-auto">
+                                <div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
+                                    <button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
+                                    <input type="number" class="qty-input text-dark text-center border-0 bg-body-secondary rounded h-100" value="1" min="0" max="${maxQty}" readonly>
+                                    <button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100" data-system_id="${data.id}">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between px-1">
+                            <div>
+                                <p class="text-dark fw-semibold fs-16 mb-0">₹${data.price}</p>
+                            </div>
+                            <div class="d-flex align-content-center gap-1">
+                                <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center remove-item">
+                                    <i class="ri-delete-bin-5-line align-middle fs-12"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+                updateCartSummary();
+            }
+        });
+    }
+}
+
+// Remove product from cart
+function remove_from_cart(element) {
+    $(element).closest('[data-product-id]').remove();
+    updateCartSummary();
+}
+
+// Update totals, tax, and amount
+function updateCartSummary() {
+    var totalItems = 0;
+    var subTotal = 0;
+    var totalTax = 0;
+
+    $('#cart_item').find('[data-product-id]').each(function() {
+        var qty = parseInt($(this).find('.qty-input').val());
+        var price = parseFloat($(this).data('price'));
+        var taxId = parseInt($(this).data('tax-id'));
+
+        totalItems += qty;
+        subTotal += price * qty;
+
+        // Tax rate mapping
+        var taxRate = 0;
+        switch (taxId) {
+            case 2: taxRate = 0.05; break;
+            case 3: taxRate = 0.12; break;
+            case 4: taxRate = 0.18; break;
+            case 5: taxRate = 0.28; break;
+            default: taxRate = 0; break;
+        }
+        totalTax += (price * qty) * taxRate;
+    });
+
+    var totalAmount = subTotal + totalTax;
+
+    $('#total_item').text(totalItems + ' (Items)');
+    $('#sub_total').text('₹' + subTotal.toFixed(2));
+    $('#tax').text('₹' + totalTax.toFixed(2));
+    $('#amount').text('₹' + totalAmount.toFixed(2));
+    $('#amount_text').text('₹' + totalAmount.toFixed(2));
+    $('#amount_text1').text('Payable Amount: ₹' + totalAmount.toFixed(2));
+}
+
+// Delegated event handling
+$(document).on('click', '.plus', function () {
+    var $item = $(this).closest('[data-product-id]');
+    var $qtyInput = $item.find('.qty-input');
+    var currentQty = parseInt($qtyInput.val());
+    var maxQty = parseInt($item.data('stock-qty'));
+
+    if (currentQty < maxQty) {
+        $qtyInput.val(currentQty + 1);
+        updateCartSummary();
+    } else {
+        alert("Cannot add more. Stock limit reached (" + maxQty + ").");
+    }
+});
+
+$(document).on('click', '.minus', function () {
+    var $item = $(this).closest('[data-product-id]');
+    var $qtyInput = $item.find('.qty-input');
+    var qty = parseInt($qtyInput.val());
+
+    if (qty > 1) {
+        $qtyInput.val(qty - 1);
+    } else {
+        $item.remove();
+    }
+
+    updateCartSummary();
+});
+
+$(document).on('click', '.remove-item', function () {
+    remove_from_cart(this);
+});
+
+// Clear cart on click
+$(document).on('click', '#clear_cart', function (e) {
+    e.preventDefault();
+    $('#cart_item').empty();
+    updateCartSummary();
+});
+
+
+$(document).ready(function () {
+    $("#phone").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: 'suggest-customer-phone',
+                type: 'get',
+                data: { phone: request.term },
+                success: function (data) {
+                	console.log(data);
+                    response(data.phones); // expects an array
+                }
+            });
+        },
+        minLength: 1 // start suggesting after 1 digit
+    });
+});
+
+
+$(document).ready(function () {
+    $("#phone").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: 'suggest-customer-phone',
+                type: 'get',
+                data: { phone: request.term },
+                success: function (data) {
+                    response(data.phones); // Send phone array to autocomplete
+                }
+            });
+        },
+        minLength: 1,
+        select: function (event, ui) {
+            // When user selects a phone number from suggestions
+            var phone = ui.item.value;
+
+            $.ajax({
+                url: 'get_customer_detail',
+                type: 'GET',
+                dataType: 'json',
+                data: { phone: phone },
+                success: function (data) {
+
+                    console.log(data);
+
+                    $("#customer").val(data.id);
+                    $("#alt_phone").val(data.alt_phone).prop('disabled', true);
+                    $("#name").val(data.name).prop('disabled', true);
+                    $("#address").val(data.address).prop('disabled', true);
+                    
+                    jQuery('select[name="gender"]').empty();
+                    $('select[name="gender"]').append('<option value="">'+ "Select" +'</option>');
+                    if(data.gender_id == 1)
+                    {
+                        $('select[name="gender"]').append('<option value="1" selected>'+ "Female" +'</option>');
+                        $('select[name="gender"]').append('<option value="2">'+ "Male" +'</option>');
+                    }
+                    else if(data.gender_id == 2)
+                    {
+                        $('select[name="gender"]').append('<option value="1">'+ "Female" +'</option>');
+                        $('select[name="gender"]').append('<option value="2" selected>'+ "Male" +'</option>');
+                    }
+                    $('select[name="gender"]').prop('disabled', true);
+                    $("#dob").val(data.dob).prop('disabled', true);
+
+                }
+            });
+        }
+    });
+});
+
+$(document).ready(function () {
+    // Handle form submission via AJAX
+    $('#customer_add').on('submit', function (e) {
+        e.preventDefault(); // Prevent normal form submit
+
+        $.ajax({
+            url: 'customer_store', // Change to your actual route
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+               alert('Customer added successfully');
+                $('#customerAdd').modal('hide');
+                $('#customer_add')[0].reset();
+            },
+            error: function (xhr) {
+                alert('Something went wrong!');
+            }
+        });
+    });
+
+    // If you want to trigger submit from JS somewhere else:
+    function submitCustomerForm() {
+        document.getElementById('customer_add').requestSubmit(); // With validation
+    }
+
+    $("#phone").on("input", function () {
+        if ($(this).val().trim() === "") {
+            $("#customer").val("");
+            $("#alt_phone").val("").prop('disabled', false);
+            $("#name").val("").prop('disabled', false);
+            $("#address").val("").prop('disabled', false);
+            $('select[name="gender"]').empty().append('<option value="">Select</option>').append('<option value="1">'+ "Female" +'</option>').append('<option value="2">'+ "Male" +'</option>').prop('disabled', false);
+            $("#dob").val("").prop('disabled', false);
+        }
+    });
+});
+
+document.getElementById('next_tab_user_info').addEventListener('click', function(e) {
+    e.preventDefault();
+    let nextTab = document.querySelector('a[href="#messagesTabsJustified"]');
+    let tab = new bootstrap.Tab(nextTab);
+    tab.show();
+});
+
+document.getElementById('next_tab_payment_info').addEventListener('click', function(e) {
+    e.preventDefault();
+    let nextTab = document.querySelector('a[href="#profileTabsJustified"]');
+    let tab = new bootstrap.Tab(nextTab);
+    tab.show();
+});
+
+document.getElementById('previous_tab_home_info').addEventListener('click', function(e) {
+    e.preventDefault();
+    let nextTab = document.querySelector('a[href="#homeTabsJustified"]');
+    let tab = new bootstrap.Tab(nextTab);
+    tab.show();
+});
+
+document.getElementById('previous_tab_user_info').addEventListener('click', function(e) {
+    e.preventDefault();
+    let nextTab = document.querySelector('a[href="#messagesTabsJustified"]');
+    let tab = new bootstrap.Tab(nextTab);
+    tab.show();
+});
+
+
+
+
+
+
+

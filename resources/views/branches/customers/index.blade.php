@@ -132,7 +132,7 @@
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Phone</label>
 		                            <span class="text-danger">*</span>
-		                            <input type="number" id="phone" name="phone" class="form-control" min="1" required="">
+		                            <input type="tel" name="phone" id="phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
 		                        </div>
 		                    </div>
 	                   	</div>
@@ -141,7 +141,7 @@
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Alternate Phone</label>
-		                            <input type="number" id="alt_phone" name="alt_phone" class="form-control" min="1">
+		                            <input type="tel" id="alt_phone" name="alt_phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
 		                        </div>
 		                    </div>
 	                   	</div>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Product extends Model
 {
@@ -33,5 +34,18 @@ class Product extends Model
     public function metric()
     {
         return $this->belongsTo('App\Models\Metric');
+    }
+
+     public function stock()
+    {
+        return $this->hasOne(Stock::class, 'product_id');
+    }
+
+    // Filtered stock for the logged-in shop & branch
+    public function filteredStock()
+    {
+        return $this->hasOne(Stock::class, 'product_id')
+            ->where('shop_id', Auth::user()->parent_id)
+            ->where('branch_id', Auth::user()->id);
     }
 }
