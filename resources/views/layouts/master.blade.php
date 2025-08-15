@@ -171,6 +171,15 @@
                                 <span class="nav-text"> Billing </span>
                             </a>
                         </li>
+
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('branch.setting', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-settings-3-line"></i>
+                                </span>
+                                <span class="nav-text"> Settings </span>
+                            </a>
+                        </li>
                         
 
                     </ul>

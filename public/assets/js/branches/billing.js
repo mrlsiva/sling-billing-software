@@ -65,7 +65,7 @@ function loadProducts(page = 1) {
                 }
 
                 html += `
-                    <div class="col-xl-3 col-lg-3 col-md-4">
+                    <div class="col-md-4">
                         <div class="card ${cardClass}">
                             <div class="card-body p-2">
                                 <div class="d-flex flex-column">
@@ -423,6 +423,210 @@ document.getElementById('previous_tab_user_info').addEventListener('click', func
     let tab = new bootstrap.Tab(nextTab);
     tab.show();
 });
+
+jQuery(document).ready(function ()
+{
+    jQuery('select[name="payment"]').on('change',function(){
+        var payment = jQuery(this).val();
+        if(payment)
+        {
+            if(payment == 1)
+            {
+                $('#cash').removeClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 2)
+            {
+                $('#cash').addClass('secret');
+                $('#card').removeClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 3)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').removeClass('secret');
+            }
+            else if(payment == 4)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').removeClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 5)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').removeClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 6)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').removeClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 7)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').removeClass('secret');
+                $('#upi').addClass('secret');
+            }
+            
+        }
+    });
+});
+
+function appendPaymentRow(method, amount) {
+    let tbody = $("#payment-info-body");
+    let existingRow = tbody.find(`tr[data-method="${method}"]`);
+
+    if (existingRow.length) {
+        // Replace with latest amount
+        existingRow.find("td").eq(1).text(`₹${parseFloat(amount).toFixed(2)}`);
+    } else {
+        // Add as new entry
+        tbody.append(`
+            <tr data-method="${method}">
+                <td>${method}</td>
+                <td>₹${parseFloat(amount).toFixed(2)}</td>
+            </tr>
+        `);
+    }
+
+    updateTotal();
+}
+
+function updateTotal() {
+    let total = 0;
+    $("#payment-info-body tr").each(function () {
+        let amt = parseFloat($(this).find("td").eq(1).text().replace("₹", "")) || 0;
+        total += amt;
+    });
+    $("#received_cash").text(`Total Cash: ₹${total.toFixed(2)}`);
+}
+
+
+// The rest stays the same
+function cash_add() {
+    let cash_amount = $("#cash_amount").val().trim();
+    if (cash_amount === "" || isNaN(cash_amount) || parseFloat(cash_amount) <= 0) {
+        alert('Amount is required');
+        return;
+    }
+    appendPaymentRow("Cash", cash_amount);
+    $("#cash_amount").val("");
+}
+
+function card_add() {
+    let card_number = $("#card_number").val().trim();
+    let card_name = $("#card_name").val().trim();
+    let card_amount = $("#card_amount").val().trim();
+
+    if (card_number === "" || card_name === "" || card_amount === "" || isNaN(card_amount) || parseFloat(card_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    if (!/^\d{8,}$/.test(card_number)) {
+        alert('Invalid Card Number (min 8 digits)');
+        return;
+    }
+    appendPaymentRow(`Card - ${card_name}`, card_amount);
+    $("#card_number, #card_name, #card_amount").val("");
+}
+
+function finance_add() {
+    let finance_card = $("#finance_card").val().trim();
+    let finance_type = $("#finance_type").val().trim();
+    let finance_amount = $("#finance_amount").val().trim();
+
+    if (finance_card === "" || finance_type === "" || finance_amount === "" || isNaN(finance_amount) || parseFloat(finance_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    if (!/^\d{8,}$/.test(finance_card)) {
+        alert('Invalid Finance Card Number (min 8 digits)');
+        return;
+    }
+    appendPaymentRow(`Finance - ${$("#finance_type option:selected").text()}`, finance_amount);
+    $("#finance_card, #finance_type, #finance_amount").val("");
+}
+
+function exchange_add() {
+    let exchange_amount = $("#exchange_amount").val().trim();
+    if (exchange_amount === "" || isNaN(exchange_amount) || parseFloat(exchange_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    appendPaymentRow("Exchange", exchange_amount);
+    $("#exchange_amount").val("");
+}
+
+function credit_add() {
+    let credit_amount = $("#credit_amount").val().trim();
+    if (credit_amount === "" || isNaN(credit_amount) || parseFloat(credit_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    appendPaymentRow("Credit", credit_amount);
+    $("#credit_amount").val("");
+}
+
+function cheque_add() {
+    let cheque_number = $("#cheque_number").val().trim();
+    let cheque_amount = $("#cheque_amount").val().trim();
+
+    if (cheque_number === "" || cheque_amount === "" || isNaN(cheque_amount) || parseFloat(cheque_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    if (!/^\d{6,}$/.test(cheque_number)) {
+        alert('Invalid Cheque Number (min 6 digits)');
+        return;
+    }
+    appendPaymentRow("Cheque", cheque_amount);
+    $("#cheque_number, #cheque_amount").val("");
+}
+
+function upi_add() {
+    let upi_amount = $("#upi_amount").val().trim();
+    if (upi_amount === "" || isNaN(upi_amount) || parseFloat(upi_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    appendPaymentRow("UPI", upi_amount);
+    $("#upi_amount").val("");
+}
+
+
 
 
 

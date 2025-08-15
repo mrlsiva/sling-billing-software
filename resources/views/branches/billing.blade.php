@@ -84,7 +84,7 @@
 					        }
 					    @endphp
 
-					    <div class="col-xl-3 col-lg-3 col-md-4">
+					    <div class="col-md-4">
 					        <div class="card {{ $cardClass }}">
 					            <div class="card-body p-2">
 					                <div class="d-flex flex-column">
@@ -294,113 +294,151 @@
 						<div class="tab-pane" id="profileTabsJustified">
 							<h5 class="fw-semibold my-3">Payment Method</h5>
 							<div class="row g-2">
-								<div class="col-md-4">
-									<div class="form-check form-checkbox-success ps-0">
-										<label for="cash-payment" class="w-100">
-											<div class="d-flex align-items-center p-3 rounded gap-2 border">
-												<div class="d-flex align-items-center gap-2">
-													<h5 class="mb-0"><i class="ri-cash-fill text-success"></i> Cash</h5>
-												</div>
-												<div class="ms-auto">
-													<input class="form-check-input float-end" type="radio" name="shipping"
-														id="cash-payment" checked>
-												</div>
-											</div>
-										</label>
-									</div>
-								</div>
-								<div class="col-md-4">
-									<div class="form-check form-checkbox-success ps-0">
-										<label for="card-payment" class="w-100">
-											<div class="d-flex align-items-center p-3 rounded gap-2 border">
-												<div class="d-flex align-items-center gap-2">
-													<h5 class="mb-0"><i class="ri-bank-card-fill text-success"></i> Card
-													</h5>
-												</div>
-												<div class="ms-auto">
-													<input class="form-check-input float-end" type="radio" name="shipping"
-														id="card-payment">
-												</div>
-											</div>
-										</label>
-									</div>
-								</div>
-								<div class="col-md-4">
-									<div class="form-check form-checkbox-success ps-0">
-										<label for="upi-payment" class="w-100">
-											<div class="d-flex align-items-center p-3 rounded gap-2 border">
-												<div class="d-flex align-items-center gap-2">
-													<h5 class="mb-0"><i class="ri-bank-fill text-success"></i> UPI</h5>
-												</div>
-												<div class="ms-auto">
-													<input class="form-check-input float-end" type="radio" name="shipping"
-														id="upi-payment">
-												</div>
-											</div>
-										</label>
-									</div>
-								</div>
-								<div class="col-md-4">
-									<div class="form-check form-checkbox-success ps-0">
-										<label for="exchange-payment" class="w-100">
-											<div class="d-flex align-items-center p-3 rounded gap-2 border">
-												<div class="d-flex align-items-center gap-2">
-													<h5 class="mb-0"><i class="ri-exchange-funds-line text-success"></i> Exchange</h5>
-												</div>
-												<div class="ms-auto">
-													<input class="form-check-input float-end" type="radio" name="shipping"
-														id="exchange-payment">
-												</div>
-											</div>
-										</label>
-									</div>
-								</div>
-								<div class="col-md-4">
-									<div class="form-check form-checkbox-success ps-0">
-										<label for="finanace-payment" class="w-100">
-											<div class="d-flex align-items-center p-3 rounded gap-2 border">
-												<div class="d-flex align-items-center gap-2">
-													<h5 class="mb-0"><i class="ri-wallet-fill text-success"></i> Finanace</h5>
-												</div>
-												<div class="ms-auto">
-													<input class="form-check-input float-end" type="radio" name="shipping"
-														id="finanace-payment">
-												</div>
-											</div>
-										</label>
-									</div>
-								</div>
-								<div class="col-md-4">
-									<div class="form-check form-checkbox-success ps-0">
-										<label for="credit-payment" class="w-100">
-											<div class="d-flex align-items-center p-3 rounded gap-2 border">
-												<div class="d-flex align-items-center gap-2">
-													<h5 class="mb-0"><i class="ri-hand-coin-fill text-success"></i> Credit</h5>
-												</div>
-												<div class="ms-auto">
-													<input class="form-check-input float-end" type="radio" name="shipping"
-														id="credit-payment">
-												</div>
-											</div>
-										</label>
-									</div>
-								</div>
-								<div class="col-md-4">
-									<div class="form-check form-checkbox-success ps-0">
-										<label for="cheque-payment" class="w-100">
-											<div class="d-flex align-items-center p-3 rounded gap-2 border">
-												<div class="d-flex align-items-center gap-2">
-													<h5 class="mb-0"><i class="ri-cash-line text-success"></i> Cheque</h5>
-												</div>
-												<div class="ms-auto">
-													<input class="form-check-input float-end" type="radio" name="shipping"
-														id="cheque-payment">
-												</div>
-											</div>
-										</label>
+								<div class="col-md-12">
+									<div class="mb-3">
+	                                    <select class="form-control" data-choices name="payment" id="payment">
+	                                        <option value="">Select</option>
+	                                        @foreach($payments as $payment)
+	                                        	<option value="{{$payment->id}}">{{$payment->name}}</option>
+	                                        @endforeach
+	                                    </select>
 									</div>
 								</div>
 							</div>
+
+							<div class="row g-2 secret" id="cash">
+								<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="cash" class="form-label">Cash</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="cash_amount" id="cash_amount" value="{{old('cash_amount')}}" class="form-control" placeholder="Amount">
+	                                </div>
+                            	</div>
+                            	<div class=" d-flex justify-content-center" >
+                            		<button type="btn" class="btn btn-primary" id="cash_add" onclick="cash_add()"><i class="ri-bank-line"></i> Add</button>
+                            	</div>
+							</div>
+
+							<div class="row g-2 secret" id="card">
+								<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="card_number" class="form-label">Card Number</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="card_number" id="card_number" value="{{old('card_number')}}" class="form-control" placeholder="Card Number">
+	                                </div>
+                            	</div>
+                            	<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="card_name" class="form-label">Card Name</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="text" name="card_name" id="card_name" value="{{old('card_name')}}" class="form-control" placeholder="Card Name">
+	                                </div>
+                            	</div>
+                            	<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="card_amount" class="form-label">Amount</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="card_amount" id="card_amount" value="{{old('card_amount')}}" class="form-control" placeholder="Amount">
+	                                </div>
+                            	</div>
+                            	<div class=" d-flex justify-content-center" >
+                            		<button type="btn" class="btn btn-primary" id="card_add" onclick="card_add()"><i class="ri-bank-line"></i> Add</button>
+                            	</div>
+							</div>
+
+							<div class="row g-2 secret" id="finance">
+								<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="finance_card" class="form-label">Finance Card Number</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="finance_card" id="finance_card" value="{{old('finance_card')}}" class="form-control" placeholder="Finance Card Number">
+	                                </div>
+                            	</div>
+                            	<div class="col-md-12">
+									<div class="mb-3">
+										<label for="finance_type" class="form-label">Finance</label>
+										<span class="text-danger">*</span>
+	                                    <select class="form-control" data-choices name="finance_type" id="finance_type">
+	                                        <option value="">Select</option>
+	                                        @foreach($finances as $finance)
+	                                        	<option value="{{$finance->id}}">{{$finance->name}}</option>
+	                                        @endforeach
+	                                    </select>
+									</div>
+								</div>
+                            	<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="finance_amount" class="form-label">Amount</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="finance_amount" id="finance_amount" value="{{old('finance_amount')}}" class="form-control" placeholder="Amount">
+	                                </div>
+                            	</div>
+                            	<div class=" d-flex justify-content-center" >
+                            		<button type="btn" class="btn btn-primary" id="finance_add" onclick="finance_add()"><i class="ri-bank-line"></i> Add</button>
+                            	</div>
+							</div>
+
+							<div class="row g-2 secret" id="exchange">
+								<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="exchange_amount" class="form-label">Exchange</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="exchange_amount" id="exchange_amount" value="{{old('exchange_amount')}}" class="form-control" placeholder="Exchange Amount">
+	                                </div>
+                            	</div>
+                            	<div class=" d-flex justify-content-center" >
+                            		<button type="btn" class="btn btn-primary" id="exchange_add" onclick="exchange_add()"><i class="ri-bank-line"></i> Add</button>
+                            	</div>
+							</div>
+
+							<div class="row g-2 secret" id="credit">
+								<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="credit_amount" class="form-label">Credit</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="credit_amount" id="credit_amount" value="{{old('credit_amount')}}" class="form-control" placeholder="Credit">
+	                                </div>
+                            	</div>
+                            	<div class=" d-flex justify-content-center" >
+                            		<button type="btn" class="btn btn-primary" id="credit_add" onclick="credit_add()"><i class="ri-bank-line"></i> Add</button>
+                            	</div>
+							</div>
+
+							<div class="row g-2 secret" id="cheque">
+								<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="cheque_number" class="form-label">Cheque No</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="cheque_number" id="cheque_number" value="{{old('cheque_number')}}" class="form-control" placeholder="Cheque No">
+	                                </div>
+                            	</div>
+                            	<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="cheque_amount" class="form-label">Amount</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="cheque_amount" id="cheque_amount" value="{{old('cheque_amount')}}" class="form-control" placeholder="Amount">
+	                                </div>
+                            	</div>
+                            	<div class=" d-flex justify-content-center" >
+                            		<button type="btn" class="btn btn-primary" id="cheque_add" onclick="cheque_add()"><i class="ri-bank-line"></i> Add</button>
+                            	</div>
+							</div>
+
+							<div class="row g-2 secret" id="upi">
+								<div class="col-md-12">
+	                                <div class="mb-3">
+	                                	<label for="upi_amount" class="form-label">UPI Amount</label>
+                                    	<span class="text-danger">*</span>
+	                                    <input type="number" name="upi_amount" id="upi_amount" value="{{old('upi_amount')}}" class="form-control" placeholder="UPI Amount">
+	                                </div>
+                            	</div>
+                            	<div class=" d-flex justify-content-center" >
+                            		<button type="btn" class="btn btn-primary" id="upi_add" onclick="upi_add()"><i class="ri-bank-line"></i> Add</button>
+                            	</div>
+							</div>
+
+
+
 							<h5 class="fw-semibold my-3">Payment info</h5>
 							<div class="table-responsive">
 								<table class="table table-bordered bg-light-subtle">
@@ -410,24 +448,13 @@
 											<td class="fw-semibold">Amount</td>
 										</tr>
 									</thead>
-									<tbody>
-										<tr>
-											<td>Cash</td>
-											<td>₹0.00</td>
-										</tr>
-										<tr>
-											<td>Card</td>
-											<td>₹0.00</td>
-										</tr>
-										<tr>
-											<td>UPI</td>
-											<td>₹0.00</td>
-										</tr>
+									<tbody id="payment-info-body">
+									    <!-- Rows will be appended dynamically -->
 									</tbody>
 									<tfoot>
 										<tr>
 											<td>
-												<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-success">Total Cash: </p>
+												<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-success" id="received_cash">Total Cash: </p>
 											</td>
 											<td>
 												<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-success" id="amount_text1">Payable Amount: </p>

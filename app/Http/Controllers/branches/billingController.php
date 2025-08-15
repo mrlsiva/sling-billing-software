@@ -12,6 +12,8 @@ use App\Models\Product;
 use App\Models\Gender;
 use App\Models\Stock;
 use App\Models\Customer;
+use App\Models\Payment;
+use App\Models\Finance;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Traits\Log;
@@ -26,6 +28,8 @@ class billingController extends Controller
     {
 
         $genders = Gender::where('is_active',1)->get();
+        $payments = Payment::where('is_active',1)->get();
+        $finances = Finance::where('is_active',1)->get();
         $categories = Stock::where([['branch_id',Auth::user()->id],['is_active',1]])->select('category_id')->get();
         $categories = Category::whereIn('id',$categories)->get();
 
@@ -41,7 +45,7 @@ class billingController extends Controller
             })
         ->paginate(28);
 
-        return view('branches.billing',compact('stocks','categories','genders'));
+        return view('branches.billing',compact('stocks','categories','genders','payments','finances'));
     }
 
     public function get_sub_category(Request $request)

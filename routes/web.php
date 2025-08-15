@@ -14,6 +14,7 @@ use App\Http\Controllers\users\dashboardController;
 
 use App\Http\Controllers\branches\customerController;
 use App\Http\Controllers\branches\billingController;
+use App\Http\Controllers\branches\settingController;
 use App\Http\Controllers\branches\branchDashboardController;
 
 
@@ -128,6 +129,14 @@ else
                                      Route::post('/customer_store',[billingController::class, 'customer_store'])->name('customer_store');
                                 });
                             });
+
+                            Route::prefix('settings')->group(function () {
+                                Route::name('setting')->group(function () {
+
+                                    Route::get('/',[settingController::class, 'index']);
+                                });
+                            });
+
                         });
                     });
                 });
