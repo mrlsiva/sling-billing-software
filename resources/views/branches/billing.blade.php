@@ -130,21 +130,23 @@
 				<div class="card-body pt-2 ">
 					<ul class="nav nav-tabs nav-justified">
 						<li class="nav-item">
-							<a href="#homeTabsJustified" data-bs-toggle="tab" aria-expanded="false" class="nav-link active">
+							<a href="#homeTabsJustified" data-bs-toggle="tab" aria-expanded="false" class="nav-link active" id="cart_tab">
 								<span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
 								<span class="d-none d-sm-block"><i class="ri-shopping-cart-line"></i></span>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="#messagesTabsJustified" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+							<a href="#messagesTabsJustified" data-bs-toggle="tab" aria-expanded="false" class="nav-link" id="customer_tab">
 								<span class="d-block d-sm-none"><i class="bx bx-envelope"></i></span>
 								<span class="d-none d-sm-block"><i class="ri-id-card-line"></i></span>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="#profileTabsJustified" data-bs-toggle="tab" aria-expanded="true" class="nav-link ">
+
+
+							<a data-bs-toggle="tab" aria-expanded="false" class="nav-link disabled" id="payment_tab" title="Cart is empty" >
 								<span class="d-block d-sm-none"><i class="bx bx-user"></i></span>
-								<span class="d-none d-sm-block"><i class="ri-bank-card-line"></i></span>
+								<span class="d-none d-sm-block"><i class="ri-money-rupee-circle-line"></i></span>
 							</a>
 						</li>
 
@@ -152,6 +154,7 @@
 					<div class="tab-content pt-2 text-muted">
 
 						<div class="tab-pane show active" id="homeTabsJustified">
+							<div id="order_detail" class="secret">
 							<h5 class="fw-semibold my-3">Order Summery</h5>
 							<div class="" data-simplebar style="max-height: 200px;">
 								<div id="cart_item">
@@ -200,6 +203,12 @@
 								<a href="#!" class="btn btn-danger w-100" id="clear_cart"><i class="ri-close-circle-line"></i> Clear</a>
 								<a href="#!" id="next_tab_user_info" class="btn btn-primary w-100"><i class="ri-arrow-right-circle-line"></i>
 									Next</a>
+							</div>
+							</div>
+							<div id="empty_order_detail" class="">
+								<div class="row">
+									<h3>Cart is Empty</h3>
+								</div>
 							</div>
 						</div>
 						<div class="tab-pane" id="messagesTabsJustified">

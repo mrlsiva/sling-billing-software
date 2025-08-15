@@ -154,6 +154,7 @@ function add_to_cart(element) {
             alert("Cannot add more. Stock limit reached (" + maxQty + ").");
         }
     } else {
+
         // Fetch product details
         $.ajax({
             url: 'get_product_detail',
@@ -246,6 +247,25 @@ function updateCartSummary() {
     $('#amount').text('₹' + totalAmount.toFixed(2));
     $('#amount_text').text('₹' + totalAmount.toFixed(2));
     $('#amount_text1').text('Payable Amount: ₹' + totalAmount.toFixed(2));
+
+    if(totalItems == 0)
+    {
+        $('#order_detail').addClass('secret');
+        $('#empty_order_detail').removeClass('secret');
+        $('#payment_tab').removeAttr('href data-bs-toggle aria-expanded').addClass('disabled');
+    }
+    else
+    {
+        $('#order_detail').removeClass('secret');
+        $('#empty_order_detail').addClass('secret');
+        $('#payment_tab')
+        .attr({
+            href: '#profileTabsJustified',
+            'data-bs-toggle': 'tab',
+            'aria-expanded': 'true'
+        }).removeClass('disabled');
+
+    }
 }
 
 // Delegated event handling
