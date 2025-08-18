@@ -184,7 +184,7 @@
 										</tr>
 										<tr>
 											<td>
-												<p class="d-flex mb-0 align-items-center gap-1"> Estimated Tax :
+												<p class="d-flex mb-0 align-items-center gap-1"> Tax :
 												</p>
 											</td>
 											<td class="text-end text-dark fw-medium" id="tax">₹0.00</td>
