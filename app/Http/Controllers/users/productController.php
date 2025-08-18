@@ -80,6 +80,16 @@ class productController extends Controller
 
         DB::beginTransaction();
 
+        $tax = Tax::where('id',$request->tax)->first();
+        $price = $request->price; // base price
+
+        $taxAmount = 0; // default, in case tax = 0
+
+        if ($tax && preg_match('/(\d+)%/', $tax->name, $matches)) {
+            $taxRate = (int) $matches[1]; // extract number part e.g. "18" from "GST 18%"
+            $taxAmount = $price * $taxRate / 100;
+        }
+
         $product = Product::create([ 
             'user_id' => Auth::user()->id,
             'category_id' => $request->category,
@@ -89,6 +99,7 @@ class productController extends Controller
             'code' => $request->code,
             'hsn_code' => $request->hsn_code,
             'price' => $request->price,
+            'tax_amount' => $taxAmount,
             'tax_id' => $request->tax,
             'metric_id' => $request->metric,
             'discount_type' => $request->discount_type,
@@ -181,6 +192,17 @@ class productController extends Controller
 
         $product = Product::find($request->id);
 
+        $tax = Tax::where('id',$request->tax)->first();
+
+        $price = $request->price; // base price
+
+        $taxAmount = 0; // default, in case tax = 0
+
+        if ($tax && preg_match('/(\d+)%/', $tax->name, $matches)) {
+            $taxRate = (int) $matches[1]; // extract number part e.g. "18" from "GST 18%"
+            $taxAmount = $price * $taxRate / 100;
+        }
+
         $product->update([ 
             'category_id' => $request->category_id,
             'sub_category_id' => $request->sub_category,
@@ -189,6 +211,7 @@ class productController extends Controller
             'code' => $request->code,
             'hsn_code' => $request->hsn_code,
             'price' => $request->price,
+            'tax_amount' => $taxAmount,
             'tax_id' => $request->tax,
             'metric_id' => $request->metric,
             'discount_type' => $request->discount_type,

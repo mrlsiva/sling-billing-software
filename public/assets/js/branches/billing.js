@@ -70,10 +70,10 @@ function loadProducts(page = 1) {
                             <div class="card-body p-2">
                                 <div class="d-flex flex-column">
                                     <a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">
-                                        ${stock.product.category.name} - ${stock.product.sub_category.name}
+                                        ${stock.product.name} 
                                     </a>
                                     <a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">
-                                        ${stock.product.name}
+                                        ${stock.product.category.name} - ${stock.product.sub_category.name}   
                                     </a>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between mt-2">
@@ -172,13 +172,14 @@ function add_to_cart(element) {
                 $("#cart_item").append(`
                     <div class="border border-light mt-3 p-2 rounded" 
                          data-product-id="${data.id}" 
-                         data-price="${data.price}" 
+                         data-price="${data.price}"
+                         data-tax_amount="${data.tax_amount}" 
                          data-tax-id="${data.tax_id}" 
                          data-stock-qty="${maxQty}">
                         <div class="d-flex flex-wrap align-items-center gap-3">
                             <div>
-                                <a class="text-dark fs-12 fw-bold">${data.category.name} - ${data.sub_category.name}</a>
-                                <p class="fs-10 my-1">${data.name}</p>
+                                <a class="text-dark fs-12 fw-bold">${data.name}</a>
+                                <p class="fs-10 my-1">${data.category.name} - ${data.sub_category.name}</p>
                             </div>
                             <div class="ms-lg-auto">
                                 <div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
@@ -221,25 +222,15 @@ function updateCartSummary() {
 
     $('#cart_item').find('[data-product-id]').each(function() {
         var qty = parseInt($(this).find('.qty-input').val());
-        var price = parseFloat($(this).data('price'));
-        var taxId = parseInt($(this).data('tax-id'));
+        var price = parseFloat($(this).data('price'));        // total price WITH tax (per item)
+        var tax_amount = parseFloat($(this).data('tax_amount')); // tax portion (per item)
 
         totalItems += qty;
-        subTotal += price * qty;
-
-        // Tax rate mapping
-        var taxRate = 0;
-        switch (taxId) {
-            case 2: taxRate = 0.05; break;
-            case 3: taxRate = 0.12; break;
-            case 4: taxRate = 0.18; break;
-            case 5: taxRate = 0.28; break;
-            default: taxRate = 0; break;
-        }
-        totalTax += (price * qty) * taxRate;
+        subTotal += (price - tax_amount) * qty;  // only base price part
+        totalTax  += tax_amount * qty;           // tax part
     });
 
-    var totalAmount = subTotal + totalTax;
+    var totalAmount = subTotal + totalTax; // OR just sum(price * qty)
 
     $('#total_item').text(totalItems + ' (Items)');
     $('#sub_total').text('₹' + subTotal.toFixed(2));
@@ -248,25 +239,22 @@ function updateCartSummary() {
     $('#amount_text').text('₹' + totalAmount.toFixed(2));
     $('#amount_text1').text('Payable Amount: ₹' + totalAmount.toFixed(2));
 
-    if(totalItems == 0)
-    {
+    if(totalItems == 0) {
         $('#order_detail').addClass('secret');
         $('#empty_order_detail').removeClass('secret');
         $('#payment_tab').removeAttr('href data-bs-toggle aria-expanded').addClass('disabled');
-    }
-    else
-    {
+    } else {
         $('#order_detail').removeClass('secret');
         $('#empty_order_detail').addClass('secret');
         $('#payment_tab')
-        .attr({
-            href: '#profileTabsJustified',
-            'data-bs-toggle': 'tab',
-            'aria-expanded': 'true'
-        }).removeClass('disabled');
-
+            .attr({
+                href: '#profileTabsJustified',
+                'data-bs-toggle': 'tab',
+                'aria-expanded': 'true'
+            }).removeClass('disabled');
     }
 }
+
 
 // Delegated event handling
 $(document).on('click', '.plus', function () {
