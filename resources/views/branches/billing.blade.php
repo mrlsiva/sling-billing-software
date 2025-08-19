@@ -6,6 +6,7 @@
 
 @section('body')
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+	<meta name="csrf-token" content="{{ csrf_token() }}">
 
 	<div class="row">
 		<div class="col-md-8">
@@ -274,6 +275,13 @@
 
 								<div class="col-md-12">
 									<div class="mb-3">
+										<label for="pincode" class="form-label">Pincode</label>
+										<input type="number" id="pincode" name="pincode" class="form-control" min="1" placeholder="Pincode">
+									</div>
+								</div>
+
+								<div class="col-md-12">
+									<div class="mb-3">
 										<label for="payment_method" class="form-label">Gender</label>
 	                                    <select class="form-control" name="gender" id="gender">
 	                                        <option value="">Select</option>
@@ -474,7 +482,7 @@
 							</div>
 							<div class=" gap-1 hstack mt-3">
 								<a href="#!" class="btn btn-danger w-100" id="previous_tab_user_info"><i class="ri-close-circle-line"></i> Previous</a>
-								<a href="#!" class="btn btn-primary w-100"><i class="ri-shopping-basket-2-line"></i>
+								<a href="#!" onclick="submit()" class="btn btn-primary w-100"><i class="ri-shopping-basket-2-line"></i>
 									Proceed</a>
 							</div>
 						</div>

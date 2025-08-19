@@ -253,6 +253,8 @@ function updateCartSummary() {
                 'aria-expanded': 'true'
             }).removeClass('disabled');
     }
+
+    //saveCartToSession();
 }
 
 
@@ -345,6 +347,7 @@ $(document).ready(function () {
                     $("#alt_phone").val(data.alt_phone).prop('disabled', true);
                     $("#name").val(data.name).prop('disabled', true);
                     $("#address").val(data.address).prop('disabled', true);
+                    $("#pincode").val(data.pincode).prop('disabled', true);
                     
                     jQuery('select[name="gender"]').empty();
                     $('select[name="gender"]').append('<option value="">'+ "Select" +'</option>');
@@ -513,25 +516,81 @@ jQuery(document).ready(function ()
     });
 });
 
-function appendPaymentRow(method, amount) {
+function appendPaymentRow(method, amount, extraData = {}) {
     let tbody = $("#payment-info-body");
-    let existingRow = tbody.find(`tr[data-method="${method}"]`);
+    let rowId = Date.now(); // unique row id for multiple entries
 
-    if (existingRow.length) {
-        // Replace with latest amount
-        existingRow.find("td").eq(1).text(`₹${parseFloat(amount).toFixed(2)}`);
-    } else {
-        // Add as new entry
+    // prepare display text
+    let displayMethod = method;
+    if (method === "Card" && extraData.card_name) {
+        displayMethod = `Card - ${extraData.card_name}`;
+    } else if (method === "Finance" && extraData.finance_type) {
+        displayMethod = `Finance - ${extraData.finance_type}`;
+    } else if (method === "Cheque" && extraData.cheque_number) {
+        displayMethod = `Cheque - ${extraData.cheque_number}`;
+    }
+
+    // methods that must stay unique
+    const globalUniqueMethods = ["Cash", "Credit", "Exchange", "UPI"];
+
+    if (globalUniqueMethods.includes(method)) {
+        // overwrite existing
+        let existingRow = tbody.find(`tr[data-method="${method}"]`);
+        if (existingRow.length) {
+            existingRow.attr("data-extra", JSON.stringify(extraData));
+            existingRow.find("td").eq(0).text(displayMethod);
+            existingRow.find("td").eq(1).text(`₹${parseFloat(amount).toFixed(2)}`);
+        } else {
+            tbody.append(`
+                <tr data-id="${rowId}" data-method="${method}" data-extra='${JSON.stringify(extraData)}'>
+                    <td>${displayMethod}</td>
+                    <td>₹${parseFloat(amount).toFixed(2)}</td>
+                </tr>
+            `);
+        }
+    } 
+    else if (method === "Finance") {
+    // unique per finance type (check by ID)
+        let existingRow = tbody.find(`tr[data-method="Finance"]`).filter(function () {
+            let rowExtra = $(this).attr("data-extra");
+            if (!rowExtra) return false;
+            try {
+                let parsed = JSON.parse(rowExtra);
+                return parsed.finance_type === extraData.finance_type; // match by ID
+            } catch (e) {
+                return false;
+            }
+        });
+
+        if (existingRow.length) {
+            // overwrite existing row for same finance type
+            existingRow.attr("data-extra", JSON.stringify(extraData));
+            existingRow.find("td").eq(0).text(`Finance - ${extraData.finance_type_name}`);
+            existingRow.find("td").eq(1).text(`₹${parseFloat(amount).toFixed(2)}`);
+        } else {
+            // insert new row for new finance type
+            tbody.append(`
+                <tr data-id="${rowId}" data-method="Finance" data-extra='${JSON.stringify(extraData)}'>
+                    <td>Finance - ${extraData.finance_type_name}</td>
+                    <td>₹${parseFloat(amount).toFixed(2)}</td>
+                </tr>
+            `);
+        }
+    }
+    else {
+        // Card, Cheque → always allow multiple
         tbody.append(`
-            <tr data-method="${method}">
-                <td>${method}</td>
+            <tr data-id="${rowId}" data-method="${method}" data-extra='${JSON.stringify(extraData)}'>
+                <td>${displayMethod}</td>
                 <td>₹${parseFloat(amount).toFixed(2)}</td>
             </tr>
         `);
     }
 
     updateTotal();
+    //saveCartToSession();
 }
+
 
 function updateTotal() {
     let total = 0;
@@ -567,9 +626,15 @@ function card_add() {
         alert('Invalid Card Number (min 8 digits)');
         return;
     }
-    appendPaymentRow(`Card - ${card_name}`, card_amount);
+
+    appendPaymentRow("Card", card_amount, {
+        card_name: card_name,
+        card_number: card_number
+    });
+
     $("#card_number, #card_name, #card_amount").val("");
 }
+
 
 function finance_add() {
     let finance_card = $("#finance_card").val().trim();
@@ -584,9 +649,18 @@ function finance_add() {
         alert('Invalid Finance Card Number (min 8 digits)');
         return;
     }
-    appendPaymentRow(`Finance - ${$("#finance_type option:selected").text()}`, finance_amount);
+
+    let finance_type_text = $("#finance_type option:selected").text();
+
+    appendPaymentRow("Finance", finance_amount, {
+        finance_type: finance_type,         // keep ID for DB
+        finance_type_name: finance_type_text, // add readable name for UI
+        finance_card: finance_card
+    });
+
     $("#finance_card, #finance_type, #finance_amount").val("");
 }
+
 
 function exchange_add() {
     let exchange_amount = $("#exchange_amount").val().trim();
@@ -620,9 +694,14 @@ function cheque_add() {
         alert('Invalid Cheque Number (min 6 digits)');
         return;
     }
-    appendPaymentRow("Cheque", cheque_amount);
+
+    appendPaymentRow("Cheque", cheque_amount, {
+        cheque_number: cheque_number
+    });
+
     $("#cheque_number, #cheque_amount").val("");
 }
+
 
 function upi_add() {
     let upi_amount = $("#upi_amount").val().trim();
@@ -632,6 +711,155 @@ function upi_add() {
     }
     appendPaymentRow("UPI", upi_amount);
     $("#upi_amount").val("");
+}
+
+// function saveCartToSession() {
+//     let cartData = [];
+
+//     $('#cart_item').find('[data-product-id]').each(function () {
+//         let qty = parseInt($(this).find('.qty-input').val());
+//         let price = parseFloat($(this).data('price'));
+//         let tax_amount = parseFloat($(this).data('tax_amount'));
+
+//         cartData.push({
+//             product_id: $(this).data('product-id'),
+//             qty: qty,
+//             price: price,
+//             tax_amount: tax_amount
+//         });
+//     });
+
+//     console.log(cartData);
+
+//     let paymentData = [];
+//     $("#payment-info-body tr").each(function () {
+//         let method = $(this).data("method");
+//         let amt = parseFloat($(this).find("td").eq(1).text().replace("₹", "")) || 0;
+//         let extra = $(this).data("extra") ? JSON.parse($(this).attr("data-extra")) : {};
+
+//         paymentData.push({
+//             method: method,
+//             amount: amt,
+//             extra: extra
+//         });
+//     });
+
+//     console.log(paymentData);
+// }
+
+
+function submit() {
+
+    let phone = $("#phone").val().trim();
+    let altPhone = $("#alt_phone").val().trim();
+    let name = $("#name").val().trim();
+    let address = $("#address").val().trim();
+    let pincode = $("#pincode").val().trim();
+    let gender = $("#gender").val();
+    let dob = $("#dob").val();
+
+    // --- Customer validation ---
+    if (!/^[0-9]{10}$/.test(phone)) {
+        alert("Please enter a valid 10-digit Phone number.");
+        return;
+    }
+
+    if (altPhone !== "" && !/^[0-9]{10}$/.test(altPhone)) {
+        alert("Alternate Phone must be a valid 10-digit number.");
+        return;
+    }
+
+    if (altPhone !== "" && phone === altPhone) {
+        alert("Phone and Alternate Phone cannot be the same.");
+        return;
+    }
+
+    if (name === "") {
+        alert("Name is required.");
+        return;
+    }
+
+    if (address === "") {
+        alert("Address is required.");
+        return;
+    }
+
+    // Get payable and received amounts
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+
+    // Compare both
+    if (payable !== received) {
+        alert("Received amount (" + received.toFixed(2) + ") must be equal to Payable amount (" + payable.toFixed(2) + ").");
+        return; // Stop submit
+    }
+
+    // collect cart items
+    let cartData = [];
+    $('#cart_item').find('[data-product-id]').each(function () {
+        let qty = parseInt($(this).find('.qty-input').val());
+        let price = parseFloat($(this).data('price'));
+        let tax_amount = parseFloat($(this).data('tax_amount'));
+
+        cartData.push({
+            product_id: $(this).data('product-id'),
+            qty: qty,
+            price: price,
+            tax_amount: tax_amount
+        });
+    });
+
+    // collect payment info
+    let paymentData = [];
+    $("#payment-info-body tr").each(function () {
+        let method = $(this).data("method");
+        let amt = parseFloat($(this).find("td").eq(1).text().replace("₹", "")) || 0;
+        let extra = $(this).data("extra") ? JSON.parse($(this).attr("data-extra")) : {};
+
+        paymentData.push({
+            method: method,
+            amount: amt,
+            extra: extra
+        });
+    });
+
+    // collect customer info
+    let customer = {
+        phone: $("#phone").val().trim(),
+        alt_phone: $("#alt_phone").val().trim(),
+        name: $("#name").val().trim(),
+        address: $("#address").val().trim(),
+        pincode: $("#pincode").val().trim(),
+        gender: $("#gender").val(),
+        dob: $("#dob").val()
+    };
+
+    console.log(customer);
+    console.log(cartData);
+    console.log(paymentData);
+
+    // ajax submit
+    $.ajax({
+        url: "store",
+        method: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr("content"),
+            cart: cartData,
+            payments: paymentData,
+            customer: customer
+        },
+        success: function (data) {
+            console.log("Order stored:", data);
+            alert('Order Saved');
+            location.reload();
+            // example: redirect to success page
+            // window.location.href = "/order/success/" + data.order_id;
+        },
+        error: function (xhr) {
+            console.error("Error saving order:", xhr.responseText);
+            alert("Failed to save order. Please try again.");
+        }
+    });
 }
 
 
