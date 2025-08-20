@@ -89,9 +89,9 @@
                             
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="Price" class="form-label">Price</label>
+                                    <label for="Price" class="form-label">Selling Price (Including Tax)</label>
                                     <span class="text-danger">*</span>
-                                    <input type="number" name="price" id="price" value="{{old('price')}}" class="form-control" placeholder="Enter Price" min="1">
+                                    <input type="number" name="price" id="price" value="{{old('price')}}" class="form-control" placeholder="Enter Selling Price (Including Tax)" min="1">
                                 </div>
                             </div>
 

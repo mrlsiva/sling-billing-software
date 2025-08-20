@@ -26,6 +26,115 @@ jQuery(document).ready(function ()
 	});
 });
 
+$(document).on('click', '#pagination a', function (e) {
+    e.preventDefault();
+    let page = $(this).attr('href').split('page=')[1];
+    loadProducts(page);
+});
+
+function loadProducts(page = 1) {
+    let sub_category = jQuery('select[name="sub_category"]').val();
+    let category = jQuery("#category").val();
+    let filter = jQuery("#filterInput").val();
+
+    jQuery.ajax({
+        url: 'get_product',
+        type: 'GET',
+        dataType: 'json',
+        data: {
+            page: page,
+            category: category,
+            sub_category: sub_category,
+            filter: filter
+        },
+        success: function (response) {
+
+            let html = '<div class="row">';
+            response.data.forEach(function (stock) {
+                let cardClass = '';
+                let badgeClass = '';
+
+                if (stock.quantity === 0) {
+                    cardClass = 'bg-soft-danger';
+                    badgeClass = 'bg-danger';
+                } else if (stock.quantity <= 5) {
+                    cardClass = 'bg-soft-warning';
+                    badgeClass = 'bg-warning';
+                } else {
+                    badgeClass = 'bg-soft-success';
+                }
+
+                html += `
+                    <div class="col-md-4">
+                        <div class="card ${cardClass}">
+                            <div class="card-body p-2">
+                                <div class="d-flex flex-column">
+                                    <a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">
+                                        ${stock.product.name} 
+                                    </a>
+                                    <a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">
+                                        ${stock.product.category.name} - ${stock.product.sub_category.name}   
+                                    </a>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mt-2">
+                                    <div>
+                                        <p class="text-dark fw-semibold fs-12 mb-0">Rs ${stock.product.price}</p>
+                                    </div>
+                                    <div class="d-flex align-content-center gap-1">
+                                        <p class="mb-0 fs-12">${stock.quantity}</p>
+                                        <p class="badge ${badgeClass} fs-10 mb-1 text-dark py-1 px-2">Qty</p>
+                                        ${stock.quantity > 0 ? `
+                                            <button type="button" 
+                                                class="bg-light text-dark border-0 rounded fs-20 lh-1 h-100"
+                                                onclick="add_to_cart(this)"
+                                                data-system_id="${stock.product_id}">
+                                                +
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+
+            $("#productContainer").html(html);
+            $("#pagination").html(response.pagination);
+        }
+    });
+}
+
+$(document).ready(function () {
+    let currentPage = 1;
+
+    $('select[name="sub_category"]').on('change', function () {
+        currentPage = 1;
+        loadProducts(currentPage);
+    });
+
+    $('#category').on('change', function () {
+        currentPage = 1;
+        loadProducts(currentPage);
+    });
+
+    $('#checkbox-veg').on('change', function () {
+        currentPage = 1;
+        loadProducts(currentPage);
+    });
+
+    $(document).on('click', '#pagination a', function (e) {
+        e.preventDefault();
+        let page = $(this).attr('href').split('page=')[1];
+        currentPage = page;
+        loadProducts(currentPage);
+    });
+
+    loadProducts(currentPage);
+});
+
+
 // Add product to cart or increase quantity
 function add_to_cart(element) {
     var system_id = $(element).data("system_id");
@@ -45,6 +154,7 @@ function add_to_cart(element) {
             alert("Cannot add more. Stock limit reached (" + maxQty + ").");
         }
     } else {
+
         // Fetch product details
         $.ajax({
             url: 'get_product_detail',
@@ -62,13 +172,14 @@ function add_to_cart(element) {
                 $("#cart_item").append(`
                     <div class="border border-light mt-3 p-2 rounded" 
                          data-product-id="${data.id}" 
-                         data-price="${data.price}" 
+                         data-price="${data.price}"
+                         data-tax_amount="${data.tax_amount}" 
                          data-tax-id="${data.tax_id}" 
                          data-stock-qty="${maxQty}">
                         <div class="d-flex flex-wrap align-items-center gap-3">
                             <div>
-                                <a class="text-dark fs-12 fw-bold">${data.category.name} - ${data.sub_category.name}</a>
-                                <p class="fs-10 my-1">${data.name}</p>
+                                <a class="text-dark fs-12 fw-bold">${data.name}</a>
+                                <p class="fs-10 my-1">${data.category.name} - ${data.sub_category.name}</p>
                             </div>
                             <div class="ms-lg-auto">
                                 <div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
@@ -111,25 +222,15 @@ function updateCartSummary() {
 
     $('#cart_item').find('[data-product-id]').each(function() {
         var qty = parseInt($(this).find('.qty-input').val());
-        var price = parseFloat($(this).data('price'));
-        var taxId = parseInt($(this).data('tax-id'));
+        var price = parseFloat($(this).data('price'));        // total price WITH tax (per item)
+        var tax_amount = parseFloat($(this).data('tax_amount')); // tax portion (per item)
 
         totalItems += qty;
-        subTotal += price * qty;
-
-        // Tax rate mapping
-        var taxRate = 0;
-        switch (taxId) {
-            case 2: taxRate = 0.05; break;
-            case 3: taxRate = 0.12; break;
-            case 4: taxRate = 0.18; break;
-            case 5: taxRate = 0.28; break;
-            default: taxRate = 0; break;
-        }
-        totalTax += (price * qty) * taxRate;
+        subTotal += (price - tax_amount) * qty;  // only base price part
+        totalTax  += tax_amount * qty;           // tax part
     });
 
-    var totalAmount = subTotal + totalTax;
+    var totalAmount = subTotal + totalTax; // OR just sum(price * qty)
 
     $('#total_item').text(totalItems + ' (Items)');
     $('#sub_total').text('₹' + subTotal.toFixed(2));
@@ -137,7 +238,25 @@ function updateCartSummary() {
     $('#amount').text('₹' + totalAmount.toFixed(2));
     $('#amount_text').text('₹' + totalAmount.toFixed(2));
     $('#amount_text1').text('Payable Amount: ₹' + totalAmount.toFixed(2));
+
+    if(totalItems == 0) {
+        $('#order_detail').addClass('secret');
+        $('#empty_order_detail').removeClass('secret');
+        $('#payment_tab').removeAttr('href data-bs-toggle aria-expanded').addClass('disabled');
+    } else {
+        $('#order_detail').removeClass('secret');
+        $('#empty_order_detail').addClass('secret');
+        $('#payment_tab')
+            .attr({
+                href: '#profileTabsJustified',
+                'data-bs-toggle': 'tab',
+                'aria-expanded': 'true'
+            }).removeClass('disabled');
+    }
+
+    //saveCartToSession();
 }
+
 
 // Delegated event handling
 $(document).on('click', '.plus', function () {
@@ -228,6 +347,7 @@ $(document).ready(function () {
                     $("#alt_phone").val(data.alt_phone).prop('disabled', true);
                     $("#name").val(data.name).prop('disabled', true);
                     $("#address").val(data.address).prop('disabled', true);
+                    $("#pincode").val(data.pincode).prop('disabled', true);
                     
                     jQuery('select[name="gender"]').empty();
                     $('select[name="gender"]').append('<option value="">'+ "Select" +'</option>');
@@ -314,6 +434,435 @@ document.getElementById('previous_tab_user_info').addEventListener('click', func
     let tab = new bootstrap.Tab(nextTab);
     tab.show();
 });
+
+jQuery(document).ready(function ()
+{
+    jQuery('select[name="payment"]').on('change',function(){
+        var payment = jQuery(this).val();
+        if(payment)
+        {
+            if(payment == 1)
+            {
+                $('#cash').removeClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 2)
+            {
+                $('#cash').addClass('secret');
+                $('#card').removeClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 3)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').removeClass('secret');
+            }
+            else if(payment == 4)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').removeClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 5)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').removeClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 6)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').removeClass('secret');
+                $('#cheque').addClass('secret');
+                $('#upi').addClass('secret');
+            }
+            else if(payment == 7)
+            {
+                $('#cash').addClass('secret');
+                $('#card').addClass('secret');
+                $('#finance').addClass('secret');
+                $('#exchange').addClass('secret');
+                $('#credit').addClass('secret');
+                $('#cheque').removeClass('secret');
+                $('#upi').addClass('secret');
+            }
+            
+        }
+    });
+});
+
+function appendPaymentRow(method, amount, extraData = {}) {
+    let tbody = $("#payment-info-body");
+    let rowId = Date.now(); // unique row id for multiple entries
+
+    // prepare display text
+    let displayMethod = method;
+    if (method === "Card" && extraData.card_name) {
+        displayMethod = `Card - ${extraData.card_name}`;
+    } else if (method === "Finance" && extraData.finance_type) {
+        displayMethod = `Finance - ${extraData.finance_type}`;
+    } else if (method === "Cheque" && extraData.cheque_number) {
+        displayMethod = `Cheque - ${extraData.cheque_number}`;
+    }
+
+    // methods that must stay unique
+    const globalUniqueMethods = ["Cash", "Credit", "Exchange", "UPI"];
+
+    if (globalUniqueMethods.includes(method)) {
+        // overwrite existing
+        let existingRow = tbody.find(`tr[data-method="${method}"]`);
+        if (existingRow.length) {
+            existingRow.attr("data-extra", JSON.stringify(extraData));
+            existingRow.find("td").eq(0).text(displayMethod);
+            existingRow.find("td").eq(1).text(`₹${parseFloat(amount).toFixed(2)}`);
+        } else {
+            tbody.append(`
+                <tr data-id="${rowId}" data-method="${method}" data-extra='${JSON.stringify(extraData)}'>
+                    <td>${displayMethod}</td>
+                    <td>₹${parseFloat(amount).toFixed(2)}</td>
+                </tr>
+            `);
+        }
+    } 
+    else if (method === "Finance") {
+    // unique per finance type (check by ID)
+        let existingRow = tbody.find(`tr[data-method="Finance"]`).filter(function () {
+            let rowExtra = $(this).attr("data-extra");
+            if (!rowExtra) return false;
+            try {
+                let parsed = JSON.parse(rowExtra);
+                return parsed.finance_type === extraData.finance_type; // match by ID
+            } catch (e) {
+                return false;
+            }
+        });
+
+        if (existingRow.length) {
+            // overwrite existing row for same finance type
+            existingRow.attr("data-extra", JSON.stringify(extraData));
+            existingRow.find("td").eq(0).text(`Finance - ${extraData.finance_type_name}`);
+            existingRow.find("td").eq(1).text(`₹${parseFloat(amount).toFixed(2)}`);
+        } else {
+            // insert new row for new finance type
+            tbody.append(`
+                <tr data-id="${rowId}" data-method="Finance" data-extra='${JSON.stringify(extraData)}'>
+                    <td>Finance - ${extraData.finance_type_name}</td>
+                    <td>₹${parseFloat(amount).toFixed(2)}</td>
+                </tr>
+            `);
+        }
+    }
+    else {
+        // Card, Cheque → always allow multiple
+        tbody.append(`
+            <tr data-id="${rowId}" data-method="${method}" data-extra='${JSON.stringify(extraData)}'>
+                <td>${displayMethod}</td>
+                <td>₹${parseFloat(amount).toFixed(2)}</td>
+            </tr>
+        `);
+    }
+
+    updateTotal();
+    //saveCartToSession();
+}
+
+
+function updateTotal() {
+    let total = 0;
+    $("#payment-info-body tr").each(function () {
+        let amt = parseFloat($(this).find("td").eq(1).text().replace("₹", "")) || 0;
+        total += amt;
+    });
+    $("#received_cash").text(`Total Cash: ₹${total.toFixed(2)}`);
+}
+
+
+// The rest stays the same
+function cash_add() {
+    let cash_amount = $("#cash_amount").val().trim();
+    if (cash_amount === "" || isNaN(cash_amount) || parseFloat(cash_amount) <= 0) {
+        alert('Amount is required');
+        return;
+    }
+    appendPaymentRow("Cash", cash_amount);
+    $("#cash_amount").val("");
+}
+
+function card_add() {
+    let card_number = $("#card_number").val().trim();
+    let card_name = $("#card_name").val().trim();
+    let card_amount = $("#card_amount").val().trim();
+
+    if (card_number === "" || card_name === "" || card_amount === "" || isNaN(card_amount) || parseFloat(card_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    if (!/^\d{8,}$/.test(card_number)) {
+        alert('Invalid Card Number (min 8 digits)');
+        return;
+    }
+
+    appendPaymentRow("Card", card_amount, {
+        card_name: card_name,
+        card_number: card_number
+    });
+
+    $("#card_number, #card_name, #card_amount").val("");
+}
+
+
+function finance_add() {
+    let finance_card = $("#finance_card").val().trim();
+    let finance_type = $("#finance_type").val().trim();
+    let finance_amount = $("#finance_amount").val().trim();
+
+    if (finance_card === "" || finance_type === "" || finance_amount === "" || isNaN(finance_amount) || parseFloat(finance_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    if (!/^\d{8,}$/.test(finance_card)) {
+        alert('Invalid Finance Card Number (min 8 digits)');
+        return;
+    }
+
+    let finance_type_text = $("#finance_type option:selected").text();
+
+    appendPaymentRow("Finance", finance_amount, {
+        finance_type: finance_type,         // keep ID for DB
+        finance_type_name: finance_type_text, // add readable name for UI
+        finance_card: finance_card
+    });
+
+    $("#finance_card, #finance_type, #finance_amount").val("");
+}
+
+
+function exchange_add() {
+    let exchange_amount = $("#exchange_amount").val().trim();
+    if (exchange_amount === "" || isNaN(exchange_amount) || parseFloat(exchange_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    appendPaymentRow("Exchange", exchange_amount);
+    $("#exchange_amount").val("");
+}
+
+function credit_add() {
+    let credit_amount = $("#credit_amount").val().trim();
+    if (credit_amount === "" || isNaN(credit_amount) || parseFloat(credit_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    appendPaymentRow("Credit", credit_amount);
+    $("#credit_amount").val("");
+}
+
+function cheque_add() {
+    let cheque_number = $("#cheque_number").val().trim();
+    let cheque_amount = $("#cheque_amount").val().trim();
+
+    if (cheque_number === "" || cheque_amount === "" || isNaN(cheque_amount) || parseFloat(cheque_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    if (!/^\d{6,}$/.test(cheque_number)) {
+        alert('Invalid Cheque Number (min 6 digits)');
+        return;
+    }
+
+    appendPaymentRow("Cheque", cheque_amount, {
+        cheque_number: cheque_number
+    });
+
+    $("#cheque_number, #cheque_amount").val("");
+}
+
+
+function upi_add() {
+    let upi_amount = $("#upi_amount").val().trim();
+    if (upi_amount === "" || isNaN(upi_amount) || parseFloat(upi_amount) <= 0) {
+        alert('Invalid Input');
+        return;
+    }
+    appendPaymentRow("UPI", upi_amount);
+    $("#upi_amount").val("");
+}
+
+// function saveCartToSession() {
+//     let cartData = [];
+
+//     $('#cart_item').find('[data-product-id]').each(function () {
+//         let qty = parseInt($(this).find('.qty-input').val());
+//         let price = parseFloat($(this).data('price'));
+//         let tax_amount = parseFloat($(this).data('tax_amount'));
+
+//         cartData.push({
+//             product_id: $(this).data('product-id'),
+//             qty: qty,
+//             price: price,
+//             tax_amount: tax_amount
+//         });
+//     });
+
+//     console.log(cartData);
+
+//     let paymentData = [];
+//     $("#payment-info-body tr").each(function () {
+//         let method = $(this).data("method");
+//         let amt = parseFloat($(this).find("td").eq(1).text().replace("₹", "")) || 0;
+//         let extra = $(this).data("extra") ? JSON.parse($(this).attr("data-extra")) : {};
+
+//         paymentData.push({
+//             method: method,
+//             amount: amt,
+//             extra: extra
+//         });
+//     });
+
+//     console.log(paymentData);
+// }
+
+
+function submit() {
+
+    let phone = $("#phone").val().trim();
+    let altPhone = $("#alt_phone").val().trim();
+    let name = $("#name").val().trim();
+    let address = $("#address").val().trim();
+    let pincode = $("#pincode").val().trim();
+    let gender = $("#gender").val();
+    let dob = $("#dob").val();
+
+    // --- Customer validation ---
+    if (!/^[0-9]{10}$/.test(phone)) {
+        alert("Please enter a valid 10-digit Phone number.");
+        return;
+    }
+
+    if (altPhone !== "" && !/^[0-9]{10}$/.test(altPhone)) {
+        alert("Alternate Phone must be a valid 10-digit number.");
+        return;
+    }
+
+    if (altPhone !== "" && phone === altPhone) {
+        alert("Phone and Alternate Phone cannot be the same.");
+        return;
+    }
+
+    if (name === "") {
+        alert("Name is required.");
+        return;
+    }
+
+    if (address === "") {
+        alert("Address is required.");
+        return;
+    }
+
+    // Get payable and received amounts
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+
+    // Compare both
+    if (payable !== received) {
+        alert("Received amount (" + received.toFixed(2) + ") must be equal to Payable amount (" + payable.toFixed(2) + ").");
+        return; // Stop submit
+    }
+
+    // collect cart items
+    let cartData = [];
+    $('#cart_item').find('[data-product-id]').each(function () {
+        let qty = parseInt($(this).find('.qty-input').val());
+        let price = parseFloat($(this).data('price'));
+        let tax_amount = parseFloat($(this).data('tax_amount'));
+
+        cartData.push({
+            product_id: $(this).data('product-id'),
+            qty: qty,
+            price: price,
+            tax_amount: tax_amount
+        });
+    });
+
+    // collect payment info
+    let paymentData = [];
+    $("#payment-info-body tr").each(function () {
+        let method = $(this).data("method");
+        let amt = parseFloat($(this).find("td").eq(1).text().replace("₹", "")) || 0;
+        let extra = $(this).data("extra") ? JSON.parse($(this).attr("data-extra")) : {};
+
+        paymentData.push({
+            method: method,
+            amount: amt,
+            extra: extra
+        });
+    });
+
+    // collect customer info
+    let customer = {
+        phone: $("#phone").val().trim(),
+        alt_phone: $("#alt_phone").val().trim(),
+        name: $("#name").val().trim(),
+        address: $("#address").val().trim(),
+        pincode: $("#pincode").val().trim(),
+        gender: $("#gender").val(),
+        dob: $("#dob").val()
+    };
+
+    console.log(customer);
+    console.log(cartData);
+    console.log(paymentData);
+
+    // ajax submit
+    $.ajax({
+        url: "store",
+        method: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr("content"),
+            cart: cartData,
+            payments: paymentData,
+            customer: customer
+        },
+        success: function (data) {
+            console.log("Order stored:", data);
+            alert('Order Saved');
+            location.reload();
+            // example: redirect to success page
+            // window.location.href = "/order/success/" + data.order_id;
+        },
+        error: function (xhr) {
+            console.error("Error saving order:", xhr.responseText);
+            alert("Failed to save order. Please try again.");
+        }
+    });
+}
+
+
 
 
 

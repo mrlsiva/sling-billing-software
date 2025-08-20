@@ -12,9 +12,15 @@ use App\Models\Product;
 use App\Models\Gender;
 use App\Models\Stock;
 use App\Models\Customer;
+use App\Models\Payment;
+use App\Models\Finance;
+use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\OrderPaymentDetail;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Traits\Log;
+use Carbon\Carbon;
 use Session;
 use DB;
 
@@ -26,6 +32,8 @@ class billingController extends Controller
     {
 
         $genders = Gender::where('is_active',1)->get();
+        $payments = Payment::where('is_active',1)->get();
+        $finances = Finance::where('is_active',1)->get();
         $categories = Stock::where([['branch_id',Auth::user()->id],['is_active',1]])->select('category_id')->get();
         $categories = Category::whereIn('id',$categories)->get();
 
@@ -41,13 +49,34 @@ class billingController extends Controller
             })
         ->paginate(28);
 
-        return view('branches.billing',compact('stocks','categories','genders'));
+        return view('branches.billing',compact('stocks','categories','genders','payments','finances'));
     }
 
     public function get_sub_category(Request $request)
     {
         return $sub_categories = SubCategory::where([['category_id',$request->id],['is_active',1]])->get();
     }
+
+    public function get_product(Request $request)
+    {
+        $stocks = Stock::with(['product.category', 'product.sub_category'])
+            ->where('branch_id', Auth::id())
+            ->where('is_active', 1)
+            ->when($request->category, fn($q, $category) => $q->where('category_id', $category))
+            ->when($request->sub_category, fn($q, $subCategory) => $q->where('sub_category_id', $subCategory))
+            ->when($request->filter == 1, fn($q) => $q->where('quantity', '>', 0))
+            ->paginate(28);
+
+        // If AJAX request → return JSON
+        return response()->json([
+            'data' => $stocks->items(),
+            'pagination' => (string) $stocks->links('pagination::bootstrap-4') // or tailwind
+        ]);
+
+        // Else load Blade normally
+        return view('branches.billing', compact('stocks'));
+    }
+
 
     public function get_product_detail(Request $request)
     {
@@ -116,6 +145,86 @@ class billingController extends Controller
 
         return true;
     }
+
+    public function store(Request $request)
+    {
+
+        DB::beginTransaction();
+
+        $user = User::where('id',Auth::user()->id)->first();
+
+        $customerData = $request->input('customer');
+        $customer = Customer::firstOrCreate(
+            ['phone' => $customerData['phone']], // unique by phone
+            [
+                'user_id' => $user->parent_id,
+                'alt_phone' => $customerData['alt_phone'] ?? null,
+                'name'      => $customerData['name'],
+                'address'   => $customerData['address'],
+                'pincode'   => $customerData['pincode'] ?? null,
+                'gender_id' => $customerData['gender'] ?? null,
+                'dob'       => $customerData['dob'] ?? null,
+            ]
+        );
+
+        $cart = $request->input('cart', []);
+        $billAmount = collect($cart)->sum(function ($item) {
+            return ($item['qty'] * $item['price']);
+        });
+
+        $order = Order::create([
+            'bill_id'     => uniqid('BILL-'),
+            'billed_by'   => Auth::id(),
+            'customer_id' => $customer->id,
+            'bill_amount' => $billAmount,
+            'billed_on'   => Carbon::now(),
+        ]);
+
+
+        foreach ($cart as $item) {
+
+            $product = Product::where('id',$item['product_id'])->first();
+
+            OrderDetail::create([
+                'order_id'   => $order->id,
+                'product_id' => $item['product_id'],
+                'name'       => $product->name,
+                'quantity'   => $item['qty'],
+                'price'      => $item['price'],
+                'tax_amount' => $item['tax_amount'],
+            ]);
+        }
+
+        $payments = $request->input('payments', []);
+        foreach ($payments as $payment) {
+
+            $payment_id = Payment::where('name',$payment['method'])->first()->id;
+            $extra = $payment['extra'] ?? [];
+
+            OrderPaymentDetail::create([
+                'order_id'   => $order->id,
+                'payment_id' => $payment_id,
+                'amount'     => $payment['amount'],
+                'number'     => $extra['cheque_number'] ?? $extra['upi_id'] ?? $extra['card_number'] ?? $extra['finance_card'] ?? null,
+                'card'       => $extra['card_name'] ?? null,
+                'finance_id' => $extra['finance_type'] ?? null,
+            ]);
+        }
+
+        DB::commit();
+
+        //Log
+        $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
+
+
+        return response()->json([
+            'status'   => 'success',
+            'message'  => 'Order saved successfully',
+            'order_id' => $order->id
+        ]);
+
+    }
+
 
 
 }
