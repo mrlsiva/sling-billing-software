@@ -1,4 +1,4 @@
-<?php
+5<?php
 
 namespace App\Http\Controllers\users;
 
@@ -23,7 +23,7 @@ class productController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::where('user_id',Auth::user()->id)->paginate(30);
+        $products = Product::where('user_id',Auth::user()->id)->paginate(10);
         return view('users.products.index',compact('products'));
     }
 

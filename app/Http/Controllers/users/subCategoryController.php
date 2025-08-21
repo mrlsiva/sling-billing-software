@@ -18,7 +18,7 @@ class subCategoryController extends Controller
     public function index(Request $request)
     {
         $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
-        $sub_categories = SubCategory::where('user_id',Auth::user()->id)->orderBy('id','desc')->paginate(30);
+        $sub_categories = SubCategory::where('user_id',Auth::user()->id)->orderBy('id','desc')->paginate(10);
         return view('users.sub_categories.index',compact('sub_categories','categories'));
     }
 

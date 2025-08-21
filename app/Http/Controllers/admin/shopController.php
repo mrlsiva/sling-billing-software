@@ -22,7 +22,7 @@ class shopController extends Controller
 
     public function index(Request $request)
     {
-        $shops = User::with(['user_detail', 'bank_detail'])->where('role_id',2)->orderBy('id','desc')->paginate(30);
+        $shops = User::with(['user_detail', 'bank_detail'])->where('role_id',2)->orderBy('id','desc')->paginate(10);
         return view('admin.shops.index',compact('shops'));
     }
 

@@ -22,11 +22,11 @@ class inventoryController extends Controller
 
         if ($branch != 0) {
 
-            $stocks = Stock::where('shop_id', $shop)->where('branch_id', $branch)->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(30);
+            $stocks = Stock::where('shop_id', $shop)->where('branch_id', $branch)->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
         }
         else
         {
-            $stocks = Stock::where('shop_id', $shop)->where('branch_id', null)->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(30);
+            $stocks = Stock::where('shop_id', $shop)->where('branch_id', null)->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
         }
 
         $branches = User::where([['parent_id',Auth::user()->id],['is_active',1],['is_lock',0],['is_delete',0]])->get();

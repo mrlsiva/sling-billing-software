@@ -21,7 +21,7 @@ class customerController extends Controller
     {
         $parent = User::where('id',Auth::user()->id)->first();
         $genders = Gender::where('is_active',1)->get();
-        $users = Customer::where('user_id',$parent->parent_id)->paginate(30);
+        $users = Customer::where('user_id',$parent->parent_id)->paginate(10);
         return view('branches.customers.index',compact('users','genders'));
     }
 
