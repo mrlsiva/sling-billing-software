@@ -27,14 +27,23 @@
 						<div class="d-flex align-items-center justify-content-between">
 							<div>
 								<p class="mb-3 card-title">No.Of Branches </p>
-								@foreach($branches as $branch)
 								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0"> {{ count($branches) }}</h4>
-								@endforeach
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+
+			 @php
+
+                $category_count = App\Models\Category::where('user_id', Auth::user()->id)->count();
+
+                $sub_category_count = App\Models\SubCategory::where('user_id', Auth::user()->id)->count();
+
+                $product_count = App\Models\Product::where('user_id', Auth::user()->id)->count();
+
+            @endphp
+
 			<div class="col-md-3 col-md-3">
 				<div class="card">
 					<div class="card-body">
@@ -42,7 +51,7 @@
 							<div>
 								<p class="mb-3 card-title">No.Of Categories </p>
 
-								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0"> 2</h4>
+								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0"> {{$category_count}}</h4>
 							</div>
 						</div>
 					</div>
@@ -55,7 +64,7 @@
 							<div>
 								<p class="mb-3 card-title">No. Of Sub Categories</p>
 								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0">
-									5
+									{{$sub_category_count}}
 								</h4>
 							</div>
 						</div>
@@ -69,7 +78,7 @@
 						<div class="d-flex align-items-center justify-content-between">
 							<div>
 								<p class="mb-3 card-title">No.Of Products </p>
-								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0"> 23</h4>
+								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0"> {{$product_count}}</h4>
 							</div>
 						</div>
 					</div>
@@ -88,11 +97,15 @@
 			<div class="col-md-3 col-md-3">
 				<div class="card">
 					<div class="card-body">
+						@php
+							$order_count = App\Models\Order::where([['shop_id',Auth::user()->id],['branch_id',$branch->id]])->count();
+						@endphp
+
 						<div class="d-flex align-items-center justify-content-between">
 							<div>
 								<!-- {{$branch->name}} -  -->
 								<p class="mb-3 card-title">{{$branch->user_name}}</p>
-								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0">0 Orders</h4>
+								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0">{{$order_count}} Orders</h4>
 							</div>
 							<div>
 								<a href="#!"> <i class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>
