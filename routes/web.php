@@ -128,6 +128,7 @@ else
                                     Route::get('/get_customer_detail',[billingController::class, 'get_customer_detail'])->name('get_customer_detail');
                                     Route::post('/customer_store',[billingController::class, 'customer_store'])->name('customer_store');
                                     Route::post('/store',[billingController::class, 'store'])->name('store');
+                                    Route::get('/{id}/get_bill',[billingController::class, 'get_bill'])->name('get_bill');
                                 });
                             });
 

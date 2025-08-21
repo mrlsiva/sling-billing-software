@@ -9,4 +9,24 @@ class Order extends Model
     protected $fillable = [
         'shop_id','branch_id','bill_id','billed_by','customer_id','bill_amount','billed_on'
     ];
+
+    public function shop()
+    {
+        return $this->belongsTo('App\Models\User','user_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo('App\Models\User','user_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo('App\Models\Customer');
+    }
+
+    public function billedBy()
+    {
+        return $this->belongsTo('App\Models\User','billed_by');
+    }
 }
