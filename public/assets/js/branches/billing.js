@@ -850,8 +850,10 @@ function submit() {
         },
         success: function (data) {
             console.log("Order stored:", data);
-            alert('Order Saved');
+            window.open(data.order_id +'/get_bill', '_blank');
             location.reload();
+
+            //alert('Order Saved');
             // example: redirect to success page
             // window.location.href = "/order/success/" + data.order_id;
         },

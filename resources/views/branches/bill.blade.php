@@ -3,10 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Invoice</title>
+    <title>{{ config('app.name')}} | Invoice</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'DejaVu Sans', sans-serif;
             margin: 0;
         }
 
@@ -86,6 +86,7 @@
             <tr>
                 <td colspan="10" class="no-border center">
                     <img src="{{ asset('storage/' . $user->logo) }}" class="logo" alt="Logo">
+                    <!-- <img src="{{ public_path('storage/' . $user->logo) }}" class="logo" alt="Logo"> -->
                     <div style="font-size:20px;" class="bold">TAX INVOICE</div>
                     <div>
                         <strong>{{$user->name}}</strong><br>
@@ -189,7 +190,13 @@
             </tr>
         </tfoot>
     </table>
-
+	<script>
+	    window.onload = function() {
+	        setTimeout(() => {
+	            window.print();
+	        }, 500); // half a second delay
+	    }
+	</script>
 </body>
 
 </html>

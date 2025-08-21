@@ -5,6 +5,7 @@ namespace App\Http\Controllers\branches;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\SubCategory;
 use App\Models\Category;
@@ -239,6 +240,16 @@ class billingController extends Controller
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
         return view('branches.bill',compact('user','order','order_details','order_payment_details'));
+
+        // $pdf = Pdf::loadView('branches.bill', [
+        //     'user' => $user,
+        //     'order' => $order,
+        //     'order_details' => $order_details,
+        //     'order_payment_details' => $order_payment_details,
+        // ])->setPaper('a4', 'landscape');
+ 
+        // return $pdf->stream('bill.pdf'); // to open in browser
+        // return $pdf->download('bill.pdf'); // to force download
     }
 
 
