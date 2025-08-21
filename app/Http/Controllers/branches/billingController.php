@@ -80,7 +80,7 @@ class billingController extends Controller
 
     public function get_product_detail(Request $request)
     {
-        return $products = Product::with(['sub_category','category','stock' => function ($query) use ($request) {
+        return $products = Product::with(['tax','sub_category','category','stock' => function ($query) use ($request) {
                 $query->where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id);
             },
         ])->where('id', $request->id)->first();
@@ -173,6 +173,8 @@ class billingController extends Controller
         });
 
         $order = Order::create([
+            'shop_id'     => $user->parent_id,
+            'branch_id'   => Auth::user()->id,
             'bill_id'     => uniqid('BILL-'),
             'billed_by'   => Auth::id(),
             'customer_id' => $customer->id,
@@ -193,6 +195,11 @@ class billingController extends Controller
                 'price'      => $item['price'],
                 'tax_amount' => $item['tax_amount'],
             ]);
+
+            $stock = Stock::where([['shop_id',$user->parent_id],['branch_id',Auth::user()->id],['product_id',$item['product_id']]])->first();
+
+            $stock->update(['quantity' => $stock->quantity - $item['qty'] ]);
+
         }
 
         $payments = $request->input('payments', []);

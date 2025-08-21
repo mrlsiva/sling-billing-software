@@ -67,14 +67,19 @@ class inventoryController extends Controller
             'quantity.min'          => 'Quantity cannot be negative.',
         ]);
 
-        DB::beginTransaction();
-
         $product = Product::findOrFail($request->product);
 
-        if ($product->quantity < $request->quantity) {
+        if ($product->quantity == 0) 
+        {
+            return redirect()->back()->with('toast_error', 'You cant transfer a product with 0 quantity.');
+        }
 
+        if ($product->quantity < $request->quantity) 
+        {
             return redirect()->back()->with('toast_error', 'Quantity can’t be greater than stock.');
         }
+
+        DB::beginTransaction();
 
         // Update or create branch stock
         $branchStock = Stock::where([['branch_id', $request->branch],['product_id', $request->product]])->first();

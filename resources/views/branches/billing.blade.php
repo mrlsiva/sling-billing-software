@@ -179,12 +179,6 @@
 										</tr>
 										<tr>
 											<td>
-												<p class="d-flex mb-0 align-items-center gap-1"> Delivery Charge : </p>
-											</td>
-											<td class="text-end text-dark fw-medium">₹0.00</td>
-										</tr>
-										<tr>
-											<td>
 												<p class="d-flex mb-0 align-items-center gap-1"> Tax :
 												</p>
 											</td>

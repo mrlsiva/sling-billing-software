@@ -28,7 +28,11 @@
 						<div class="d-flex align-items-center justify-content-between">
 							<div>
 								<p class="mb-3 card-title">{{$branch->name}} - {{$branch->user_name}}</p>
-								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0">0 Orders</h4>
+
+								@php
+									$order_count = App\Models\Order::where([['shop_id',Auth::user()->id],['branch_id',$branch->id]])->count();
+								@endphp
+								<h4 class="fw-bold d-flex align-items-center gap-2 mb-0">{{$order_count}} Orders</h4>
 							</div>
 							<div>
 								<a href="#!"> <i class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>

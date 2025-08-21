@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-<title>{{ config('app.name')}} | Product Create</title>
+<title>{{ config('app.name')}} | Product Transfer</title>
 @endsection
 
 @section('body')

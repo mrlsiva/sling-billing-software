@@ -34,9 +34,17 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                @php
+                                    $category_count = App\Models\Category::where('user_id', $shop->id)->count();
+
+                                    $product_count = App\Models\Product::where('user_id', $shop->id)->count();
+
+                                @endphp
+
                                 <div class="card-Footer border px-4 pt-2 d-flex justify-content-between align-items-center">
-                                    <h4 class="fw-bold d-flex align-items-center gap-2">10 <span class="fs-10 mt-2"> Categories</span></h4>
-                                    <h4 class="fw-bold d-flex align-items-center gap-2 ">29 <span class="fs-10 mt-2"> Products</span></h4>
+                                    <h4 class="fw-bold d-flex align-items-center gap-2">{{$category_count}} <span class="fs-10 mt-2"> Categories</span></h4>
+                                    <h4 class="fw-bold d-flex align-items-center gap-2 ">{{$product_count}} <span class="fs-10 mt-2"> Products</span></h4>
                                 </div>
                         </div>
                     </div>

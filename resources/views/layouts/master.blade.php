@@ -382,7 +382,7 @@
                         text: "{{ session('toast_error') }}",
                         gravity: "top",      // top / bottom
                         position: "right",   // left / center / right
-                        className: "danger", // success, error, info, etc. depending on your toast lib
+                        className: "success", // success, error, info, etc. depending on your toast lib
                         duration: 10000,
                         close: "close",
                         style: "style"
