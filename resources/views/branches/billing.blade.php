@@ -157,7 +157,7 @@
 						<div class="tab-pane show active" id="homeTabsJustified">
 							<div id="order_detail" class="secret">
 							<h5 class="fw-semibold my-3">Order Summery</h5>
-							<div class="" data-simplebar style="max-height: 200px;">
+							<div class="" data-simplebar style="max-height: calc(100vh - 466px); min-height: calc(100vh - 466px);">
 								<div id="cart_item">
 									
 								</div>
@@ -202,7 +202,10 @@
 							</div>
 							<div id="empty_order_detail" class="">
 								<div class="row">
-									<h3>Cart is Empty</h3>
+									<div class="col-md-12 text-center d-flex justify-content-center align-items-center gap-2" style="height: calc(100vh - 160px);">
+										<i class="ri-shopping-cart-line"></i>
+										<p class="mb-0">Cart is Empty</p>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -224,7 +227,7 @@
 								</div>
 							</div>
 
-							<div class="d-flex justify-content-between align-items-center">
+							<div class="d-flex justify-content-between align-items-center mb-3">
 							    <h5 class="fw-semibold my-3 mb-0">Customer Info</h5>
 							    <!-- <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#customerAdd">
 							        <i class="ri-add-line"></i> Customer
@@ -232,7 +235,7 @@
 
 							</div>
 
-							<div class="row">
+							<div class="row" style="max-height: calc(100vh - 356px); height: calc(100vh - 356px);min-height: calc(100vh - 356px); overflow-y: auto;">
 
 								<div class="col-md-12">
 									<div class="mb-3">
