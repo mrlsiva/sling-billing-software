@@ -90,7 +90,7 @@
                 <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Transfer Product</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form class="row" action="{{route('inventory.transfered', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+            <form class="row" action="{{route('inventory.transfered', ['company' => request()->route('company')])}}" method="post" id="transfer_submit">
             	@csrf
                 <div class="modal-body">
 
@@ -167,7 +167,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Transfer</button>
+                    <button type="submit" id="transfer" class="btn btn-primary">Transfer</button>
                 </div>
             </form>
         </div>
