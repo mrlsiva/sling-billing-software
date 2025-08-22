@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\SubCategory;
@@ -47,8 +48,18 @@ class productController extends Controller
             'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // up to 2MB
             'category' => 'required',
             'sub_category' => 'required',
-            'name' => 'required|string|max:50',
-            'code' => 'required|string|max:50',
+            'name' => ['required','string','max:50',
+                Rule::unique('products')->where(function ($query) use ($request) {
+                    return $query->where('user_id', Auth::user()->id)
+                                 ->where('category_id', $request->category)
+                                 ->where('sub_category_id', $request->sub_category);
+                }),
+            ],
+            'code' => ['required','string','max:50',
+                Rule::unique('products')->where(function ($query) use ($request) {
+                    return $query->where('user_id', Auth::user()->id);
+                }),
+            ],
             'price' => 'required|numeric|min:1',
             'tax' => 'required',
             'metric' => 'required',
@@ -157,8 +168,18 @@ class productController extends Controller
             'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // up to 2MB
             'category_id' => 'required',
             'sub_category' => 'required',
-            'name' => 'required|string|max:50',
-            'code' => 'required|string|max:50',
+            'name' => ['required','string','max:50',
+                Rule::unique('products')->where(function ($query) use ($request) {
+                    return $query->where('user_id', Auth::user()->id)
+                                 ->where('category_id', $request->category_id)
+                                 ->where('sub_category_id', $request->sub_category);
+                })->ignore($request->id), // ignore current product on update
+            ],
+            'code' => ['required','string','max:50',
+                Rule::unique('products')->where(function ($query) {
+                    return $query->where('user_id', Auth::user()->id);
+                })->ignore($request->id), // <-- ignore current record
+            ],
             'price' => 'required|numeric|min:1',
             'tax' => 'required',
             'metric' => 'required',
