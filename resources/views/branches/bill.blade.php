@@ -146,7 +146,7 @@
                 <td>-</td>
                 <td>-</td>
                 <td>-</td>
-                <td>₹ {{$order_detail->price}}</td>
+                <td>₹ {{$order_detail->price * $order_detail->quantity}}</td>
             </tr>
             @endforeach
             <!-- Add many more rows here (5…25…100). The header/footer will repeat per page automatically. -->

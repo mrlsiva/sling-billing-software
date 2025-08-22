@@ -70,10 +70,35 @@ jQuery(document).ready(function ()
 				{
 					console.log(data);
 					document.getElementById("unit").value = data.metric.name;
-					document.getElementById("available").value = data.quantity;				
+					document.getElementById("available").value = data.quantity;	
+					if(data.quantity == 0)
+					{
+						$('#transfer').prop('disabled', true).attr('data-bs-original-title', 'You can’t transfer a product with 0 quantity.').tooltip('dispose').tooltip('show');
+
+					}	
+					else
+					{
+						$('#transfer').prop('disabled', false).attr('data-bs-original-title', 'Click to transfer this product').tooltip('dispose').tooltip();
+
+					}		
 					
 				}
 			});
 		}
 	});
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('transfer_submit');
+
+    form.addEventListener('submit', function (e) {
+        const available = parseInt(document.getElementById('available').value, 10) || 0;
+        const quantity  = parseInt(document.getElementById('quantity').value, 10) || 0;
+
+        if (quantity > available) {
+            e.preventDefault();
+            alert('Quantity can’t be greater than stock.');
+        }
+        // else { no need to call form.submit() because the form will submit naturally }
+    });
 });

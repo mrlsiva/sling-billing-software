@@ -31,8 +31,12 @@ $(document).on('click', '#pagination a', function (e) {
 
 function loadProducts(page = 1) {
     let sub_category = jQuery('select[name="sub_category"]').val();
-    let category = jQuery("#category").val();
+    let category = jQuery('select[name="category"]').val();
     let filter = jQuery("#filterInput").val();
+
+    console.log(sub_category);
+    console.log(category);
+    console.log(filter);
 
     jQuery.ajax({
         url: 'get_product',
@@ -111,9 +115,11 @@ $(document).ready(function () {
         loadProducts(currentPage);
     });
 
-    $('#category').on('change', function () {
+    $('select[name="category"]').on('change', function () {
         currentPage = 1;
-        loadProducts(currentPage);
+        setTimeout(() => {
+            loadProducts(currentPage);
+        }, 400);
     });
 
     $('#checkbox-veg').on('change', function () {
