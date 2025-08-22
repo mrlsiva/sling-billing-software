@@ -60,6 +60,11 @@ class productController extends Controller
                     return $query->where('user_id', Auth::user()->id);
                 }),
             ],
+            'hsn_code' => ['nullable','string','max:50',
+                Rule::unique('products')->where(function ($query) use ($request) {
+                    return $query->where('user_id', Auth::user()->id);
+                }),
+            ],
             'price' => 'required|numeric|min:1',
             'tax' => 'required',
             'metric' => 'required',
@@ -176,6 +181,11 @@ class productController extends Controller
                 })->ignore($request->id), // ignore current product on update
             ],
             'code' => ['required','string','max:50',
+                Rule::unique('products')->where(function ($query) {
+                    return $query->where('user_id', Auth::user()->id);
+                })->ignore($request->id), // <-- ignore current record
+            ],
+            'hsn_code' => ['nullable','string','max:50',
                 Rule::unique('products')->where(function ($query) {
                     return $query->where('user_id', Auth::user()->id);
                 })->ignore($request->id), // <-- ignore current record

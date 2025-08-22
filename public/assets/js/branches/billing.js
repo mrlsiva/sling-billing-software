@@ -119,7 +119,7 @@ $(document).ready(function () {
         currentPage = 1;
         setTimeout(() => {
             loadProducts(currentPage);
-        }, 400);
+        }, 500);
     });
 
     $('#checkbox-veg').on('change', function () {
