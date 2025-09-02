@@ -17,7 +17,7 @@
             </div>
         @endif
         <div class="col-xl-12 col-md-12">
-            <form class="row" action="{{route('admin.branch.store')}}" method="post" enctype="multipart/form-data">
+            <form class="row" action="{{route('admin.branch.store')}}" method="post" enctype="multipart/form-data" id="branchCreate">
                 @csrf
                 <div class="card">
                     <div class="card-header pb-0">
@@ -38,7 +38,7 @@
                             <div class="col-xl-12 col-md-12 mb-3">
                                 <label for="logo" class="form-label">Upload Branch Logo</label>
                                 <div class="input-group">
-                                    <input type="file" name="logo" id="logo" class="form-control">
+                                    <input type="file" name="logo" id="logo" class="form-control" accept="image/*">
                                 </div>
                             </div>
 
@@ -94,6 +94,7 @@
                                 
                                 <div class="mb-3">
                                     <label for="user_name" class="form-label">User Name</label>
+                                    <span class="text-danger">*</span>
                                     <input type="user_name" name="user_name" id="user_name" value="{{old('user_name')}}" class="form-control" placeholder="Enter User Name">
                                 </div>
                                 
@@ -225,4 +226,14 @@
             </form>
         </div>
     </div>
+@endsection
+
+@section('script')
+
+<!-- jQuery Validation Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+
+<!-- Optional additional methods (if you need pattern, equalTo, etc.) -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
+<script src="{{asset('assets/js/admins/branch.js')}}"></script>
 @endsection

@@ -112,7 +112,7 @@
 		                        <div class="mb-3">
 		                            <label for="name" class="form-label">Upload Sub Category Image</label>
 	                                <div class="input-group">
-	                                    <input type="file" name="image" id="image" class="form-control">
+	                                    <input type="file" name="image" id="image" class="form-control" accept="image/*">
 	                                </div>
 		                        </div>
 		                    </div>
@@ -122,7 +122,7 @@
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Category</label>
-		                            <select class="form-control" data-choices name="category" id="category">
+		                            <select class="form-control" data-choices name="category" id="category" required="">
                                         <option value=""> Select </option>
                                         @foreach($categories as $category)
                                         	<option value="{{$category->id}}">{{$category->name}}</option>
@@ -135,7 +135,7 @@
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Sub Category</label>
-		                            <input type="text" id="sub_category" name="sub_category" class="form-control">
+		                            <input type="text" id="sub_category" name="sub_category" class="form-control" required="">
 		                        </div>
 		                    </div>
 	                   </div>
@@ -165,7 +165,7 @@
 		                        <div class="mb-3">
 		                            <label for="name" class="form-label">Upload Sub Category Image</label>
 	                                <div class="input-group">
-	                                    <input type="file" name="image" id="image" class="form-control">
+	                                    <input type="file" name="image" id="image" class="form-control" accept="image/*">
 	                                </div>
 		                        </div>
 		                    </div>
@@ -174,8 +174,8 @@
 	                	<div class="row">
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">Sub Category</label>
-		                            <select class="form-control" name="category_id" id="category_id">
+		                            <label for="choices-single-groups" class="form-label text-muted">Category</label>
+		                            <select class="form-control" name="category_id" id="category_id" required="">
                                         <option value=""> Select </option>
                                         @foreach($categories as $category)
                                         	<option value="{{$category->id}}">{{$category->name}}</option>
@@ -188,7 +188,7 @@
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Sub Category Name</label>
-		                            <input type="text" id="sub_category_name" name="sub_category_name" class="form-control">
+		                            <input type="text" id="sub_category_name" name="sub_category_name" class="form-control" required="">
 		                            <input type="hidden" name="sub_category_id" id="sub_category_id">
 		                        </div>
 		                    </div>

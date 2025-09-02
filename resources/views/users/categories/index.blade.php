@@ -110,7 +110,7 @@
 		                        <div class="mb-3">
 		                            <label for="name" class="form-label">Upload Category Image</label>
 	                                <div class="input-group">
-	                                    <input type="file" name="image" id="image" class="form-control">
+	                                    <input type="file" name="image" id="image" class="form-control" accept="image/*">
 	                                </div>
 		                        </div>
 		                    </div>
@@ -119,7 +119,7 @@
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Category Name</label>
-		                            <input type="text" id="category" name="category" class="form-control">
+		                            <input type="text" id="category" name="category" class="form-control" required="">
 		                        </div>
 		                    </div>
 	                   	</div>
@@ -149,7 +149,7 @@
 		                        <div class="mb-3">
 		                            <label for="name" class="form-label">Upload Category Image</label>
 	                                <div class="input-group">
-	                                    <input type="file" name="image" id="image" class="form-control">
+	                                    <input type="file" name="image" id="image" class="form-control" accept="image/*">
 	                                </div>
 		                        </div>
 		                    </div>
@@ -159,7 +159,7 @@
 		                    <div class="col-md-12">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Category Name</label>
-		                            <input type="text" id="category_name" name="category_name" class="form-control">
+		                            <input type="text" id="category_name" name="category_name" class="form-control" required="">
 		                            <input type="hidden" name="category_id" id="category_id">
 		                        </div>
 		                    </div>

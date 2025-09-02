@@ -614,8 +614,8 @@ function card_add() {
         alert('Invalid Input');
         return;
     }
-    if (!/^\d{8,}$/.test(card_number)) {
-        alert('Invalid Card Number (min 8 digits)');
+    if (!/^\d{13,19}$/.test(card_number)) {
+        alert('Invalid Card Number (must be 13–19 digits)');
         return;
     }
 

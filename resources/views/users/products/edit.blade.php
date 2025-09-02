@@ -17,7 +17,7 @@
             </div>
         @endif
         <div class="col-xl-12 col-md-12">
-            <form class="row" action="{{ route('product.update', ['company' => request()->route('company')]) }}" method="post" enctype="multipart/form-data">
+            <form class="row" action="{{ route('product.update', ['company' => request()->route('company')]) }}" method="post" enctype="multipart/form-data" id="productEdit">
                 @csrf
                 <div class="card">
                     <div class="card-header pb-0">
@@ -30,7 +30,7 @@
                             <div class="col-xl-12 col-md-12 mb-3">
                                 <label for="name" class="form-label">Upload Product Image</label>
                                 <div class="input-group">
-                                    <input type="file" name="image" id="image" class="form-control">
+                                    <input type="file" name="image" id="image" class="form-control" accept="image/*">
                                 </div>
                             </div>
 
@@ -113,7 +113,7 @@
                                 <div class="mb-3">
                                     <label for="choices-single-groups" class="form-label text-muted">Tax</label>
                                     <span class="text-danger">*</span>
-                                    <select class="form-control" data-choices name="tax" id="tax">
+                                    <select class="form-control"  name="tax" id="tax">
                                         <option value=""> Select </option>
                                         @foreach($taxes as $tax)
                                             <option value="{{$tax->id}}" {{$product->tax_id == $tax->id ? 'selected' : '' }}>{{$tax->name}}</option>
@@ -126,7 +126,7 @@
                                 <div class="mb-3">
                                     <label for="choices-single-groups" class="form-label text-muted">Metric</label>
                                     <span class="text-danger">*</span>
-                                    <select class="form-control" data-choices name="metric" id="metric">
+                                    <select class="form-control"  name="metric" id="metric">
                                         <option value=""> Select </option>
                                         @foreach($metrics as $metric)
                                             <option value="{{$metric->id}}" {{$product->metric_id == $metric->id ? 'selected' : '' }}>{{$metric->name}}</option>
@@ -138,7 +138,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="choices-single-groups" class="form-label text-muted">Discount Type</label>
-                                    <select class="form-control" data-choices name="discount_type" id="discount_type">
+                                    <select class="form-control"  name="discount_type" id="discount_type">
                                         <option value=""> Select </option>
                                         <option value="1" {{$product->discount_type == 1 ? 'selected' : '' }}> Flat </option>
                                         <option value="2" {{$product->discount_type == 2 ? 'selected' : '' }}> Percentage </option>
@@ -179,5 +179,10 @@
 @endsection
 
 @section('script')
+<!-- jQuery Validation Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+
+<!-- Optional additional methods (if you need pattern, equalTo, etc.) -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
 <script src="{{asset('assets/js/users/product.js')}}"></script>
 @endsection
