@@ -16,6 +16,7 @@ use App\Http\Controllers\branches\customerController;
 use App\Http\Controllers\branches\billingController;
 use App\Http\Controllers\branches\settingController;
 use App\Http\Controllers\branches\branchDashboardController;
+use App\Http\Controllers\branches\orderController;
 
 
 Route::get('/', function () {
@@ -129,6 +130,13 @@ else
                                     Route::post('/customer_store',[billingController::class, 'customer_store'])->name('customer_store');
                                     Route::post('/store',[billingController::class, 'store'])->name('store');
                                     Route::get('/{id}/get_bill',[billingController::class, 'get_bill'])->name('get_bill');
+                                });
+                            });
+
+                            Route::prefix('orders')->group(function () {
+                                Route::name('order.')->group(function () {
+
+                                    Route::get('/index',[orderController::class, 'index'])->name('index');
                                 });
                             });
 
