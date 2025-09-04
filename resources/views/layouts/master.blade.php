@@ -120,8 +120,8 @@
                             </div>
                         </li>
 
-                        <li class="menu-item">
-                            <a class="menu-link" href="#">
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/orders/*') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{route('order.index', ['company' => request()->route('company'),'branch' => 0])}}">
                                 <span class="nav-icon">
                                     <i class="ri-shopping-cart-line"></i>
                                 </span>
@@ -129,8 +129,8 @@
                             </a>
                         </li>
 
-                        <li class="menu-item">
-                            <a class="menu-link" href="#">
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/customers/*') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{route('customer.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-group-line"></i>
                                 </span>
@@ -154,7 +154,7 @@
                             </a>
                         </li>
 
-                        <li class="menu-item">
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/branches/customers/*') ? 'active' : '' }}">
                             <a class="menu-link" href="{{route('branch.customer.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-group-2-line"></i>

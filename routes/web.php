@@ -10,6 +10,8 @@ use App\Http\Controllers\users\subCategoryController;
 use App\Http\Controllers\users\productController;
 use App\Http\Controllers\users\inventoryController;
 use App\Http\Controllers\users\dashboardController;
+use App\Http\Controllers\users\posController;
+use App\Http\Controllers\users\userController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -98,6 +100,22 @@ else
                         });
                     });
 
+                    Route::prefix('orders')->group(function () {
+                        Route::name('order.')->group(function () {
+
+                            Route::get('/{branch}/index',[posController::class, 'index'])->name('index');
+                            Route::get('/{id}/get_bill',[posController::class, 'get_bill'])->name('get_bill');
+                        });
+                    });
+
+                    Route::prefix('customers')->group(function () {
+                        Route::name('customer.')->group(function () {
+
+                            Route::get('/index',[userController::class, 'index'])->name('index');
+                            Route::get('/{id}/order',[userController::class, 'order'])->name('order');
+                        });
+                    });
+
                 });
 
                 Route::group(['middleware' => ['role:Branch']], function () {
@@ -115,6 +133,7 @@ else
                                     Route::get('/view',[customerController::class, 'view'])->name('view');
                                     Route::get('/{id}/edit',[customerController::class, 'edit'])->name('edit');
                                     Route::post('/update',[customerController::class, 'update'])->name('update');
+                                    Route::get('/{id}/order',[customerController::class, 'order'])->name('order');
                                     
                                 });
                             });

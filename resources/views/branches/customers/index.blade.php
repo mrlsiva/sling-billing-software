@@ -85,7 +85,7 @@
 										</td>
 										<td>
 											<div class="d-flex gap-3">
-												<a href="#" class="text-muted" title="Order History"><i class="ri-eye-line align-middle fs-20"></i></a>
+												<a href="{{ route('branch.customer.order', ['company' => request()->route('company'),'id' => $user->id ]) }}" class="text-muted" title="Order History"><i class="ri-eye-line align-middle fs-20"></i></a>
 											</div>
 										</td>
 										<td>

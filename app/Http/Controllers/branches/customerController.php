@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use App\Models\Customer;
 use App\Models\Gender;
 use App\Models\User;
+use App\Models\Order;
 use App\Traits\Log;
 use DB;
 
@@ -117,6 +118,20 @@ class customerController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Customer Update','App/Models/Customer','customers',$customer->id,'Update',null,$request,'Success','Customer Updated Successfully');
 
         return redirect()->back()->with('toast_success', 'Customer updated successfully.');
+
+    }
+
+    public function order(Request $request,$company,$id)
+    {
+
+        $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])->paginate(30);
+
+        return view('branches.orders.index',compact('orders'));
+
+        // $customer = Customer::where('id',$id)->first();
+        // $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])->paginate(30);
+
+        // return view('branches.customers.order',compact('orders','customer'));
 
     }
 

@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-<title>{{ config('app.name')}} | Orders</title>
+<title>{{ config('app.name')}} | Customer Order History</title>
 @endsection
 
 @section('body')
@@ -10,7 +10,10 @@
 			<div class="card">
 				<div class="card-header d-flex justify-content-between align-items-center">
 					<div>
-						<p class="card-title">All Order</p>
+						<p class="card-title">Customer - {{$customer->name}} ({{$customer->phone}}) Order History</p>
+					</div>
+					<div>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" href="{{route('customer.index', ['company' => request()->route('company')])}}"><i class='bx bxs-arrow-to-left'></i> Back</a>
 					</div>
 
 				</div>
@@ -21,6 +24,7 @@
 							<thead class="bg-light-subtle">
 								<tr>
 									<th>S.No</th>
+									<th>Branch</th>
 									<th>Bill ID</th>
 									<th>Amount (In ₹)</th>
 									<th>Billed On</th>
@@ -34,6 +38,9 @@
 									<tr>
 										<td>
 											{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
+										</td>
+										<td>
+											{{$order->branch->name}} ({{$order->branch->user_name}})
 										</td>
 										<td>
 											{{$order->bill_id}}
@@ -51,7 +58,8 @@
 											{{ $order->customer->phone }} ({{ $order->customer->name }})
 										</td>
 										<td>
-											<a href="{{ route('branch.billing.get_bill', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
+
+											<a href="{{ route('order.get_bill', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
 										</td>
 									</tr>
 								@endforeach

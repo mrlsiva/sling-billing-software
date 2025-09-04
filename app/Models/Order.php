@@ -17,7 +17,7 @@ class Order extends Model
 
     public function branch()
     {
-        return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User','branch_id');
     }
 
     public function customer()

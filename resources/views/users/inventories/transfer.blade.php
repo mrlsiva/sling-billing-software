@@ -79,6 +79,9 @@
                     </div>
                 </div>
             </div>
+            <div class="card-footer border-0">
+                {!! $stocks->withQueryString()->links('pagination::bootstrap-5') !!}
+            </div>
         </div>
     </div>
 </div>
