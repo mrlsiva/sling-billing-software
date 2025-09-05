@@ -18,6 +18,7 @@ use App\Models\Finance;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPaymentDetail;
+use App\Models\PosSetting;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Traits\Log;
@@ -38,6 +39,16 @@ class billingController extends Controller
         $categories = Stock::where([['branch_id',Auth::user()->id],['is_active',1]])->select('category_id')->get();
         $categories = Category::whereIn('id',$categories)->get();
 
+        $pagination = PosSetting::where('branch_id',Auth::user()->id)->first();
+        if($pagination)
+        {
+            $pagination = $pagination->pagination;
+        }
+        else
+        {
+            $pagination = 21;
+        }
+
         $stocks = Stock::where('branch_id', Auth::user()->id)->where('is_active', 1)
             ->when($request->category, function ($query, $category) {
                 $query->where('category_id', $category);
@@ -48,7 +59,7 @@ class billingController extends Controller
             ->when($request->filter == 1, function ($query) {
                 $query->where('quantity', '>', 0);
             })
-        ->paginate(28);
+        ->paginate($pagination);
 
         return view('branches.billing',compact('stocks','categories','genders','payments','finances'));
     }

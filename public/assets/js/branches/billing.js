@@ -537,6 +537,7 @@ function appendPaymentRow(method, amount, extraData = {}) {
                 <tr data-id="${rowId}" data-method="${method}" data-extra='${JSON.stringify(extraData)}'>
                     <td>${displayMethod}</td>
                     <td>₹${parseFloat(amount).toFixed(2)}</td>
+                    <td><button type="button" class="btn btn-sm btn-danger delete-row"><i class="ri-delete-bin-line"></i>Delete</button></td>
                 </tr>
             `);
         }
@@ -565,6 +566,7 @@ function appendPaymentRow(method, amount, extraData = {}) {
                 <tr data-id="${rowId}" data-method="Finance" data-extra='${JSON.stringify(extraData)}'>
                     <td>Finance - ${extraData.finance_type_name}</td>
                     <td>₹${parseFloat(amount).toFixed(2)}</td>
+                    <td><button type="button" class="btn btn-sm btn-danger delete-row"><i class="ri-delete-bin-line"></i>Delete</button></td>
                 </tr>
             `);
         }
@@ -575,6 +577,7 @@ function appendPaymentRow(method, amount, extraData = {}) {
             <tr data-id="${rowId}" data-method="${method}" data-extra='${JSON.stringify(extraData)}'>
                 <td>${displayMethod}</td>
                 <td>₹${parseFloat(amount).toFixed(2)}</td>
+                <td><button type="button" class="btn btn-sm btn-danger delete-row"><i class="ri-delete-bin-line"></i>Delete</button></td>
             </tr>
         `);
     }
@@ -583,6 +586,10 @@ function appendPaymentRow(method, amount, extraData = {}) {
     //saveCartToSession();
 }
 
+$(document).on("click", ".delete-row", function () {
+    $(this).closest("tr").remove(); // remove row
+    updateTotal(); // recalc total
+});
 
 function updateTotal() {
     let total = 0;

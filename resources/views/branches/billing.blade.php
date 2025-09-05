@@ -460,6 +460,7 @@
 										<tr>
 											<td class="fw-semibold">Method</td>
 											<td class="fw-semibold">Amount</td>
+											<td class="fw-semibold">Action</td>
 										</tr>
 									</thead>
 									<tbody id="payment-info-body">
@@ -470,7 +471,7 @@
 											<td>
 												<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-success" id="received_cash">Total Cash: </p>
 											</td>
-											<td>
+											<td colspan="2">
 												<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-success" id="amount_text1">Payable Amount: </p>
 											</td>
 										</tr>

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\BankDetail;
 use App\Models\UserDetail;
+use App\Models\PosSetting;
 use App\Traits\common;
 use App\Models\User;
 use App\Traits\Log;
@@ -177,6 +178,12 @@ class branchController extends Controller
 
         $role = Role::where('id',3)->first()->name;
         $user->assignRole($role);
+
+        $pos_setting = PosSetting::create([ 
+            'shop_id' => $request->parent_id,
+            'branch_id' => $user->id,
+            'pagination' => 21,
+        ]);
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Branch Create','App/Models/User','users',$user->id,'Insert',null,$request,'Success','Branch Created Successfully');
