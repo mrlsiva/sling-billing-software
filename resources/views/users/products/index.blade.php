@@ -15,6 +15,21 @@
 					<a class="btn btn-outline-primary btn-sm fw-semibold" href="{{ route('product.create', ['company' => request()->route('company')]) }}"><i class='bx bxs-folder-plus'></i> Create Product</a>
 				</div>
 
+				<form method="get" action="{{route('product.index', ['company' => request()->route('company')])}}">
+				    <div class="row mb-3 p-3">
+				    	<div class="col-md-11">
+				    		<div class="input-group input-group-lg">
+				    			<span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
+				    			<input type="text" class="form-control" placeholder="Product Name / Code / HSN Code" name="product" value="{{ request('product') }}">
+				    		</div>
+				    	</div>
+
+					    <div class="col-md-1">
+					    	<button class="btn btn-primary"> Search </button>
+					    </div>
+				    </div>
+		    	</form>
+
 				<div class="">
 					<div class="table-responsive">
 						<table class="table align-middle mb-0 table-hover table-centered">
@@ -23,7 +38,8 @@
 									<th>S.No</th>
 									<th>Image</th>
 									<th>Name</th>
-									<th>Code</th>
+									<th>Product Code</th>
+									<th>HSN Code</th>
 									<th>Price (₹)</th>
 									<th>Active / In-Active</th>
 									<th>Status</th>
@@ -45,6 +61,7 @@
 										</td>
 										<td>{{$product->name}}</td>
 										<td>{{$product->code}}</td>
+										<td>{{$product->hsn_code}}</td>
 										<td>{{$product->price}}</td>
 										<td>
 										    <form action="{{ route('product.status', ['company' => request()->route('company')]) }}" method="post" onsubmit="return confirm('Are you sure you want to change the product status?')">

@@ -15,6 +15,22 @@
 					</div>
 					<a href="{{route('admin.shop.create')}}" class="btn btn-outline-primary btn-sm fw-semibold"><i class='bx bxs-folder-plus'></i> Create Shop</a>
 				</div>
+
+				<form method="get" action="{{route('admin.shop.index')}}">
+                    <div class="row mb-2 p-3">
+                        <div class="col-md-11">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
+                                <input type="text" class="form-control" placeholder="Name/ User Name/ Slug Name/ Phone" name="shop" value="{{ request('shop') }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button class="btn btn-primary"> Search </button>
+                        </div>
+                    </div>
+                </form>
+
 				<div class="">
 					<div class="table-responsive">
 						<table class="table align-middle mb-0 table-hover table-centered">

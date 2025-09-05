@@ -24,7 +24,14 @@ class productController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::where('user_id',Auth::user()->id)->paginate(10);
+        $products = Product::where('user_id',Auth::user()->id)->when(request('product'), function ($query) {
+            $search = request('product');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('hsn_code', 'like', "%{$search}%");
+            });
+        })->orderBy('id','desc')->paginate(10);
         return view('users.products.index',compact('products'));
     }
 

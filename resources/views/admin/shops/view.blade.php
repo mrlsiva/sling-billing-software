@@ -110,6 +110,21 @@
                     <a href="{{route('admin.branch.create', ['id' => $user->id])}}" class="link-dark"><i class="ri-add-circle-line align-middle fs-20"></i>Add New Branch</a>
                 </div>
 
+                <form method="get" action="{{route('admin.shop.view', ['id' => $user->id])}}">
+                    <div class="row mb-2 p-3">
+                        <div class="col-md-10">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
+                                <input type="text" class="form-control" placeholder="Name/ User Name/ Slug Name/ Phone" name="branch" value="{{ request('branch') }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button class="btn btn-primary"> Search </button>
+                        </div>
+                    </div>
+                </form>
+
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table align-middle mb-0 table-hover table-centered">

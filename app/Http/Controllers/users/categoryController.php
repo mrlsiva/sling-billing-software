@@ -17,7 +17,9 @@ class categoryController extends Controller
 
     public function index(Request $request)
     {
-        $categories = Category::with(['sub_categories'])->where('user_id',Auth::user()->id)->orderBy('id','desc')->paginate(10);
+        $categories = Category::with(['sub_categories'])->where('user_id',Auth::user()->id)->when(request('name'), function ($query) {
+                $query->where('name', 'like', '%' . request('name') . '%');
+        })->orderBy('id','desc')->paginate(10);
         return view('users.categories.index',compact('categories'));
     }
 

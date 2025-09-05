@@ -22,11 +22,45 @@ class inventoryController extends Controller
 
         if ($branch != 0) {
 
-            $stocks = Stock::where('shop_id', $shop)->where('branch_id', $branch)->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
+            $stocks = Stock::where('shop_id', $shop)->where('branch_id', $branch)
+            ->when(request('product'), function ($query) {
+                $search = request('product');
+                $query->where(function ($q) use ($search) {
+                    // product name
+                    $q->whereHas('product', function ($q1) use ($search) {
+                        $q1->where('name', 'like', "%{$search}%");
+                    })
+                    // category name
+                    ->orWhereHas('product.category', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    })
+                    // subcategory name
+                    ->orWhereHas('product.sub_category', function ($q3) use ($search) {
+                        $q3->where('name', 'like', "%{$search}%");
+                    });
+                });
+            })->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
         }
         else
         {
-            $stocks = Stock::where('shop_id', $shop)->where('branch_id', null)->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
+            $stocks = Stock::where('shop_id', $shop)->whereNull('branch_id')
+            ->when(request('product'), function ($query) {
+                $search = request('product');
+                $query->where(function ($q) use ($search) {
+                    // product name
+                    $q->whereHas('product', function ($q1) use ($search) {
+                        $q1->where('name', 'like', "%{$search}%");
+                    })
+                    // category name
+                    ->orWhereHas('product.category', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    })
+                    // subcategory name
+                    ->orWhereHas('product.sub_category', function ($q3) use ($search) {
+                        $q3->where('name', 'like', "%{$search}%");
+                    });
+                });
+            })->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
         }
 
         $branches = User::where([['parent_id',Auth::user()->id],['is_active',1],['is_lock',0],['is_delete',0]])->get();

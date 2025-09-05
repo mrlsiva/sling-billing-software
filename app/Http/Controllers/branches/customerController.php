@@ -22,7 +22,14 @@ class customerController extends Controller
     {
         $parent = User::where('id',Auth::user()->id)->first();
         $genders = Gender::where('is_active',1)->get();
-        $users = Customer::where('user_id',$parent->parent_id)->paginate(10);
+        $users = Customer::where('user_id',$parent->parent_id)
+        ->when(request('customer'), function ($query) {
+            $search = request('customer');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        })->orderBy('id','desc')->paginate(10);
         return view('branches.customers.index',compact('users','genders'));
     }
 
@@ -124,14 +131,26 @@ class customerController extends Controller
     public function order(Request $request,$company,$id)
     {
 
-        $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])->orderBy('id','desc')->paginate(10);
+        // $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])->orderBy('id','desc')->paginate(10);
 
-        return view('branches.orders.index',compact('orders'));
+        // return view('branches.orders.index',compact('orders'));
 
-        // $customer = Customer::where('id',$id)->first();
-        // $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])->paginate(10);
+        $customer = Customer::where('id',$id)->first();
+        $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])
+        ->when(request('order'), function ($query) {
+            $search = request('order');
+            $query->where(function ($q) use ($search) {
+                // Bill No
+                $q->where('bill_id', 'like', "%{$search}%")
+                  // Customer Name / Phone
+                  ->orWhereHas('customer', function ($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%")
+                         ->orWhere('phone', 'like', "%{$search}%");
+                  });
+            });
+        })->orderBy('id','desc')->paginate(10);
 
-        // return view('branches.customers.order',compact('orders','customer'));
+        return view('branches.customers.order',compact('orders','customer'));
 
     }
 

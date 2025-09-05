@@ -22,7 +22,16 @@ class shopController extends Controller
 
     public function index(Request $request)
     {
-        $shops = User::with(['user_detail', 'bank_detail'])->where('role_id',2)->orderBy('id','desc')->paginate(10);
+        $shops = User::with(['user_detail', 'bank_detail'])->where('role_id',2)
+        ->when(request('shop'), function ($query) {
+            $search = request('shop');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('user_name', 'like', "%{$search}%")
+                  ->orWhere('slug_name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        })->orderBy('id','desc')->paginate(10);
         return view('admin.shops.index',compact('shops'));
     }
 
@@ -159,7 +168,16 @@ class shopController extends Controller
     public function view(Request $request,$id)
     {
         $user = User::with(['user_detail', 'bank_detail'])->where('id', $id)->first();
-        $branches = User::with(['user_detail', 'bank_detail'])->where('parent_id', $id)->paginate(5);
+        $branches = User::with(['user_detail', 'bank_detail'])->where('parent_id', $id)
+        ->when(request('branch'), function ($query) {
+            $search = request('branch');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('user_name', 'like', "%{$search}%")
+                  ->orWhere('slug_name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        })->orderBy('id','desc')->paginate(5);
         return view('admin.shops.view',compact('user','branches'));
     }
 

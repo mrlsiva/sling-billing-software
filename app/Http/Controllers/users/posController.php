@@ -23,12 +23,46 @@ class posController extends Controller
 
         if($branch != 0)
         {
-            $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->id]])->orderBy('id','desc')->paginate(10);
+            $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->id]])
+            ->when(request('order'), function ($query) {
+                $search = request('order');
+                $query->where(function ($q) use ($search) {
+                    // search by bill id
+                    $q->where('bill_id', 'like', "%{$search}%")
+                      // branch name / username
+                      ->orWhereHas('branch', function ($q1) use ($search) {
+                          $q1->where('name', 'like', "%{$search}%")
+                             ->orWhere('user_name', 'like', "%{$search}%");
+                      })
+                      // customer name / phone
+                      ->orWhereHas('customer', function ($q2) use ($search) {
+                          $q2->where('name', 'like', "%{$search}%")
+                             ->orWhere('phone', 'like', "%{$search}%");
+                      });
+                });
+            })->orderBy('id','desc')->paginate(10);
 
         }
         else
         {
-            $orders = Order::where('shop_id',Auth::user()->id)->orderBy('id','desc')->paginate(10);
+            $orders = Order::where('shop_id',Auth::user()->id)
+            ->when(request('order'), function ($query) {
+                $search = request('order');
+                $query->where(function ($q) use ($search) {
+                    // search by bill id
+                    $q->where('bill_id', 'like', "%{$search}%")
+                      // branch name / username
+                      ->orWhereHas('branch', function ($q1) use ($search) {
+                          $q1->where('name', 'like', "%{$search}%")
+                             ->orWhere('user_name', 'like', "%{$search}%");
+                      })
+                      // customer name / phone
+                      ->orWhereHas('customer', function ($q2) use ($search) {
+                          $q2->where('name', 'like', "%{$search}%")
+                             ->orWhere('phone', 'like', "%{$search}%");
+                      });
+                });
+            })->orderBy('id','desc')->paginate(10);
         }
         return view('users.orders.index',compact('orders','branches'));
     }

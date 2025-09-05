@@ -36,6 +36,22 @@
                     
 
                 </ul>
+
+                <form method="get" action="{{route('inventory.transfer', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}">
+                    <div class="row mb-2 p-3">
+                        <div class="col-md-11">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
+                                <input type="text" class="form-control" placeholder="Product/ Categoy/ Sub Category Name" name="product" value="{{ request('product') }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button class="btn btn-primary"> Search </button>
+                        </div>
+                    </div>
+                </form>
+
                 <div class="tab-content pt-2 text-muted">
                     <div class="tab-pane show active" id="homeTabsJustified">
                         <div class="table-responsive">

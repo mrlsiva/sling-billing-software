@@ -15,6 +15,21 @@
 
 				</div>
 
+				<form method="get" action="{{route('branch.order.index', ['company' => request()->route('company')])}}">
+                    <div class="row mb-2 p-3">
+                        <div class="col-md-11">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
+                                <input type="text" class="form-control" placeholder="Customer Name/ Customer Phone/ Bill No" name="order" value="{{ request('order') }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button class="btn btn-primary"> Search </button>
+                        </div>
+                    </div>
+                </form>
+
 				<div class="">
 					<div class="table-responsive">
 						<table class="table align-middle mb-0 table-hover table-centered">
