@@ -222,9 +222,24 @@ $(document).ready(function () {
                 pattern: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i
             },
             password: {
-                minlength: 6,
-                maxlength: 20,
-                pwcheck: true
+                required: false, // not required by default
+                minlength: {
+                    param: 6,
+                    depends: function (element) {
+                        return $(element).val().length > 0; // only validate if not empty
+                    }
+                },
+                maxlength: {
+                    param: 20,
+                    depends: function (element) {
+                        return $(element).val().length > 0;
+                    }
+                },
+                pwcheck: {
+                    depends: function (element) {
+                        return $(element).val().length > 0;
+                    }
+                }
             },
             password_confirmation: {
                 equalTo: "#password"
