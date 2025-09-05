@@ -124,12 +124,12 @@ class customerController extends Controller
     public function order(Request $request,$company,$id)
     {
 
-        $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])->paginate(30);
+        $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])->orderBy('id','desc')->paginate(10);
 
         return view('branches.orders.index',compact('orders'));
 
         // $customer = Customer::where('id',$id)->first();
-        // $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])->paginate(30);
+        // $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])->paginate(10);
 
         // return view('branches.customers.order',compact('orders','customer'));
 

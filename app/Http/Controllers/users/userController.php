@@ -17,7 +17,7 @@ class userController extends Controller
     public function index(Request $request)
     {
 
-        $users = Customer::where('user_id',Auth::user()->id)->paginate(30);
+        $users = Customer::where('user_id',Auth::user()->id)->paginate(10);
 
         return view('users.customers.index',compact('users'));
     }
@@ -26,7 +26,7 @@ class userController extends Controller
     {
 
         $customer = Customer::where('id',$id)->first();
-        $orders = Order::where('customer_id',$id)->paginate(30);
+        $orders = Order::where('customer_id',$id)->orderBy('id','desc')->paginate(10);
 
         return view('users.customers.order',compact('orders','customer'));
 

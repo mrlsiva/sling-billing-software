@@ -263,7 +263,16 @@ class productController extends Controller
             $product->save();
         }
 
+        $stock = Stock::where([['shop_id', Auth::user()->id],['category_id', $request->category_id],['sub_category_id', $request->sub_category],['product_id', $request->id]])->first();
+
+        $stock->update([ 
+            'quantity' => $request->quantity,
+        ]);
+
         DB::commit();
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Stock Updated','App/Models/Stock','stocks',$stock->id,'Update',null,$request,'Success','Stock Updated for this product');
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Product Update','App/Models/Product','products',$product->id,'Update',null,$request,'Success','Product Updated Successfully');

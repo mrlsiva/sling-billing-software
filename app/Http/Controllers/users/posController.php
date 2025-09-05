@@ -23,12 +23,12 @@ class posController extends Controller
 
         if($branch != 0)
         {
-            $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->id]])->paginate(30);
+            $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->id]])->orderBy('id','desc')->paginate(10);
 
         }
         else
         {
-            $orders = Order::where('shop_id',Auth::user()->id)->paginate(30);
+            $orders = Order::where('shop_id',Auth::user()->id)->orderBy('id','desc')->paginate(10);
         }
         return view('users.orders.index',compact('orders','branches'));
     }
