@@ -20,6 +20,7 @@
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Customer Name/ Customer Phone" name="customer" value="{{ request('customer') }}">
+                                <span class="input-group-text"><a href="{{route('customer.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
 

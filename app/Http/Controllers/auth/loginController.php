@@ -69,7 +69,7 @@ class loginController extends Controller
 
                 $company = request()->route('company');
 
-                return redirect()->route('branch.dashboard', ['company' => $company]);
+                return redirect()->route('branch.billing.pos', ['company' => $company]);
             }
         }
         else 

@@ -51,14 +51,21 @@
 						</select>
 					</div>
 				</div>
-				<div class="col-md-4">
+				<!-- <div class="col-md-4">
 					<input type="hidden" name="filter" id="filterInput" value="{{ request('filter', 0) }}">
 					<div class="form-check mb-3">
-						<input type="checkbox" 
-						class="form-check-input" 
-						id="checkbox-veg" 
-						{{ request('filter') == 1 ? 'checked' : '' }}
+						<input type="checkbox" class="form-check-input" id="checkbox-veg" {{ request('filter') == 1 ? 'checked' : '' }}
 						onchange="document.getElementById('filterInput').value = this.checked ? 1 : 0; ">
+						<label class="form-check-label" for="checkbox-veg">
+							Show in stock products only
+						</label>
+					</div>
+				</div> -->
+
+				<div class="col-md-4">
+					<input type="hidden" name="filter" id="filterInput" value="1">
+					<div class="form-check mb-3">
+						<input type="checkbox" class="form-check-input" id="checkbox-veg" {{ request('filter', 1) == 1 ? 'checked' : '' }} onchange="document.getElementById('filterInput').value = this.checked ? 1 : 0;">
 						<label class="form-check-label" for="checkbox-veg">
 							Show in stock products only
 						</label>
@@ -328,6 +335,16 @@
 	                                    <input type="number" name="cash_amount" id="cash_amount" value="{{old('cash_amount')}}" class="form-control" placeholder="Amount">
 	                                </div>
                             	</div>
+
+                            	<div class="col-md-12">
+									<div class="form-check mb-3">
+										<input type="checkbox" class="form-check-input" id="amount_fill" name="amount_fill">
+										<label class="form-check-label" for="amount_fill">
+											Full Amount
+										</label>
+									</div>
+								</div>
+
                             	<div class=" d-flex justify-content-center" >
                             		<button type="btn" class="btn btn-primary" id="cash_add" onclick="cash_add()"><i class="ri-bank-line"></i> Add</button>
                             	</div>
@@ -355,6 +372,16 @@
 	                                    <input type="number" name="card_amount" id="card_amount" value="{{old('card_amount')}}" class="form-control" placeholder="Amount">
 	                                </div>
                             	</div>
+
+                            	<div class="col-md-12">
+									<div class="form-check mb-3">
+										<input type="checkbox" class="form-check-input" id="card_fill" name="card_fill">
+										<label class="form-check-label" for="card_fill">
+											Full Amount
+										</label>
+									</div>
+								</div>
+
                             	<div class=" d-flex justify-content-center" >
                             		<button type="btn" class="btn btn-primary" id="card_add" onclick="card_add()"><i class="ri-bank-line"></i> Add</button>
                             	</div>
@@ -387,6 +414,14 @@
 	                                    <input type="number" name="finance_amount" id="finance_amount" value="{{old('finance_amount')}}" class="form-control" placeholder="Amount">
 	                                </div>
                             	</div>
+                            	<div class="col-md-12">
+									<div class="form-check mb-3">
+										<input type="checkbox" class="form-check-input" id="finance_fill" name="finance_fill">
+										<label class="form-check-label" for="finance_fill">
+											Full Amount
+										</label>
+									</div>
+								</div>
                             	<div class=" d-flex justify-content-center" >
                             		<button type="btn" class="btn btn-primary" id="finance_add" onclick="finance_add()"><i class="ri-bank-line"></i> Add</button>
                             	</div>
@@ -400,6 +435,14 @@
 	                                    <input type="number" name="exchange_amount" id="exchange_amount" value="{{old('exchange_amount')}}" class="form-control" placeholder="Exchange Amount">
 	                                </div>
                             	</div>
+                            	<div class="col-md-12">
+									<div class="form-check mb-3">
+										<input type="checkbox" class="form-check-input" id="exchange_fill" name="exchange_fill">
+										<label class="form-check-label" for="exchange_fill">
+											Full Amount
+										</label>
+									</div>
+								</div>
                             	<div class=" d-flex justify-content-center" >
                             		<button type="btn" class="btn btn-primary" id="exchange_add" onclick="exchange_add()"><i class="ri-bank-line"></i> Add</button>
                             	</div>
@@ -413,6 +456,14 @@
 	                                    <input type="number" name="credit_amount" id="credit_amount" value="{{old('credit_amount')}}" class="form-control" placeholder="Credit">
 	                                </div>
                             	</div>
+                            	<div class="col-md-12">
+									<div class="form-check mb-3">
+										<input type="checkbox" class="form-check-input" id="credit_fill" name="credit_fill">
+										<label class="form-check-label" for="credit_fill">
+											Full Amount
+										</label>
+									</div>
+								</div>
                             	<div class=" d-flex justify-content-center" >
                             		<button type="btn" class="btn btn-primary" id="credit_add" onclick="credit_add()"><i class="ri-bank-line"></i> Add</button>
                             	</div>
@@ -433,6 +484,14 @@
 	                                    <input type="number" name="cheque_amount" id="cheque_amount" value="{{old('cheque_amount')}}" class="form-control" placeholder="Amount">
 	                                </div>
                             	</div>
+                            	<div class="col-md-12">
+									<div class="form-check mb-3">
+										<input type="checkbox" class="form-check-input" id="cheque_fill" name="cheque_fill">
+										<label class="form-check-label" for="cheque_fill">
+											Full Amount
+										</label>
+									</div>
+								</div>
                             	<div class=" d-flex justify-content-center" >
                             		<button type="btn" class="btn btn-primary" id="cheque_add" onclick="cheque_add()"><i class="ri-bank-line"></i> Add</button>
                             	</div>
@@ -446,12 +505,18 @@
 	                                    <input type="number" name="upi_amount" id="upi_amount" value="{{old('upi_amount')}}" class="form-control" placeholder="UPI Amount">
 	                                </div>
                             	</div>
+                            	<div class="col-md-12">
+									<div class="form-check mb-3">
+										<input type="checkbox" class="form-check-input" id="upi_fill" name="upi_fill">
+										<label class="form-check-label" for="upi_fill">
+											Full Amount
+										</label>
+									</div>
+								</div>
                             	<div class=" d-flex justify-content-center" >
                             		<button type="btn" class="btn btn-primary" id="upi_add" onclick="upi_add()"><i class="ri-bank-line"></i> Add</button>
                             	</div>
 							</div>
-
-
 
 							<h5 class="fw-semibold my-3">Payment info</h5>
 							<div class="table-responsive">

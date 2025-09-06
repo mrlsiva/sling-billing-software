@@ -35,7 +35,7 @@ class billingController extends Controller
 
         $genders = Gender::where('is_active',1)->get();
         $payments = Payment::where('is_active',1)->get();
-        $finances = Finance::where('is_active',1)->get();
+        $finances = Finance::where([['shop_id',Auth::user()->parent_id],['is_active',1]])->get();
         $categories = Stock::where([['branch_id',Auth::user()->id],['is_active',1]])->select('category_id')->get();
         $categories = Category::whereIn('id',$categories)->get();
 

@@ -12,9 +12,14 @@ use App\Http\Controllers\users\inventoryController;
 use App\Http\Controllers\users\dashboardController;
 use App\Http\Controllers\users\posController;
 use App\Http\Controllers\users\userController;
+use App\Http\Controllers\users\taxController;
+use App\Http\Controllers\users\metricController;
+use App\Http\Controllers\users\financeController;
+use App\Http\Controllers\users\paymentController;
 
 
 use App\Http\Controllers\branches\customerController;
+use App\Http\Controllers\branches\stockController;
 use App\Http\Controllers\branches\billingController;
 use App\Http\Controllers\branches\settingController;
 use App\Http\Controllers\branches\branchDashboardController;
@@ -116,6 +121,54 @@ else
                         });
                     });
 
+                    Route::prefix('settings')->group(function () {
+                        Route::name('setting.')->group(function () {
+
+                            Route::prefix('taxes')->group(function () {
+                                Route::name('tax.')->group(function () {
+
+                                    Route::get('/index',[taxController::class, 'index'])->name('index');
+                                    Route::post('/store',[taxController::class, 'store'])->name('store');
+                                    Route::post('/status',[taxController::class, 'status'])->name('status');
+                                    Route::get('/edit',[taxController::class, 'edit'])->name('edit');
+                                    Route::post('/update',[taxController::class, 'update'])->name('update');
+                                });
+                            });
+
+                            Route::prefix('metrics')->group(function () {
+                                Route::name('metric.')->group(function () {
+
+                                    Route::get('/index',[metricController::class, 'index'])->name('index');
+                                    Route::post('/store',[metricController::class, 'store'])->name('store');
+                                    Route::post('/status',[metricController::class, 'status'])->name('status');
+                                    Route::get('/edit',[metricController::class, 'edit'])->name('edit');
+                                    Route::post('/update',[metricController::class, 'update'])->name('update');
+                                });
+                            });
+
+                            Route::prefix('finances')->group(function () {
+                                Route::name('finance.')->group(function () {
+
+                                    Route::get('/index',[financeController::class, 'index'])->name('index');
+                                    Route::post('/store',[financeController::class, 'store'])->name('store');
+                                    Route::post('/status',[financeController::class, 'status'])->name('status');
+                                    Route::get('/edit',[financeController::class, 'edit'])->name('edit');
+                                    Route::post('/update',[financeController::class, 'update'])->name('update');
+                                });
+                            });
+
+                            Route::prefix('payments')->group(function () {
+                                Route::name('payment.')->group(function () {
+
+                                    Route::get('/index',[paymentController::class, 'index'])->name('index');
+                                    Route::post('/store',[paymentController::class, 'store'])->name('store');
+                                });
+                            });
+
+
+                        });
+                    });
+
                 });
 
                 Route::group(['middleware' => ['role:Branch']], function () {
@@ -135,6 +188,13 @@ else
                                     Route::post('/update',[customerController::class, 'update'])->name('update');
                                     Route::get('/{id}/order',[customerController::class, 'order'])->name('order');
                                     
+                                });
+                            });
+
+                            Route::prefix('products')->group(function () {
+                                Route::name('product.')->group(function () {
+
+                                    Route::get('/index',[stockController::class, 'index'])->name('index');
                                 });
                             });
 

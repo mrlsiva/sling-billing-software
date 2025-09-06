@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Metric extends Model
 {
     protected $fillable = [
-        'name','is_active'
+        'shop_id','name','is_active'
     ];
 }

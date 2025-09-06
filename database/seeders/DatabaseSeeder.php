@@ -13,10 +13,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RoleSeeder::class);
         $this->call(AdminSeeder::class);
-         $this->call(GenderSeeder::class);
-        $this->call(FinanceSeeder::class);
-        $this->call(MetricSeeder::class);
+        $this->call(GenderSeeder::class);
         $this->call(PaymentSeeder::class);
-        $this->call(TaxSeeder::class);
+        //$this->call(FinanceSeeder::class);
+        //$this->call(MetricSeeder::class);
+        //$this->call(TaxSeeder::class);
     }
 }

@@ -508,6 +508,103 @@ jQuery(document).ready(function () {
     });
 });
 
+$(document).ready(function () {
+    $("#amount_fill").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#cash_amount").val(payable);
+        } else {
+            $("#cash_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
+    $("#card_fill").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#card_amount").val(payable);
+        } else {
+            $("#card_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
+    $("#finance_fill").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#finance_amount").val(payable);
+        } else {
+            $("#finance_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
+    $("#exchange_fill").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#exchange_amount").val(payable);
+        } else {
+            $("#exchange_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
+    $("#cheque_fill").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#cheque_amount").val(payable);
+        } else {
+            $("#cheque_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
+    $("#credit_fill").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#credit_amount").val(payable);
+        } else {
+            $("#credit_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
+    $("#credit_fill").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#credit_amount").val(payable);
+        } else {
+            $("#credit_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
+    $("#upi_fill").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#upi_amount").val(payable);
+        } else {
+            $("#upi_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+
 function appendPaymentRow(method, amount, extraData = {}) {
     let tbody = $("#payment-info-body");
     let rowId = Date.now(); // unique row id for multiple entries
@@ -537,7 +634,7 @@ function appendPaymentRow(method, amount, extraData = {}) {
                 <tr data-id="${rowId}" data-method="${method}" data-extra='${JSON.stringify(extraData)}'>
                     <td>${displayMethod}</td>
                     <td>₹${parseFloat(amount).toFixed(2)}</td>
-                    <td><button type="button" class="btn btn-sm btn-danger delete-row"><i class="ri-delete-bin-line"></i>Delete</button></td>
+                    <td><button type="button" class="btn btn-sm btn-danger delete-row"><i class="ri-delete-bin-line"></i></button></td>
                 </tr>
             `);
         }
@@ -566,7 +663,7 @@ function appendPaymentRow(method, amount, extraData = {}) {
                 <tr data-id="${rowId}" data-method="Finance" data-extra='${JSON.stringify(extraData)}'>
                     <td>Finance - ${extraData.finance_type_name}</td>
                     <td>₹${parseFloat(amount).toFixed(2)}</td>
-                    <td><button type="button" class="btn btn-sm btn-danger delete-row"><i class="ri-delete-bin-line"></i>Delete</button></td>
+                    <td><button type="button" class="btn btn-sm btn-danger delete-row"><i class="ri-delete-bin-line"></i></button></td>
                 </tr>
             `);
         }
@@ -577,7 +674,7 @@ function appendPaymentRow(method, amount, extraData = {}) {
             <tr data-id="${rowId}" data-method="${method}" data-extra='${JSON.stringify(extraData)}'>
                 <td>${displayMethod}</td>
                 <td>₹${parseFloat(amount).toFixed(2)}</td>
-                <td><button type="button" class="btn btn-sm btn-danger delete-row"><i class="ri-delete-bin-line"></i>Delete</button></td>
+                <td><button type="button" class="btn btn-sm btn-danger delete-row"><i class="ri-delete-bin-line"></i></button></td>
             </tr>
         `);
     }
@@ -610,6 +707,8 @@ function cash_add() {
     }
     appendPaymentRow("Cash", cash_amount);
     $("#cash_amount").val("");
+    // uncheck "Full Amount"
+    $("#amount_fill").prop("checked", false);
 }
 
 function card_add() {
@@ -632,6 +731,7 @@ function card_add() {
     });
 
     $("#card_number, #card_name, #card_amount").val("");
+    $("#card_fill").prop("checked", false);
 }
 
 
@@ -658,6 +758,7 @@ function finance_add() {
     });
 
     $("#finance_card, #finance_type, #finance_amount").val("");
+    $("#finance_fill").prop("checked", false);
 }
 
 
@@ -669,6 +770,7 @@ function exchange_add() {
     }
     appendPaymentRow("Exchange", exchange_amount);
     $("#exchange_amount").val("");
+    $("#exchange_fill").prop("checked", false);
 }
 
 function credit_add() {
@@ -679,6 +781,7 @@ function credit_add() {
     }
     appendPaymentRow("Credit", credit_amount);
     $("#credit_amount").val("");
+    $("#credit_fill").prop("checked", false);
 }
 
 function cheque_add() {
@@ -699,6 +802,7 @@ function cheque_add() {
     });
 
     $("#cheque_number, #cheque_amount").val("");
+    $("#cheque_fill").prop("checked", false);
 }
 
 
@@ -710,6 +814,7 @@ function upi_add() {
     }
     appendPaymentRow("UPI", upi_amount);
     $("#upi_amount").val("");
+    $("#upi_fill").prop("checked", false);
 }
 
 // function saveCartToSession() {

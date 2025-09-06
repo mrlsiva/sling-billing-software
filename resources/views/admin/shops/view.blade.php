@@ -116,6 +116,7 @@
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Name/ User Name/ Slug Name/ Phone" name="branch" value="{{ request('branch') }}">
+                                <span class="input-group-text"><a href="{{route('admin.shop.view', ['id' => $user->id])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
 

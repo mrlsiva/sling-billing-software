@@ -38,8 +38,8 @@ class productController extends Controller
     public function create(Request $request)
     {
         $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
-        $taxes = Tax::where('is_active',1)->get();
-        $metrics = Metric::where('is_active',1)->get();
+        $taxes = Tax::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
+        $metrics = Metric::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
 
         return view('users.products.create',compact('categories','taxes','metrics'));
     }
@@ -108,9 +108,15 @@ class productController extends Controller
 
         $taxAmount = 0; // default, in case tax = 0
 
-        if ($tax && preg_match('/(\d+)%/', $tax->name, $matches)) {
-            $taxRate = (int) $matches[1]; // extract number part e.g. "18" from "GST 18%"
-            $taxAmount = $price * $taxRate / 100;
+        // if ($tax && preg_match('/(\d+)%/', $tax->name, $matches)) {
+        //     $taxRate = (int) $matches[1]; // extract number part e.g. "18" from "GST 18%"
+        //     $taxAmount = $price * $taxRate / 100;
+        // }
+
+        if ($tax)
+        {
+            $taxAmount = $price * ((float) $tax->name / 100); 
+            $finalPrice = $price + $taxAmount; // if you want price including tax
         }
 
         $product = Product::create([ 
@@ -169,8 +175,8 @@ class productController extends Controller
     {
         $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
         $product = Product::find($id);
-        $taxes = Tax::where('is_active',1)->get();
-        $metrics = Metric::where('is_active',1)->get();
+        $taxes = Tax::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
+        $metrics = Metric::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
         return view('users.products.edit',compact('product','categories','taxes','metrics'));
     }
 

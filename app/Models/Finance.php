@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Finance extends Model
 {
     protected $fillable = [
-        'name','is_active'
+        'shop_id','name','is_active'
     ];
 }

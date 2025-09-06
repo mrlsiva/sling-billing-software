@@ -104,17 +104,17 @@
                             </a>
                         </li>
 
-                        <li class="menu-item ">
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/inventories/*') ? 'active' : '' }}">
                             <a class="menu-link menu-arrow" href="#sidebarProduct" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProduct">
                                 <span class="nav-icon">
                                     <i class="ri-hand-coin-fill"></i>
                                 </span>
                                 <span class="nav-text"> Inventory </span>
                             </a>
-                            <div class="collapse" id="sidebarProduct">
+                            <div class="collapse {{ request()->is(Auth::user()->slug_name . '/inventories/*') ? 'show' : '' }}" id="sidebarProduct">
                                 <ul class="sub-menu-nav">
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="{{route('inventory.transfer', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}">Product Transfer</a>
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/*') ? 'active' : '' }}" href="{{route('inventory.transfer', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}">Product Transfer</a>
                                     </li>
                                 </ul>
                             </div>
@@ -136,6 +136,31 @@
                                 </span>
                                 <span class="nav-text"> Customers </span>
                             </a>
+                        </li>
+
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/settings/*') ? 'active' : '' }}">
+                            <a class="menu-link menu-arrow" href="#sidebarSetting" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSetting">
+                                <span class="nav-icon">
+                                    <i class="ri-settings-3-line"></i>
+                                </span>
+                                <span class="nav-text"> Settings </span>
+                            </a>
+                            <div class="collapse {{ request()->is(Auth::user()->slug_name . '/settings/*') ? 'show' : '' }}" id="sidebarSetting">
+                                <ul class="sub-menu-nav">
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/taxes/index') ? 'active' : '' }}" href="{{route('setting.tax.index', ['company' => request()->route('company')])}}">Tax</a>
+                                    </li>
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/metrics/index') ? 'active' : '' }}" href="{{route('setting.metric.index', ['company' => request()->route('company')])}}">Metrics</a>
+                                    </li>
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/finances/index') ? 'active' : '' }}" href="{{route('setting.finance.index', ['company' => request()->route('company')])}}">Finances</a>
+                                    </li>
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/payments/index') ? 'active' : '' }}" href="{{route('setting.payment.index', ['company' => request()->route('company')])}}">Payment Method</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                         
 
@@ -160,6 +185,15 @@
                                     <i class="ri-group-2-line"></i>
                                 </span>
                                 <span class="nav-text"> Customers </span>
+                            </a>
+                        </li>
+
+                        <li class="menu-item {{ request()->is(request()->route('company') . '/products*') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{route('branch.product.index', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-shopping-basket-line"></i>
+                                </span>
+                                <span class="nav-text"> Products </span>
                             </a>
                         </li>
 

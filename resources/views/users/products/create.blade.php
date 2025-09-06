@@ -103,7 +103,7 @@
                                     <select class="form-control"  name="tax" id="tax">
                                         <option value=""> Select </option>
                                         @foreach($taxes as $tax)
-                                            <option value="{{$tax->id}}">{{$tax->name}}</option>
+                                            <option value="{{$tax->id}}">{{$tax->name}}%</option>
                                         @endforeach
                                     </select>
                                 </div>
