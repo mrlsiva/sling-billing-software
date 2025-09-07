@@ -19,6 +19,17 @@
 				</div>
 			</div>
 
+
+			<div class="row mb-3 p-3">
+				<div class="col-md-12">
+					<div class="input-group input-group-lg">
+						<span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
+						<input type="text" class="form-control" placeholder="Product Name / Code" name="product" id="product" value="{{ request('product') }}">
+					</div>
+				</div>
+			</div>
+			
+
 			<div class="row">
 				<div class="col-md-4">
 					<div class="mb-3">
@@ -93,7 +104,7 @@
 					    @endphp
 
 					    <div class="col-md-4">
-					        <div class="card {{ $cardClass }}">
+					        <div class="card {{ $cardClass }}" onclick="add_to_cart(this)" data-system_id="{{ $stock->product_id }}" style="cursor:pointer;">
 					            <div class="card-body p-2">
 					                <div class="d-flex flex-column">
 					                    <a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">
@@ -110,14 +121,11 @@
 					                    <div class="d-flex align-content-center gap-1">
 					                        <p class="mb-0 fs-12">{{ $stock->quantity }}</p>
 					                        <p class="badge {{ $badgeClass }} fs-10 mb-1 text-dark py-1 px-2">Qty</p>
-					                        @if($showButton)
-					                            <button type="button"
-					                                    class="bg-light text-dark border-0 rounded fs-20 lh-1 h-100"
-					                                    onclick="add_to_cart(this)"
-					                                    data-system_id="{{ $stock->product_id }}">
+					                        <!-- @if($showButton)
+					                            <button type="button"class="bg-light text-dark border-0 rounded fs-20 lh-1 h-100" onclick="add_to_cart(this)" data-system_id="{{ $stock->product_id }}">
 					                                +
 					                            </button>
-					                        @endif
+					                        @endif -->
 					                    </div>
 					                </div>
 					            </div>

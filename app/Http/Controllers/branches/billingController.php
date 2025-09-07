@@ -59,6 +59,16 @@ class billingController extends Controller
             ->when($request->filter == 1, function ($query) {
                 $query->where('quantity', '>', 0);
             })
+            ->when($request->product, function ($query, $product) {
+                $query->whereHas('product', function ($q) use ($product) {
+                    $q->where(function ($sub) use ($product) {
+                        $sub->where('name', 'like', "%{$product}%")
+                            ->orWhere('code', 'like', "%{$product}%")
+                            ->orWhere('hsn_code', 'like', "%{$product}%");
+                    });
+                });
+            })
+
         ->paginate($pagination);
 
         return view('branches.billing',compact('stocks','categories','genders','payments','finances'));
@@ -71,13 +81,33 @@ class billingController extends Controller
 
     public function get_product(Request $request)
     {
+
+        $pagination = PosSetting::where('branch_id',Auth::user()->id)->first();
+        if($pagination)
+        {
+            $pagination = $pagination->pagination;
+        }
+        else
+        {
+            $pagination = 21;
+        }
+        
         $stocks = Stock::with(['product.category', 'product.sub_category'])
             ->where('branch_id', Auth::id())
             ->where('is_active', 1)
             ->when($request->category, fn($q, $category) => $q->where('category_id', $category))
             ->when($request->sub_category, fn($q, $subCategory) => $q->where('sub_category_id', $subCategory))
             ->when($request->filter == 1, fn($q) => $q->where('quantity', '>', 0))
-            ->paginate(28);
+            ->when($request->product, function ($q, $product) {
+                $q->whereHas('product', function ($sub) use ($product) {
+                    $sub->where(function ($inner) use ($product) {
+                        $inner->where('name', 'like', "%{$product}%")
+                              ->orWhere('code', 'like', "%{$product}%")
+                              ->orWhere('hsn_code', 'like', "%{$product}%");
+                    });
+                });
+            })
+            ->paginate($pagination);
 
         // If AJAX request → return JSON
         return response()->json([

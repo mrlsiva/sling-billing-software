@@ -32,11 +32,13 @@ $(document).on('click', '#pagination a', function (e) {
 function loadProducts(page = 1) {
     let sub_category = jQuery('select[name="sub_category"]').val();
     let category = jQuery('select[name="category"]').val();
+    let product = jQuery('input[name="product"]').val();
     let filter = jQuery("#filterInput").val();
 
     console.log(sub_category);
     console.log(category);
     console.log(filter);
+    console.log(product);
 
     jQuery.ajax({
         url: 'get_product',
@@ -46,9 +48,12 @@ function loadProducts(page = 1) {
             page: page,
             category: category,
             sub_category: sub_category,
+            product: product,
             filter: filter
         },
         success: function (response) {
+
+            console.log(response);
 
             let html = '<div class="row">';
             response.data.forEach(function (stock) {
@@ -67,7 +72,7 @@ function loadProducts(page = 1) {
 
                 html += `
                     <div class="col-md-4">
-                        <div class="card ${cardClass}">
+                        <div class="card ${cardClass}" onclick="add_to_cart(this)" data-system_id="${stock.product.id}" style="cursor:pointer;"> 
                             <div class="card-body p-2">
                                 <div class="d-flex flex-column">
                                     <a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">
@@ -84,7 +89,7 @@ function loadProducts(page = 1) {
                                     <div class="d-flex align-content-center gap-1">
                                         <p class="mb-0 fs-12">${stock.quantity}</p>
                                         <p class="badge ${badgeClass} fs-10 mb-1 text-dark py-1 px-2">Qty</p>
-                                        ${stock.quantity > 0 ? `
+                                        ${stock.quantity == '-1' ? `
                                             <button type="button" 
                                                 class="bg-light text-dark border-0 rounded fs-20 lh-1 h-100"
                                                 onclick="add_to_cart(this)"
@@ -126,6 +131,12 @@ $(document).ready(function () {
         currentPage = 1;
         loadProducts(currentPage);
     });
+
+    jQuery('input[name="product"]').on('input', function() {
+        currentPage = 1;
+        loadProducts(currentPage);
+    });
+
 
     $(document).on('click', '#pagination a', function (e) {
         e.preventDefault();
