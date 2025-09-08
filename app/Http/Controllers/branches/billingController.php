@@ -18,6 +18,7 @@ use App\Models\Finance;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPaymentDetail;
+use App\Models\ShopPayment;
 use App\Models\PosSetting;
 use Illuminate\Support\Str;
 use App\Models\User;
@@ -34,7 +35,8 @@ class billingController extends Controller
     {
 
         $genders = Gender::where('is_active',1)->get();
-        $payments = Payment::where('is_active',1)->get();
+        $shop_payment_ids = ShopPayment::where('shop_id', Auth::user()->parent_id)->pluck('payment_id')->toArray();
+        $payments = Payment::whereIn('id',$shop_payment_ids)->get();
         $finances = Finance::where([['shop_id',Auth::user()->parent_id],['is_active',1]])->get();
         $categories = Stock::where([['branch_id',Auth::user()->id],['is_active',1]])->select('category_id')->get();
         $categories = Category::whereIn('id',$categories)->get();

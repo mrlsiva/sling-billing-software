@@ -216,6 +216,8 @@ else
                                 Route::name('order.')->group(function () {
 
                                     Route::get('/index',[orderController::class, 'index'])->name('index');
+                                    Route::get('/{id}/refund',[orderController::class, 'refund'])->name('refund');
+                                    Route::post('/refund',[orderController::class, 'refunded'])->name('refunded');
                                 });
                             });
 

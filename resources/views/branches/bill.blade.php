@@ -101,7 +101,15 @@
                 <td colspan="3"><strong>Buyer Name:</strong> {{$order->customer->name}} </td>
                 <td colspan="3"><strong>Mobile No:</strong> {{$order->customer->phone}} </td>
                 <td colspan="2"><strong>Inv. No:</strong> {{$order->bill_id}} </td>
-                <td colspan="2"><strong>Inv. Date:</strong> {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}</td>
+                <td colspan="2">
+                    <strong>Inv. Date:</strong> {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}
+                    @if($order->is_refunded == 1)
+                        @php
+                            $refund = App\Models\Refund::where('order_id',$order->id)->first();
+                        @endphp
+                        <strong>Refunded Date:</strong> {{ \Carbon\Carbon::parse($refund->refund_on)->format('d M Y') }}
+                    @endif
+                </td>
             </tr>
             <tr>
                 <td colspan="4"><strong>Address:</strong> {{$order->customer->address}} @if($order->customer->pincode != null) - {{$order->customer->pincode}}@endif</td>
@@ -117,7 +125,14 @@
                 		<strong>{{$order_payment_detail->payment->name}}@if($order_payment_detail->card != null)({{$order_payment_detail->card}})@endif @if($order_payment_detail->finance_id != null)({{$order_payment_detail->finance->name}})@endif:</strong> ₹ {{$order_payment_detail->amount}}, 
                 	@endforeach
                 </td>
-                <td colspan="2" class="right"><strong>Total:</strong> ₹ {{$order->bill_amount}}</td>
+                @if($order->is_refunded == 0)
+                    <td colspan="2" class="right"><strong>Total:</strong> ₹ {{number_format($order->bill_amount,2)}}</td>
+                @else
+                    @php
+                        $refund = App\Models\Refund::where('order_id',$order->id)->first();
+                    @endphp
+                    <td colspan="2"><strong>Order Amount:</strong> ₹ {{number_format($order->bill_amount,2)}} <strong>Refunded Amount:</strong> ₹ {{number_format($refund->refund_amount,2)}} <strong>Total:</strong> ₹ {{ number_format($order->bill_amount - $refund->refund_amount, 2) }}</td>
+                @endif
             </tr>
             <!-- Column Headings -->
             <tr>
@@ -149,6 +164,29 @@
                 <td>₹ {{$order_detail->price * $order_detail->quantity}}</td>
             </tr>
             @endforeach
+            @if($order->is_refunded == 1)
+
+                @php
+                    $refund = App\Models\Refund::where('order_id',$order->id)->first();
+                    $refund_details = App\Models\RefundDetail::where('refund_id',$refund->id)->get();
+                @endphp
+
+                @foreach($refund_details as $refund_detail)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{$refund_detail->name}} (Refunded)</td>
+                        <td>{{$refund_detail->quantity}}</td>
+                        <td>₹ {{ $refund_detail->price - $refund_detail->tax_amount }}</td>
+                        <td>₹ {{$refund_detail->tax_amount}}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>₹ {{$refund_detail->price * $refund_detail->quantity}}</td>
+                    </tr>
+                @endforeach
+
+            @endif
             <!-- Add many more rows here (5…25…100). The header/footer will repeat per page automatically. -->
         </tbody>
 
@@ -161,16 +199,47 @@
                 <td colspan="5"><strong>Total SGST:</strong></td>
                 <td colspan="5">-</td>
             </tr>
+
             <tr>
                 <td colspan="5"><strong>Total Tax:</strong></td>
                 <td colspan="5">
-					₹ {{ $order_details->sum('tax_amount') }}
+					₹ {{ number_format($order_details->sum(fn($d) => (float)$d->tax_amount * (int)$d->quantity),2)}}
 				</td>
             </tr>
+            @if($order->is_refunded == 1)
+                @php
+                    $refund = App\Models\Refund::where('order_id',$order->id)->first();
+                    $refund_details = App\Models\RefundDetail::where('refund_id',$refund->id)->get();
+                @endphp
+
+                <tr>
+                    <td colspan="5"><strong>REFUNDED TAX:</strong></td>
+                    <td colspan="5">
+                        ₹ {{ number_format($refund_details->sum(fn($d) => (float)$d->tax_amount * (int)$d->quantity),2) }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="5"><strong>ORDER AMOUNT:</strong></td>
+                    <td colspan="5">₹ {{number_format($order->bill_amount,2)}}</td>
+                </tr>
+
+                <tr>
+                    <td colspan="5"><strong>REFUNDED AMOUNT:</strong></td>
+                    <td colspan="5">₹ {{number_format($refund->refund_amount,2)}}</td>
+                </tr>
+
+                <tr>
+                    <td colspan="5"><strong>NET TOTAL:</strong></td>
+                    <td colspan="5">₹ {{ number_format($order->bill_amount - $refund->refund_amount, 2) }}</td>
+                </tr>
+
+            @else
             <tr>
                 <td colspan="5"><strong>NET TOTAL:</strong></td>
-                <td colspan="5">₹ {{$order->bill_amount}}</td>
+                <td colspan="5">₹ {{number_format($order->bill_amount,2)}}</td>
             </tr>
+            @endif
             <tr>
                 <td colspan="5" class="no-border">
                     <div class="foot-box">

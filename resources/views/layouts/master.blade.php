@@ -206,7 +206,7 @@
                             </a>
                         </li>
 
-                        <li class="menu-item">
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/branches/orders/*') ? 'active' : '' }}">
                             <a class="menu-link" href="{{route('branch.order.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-shopping-basket-line"></i>

@@ -68,6 +68,11 @@
 										</td>
 										<td>
 											<a href="{{ route('branch.billing.get_bill', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
+
+											@if($order->is_refunded == 0)
+												<a href="{{ route('branch.order.refund', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark"><i class="ri-p2p-fill align-middle fs-20" title="Refund"></i></a>
+											@endif
+											
 										</td>
 									</tr>
 								@endforeach
