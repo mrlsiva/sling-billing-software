@@ -27,6 +27,6 @@ class Order extends Model
 
     public function billedBy()
     {
-        return $this->belongsTo('App\Models\User','billed_by');
+        return $this->belongsTo('App\Models\Staff','billed_by');
     }
 }

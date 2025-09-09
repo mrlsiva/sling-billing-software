@@ -216,6 +216,15 @@
                         </li>
 
                         <li class="menu-item">
+                            <a class="menu-link" href="{{route('branch.staff.index', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-group-line"></i>
+                                </span>
+                                <span class="nav-text"> Staff </span>
+                            </a>
+                        </li>
+
+                        <li class="menu-item">
                             <a class="menu-link" href="{{route('branch.setting', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-settings-3-line"></i>

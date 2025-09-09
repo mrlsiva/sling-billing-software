@@ -12,6 +12,7 @@ use App\Models\Payment;
 use App\Models\Refund;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\Staff;
 use App\Traits\Log;
 use Carbon\Carbon;
 use DB;
@@ -44,7 +45,8 @@ class orderController extends Controller
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
         $payments = Payment::where('is_active',1)->get();
-        return view('branches.orders.refund',compact('order','order_details','order_payment_details','payments'));
+        $staffs = Staff::where([['branch_id',Auth::user()->id],['is_active',1]])->get();
+        return view('branches.orders.refund',compact('order','order_details','order_payment_details','payments','staffs'));
     }
 
     public function refunded(Request $request)
@@ -55,7 +57,7 @@ class orderController extends Controller
 
         $refund = Refund::create([
             'order_id'     => $request->order_id,
-            'refunded_by'   => Auth::id(),
+            'refunded_by'   => $request->refunded_by,
             'refund_amount' => $request->amount,
             'refund_on'   => Carbon::now(),
             'reason'   => $request->reason,

@@ -17,7 +17,7 @@ class Refund extends Model
 
     public function refunded_by()
     {
-        return $this->belongsTo('App\Models\User','refunded_by');
+        return $this->belongsTo('App\Models\Staff','refunded_by');
     }
 
     public function payment()

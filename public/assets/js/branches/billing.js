@@ -872,6 +872,7 @@ function submit() {
     let pincode = $("#pincode").val().trim();
     let gender = $("#gender").val();
     let dob = $("#dob").val();
+    let billed_by = $("#billed_by").val();
 
     // --- Customer validation ---
     if (!/^[0-9]{10}$/.test(phone)) {
@@ -896,6 +897,11 @@ function submit() {
 
     if (address === "") {
         alert("Address is required.");
+        return;
+    }
+
+    if (billed_by === "") {
+        alert("Billed by is required.");
         return;
     }
 
@@ -946,7 +952,8 @@ function submit() {
         address: $("#address").val().trim(),
         pincode: $("#pincode").val().trim(),
         gender: $("#gender").val(),
-        dob: $("#dob").val()
+        dob: $("#dob").val(),
+
     };
 
     console.log(customer);
@@ -961,7 +968,8 @@ function submit() {
             _token: $('meta[name="csrf-token"]').attr("content"),
             cart: cartData,
             payments: paymentData,
-            customer: customer
+            customer: customer,
+            billed_by: billed_by
         },
         success: function (data) {
             console.log("Order stored:", data);

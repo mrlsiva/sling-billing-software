@@ -22,6 +22,7 @@ use App\Models\ShopPayment;
 use App\Models\PosSetting;
 use Illuminate\Support\Str;
 use App\Models\User;
+use App\Models\Staff;
 use App\Traits\Log;
 use Carbon\Carbon;
 use Session;
@@ -40,6 +41,7 @@ class billingController extends Controller
         $finances = Finance::where([['shop_id',Auth::user()->parent_id],['is_active',1]])->get();
         $categories = Stock::where([['branch_id',Auth::user()->id],['is_active',1]])->select('category_id')->get();
         $categories = Category::whereIn('id',$categories)->get();
+        $staffs = Staff::where([['branch_id',Auth::user()->id],['is_active',1]])->get();
 
         $pagination = PosSetting::where('branch_id',Auth::user()->id)->first();
         if($pagination)
@@ -73,7 +75,7 @@ class billingController extends Controller
 
         ->paginate($pagination);
 
-        return view('branches.billing',compact('stocks','categories','genders','payments','finances'));
+        return view('branches.billing',compact('stocks','categories','genders','payments','finances','staffs'));
     }
 
     public function get_sub_category(Request $request)
@@ -220,7 +222,7 @@ class billingController extends Controller
             'shop_id'     => $user->parent_id,
             'branch_id'   => Auth::user()->id,
             'bill_id'     => uniqid('BILL-'),
-            'billed_by'   => Auth::id(),
+            'billed_by'   => $request->billed_by,
             'customer_id' => $customer->id,
             'bill_amount' => $billAmount,
             'billed_on'   => Carbon::now(),

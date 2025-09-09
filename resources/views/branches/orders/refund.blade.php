@@ -78,6 +78,16 @@
 						</div>
 					</div>
 
+					<div class="row p-3">
+						<h5 class="text-dark fs-12 text-uppercase fw-bold">Refund By</h5>
+						<select class="form-control"  name="refunded_by" id="refunded_by" required="">
+							<option value=""> Select </option>
+							@foreach($staffs as $staff)
+							<option value="{{$staff->id}}">{{$staff->name}}</option>
+							@endforeach
+						</select>
+					</div>
+
 					<div class="row g-2 p-3">
 						<div class="col-md-6">
 							<h6 class="fw-semibold my-3">Refund Reason</h6>

@@ -19,6 +19,20 @@
 				</div>
 			</div>
 
+			<div class="row">
+				<div class="col-md-12">
+					<div class="mb-3">
+						<label for="choices-single-groups" class="form-label text-muted">Billed By</label>
+						<select class="form-control" data-choices name="billed_by" id="billed_by">
+							<option value=""> Select </option>
+							@foreach($staffs as $staff)
+							<option value="{{$staff->id}}">{{$staff->name}}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+			</div>
+
 
 			<div class="row mb-3 p-3">
 				<div class="col-md-12">

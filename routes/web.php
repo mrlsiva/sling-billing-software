@@ -24,6 +24,7 @@ use App\Http\Controllers\branches\billingController;
 use App\Http\Controllers\branches\settingController;
 use App\Http\Controllers\branches\branchDashboardController;
 use App\Http\Controllers\branches\orderController;
+use App\Http\Controllers\branches\staffController;
 
 
 Route::get('/', function () {
@@ -218,6 +219,17 @@ else
                                     Route::get('/index',[orderController::class, 'index'])->name('index');
                                     Route::get('/{id}/refund',[orderController::class, 'refund'])->name('refund');
                                     Route::post('/refund',[orderController::class, 'refunded'])->name('refunded');
+                                });
+                            });
+
+                            Route::prefix('staffs')->group(function () {
+                                Route::name('staff.')->group(function () {
+
+                                    Route::get('/index',[staffController::class, 'index'])->name('index');
+                                    Route::get('/create',[staffController::class, 'create'])->name('create');
+                                    Route::post('/store',[staffController::class, 'store'])->name('store');
+                                    Route::post('/status',[staffController::class, 'status'])->name('status');
+                                    Route::post('/update',[staffController::class, 'update'])->name('update');
                                 });
                             });
 
