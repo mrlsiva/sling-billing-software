@@ -31,7 +31,7 @@ class staffController extends Controller
 
             'name' => ['required',
                 Rule::unique('staffs')->where(function ($query) use ($request) {
-                    return $query->where('branch_id', $request->branch_id);
+                    return $query->where('branch_id', Auth::user()->id);
                 }),
             ],
             'phone' => 'nullable|numeric|digits:10',
@@ -86,7 +86,7 @@ class staffController extends Controller
                 'required',
                 Rule::unique('staffs', 'name') // DB column is `name`
                     ->where(function ($query) use ($request) {
-                        return $query->where('branch_id', $request->branch_id);
+                        return $query->where('branch_id', Auth::user()->id);
                     })
                     ->ignore($request->staff_id), // ignore current staff
             ],

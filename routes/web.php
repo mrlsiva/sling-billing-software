@@ -7,6 +7,7 @@ use App\Http\Controllers\auth\loginController;
 use App\Http\Controllers\auth\homeController;
 use App\Http\Controllers\users\categoryController;
 use App\Http\Controllers\users\subCategoryController;
+use App\Http\Controllers\users\vendorController;
 use App\Http\Controllers\users\productController;
 use App\Http\Controllers\users\inventoryController;
 use App\Http\Controllers\users\dashboardController;
@@ -91,6 +92,17 @@ else
                             Route::post('/status',[productController::class, 'status'])->name('status');
                             Route::get('/get_sub_category',[productController::class, 'get_sub_category'])->name('get_sub_category');
                             
+                        });
+                    });
+
+                    Route::prefix('vendors')->group(function () {
+                        Route::name('vendor.')->group(function () {
+
+                            Route::get('/index',[vendorController::class, 'index'])->name('index');
+                            Route::post('/store',[vendorController::class, 'store'])->name('store');
+                            Route::post('/update',[vendorController::class, 'update'])->name('update');
+                            Route::post('/status',[vendorController::class, 'status'])->name('status');
+
                         });
                     });
 

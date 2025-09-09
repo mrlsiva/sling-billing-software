@@ -104,6 +104,22 @@
                             </a>
                         </li>
 
+                        <li class="menu-item {{ request()->is(request()->route('company') . '/vendors*') ? 'active' : '' }}">
+                            <a class="menu-link menu-arrow" href="#sidebarVendors" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarVendors">
+                                <span class="nav-icon">
+                                    <i class="ri-user-received-line"></i>
+                                </span>
+                                <span class="nav-text"> Vendors </span>
+                            </a>
+                            <div class="collapse" id="sidebarVendors">
+                                <ul class="sub-menu-nav">
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link" href="{{route('vendor.index', ['company' => request()->route('company')])}}">Register</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/inventories/*') ? 'active' : '' }}">
                             <a class="menu-link menu-arrow" href="#sidebarProduct" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProduct">
                                 <span class="nav-icon">
