@@ -8,6 +8,7 @@ use App\Http\Controllers\auth\homeController;
 use App\Http\Controllers\users\categoryController;
 use App\Http\Controllers\users\subCategoryController;
 use App\Http\Controllers\users\vendorController;
+use App\Http\Controllers\users\ledgerController;
 use App\Http\Controllers\users\productController;
 use App\Http\Controllers\users\inventoryController;
 use App\Http\Controllers\users\dashboardController;
@@ -102,6 +103,13 @@ else
                             Route::post('/store',[vendorController::class, 'store'])->name('store');
                             Route::post('/update',[vendorController::class, 'update'])->name('update');
                             Route::post('/status',[vendorController::class, 'status'])->name('status');
+
+                            Route::prefix('ledger')->group(function () {
+                                Route::name('ledger.')->group(function () {
+
+                                    Route::get('/{id}/index',[ledgerController::class, 'index'])->name('index');
+                                });
+                            });
 
                         });
                     });
