@@ -223,4 +223,107 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="vendorEdit" tabindex="-1" aria-labelledby="vendorEdit" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Edit Vendor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="row" action="{{route('vendor.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                	@csrf
+	                <div class="modal-body">
+
+	                	<input type="hidden" name="vendor_id" id="vendor_id">
+	                   	<div class="row">
+		                    <div class="col-md-6">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Name</label>
+		                            <input type="text" id="vendor_name" name="vendor_name" class="form-control" required="" placeholder="Enter Name">
+		                        </div>
+		                    </div>
+		                    <div class="col-md-6">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Phone</label>
+		                            <input type="number" id="vendor_phone" name="vendor_phone" class="form-control" required="" placeholder="Enter Phone">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                   	<div class="row">
+		                    <div class="col-md-6">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Email</label>
+		                            <input type="email" id="vendor_email" name="vendor_email" class="form-control" placeholder="Enter Email">
+		                        </div>
+		                    </div>
+		                    <div class="col-md-6">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">GST</label>
+		                            <input type="text" id="vendor_gst" name="vendor_gst" class="form-control" placeholder="Enter GST number">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                   	<div class="row">
+		                    <div class="col-md-6">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Address</label>
+		                            <input type="text" id="vendor_address" name="vendor_address" class="form-control" placeholder="Enter Address">
+		                        </div>
+		                    </div>
+		                    <div class="col-md-6">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Address1</label>
+		                            <input type="text" id="vendor_address1" name="vendor_address1" class="form-control" placeholder="Enter Alternate Address">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                   	<div class="row">
+		                    <div class="col-md-6">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">City</label>
+		                            <input type="text" id="vendor_city" name="vendor_city" class="form-control" placeholder="Enter City">
+		                        </div>
+		                    </div>
+		                    <div class="col-md-6">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">State</label>
+		                            <input type="text" id="vendor_state" name="vendor_state" class="form-control" placeholder="Enter State">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	                    <button type="submit" class="btn btn-primary">Submit</button>
+	                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('script')
+	<script type="text/javascript">
+		document.addEventListener("click", function(e) {
+		    if (e.target.closest("a[data-bs-target='#vendorEdit']")) {
+		        const btn = e.target.closest("a[data-bs-target='#vendorEdit']");
+
+		        document.getElementById("vendor_id").value      = btn.getAttribute("data-id");
+		        document.getElementById("vendor_name").value    = btn.getAttribute("data-name");
+		        document.getElementById("vendor_phone").value   = btn.getAttribute("data-phone");
+		        document.getElementById("vendor_email").value   = btn.getAttribute("data-email");
+		        document.getElementById("vendor_address").value = btn.getAttribute("data-address");
+		        document.getElementById("vendor_address1").value= btn.getAttribute("data-address1");
+		        document.getElementById("vendor_city").value    = btn.getAttribute("data-city");
+		        document.getElementById("vendor_state").value   = btn.getAttribute("data-state");
+		        document.getElementById("vendor_gst").value     = btn.getAttribute("data-gst");
+		    }
+		});
+	</script>
+
 @endsection

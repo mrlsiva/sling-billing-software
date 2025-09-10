@@ -153,12 +153,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="quantity" class="form-label">Quantity</label>
-                                    <input type="number" name="quantity" id="quantity" value="{{$product->quantity}}" class="form-control" placeholder="Enter Quantity" min="0">
-                                </div>
-                            </div>
+                            <input type="hidden" name="quantity" id="quantity" value="{{$product->quantity}}" >
 
                         </div>
                     </div>

@@ -8,6 +8,7 @@ use App\Http\Controllers\auth\homeController;
 use App\Http\Controllers\users\categoryController;
 use App\Http\Controllers\users\subCategoryController;
 use App\Http\Controllers\users\vendorController;
+use App\Http\Controllers\users\purchaseOrderController;
 use App\Http\Controllers\users\ledgerController;
 use App\Http\Controllers\users\productController;
 use App\Http\Controllers\users\inventoryController;
@@ -108,6 +109,18 @@ else
                                 Route::name('ledger.')->group(function () {
 
                                     Route::get('/{id}/index',[ledgerController::class, 'index'])->name('index');
+                                });
+                            });
+
+                            Route::prefix('purchase_orders')->group(function () {
+                                Route::name('purchase_order.')->group(function () {
+
+                                    Route::get('/index',[purchaseOrderController::class, 'index'])->name('index');
+                                    Route::get('/create',[purchaseOrderController::class, 'create'])->name('create');
+                                    Route::get('/get_product',[purchaseOrderController::class, 'get_product'])->name('get_product');
+                                    Route::get('/get_product_detail',[purchaseOrderController::class, 'get_product_detail'])->name('get_product_detail');
+                                    Route::post('/store',[purchaseOrderController::class, 'store'])->name('store');
+
                                 });
                             });
 

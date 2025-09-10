@@ -1,0 +1,146 @@
+jQuery(document).ready(function ()
+{
+	jQuery('select[name="category"]').on('change',function(){
+		var category = jQuery(this).val();
+		if(category)
+		{
+			jQuery.ajax({
+				url : '../../products/get_sub_category',
+				type: 'GET',
+				dataType: 'json',
+				data: { id: category },
+				success:function(data)
+				{
+					console.log(data);
+
+					jQuery('select[name="sub_category"]').empty();
+					$('select[name="sub_category"]').append('<option value="">'+ "Select" +'</option>');
+					jQuery.each(data, function(key,value){
+						console.log(value.name)
+						$('select[name="sub_category"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+					});					
+					
+				}
+			});
+		}
+	});
+});
+
+jQuery(document).ready(function ()
+{
+	jQuery('select[name="sub_category"]').on('change',function(){
+		var category = jQuery(this).val();
+		var sub_category = jQuery('#sub_category').val();
+			jQuery.ajax({
+				url : 'get_product',
+				type: 'GET',
+				dataType: 'json',
+				data: { category: category, sub_category: sub_category },
+				success:function(data)
+				{
+					console.log(data);
+
+					jQuery('select[name="product"]').empty();
+					$('select[name="product"]').append('<option value="">'+ "Select" +'</option>');
+					jQuery.each(data, function(key,value){
+						console.log(value.name)
+						$('select[name="product"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+					});					
+					
+				}
+			});
+	});
+});
+
+jQuery(document).ready(function ()
+{
+	jQuery('select[name="product"]').on('change',function(){
+		var product = jQuery(this).val();
+			jQuery.ajax({
+				url : 'get_product_detail',
+				type: 'GET',
+				dataType: 'json',
+				data: { product: product },
+				success:function(data)
+				{
+					console.log(data);
+					jQuery('select[name="unit"]').empty();	
+					$('select[name="unit"]').append('<option value="'+ data.metric.id +'">'+ data.metric.name +'</option>');			
+					
+				}
+			});
+	});
+});
+
+const invoiceDate = document.getElementById("invoice_date");
+const dueDate = document.getElementById("due_date");
+
+invoiceDate.addEventListener("change", function () {
+    dueDate.min = this.value; // block earlier dates
+    if (dueDate.value < this.value) {
+        dueDate.value = this.value; // auto-correct if invalid
+    }
+});
+
+
+function calculateCosts() {
+    let qtyInput = document.getElementById("quantity");
+    let priceInput = document.getElementById("price_per_unit");
+    let taxInput = document.getElementById("tax");
+
+    let netInput = document.getElementById("net_cost");
+    let grossInput = document.getElementById("gross_cost");
+
+    let quantity = parseFloat(qtyInput.value);
+    let price = parseFloat(priceInput.value);
+    let tax = taxInput.value === "" ? 0 : parseFloat(taxInput.value);
+
+    // Reset error messages
+    document.getElementById("quantity_error").classList.add("d-none");
+    document.getElementById("price_error").classList.add("d-none");
+    document.getElementById("tax_error").classList.add("d-none");
+
+    let valid = true;
+
+    // ✅ Quantity validation
+    if (quantity <= 0 || isNaN(quantity)) {
+        qtyInput.value = "";
+        document.getElementById("quantity_error").classList.remove("d-none");
+        valid = false;
+    }
+
+    // ✅ Price validation
+    if (price <= 0 || isNaN(price)) {
+        priceInput.value = "";
+        document.getElementById("price_error").classList.remove("d-none");
+        valid = false;
+    }
+
+    // ✅ Tax validation (only clear tax, not net/gross)
+    if (tax < 0 || isNaN(tax)) {
+        taxInput.value = "";
+        document.getElementById("tax_error").classList.remove("d-none");
+        tax = 0; // fallback to 0 so calculation still works
+    }
+
+    // Stop if qty or price invalid
+    if (!valid) {
+        netInput.value = "";
+        grossInput.value = "";
+        return;
+    }
+
+    // ✅ Calculation
+    let netCost = quantity * price;
+    let grossCost = netCost + (netCost * tax / 100);
+
+    netInput.value = netCost.toFixed(2);
+    grossInput.value = grossCost.toFixed(2);
+}
+
+// ✅ Attach listeners
+["quantity", "price_per_unit", "tax"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculateCosts);
+});
+
+

@@ -10,6 +10,7 @@ use App\Models\RefundDetail;
 use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\Refund;
+use App\Models\Stock;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Staff;
@@ -80,6 +81,11 @@ class orderController extends Controller
                     'price'       => $detail->price,
                     'tax_amount'  => $detail->tax_amount,
                 ]);
+
+                $stock = Stock::where([['shop_id',Auth::user()->parent_id],['branch_id',Auth::user()->id],['product_id',$detail->product_id]])->first();
+
+                $stock->update(['quantity' => $stock->quantity + $qty]);
+
             }
         }
 

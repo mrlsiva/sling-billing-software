@@ -92,4 +92,53 @@ class vendorController extends Controller
 
         return redirect()->back()->with('toast_success', "Vendor Status Changed");
     }
+
+    public function update(Request $request)
+    {
+
+        $request->validate([
+            'vendor_name' => [
+                'required',
+                Rule::unique('vendors','name')->where(function ($query) use ($request) {
+                    return $query->where('shop_id', Auth::user()->id);
+                })->ignore($request->vendor_id), // <-- ignore current vendor ID
+            ],
+            'vendor_phone' => 'required|digits:10',
+            'vendor_email' => 'nullable|email',
+            'vendor_gst' => [
+                'nullable',
+                'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i'
+            ],
+        ], 
+        [
+            'vendor_name.required' => 'Name is required.',
+            'vendor_phone.required' => 'Phone is required.',
+            'vendor_phone.digits' => 'Phone number must be exactly 10 digits.',
+            'vendor_gst.regex' => 'GST number format is invalid.',
+        ]);
+
+        DB::beginTransaction();
+
+        $vendor = Vendor::find($request->vendor_id);
+
+        $vendor->update([ 
+            'name' => $request->vendor_name,
+            'phone' => $request->vendor_phone,
+            'email' => $request->vendor_email,
+            'address' => $request->vendor_address,
+            'address1' => $request->vendor_address1,
+            'state' => $request->vendor_state,
+            'city' => $request->vendor_city,
+            'gst' => $request->vendor_gst,
+            'is_active' => 1,
+        ]);
+
+        DB::commit();
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Vendor Update','App/Models/Vendor','vendors',$vendor->id,'Update',null,$request,'Success','Vendor Updated Successfully');
+
+        return redirect()->back()->with('toast_success', 'Vendor updated successfully.');
+
+    }
 }

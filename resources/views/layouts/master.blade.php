@@ -111,10 +111,13 @@
                                 </span>
                                 <span class="nav-text"> Vendors </span>
                             </a>
-                            <div class="collapse" id="sidebarVendors">
+                            <div class="collapse {{  request()->is(request()->route('company') . '/vendors*') ? 'show' : '' }}" id="sidebarVendors">
                                 <ul class="sub-menu-nav">
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link" href="{{route('vendor.index', ['company' => request()->route('company')])}}">Register</a>
+                                        <a class="sub-menu-link {{ request()->is(request()->route('company') . '/vendors/index') ? 'active' : '' }}" href="{{route('vendor.index', ['company' => request()->route('company')])}}">Register</a>
+                                    </li>
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link  {{  request()->is(request()->route('company') . '/vendors/purchase_orders*') ? 'active' : '' }}" href="{{route('vendor.purchase_order.index', ['company' => request()->route('company')])}}">Purchase Order</a>
                                     </li>
                                 </ul>
                             </div>
