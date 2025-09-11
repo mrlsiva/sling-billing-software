@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreignId('metric_id')->constrained()->onDelete('cascade');
             $table->string('quantity');
             $table->string('price_per_unit');
-            $table->string('tax')
+            $table->string('tax');
             $table->string('discount')->nullable();
             $table->string('net_cost');
             $table->string('gross_cost');
