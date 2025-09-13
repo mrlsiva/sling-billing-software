@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use App\Models\VendorPaymentDetail;
 use App\Models\PurchaseOrderDetail;
 use App\Models\PurchaseOrder;
 use App\Models\ShopPayment;
@@ -124,28 +125,185 @@ class purchaseOrderController extends Controller
 
     public function update(Request $request)
     {
-        $purchase = PurchaseOrder::where('id',$request->purchase_order_id)->first();
+        $purchase = PurchaseOrder::with('vendor')->findOrFail($request->purchase_order_id);
 
         DB::beginTransaction();
 
-        $purchase->update(['gross_cost' => $request->new_amount]);
+        try {
+            $oldAmount = (float) $request->old_amount;
+            $newAmount = (float) $request->new_amount;
 
-        $purchase_order_detail = PurchaseOrderDetail::create([ 
-            'purchase_order_id' => $request->purchase_order_id,
-            'old_amount' => $request->old_amount,
-            'new_amount' => $request->new_amount,
-            'updated_on' => Carbon::now(),
-            'comment' => $request->reason,
-        ]);
+            
+            $purchase->update(['gross_cost' => $newAmount]);
 
-        //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Updated','App/Models/PurchaseOrderDetail','purchase_order_details',$purchase_order_detail->id,'Insert',null,$request,'Success','Purchase Order Updated');
+            
+            $purchase_order_detail = PurchaseOrderDetail::create([
+                'purchase_order_id' => $purchase->id,
+                'old_amount'        => $oldAmount,
+                'new_amount'        => $newAmount,
+                'updated_on'        => \Carbon\Carbon::now(),
+                'comment'           => $request->reason,
+            ]);
 
-        DB::commit();
+            
+            $this->addToLog(
+                $this->unique(),
+                Auth::user()->id,
+                'Purchase Order Updated',
+                'App/Models/PurchaseOrderDetail',
+                'purchase_order_details',
+                $purchase_order_detail->id,
+                'Insert',
+                null,
+                $request,
+                'Success',
+                'Purchase Order Updated'
+            );
 
-        return redirect()->route('vendor.ledger.index', ['company' => request()->route('company'), 'id' => $purchase->vendor->id])->with('toast_success', 'Purchase order updated successfully.');
+            
+            $paymentsForThis = VendorPaymentDetail::where('purchase_order_id', $purchase->id)
+            ->orderBy('id', 'desc')
+            ->get();
 
+            $alreadyPaid = (float) $paymentsForThis->sum('amount');
+
+            
+            if ($alreadyPaid > $newAmount) {
+                $toFree = $alreadyPaid - $newAmount;
+
+                
+                $freedByPayment = []; // [payment_id => amount]
+
+                
+                foreach ($paymentsForThis as $payRow) {
+                    if ($toFree <= 0) break;
+
+                    $rowAmt = (float) $payRow->amount;
+                    $reduce = min($rowAmt, $toFree);
+
+                    $newRowAmt = $rowAmt - $reduce;
+
+                    if ($newRowAmt <= 0) {
+                        
+                        $payRow->delete();
+                    } else {
+                        $payRow->amount = $newRowAmt;
+                        $payRow->save();
+                    }
+
+                    // accumulate freed amount mapped to original payment_id
+                    $pid = $payRow->payment_id;
+                    $freedByPayment[$pid] = ($freedByPayment[$pid] ?? 0) + $reduce;
+
+                    $toFree -= $reduce;
+                }
+
+                
+                $nextOrders = PurchaseOrder::where('vendor_id', $purchase->vendor_id)
+                ->where('id', '>', $purchase->id)
+                ->orderBy('id')
+                ->get();
+
+                
+                foreach ($nextOrders as $next) {
+                    
+                    if (array_sum($freedByPayment) <= 0) break;
+
+                    $paidNext = (float) VendorPaymentDetail::where('purchase_order_id', $next->id)->sum('amount');
+                    $remainingNext = (float) $next->gross_cost - $paidNext;
+
+                    if ($remainingNext <= 0) {
+                        
+                        continue;
+                    }
+
+                    
+                    foreach ($freedByPayment as $pid => &$available) {
+                        if ($available <= 0) continue;
+                        if ($remainingNext <= 0) break;
+
+                        $alloc = min($available, $remainingNext);
+
+                        
+                        $existing = VendorPaymentDetail::where('purchase_order_id', $next->id)
+                        ->where('payment_id', $pid)
+                        ->orderBy('id', 'desc')
+                        ->first();
+
+                        if ($existing) {
+                            
+                            $existing->amount = (float) $existing->amount + $alloc;
+                            $existing->save();
+                        } else {
+                            
+                            VendorPaymentDetail::create([
+                                'purchase_order_id' => $next->id,
+                                'payment_id'        => $pid,
+                                'amount'            => $alloc,
+                                'paid_on'           => now(),
+                                'comment'           => 'Auto-adjusted from PO #' . $purchase->id,
+                            ]);
+                        }
+
+                        $available -= $alloc;
+                        $remainingNext -= $alloc;
+                    }
+                    unset($available); // break reference
+
+                    
+                    $totalPaidNext = (float) VendorPaymentDetail::where('purchase_order_id', $next->id)->sum('amount');
+                    if ($totalPaidNext >= (float) $next->gross_cost) {
+                        $next->update(['status' => 1]); // fully paid
+                    } elseif ($totalPaidNext > 0) {
+                        $next->update(['status' => 3]); // partial
+                    } else {
+                        $next->update(['status' => 0]); // unpaid
+                    }
+                }
+
+                
+                $remainingFreed = array_sum($freedByPayment);
+                if ($remainingFreed > 0) {
+                    $vendor = $purchase->vendor;
+                    $vendor->prepaid_amount = (float) ($vendor->prepaid_amount ?? 0) + $remainingFreed;
+                    $vendor->save();
+                }
+
+                
+                $currentPaid = (float) VendorPaymentDetail::where('purchase_order_id', $purchase->id)->sum('amount');
+                if ($currentPaid >= $newAmount) {
+                    $purchase->update(['status' => 1]);
+                } elseif ($currentPaid > 0) {
+                    $purchase->update(['status' => 3]);
+                } else {
+                    $purchase->update(['status' => 0]);
+                }
+
+            } else {
+                
+                if ($alreadyPaid >= $newAmount) {
+                    $purchase->update(['status' => 1]);
+                } elseif ($alreadyPaid > 0) {
+                    $purchase->update(['status' => 3]);
+                } else {
+                    $purchase->update(['status' => 0]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('vendor.ledger.index', [
+                'company' => request()->route('company'),
+                'id'      => $purchase->vendor->id
+            ])->with('toast_success', 'Purchase order updated successfully.');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            // keep original behavior — rethrow or return with error message
+            return redirect()->back()->with('toast_error', 'Something went wrong: ' . $e->getMessage());
+        }
     }
+
 
 
 

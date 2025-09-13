@@ -57,7 +57,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-4">
+    <div class="col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body ">
                 <div class="d-flex align-items-center gap-3">
@@ -77,7 +77,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-4">
+    <div class="col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body ">
                 <div class="d-flex align-items-center gap-3">
@@ -87,6 +87,27 @@
                             Rs. {{ number_format($totalPaid, 2) }}
                         </p>
                         <p class="card-title mb-0">Total Billed Paid</p>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="#!" class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="ri-eye-line align-middle fs-16 text-white"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card">
+            <div class="card-body ">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="assets/images/food-icon/sup-4.png" alt="" class="img-fluid">
+                    <div>
+                        <p class="text-dark fw-semibold fs-26 mb-1" id="balance_amount"data-balance="{{ $balance }}">
+                            Rs. {{ number_format($balance, 2) }}
+                        </p>
+                        <p class="card-title mb-0">Total Balance</p>
                     </div>
                     <!-- <div class="ms-auto">
                         <a href="#!" class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center">
@@ -98,16 +119,16 @@
         </div>
     </div>
 
-    <div class="col-md-6 col-xl-4">
+    <div class="col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body ">
                 <div class="d-flex align-items-center gap-3">
                     <img src="assets/images/food-icon/sup-4.png" alt="" class="img-fluid">
                     <div>
-                        <p class="text-dark fw-semibold fs-26 mb-1" id="balance_amount"data-balance="{{ $balance }}">
-                            Rs. {{ number_format($balance, 2) }}
+                        <p class="text-dark fw-semibold fs-26 mb-1" >
+                            Rs. {{ number_format($vendor->prepaid_amount, 2) }}
                         </p>
-                        <p class="card-title mb-0">Total Balance</p>
+                        <p class="card-title mb-0">Prepaid Amount</p>
                     </div>
                     <!-- <div class="ms-auto">
                         <a href="#!" class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center">
@@ -206,10 +227,13 @@
                                     </td>
 
                                     <td>
-
-                                        <button type="button" class="btn btn-sm btn-soft-secondary me-1" data-bs-toggle="modal" data-bs-target="#purchaseEdit" data-id="{{ $purchase_order->id }}" data-old_amount="{{ $purchase_order->gross_cost }}">
-                                            <i class="bx bx-edit fs-16"></i>
-                                        </button>
+                                        @if($purchase_order->status != 1)
+                                            <button type="button" class="btn btn-sm btn-soft-secondary me-1" data-bs-toggle="modal" data-bs-target="#purchaseEdit" data-id="{{ $purchase_order->id }}" data-old_amount="{{ $purchase_order->gross_cost }}">
+                                                <i class="bx bx-edit fs-16"></i>
+                                            </button>
+                                        @else
+                                            -
+                                        @endif
 
                                     </td>
                                 </tr>
@@ -330,7 +354,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-groups" class="form-label text-muted">New Amount</label>
-                                <input type="text" id="new_amount" name="new_amount" class="form-control" required="" >
+                                <input type="number" id="new_amount" name="new_amount" class="form-control" required="" >
                             </div>
                         </div>
                     </div>
@@ -401,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<script>
+<!-- <script>
 document.addEventListener('DOMContentLoaded', function () {
     let form = document.getElementById('paymentStore');
     form.addEventListener('submit', function (e) {
@@ -423,6 +447,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-</script>
+</script> -->
 
 @endsection

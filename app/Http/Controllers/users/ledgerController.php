@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\VendorPaymentDetail;
+use App\Models\PurchaseOrderDetail;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use App\Models\ShopPayment;
@@ -64,6 +65,7 @@ class ledgerController extends Controller
         $request->validate([
             'payment' => 'required|exists:payments,id',
             'payment_amount' => 'required|numeric|min:1',
+            'vendor_id' => 'required|exists:vendors,id',
         ]);
 
         $amountToDistribute = $request->payment_amount;
@@ -71,15 +73,15 @@ class ledgerController extends Controller
         $comment = $request->comment;
 
         // get vendor purchase orders sorted by id
-        $purchaseOrders = PurchaseOrder::where('vendor_id', $request->vendor_id)->orderBy('id')->get();
+        $purchaseOrders = PurchaseOrder::where('vendor_id', $request->vendor_id)
+            ->orderBy('id')
+            ->get();
 
         foreach ($purchaseOrders as $order) {
-
             if ($amountToDistribute <= 0) break;
 
             // already paid for this order
             $alreadyPaid = VendorPaymentDetail::where('purchase_order_id', $order->id)->sum('amount');
-
             $remainingForOrder = $order->gross_cost - $alreadyPaid;
 
             if ($remainingForOrder <= 0) {
@@ -107,12 +109,20 @@ class ledgerController extends Controller
             if ($totalPaid >= $order->gross_cost) {
                 $order->update(['status' => 1]); // fully paid
             } elseif ($totalPaid > 0 && $totalPaid < $order->gross_cost) {
-                $order->update(['status' => 2]); // partial
+                $order->update(['status' => 2]); // partial (changed to 3 per your rule)
             }
+        }
+
+        // ✅ If any balance remains, store it in vendor's prepaid_amount
+        if ($amountToDistribute > 0) {
+            $vendor = Vendor::findOrFail($request->vendor_id);
+            $vendor->prepaid_amount = $vendor->prepaid_amount + $amountToDistribute;
+            $vendor->save();
         }
 
         return redirect()->back()->with('toast_success', 'Payment allocated successfully!');
     }
+
 
 
 

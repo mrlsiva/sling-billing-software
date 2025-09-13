@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Vendor extends Model
 {
     protected $fillable = [
-        'shop_id','name','phone','email','address','address1','city','state','gst','is_active'
+        'shop_id','name','phone','email','address','address1','city','state','gst','prepaid_amount','is_active'
     ];
 
     public function shop()
