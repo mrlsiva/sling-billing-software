@@ -49,7 +49,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="invoice_date" class="form-label">Invoice Date</label>
-                                    <input type="date" name="invoice_date" id="invoice_date" value="{{old('invoice_date')}}" class="form-control" placeholder="Enter Invoice Date">
+                                    <input type="date" name="invoice_date" id="invoice_date" value="{{old('invoice_date')}}" class="form-control" placeholder="Enter Invoice Date" required="">
                                 </div>
                             </div>
 
@@ -131,8 +131,20 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="tax" class="form-label">Tax (In %)</label>
-                                    <input type="number" name="tax" id="tax" value="{{old('tax')}}" class="form-control" placeholder="Enter Tax">
+                                    <select class="form-control"  name="tax" id="tax">
+                                        <option value=""> Select </option>
+                                        @foreach($taxes as $tax)
+                                            <option value="{{$tax->name}}"> {{$tax->name}} </option>
+                                        @endforeach
+                                    </select>
                                     <small id="tax_error" class="text-danger d-none">Tax cannot be negative</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="discount" class="form-label">Discount</label>
+                                    <input type="number" name="discount" id="discount" value="{{old('discount')}}" class="form-control" placeholder="Enter Discount">
                                 </div>
                             </div>
 

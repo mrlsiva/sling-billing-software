@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use App\Models\PurchaseOrderDetail;
 use App\Models\PurchaseOrder;
 use App\Models\ShopPayment;
 use App\Models\Category;
@@ -13,7 +14,9 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\Vendor;
+use App\Models\Tax;
 use App\Traits\Log;
+use Carbon\Carbon;
 use DB;
 
 class purchaseOrderController extends Controller
@@ -40,7 +43,8 @@ class purchaseOrderController extends Controller
         $shop_payment_ids = ShopPayment::where('shop_id', Auth::user()->parent_id)->pluck('payment_id')->toArray();
         $payments = Payment::whereIn('id',$shop_payment_ids)->get();
         $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
-        return view('users.purchase_orders.create',compact('vendors','payments','categories'));
+        $taxes = Tax::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
+        return view('users.purchase_orders.create',compact('vendors','payments','categories','taxes'));
     }
 
     public function get_product(Request $request)
@@ -117,6 +121,32 @@ class purchaseOrderController extends Controller
         return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])->with('toast_success', 'Purchase order created successfully.');
         
     }
+
+    public function update(Request $request)
+    {
+        $purchase = PurchaseOrder::where('id',$request->purchase_order_id)->first();
+
+        DB::beginTransaction();
+
+        $purchase->update(['gross_cost' => $request->new_amount]);
+
+        $purchase_order_detail = PurchaseOrderDetail::create([ 
+            'purchase_order_id' => $request->purchase_order_id,
+            'old_amount' => $request->old_amount,
+            'new_amount' => $request->new_amount,
+            'updated_on' => Carbon::now(),
+            'comment' => $request->reason,
+        ]);
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Updated','App/Models/PurchaseOrderDetail','purchase_order_details',$purchase_order_detail->id,'Insert',null,$request,'Success','Purchase Order Updated');
+
+        DB::commit();
+
+        return redirect()->route('vendor.ledger.index', ['company' => request()->route('company'), 'id' => $purchase->vendor->id])->with('toast_success', 'Purchase order updated successfully.');
+
+    }
+
 
 
 }

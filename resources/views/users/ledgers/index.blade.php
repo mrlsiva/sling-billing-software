@@ -8,14 +8,24 @@
 
 @section('body')
 <div class="row">
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="col-xl-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
-                    <a href="#!" class="btn btn-sm"> <i class="bx bx-arrow-back me-1"></i></a>
-                    <p class="card-title mb-0">AAA Agency</p>
+                    <a href="{{route('vendor.index', ['company' => request()->route('company')])}}" class="btn btn-sm"> <i class="bx bx-arrow-back me-1"></i></a>
+                    <p class="card-title mb-0">{{$vendor->name}}</p>
                 </div>
-                <a href="#!" class="btn btn-sm btn-success"> <i class="bx bx-plus me-1"></i>New Entry </a>
+                <a data-bs-toggle="modal" data-bs-target="#paymentAdd" class="btn btn-sm btn-success"> <i class="bx bx-plus me-1"></i>New Entry </a>
             </div>
         </div>
     </div>
@@ -24,18 +34,18 @@
     <div class="col-md-12 col-xl-12">
         <div class="card">
             <div class="card-body ">
-                <form>
+                <form method="GET" action="{{ route('vendor.ledger.index', ['company' => request()->route('company'),'id' => $vendor->id ]) }}">
                     <div class="row align-items-center">
                         <div class="col-3">
                             <h4 class="mt-3">Choose date range</h4>
                         </div>
                         <div class="col-3">
                             <label for="fromDate" class="col-form-label mb-1 pb-1">From:</label>
-                            <input type="text" id="fromDate" name="fromDate" class="form-control datepicker" />
+                            <input type="text" id="from_date" name="from_date" class="form-control datepicker" value="{{ request('from_date') }}" />
                         </div>
                         <div class="col-3">
                             <label for="toDate" class="col-form-label mb-1 pb-1">To:</label>
-                            <input type="text" id="toDate" name="toDate" class="form-control datepicker" />
+                            <input type="text" id="to_date" name="to_date" class="form-control datepicker" value="{{ request('to_date') }}" />
                         </div>
                         <div class="col-3">
                             <label for="toDate" class="col-form-label mb-1 pb-1">&nbsp</label>
@@ -53,14 +63,16 @@
                 <div class="d-flex align-items-center gap-3">
                     <img src="assets/images/food-icon/sup-2.png" alt="" class="img-fluid">
                     <div>
-                        <p class="text-dark fw-semibold fs-26 mb-1">Rs. 10,00,000</p>
+                        <p class="text-dark fw-semibold fs-26 mb-1">
+                            Rs. {{ number_format($totalGross, 2) }}
+                        </p>
                         <p class="card-title mb-0">Total Purchased</p>
                     </div>
-                    <div class="ms-auto">
-                        <a href="#!"
-                            class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center"><i
-                                class="ri-eye-line align-middle fs-16 text-white"></i></a>
-                    </div>
+                    <!-- <div class="ms-auto">
+                        <a href="#!" class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="ri-eye-line align-middle fs-16 text-white"></i>
+                        </a>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -71,14 +83,16 @@
                 <div class="d-flex align-items-center gap-3">
                     <img src="assets/images/food-icon/sup-3.png" alt="" class="img-fluid">
                     <div>
-                        <p class="text-dark fw-semibold fs-26 mb-1">Rs. 8,00,000</p>
+                        <p class="text-dark fw-semibold fs-26 mb-1">
+                            Rs. {{ number_format($totalPaid, 2) }}
+                        </p>
                         <p class="card-title mb-0">Total Billed Paid</p>
                     </div>
-                    <div class="ms-auto">
-                        <a href="#!"
-                            class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center"><i
-                                class="ri-eye-line align-middle fs-16 text-white"></i></a>
-                    </div>
+                    <!-- <div class="ms-auto">
+                        <a href="#!" class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="ri-eye-line align-middle fs-16 text-white"></i>
+                        </a>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -90,14 +104,16 @@
                 <div class="d-flex align-items-center gap-3">
                     <img src="assets/images/food-icon/sup-4.png" alt="" class="img-fluid">
                     <div>
-                        <p class="text-dark fw-semibold fs-26 mb-1">2,00,000</p>
+                        <p class="text-dark fw-semibold fs-26 mb-1" id="balance_amount"data-balance="{{ $balance }}">
+                            Rs. {{ number_format($balance, 2) }}
+                        </p>
                         <p class="card-title mb-0">Total Balance</p>
                     </div>
-                    <div class="ms-auto">
-                        <a href="#!"
-                            class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center"><i
-                                class="ri-eye-line align-middle fs-16 text-white"></i></a>
-                    </div>
+                    <!-- <div class="ms-auto">
+                        <a href="#!" class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="ri-eye-line align-middle fs-16 text-white"></i>
+                        </a>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -111,7 +127,11 @@
                     <h5 class="card-title mb-0">Ledger</h5>
                     <div class="search-bar ms-auto">
                         <span style="top: 5px;"><i class="bx bx-search"></i></span>
-                        <input type="search" class="form-control form-control-sm" id="search" placeholder="Search...">
+                        <form method="GET" action="{{ route('vendor.ledger.index', ['company' => request()->route('company'),'id' => $vendor->id ]) }}">
+                        <input type="hidden" name="from_date" value="{{ request('from_date') }}" />
+                        <input type="hidden" name="to_date" value="{{ request('to_date') }}" />
+                        <input type="search" class="form-control form-control-sm" id="search" name="search" placeholder="Search..." value="{{ request('search') }}">
+                        </form>
                     </div>
 
                 </div> <!-- end row -->
@@ -131,124 +151,209 @@
                                 <th class="border-0 py-2 text-dark">Via</th>
                                 <th class="border-0 py-2 text-dark">Action</th>
                             </tr>
-                        </thead> <!-- end thead-->
+                        </thead>
                         <tbody>
-                            <tr>
-                                <td>
-                                    <a class="fw-medium">#IN9023</a>
-                                </td>
-                                <td>15 Mar, 2025 <small>10:30 AM</small></td>
-                                <td>22 Mar, 2025</td>
-                                <td>Rs. 1,250.75</td>
-                                <td>Rs. 1,250.75</td>
-                                <td>Rs. 1,250.75</td>
-                                <td>
-                                    <span class="badge badge-soft-warning">Unpaid</span>
-                                </td>
-                                <td>Credit Card</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-soft-secondary me-1"><i
-                                            class="bx bx-edit fs-16"></i></button>
+                            @foreach($purchase_orders as $purchase_order)
+                                <tr>
+                                    <td>
+                                        @if($purchase_order->invoice_no != null)
+                                            <a class="fw-medium">{{$purchase_order->invoice_no}}</a>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>{{ \Carbon\Carbon::parse($purchase_order->invoice_date)->format('d M Y') }}</td>
+                                    <td>
+                                        @if($purchase_order->due_date != null)
+                                            {{ \Carbon\Carbon::parse($purchase_order->due_date)->format('d M Y') }}
+                                        @else
+                                            -
+                                        @endif 
+                                    </td>
+                                    <td>Rs. {{number_format($purchase_order->gross_cost,2)}}</td>
+                                    @php
+                                        $payment_details = App\Models\VendorPaymentDetail::where('purchase_order_id', $purchase_order->id)->get();
+                                    @endphp
+                                    <td>Rs. {{number_format($payment_details->sum('amount'),2)}}</td>
+                                    <td>
+                                        @if($purchase_order->discount != null)
+                                            Rs. {{number_format($purchase_order->discount,2)}}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($purchase_order->status == 0)
+                                            <span class="badge badge-soft-danger">Unpaid</span>
+                                        @elseif($purchase_order->status == 1)
+                                            <span class="badge badge-soft-success">Paid</span>
 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="9">
-                                    <table class="table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Updated On</th>
-                                                <th scope="col">Previous Amout</th>
-                                                <th scope="col">Updated Amout</th>
-                                                <th scope="col">Reson</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>3-12-2026</td>
-                                                <td>12000</td>
-                                                <td> 120000</td>
-                                                <td>Lorem Ipsam </td>
-                                            </tr>
-                                            <tr>
-                                                <td>3-12-2026</td>
-                                                <td>12000</td>
-                                                <td> 120000</td>
-                                                <td>Lorem Ipsam </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <a class="fw-medium">#IN3147</a>
-                                </td>
+                                        @elseif($purchase_order->status == 2)
+                                            <span class="badge badge-soft-warning">Partially Paid</span>
+                                        @endif
+                                    </td>
 
-                                <td>07 Feb, 2025 <small>02:45 PM</small></td>
-                                <td>15 Feb, 2025</td>
-                                <td>Rs. 1,250.75</td>
-                                <td>Rs. 1,250.75</td>
-                                <td>Rs. 1,250.75</td>
+                                    @php
+                                        $payment_detail = App\Models\VendorPaymentDetail::where('purchase_order_id', $purchase_order->id)->latest()->first();
+                                    @endphp
 
-                                <td>
-                                    <span class="badge badge-soft-danger">Overdue</span>
-                                </td>
-                                <td>PayPal</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-soft-secondary me-1"><i
-                                            class="bx bx-edit fs-16"></i></button>
+                                    <td>
+                                        @if($payment_detail != null)
+                                            {{$payment_detail->payment->name}}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <a class="fw-medium">#IN7654</a>
-                                </td>
+                                    <td>
 
-                                <td>28 Jan, 2025 <small>11:10 AM</small></td>
-                                <td>05 Feb, 2025</td>
-                                <td>Rs. 1,250.75</td>
-                                <td>Rs. 1,250.75</td>
-                                <td>Rs. 1,250.75</td>
+                                        <button type="button" class="btn btn-sm btn-soft-secondary me-1" data-bs-toggle="modal" data-bs-target="#purchaseEdit" data-id="{{ $purchase_order->id }}" data-old_amount="{{ $purchase_order->gross_cost }}">
+                                            <i class="bx bx-edit fs-16"></i>
+                                        </button>
 
-                                <td>
-                                    <span class="badge badge-soft-success">Paid</span>
-                                </td>
-                                <td>Wire Transfer</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-soft-secondary me-1"><i
-                                            class="bx bx-edit fs-16"></i></button>
+                                    </td>
+                                </tr>
 
-                                </td>
-                            </tr>
+                                @php
+                                    $purchase_details = App\Models\PurchaseOrderDetail::where('purchase_order_id', $purchase_order->id)->get();
+                                @endphp
 
-                        </tbody> <!-- end tbody -->
-                    </table> <!-- end table -->
-                </div> <!-- table responsive -->
-                <div
-                    class="align-items-center justify-content-between row g-0 text-center text-sm-start p-3 border-top">
-                    <div class="col-sm">
-                        <div class="text-muted">
-                            Showing <span class="fw-semibold">10</span> of <span class="fw-semibold">52</span> invoices
-                        </div>
-                    </div>
-                    <div class="col-sm-auto mt-3 mt-sm-0">
-                        <ul class="pagination justify-content-end mb-0">
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);"><i
-                                        class="ri-arrow-left-s-line"></i></a></li>
-                            <li class="page-item active"><a class="page-link" href="javascript:void(0);">1</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">3</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);"><i
-                                        class="ri-arrow-right-s-line"></i></a></li>
-                        </ul>
-                    </div>
+                                @if ($purchase_details->isNotEmpty())
+                                    <tr>
+                                        <td colspan="9">
+                                            <table class="table mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Updated On</th>
+                                                        <th scope="col">Previous Amount</th>
+                                                        <th scope="col">Updated Amount</th>
+                                                        <th scope="col">Reason</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($purchase_details as $purchase_detail)
+                                                    <tr>
+                                                        <td>{{ \Carbon\Carbon::parse($purchase_detail->updated_on)->format('d M Y') }}</td>
+                                                        <td>Rs. {{number_format($purchase_detail->old_amount,2)}}</td>
+                                                        <td>Rs. {{number_format($purchase_detail->new_amount,2)}}</td>
+                                                        <td>{{$purchase_detail->comment}}</td>
+                                                    </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                @endif
+
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div> <!-- end card body -->
+            <div class="card-footer border-0">
+                {!! $purchase_orders->withQueryString()->links('pagination::bootstrap-5') !!}
+            </div>
         </div> <!-- end card -->
     </div> <!-- end col -->
 </div>
+
+<div class="modal fade" id="paymentAdd" tabindex="-1" aria-labelledby="paymentAdd" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form class="row" action="{{route('vendor.payment.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data" id="paymentStore">
+                @csrf
+                <div class="modal-body">
+
+                    <input type="hidden" name="vendor_id" value="{{$vendor->id}}">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="payment" class="form-label">Payment</label>
+                                <select class="form-control" name="payment" id="payment" required="">
+                                    <option value="">Select</option>
+                                    @foreach($payment_methods as $payment_method)
+                                    <option value="{{$payment_method->id}}">{{$payment_method->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Payment Amount</label>
+                                <input type="number" id="payment_amount" name="payment_amount" class="form-control" required="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Comment</label>
+                                <input type="text" id="comment" name="comment" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="purchaseEdit" tabindex="-1" aria-labelledby="purchaseEdit" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Edit Purchase Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form class="row" action="{{route('vendor.purchase_order.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+
+                    <input type="hidden" name="purchase_order_id" id="purchase_order_id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Old Amount</label>
+                                <input type="text" id="old_amount" name="old_amount" class="form-control" required="" readonly="">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">New Amount</label>
+                                <input type="text" id="new_amount" name="new_amount" class="form-control" required="" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Reason</label>
+                                <input type="text" id="reason" name="reason" class="form-control" placeholder="Enter Reason">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 @section('script')
 <!-- jQuery -->
@@ -261,11 +366,63 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('.datepicker').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true
-        });
+    // initialize both datepickers
+    $('#from_date').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    }).on('changeDate', function(e) {
+        // set the selected date as the minimum for to_date
+        $('#to_date').datepicker('setStartDate', e.date);
     });
+
+    $('#to_date').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    });
+});
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var purchaseEditModal = document.getElementById('purchaseEdit');
+    purchaseEditModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+
+        // Get data from button
+        var id = button.getAttribute('data-id');
+        var oldAmount = button.getAttribute('data-old_amount');
+
+        // Set values into modal inputs
+        purchaseEditModal.querySelector('#purchase_order_id').value = id;
+        purchaseEditModal.querySelector('#old_amount').value = oldAmount;
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let form = document.getElementById('paymentStore');
+    form.addEventListener('submit', function (e) {
+        let paymentInput = document.getElementById('payment_amount');
+        let balance = parseFloat(document.getElementById('balance_amount').getAttribute('data-balance'));
+
+        let amount = parseFloat(paymentInput.value);
+
+        if (isNaN(amount) || amount <= 0) {
+            e.preventDefault();
+            alert("Please enter a valid payment amount.");
+            return;
+        }
+
+        if (amount > balance) {
+            e.preventDefault();
+            alert("Payment amount cannot exceed remaining balance of Rs. " + balance.toFixed(2));
+            return;
+        }
+    });
+});
+</script>
+
 @endsection

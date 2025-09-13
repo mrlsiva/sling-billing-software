@@ -112,6 +112,12 @@ else
                                 });
                             });
 
+                            Route::prefix('payments')->group(function () {
+                                Route::name('payment.')->group(function () {
+                                    Route::post('/store',[ledgerController::class, 'payment'])->name('store');
+                                });
+                            });
+
                             Route::prefix('purchase_orders')->group(function () {
                                 Route::name('purchase_order.')->group(function () {
 
@@ -120,6 +126,7 @@ else
                                     Route::get('/get_product',[purchaseOrderController::class, 'get_product'])->name('get_product');
                                     Route::get('/get_product_detail',[purchaseOrderController::class, 'get_product_detail'])->name('get_product_detail');
                                     Route::post('/store',[purchaseOrderController::class, 'store'])->name('store');
+                                    Route::post('/update',[purchaseOrderController::class, 'update'])->name('update');
 
                                 });
                             });

@@ -123,8 +123,6 @@
 											<div class="d-flex gap-3">
 												<a href="#!" data-bs-toggle="modal" data-bs-target="#vendorEdit" class="link-dark" data-id="{{$vendor->id}}" data-name="{{$vendor->name}}" data-phone="{{$vendor->phone}}" data-email="{{$vendor->email}}" data-address="{{$vendor->address}}" data-address1="{{$vendor->address1}}" data-city="{{$vendor->city}}" data-state="{{$vendor->state}}" data-gst="{{$vendor->gst}}"><i class="ri-edit-line align-middle fs-20" title="Edit"></i></a>
 
-												<a href=""  class="link-dark"><i class="ri-history-line align-middle fs-20" title="History"></i></a>
-
 												<a href="{{ route('vendor.ledger.index', ['company' => request()->route('company'),'id' => $vendor->id ]) }}"  class="link-dark"><i class="ri-file-list-3-line align-middle fs-20" title="Ledger"></i></a>
 											</div>
 										</td>
