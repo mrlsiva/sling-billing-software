@@ -7,7 +7,7 @@
 @section('body')
 	<div class="row">
 		<div class="col-xl-12">
-			<div class="card">
+			<div class="card p-3">
 				<div class="card-header d-flex justify-content-between align-items-center">
 					<div>
 						<p class="card-title">All Order</p>
@@ -16,9 +16,9 @@
 				</div>
 
 				<form method="get" action="{{route('branch.order.index', ['company' => request()->route('company')])}}">
-                    <div class="row mb-2 p-3">
+                    <div class="row mb-2">
                         <div class="col-md-11">
-                            <div class="input-group input-group-lg">
+                            <div class="input-group ">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Customer Name/ Customer Phone/ Bill No" name="order" value="{{ request('order') }}">
                                 <span class="input-group-text"><a href="{{route('branch.order.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
@@ -38,9 +38,10 @@
 								<tr>
 									<th>S.No</th>
 									<th>Bill ID</th>
-									<th>Amount (In ₹)</th>
-									<th>Billed On</th>
-									<th>Billed By</th>
+									<th>Amount (in ₹)</th>
+									<th>Billed on</th>
+									<th>Billed by</th>
+									<th>Mode of payment</th>
 									<th>Customer</th>
 									<th>Action</th>
 								</tr>
@@ -63,6 +64,8 @@
 										<td>
 											{{ $order->billedBy->name }}
 										</td>
+										
+										<td> - </td>
 										<td>
 											{{ $order->customer->phone }} ({{ $order->customer->name }})
 										</td>

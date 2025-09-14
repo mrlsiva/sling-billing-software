@@ -103,12 +103,14 @@
                 <td colspan="2"><strong>Inv. No:</strong> {{$order->bill_id}} </td>
                 <td colspan="2">
                     <strong>Inv. Date:</strong> {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}
+                    {{-- 
                     @if($order->is_refunded == 1)
                         @php
                             $refund = App\Models\Refund::where('order_id',$order->id)->first();
                         @endphp
                         <strong>Refunded Date:</strong> {{ \Carbon\Carbon::parse($refund->refund_on)->format('d M Y') }}
                     @endif
+                    --}}
                 </td>
             </tr>
             <tr>

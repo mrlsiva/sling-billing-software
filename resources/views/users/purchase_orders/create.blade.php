@@ -100,19 +100,20 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <!-- <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="choices-single-groups" class="form-label text-muted">Unit</label>
+                                    <label for="choices-single-groups" class="form-label text-muted">Matrics</label>
                                     <span class="text-danger">*</span>
                                     <select class="form-control"  name="unit" id="unit" required="" readonly>
                                         <option value=""> Select </option>
                                     </select>
                                 </div>
-                            </div>
+                            </div> -->
+                            
 
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="quantity" class="form-label">Quantity</label>
+                                    <label for="quantity" class="form-label">Quantity <span id="unit_display"></span></label>
                                     <span class="text-danger">*</span>
                                     <input type="number" name="quantity" id="quantity" value="{{old('quantity')}}" class="form-control" placeholder="Enter Quantity" min="1" step="1"  required="" >
                                     <small id="quantity_error" class="text-danger d-none">Quantity must be greater than 0</small>
@@ -121,7 +122,7 @@
 
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="price_per_unit" class="form-label">Price Per Unit</label>
+                                    <label for="price_per_unit" class="form-label">Price Per Unit </label>
                                     <span class="text-danger">*</span>
                                     <input type="number" name="price_per_unit" id="price_per_unit" value="{{old('price_per_unit')}}" class="form-control" placeholder="Enter Price Per Unit" min="1" step="1" required="">
                                     <small id="price_error" class="text-danger d-none">Price must be greater than 0</small>

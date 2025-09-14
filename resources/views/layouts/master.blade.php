@@ -27,17 +27,33 @@
 	
 	<div class="wrapper">
         <div class="main-nav">
+            @php
+                $user = App\Models\User::where('slug_name',request()->segment(1))->first();
+            @endphp
             <!-- Sidebar Logo -->
             <div class="logo-box">
-                <a href="#" class="logo-dark">
-                    <img src="assets/images/logo-sm.png" class="logo-sm" alt="logo sm">
-                    <img src="assets/images/logo-dark.png" class="logo-lg" alt="logo dark">
-                </a>
+                @if(request()->segment(1) === 'admin')
+                    <a href="#" class="logo-dark">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo dark">
+                    </a>
 
-                <a href="#" class="logo-light">
-                    <img src="assets/images/logo-sm.png" class="logo-sm" alt="logo sm">
-                    <img src="assets/images/logo-white.png" class="logo-lg" alt="logo light">
-                </a>
+                    <a href="#" class="logo-light">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light">
+                    </a>
+                    
+                @else
+                    <a href="#" class="logo-dark">
+                        <img src="{{ asset('storage/' . $user->logo) }}" class="logo-sm" alt="logo sm">
+                        <img src="{{ asset('storage/' . $user->logo) }}" class="logo-lg" alt="logo dark">
+                    </a>
+
+                    <a href="#" class="logo-light">
+                        <img src="{{ asset('storage/' . $user->logo) }}" class="logo-sm" alt="logo sm">
+                        <img src="{{ asset('storage/' . $user->logo) }}" class="logo-lg" alt="logo light">
+                    </a>
+                @endif
             </div>
 
             <div class="h-100" data-simplebar>
@@ -258,9 +274,7 @@
             </div>
         </div>
         <header class="topbar d-flex">
-            @php
-                $user = App\Models\User::where('slug_name',request()->segment(1))->first();
-            @endphp
+            
             <!-- Sidebar Logo -->
             <div class="logo-box">
                 @if(request()->segment(1) === 'admin')
@@ -294,15 +308,14 @@
                         <i class="ri-menu-2-line button-sm-hover-icon text-white"></i>
                     </button>
 
-                    <div class="d-flex align-items-center gap-2">
-                        <!-- App Search-->
+                    <!-- <div class="d-flex align-items-center gap-2">
                         <form class="app-search d-none d-md-block me-auto">
                             <div class="position-relative">
                                 <input type="search" class="form-control" placeholder="Start typing..." autocomplete="off" value="">
                                 <i class="ri-search-line search-widget-icon"></i>
                             </div>
                         </form>
-                    </div>
+                    </div> -->
 
                     <div class="d-flex align-items-center gap-2 ms-auto">
                         <!-- Theme Color (Light/Dark) -->
@@ -314,7 +327,7 @@
                         </div>
 
                         <!-- Notification -->
-                        <div class="dropdown topbar-item">
+                        <!-- <div class="dropdown topbar-item">
                             <button type="button" class="topbar-button" id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="topbar-badge border border-2 border-info rounded-pill">18<span class="visually-hidden">unread messages</span></span>
                             </button>
@@ -327,11 +340,9 @@
                                     </div>
                                 </div>
                                 <div data-simplebar style="max-height: 280px;">
-                                    <!-- Item -->
                                     <a href="javascript:void(0);" class="dropdown-item py-3 border-bottom text-wrap">
                                         <p class="mb-0"><span class="fw-medium">Olivia Bennett</span> mentioned you in a comment <span>"This update really improves the user experience! 🚀"</span></p>
                                     </a>
-                                    <!-- Item -->
                                     <a href="javascript:void(0);" class="dropdown-item py-3 border-bottom">
                                         <p class="mb-0 fw-semibold">Daniel Roberts</p>
                                         <p class="mb-0 text-wrap">
@@ -340,7 +351,7 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- User -->
                         <div class="dropdown topbar-item">

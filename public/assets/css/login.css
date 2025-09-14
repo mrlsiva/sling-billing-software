@@ -14,3 +14,7 @@ body {
 .logo-section img {
     max-width: 200px;
 }
+.right-logo img {
+    max-width: 220px;
+    max-height: 180px;
+}
