@@ -30,7 +30,7 @@
 				<form method="get" action="{{route('setting.finance.index', ['company' => request()->route('company')])}}">
                     <div class="row mb-2 p-3">
                         <div class="col-md-11">
-                            <div class="input-group input-group-lg">
+                            <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Name" name="finance" value="{{ request('finance') }}">
                                 <span class="input-group-text"><a href="{{route('setting.finance.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>

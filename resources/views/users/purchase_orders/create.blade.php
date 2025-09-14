@@ -105,7 +105,7 @@
 
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="quantity" class="form-label">Quantity</label>
+                                    <label for="quantity" class="form-label">Quantity <span id="unit_display"></span></label>
                                     <span class="text-danger">*</span>
                                     <input type="number" name="quantity" id="quantity" value="{{old('quantity')}}" class="form-control" placeholder="Enter Quantity" min="1" step="1"  required="" >
                                     <small id="quantity_error" class="text-danger d-none">Quantity must be greater than 0</small>

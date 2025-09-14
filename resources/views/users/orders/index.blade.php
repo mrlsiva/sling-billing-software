@@ -38,7 +38,7 @@
                 <form method="get" action="{{route('order.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}">
                     <div class="row mb-2 p-3">
                         <div class="col-md-11">
-                            <div class="input-group input-group-lg">
+                            <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Branch Name/ Branch Username/ Customer Name/ Customer Phone/ Bill No" name="order" value="{{ request('order') }}">
                                 <span class="input-group-text"><a href="{{route('order.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>

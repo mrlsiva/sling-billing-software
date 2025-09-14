@@ -18,7 +18,7 @@
 				<form method="get" action="{{route('branch.product.index', ['company' => request()->route('company')])}}">
                     <div class="row mb-2 p-3">
                         <div class="col-md-11">
-                            <div class="input-group input-group-lg">
+                            <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Product/ Categoy/ Sub Category Name" name="product" value="{{ request('product') }}">
                                 <span class="input-group-text"><a href="{{route('branch.product.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
@@ -40,7 +40,7 @@
 									<th>Image</th>
 									<th>Categoy</th>
 									<th>Product</th>
-									<th>Unit</th>
+									<th>Matrics</th>
 									<th>Price (₹)</th>
 									<th>Stock</th>
 									<th>Total Price (₹)</th>
@@ -56,7 +56,7 @@
 											@if($stock->product->image != null)
 											<img src="{{ asset('storage/' . $stock->product->image) }}" class="logo-dark me-1" alt="Product" height="30">
 											@else
-											<img src="{{ asset('assets/images/product.jpg') }}" class="logo-dark me-1" alt="Product" height="30">
+											<img src="{{ asset('assets/images/category.jpg') }}" class="logo-dark me-1" alt="Product" height="30">
 											@endif
 										</td>
 										<td>{{$stock->category->name}} - {{$stock->sub_category->name}}</td>

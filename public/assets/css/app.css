@@ -21543,6 +21543,9 @@ p.no-span::after {
 }
 
 @media (min-width: 768px) {
+    .hide-web {
+        display: none !important;
+    }
     .timeline .timeline-time .time-show {
         -webkit-box-pack: center;
         -ms-flex-pack: center;
@@ -21629,6 +21632,7 @@ p.no-span::after {
     }
 }
 @media (max-width: 575.98px) {
+
     .timeline .timeline-time .time-show {
         -webkit-box-pack: center;
         -ms-flex-pack: center;
@@ -21647,3 +21651,16 @@ p.no-span::after {
     height: 6px;
     width: 12px;
 }
+@media (max-width: 767px) {
+    .hide-mobile {
+        display: none !important;
+    }
+ }
+ .form-check-input:checked + .form-check-label::after {
+        content: ' Enabled';
+        color: green;
+    }
+    .form-check-input:not(:checked) + .form-check-label::after {
+        content: ' Disabled';
+        color: red;
+    }

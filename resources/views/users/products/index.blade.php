@@ -18,7 +18,7 @@
 				<form method="get" action="{{route('product.index', ['company' => request()->route('company')])}}">
 				    <div class="row mb-3 p-3">
 				    	<div class="col-md-11">
-				    		<div class="input-group input-group-lg">
+				    		<div class="input-group">
 				    			<span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
 				    			<input type="text" class="form-control" placeholder="Product Name / Code / HSN Code" name="product" value="{{ request('product') }}">
 				    			<span class="input-group-text"><a href="{{route('product.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
@@ -37,13 +37,14 @@
 							<thead class="bg-light-subtle">
 								<tr>
 									<th>S.No</th>
+									<th>Item Code</th>
 									<th>Image</th>
+									<th>category >> subcategory</th>
 									<th>Name</th>
-									<th>Product Code</th>
-									<th>HSN Code</th>
 									<th>Price (₹)</th>
+									<th>Tax</th>
+									<th>Stock</th>
 									<th>Active / In-Active</th>
-									<th>Status</th>
 									<th>Action</th>
 								</tr>
 							</thead>
@@ -53,17 +54,25 @@
 										<td>
 											{{ ($products->currentPage() - 1) * $products->perPage() + $loop->iteration }}
 										</td>
+										<td>{{$product->code}}</td>
+
 										<td>
 											@if($product->image != null)
 												<img src="{{ asset('storage/' . $product->image) }}" class="logo-dark me-1" alt="Product" height="30">
 											@else
-												<img src="{{ asset('assets/images/product.jpg') }}" class="logo-dark me-1" alt="Product" height="30">
+												<img src="{{ asset('assets/images/category.jpg') }}" class="logo-dark me-1" alt="Product" height="30">
 											@endif
+											
 										</td>
+										<td>{{$product->category->name}} >> {{$product->sub_category->name}}</td>
+
 										<td>{{$product->name}}</td>
-										<td>{{$product->code}}</td>
-										<td>{{$product->hsn_code}}</td>
+										<!-- <td>{{$product->hsn_code}}</td> -->
 										<td>{{$product->price}}</td>
+										<td>{{ $product->tax->name }}%</td>
+
+										<td>{{$product->quantity}}</td>
+
 										<td>
 										    <form action="{{ route('product.status', ['company' => request()->route('company')]) }}" method="post" onsubmit="return confirm('Are you sure you want to change the product status?')">
 										        @csrf
@@ -76,13 +85,13 @@
 										    </form>
 										</td>
 
-										<td>
+										<!-- <td>
 											@if($product->is_active == 1)
 												<span class="badge bg-soft-success text-success">Active</span>
 											@else
 												<span class="badge bg-soft-danger text-danger">In-Active</span>
 											@endif
-										</td>
+										</td> -->
 										<td>
 											<div class="d-flex gap-3">
 												<a href="{{ route('product.edit', ['company' => request()->route('company'),'id' => $product->id ]) }}"  class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>

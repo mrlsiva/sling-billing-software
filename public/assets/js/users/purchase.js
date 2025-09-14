@@ -1,55 +1,50 @@
-jQuery(document).ready(function ()
-{
-	jQuery('select[name="category"]').on('change',function(){
-		var category = jQuery(this).val();
-		if(category)
-		{
-			jQuery.ajax({
-				url : '../../products/get_sub_category',
-				type: 'GET',
-				dataType: 'json',
-				data: { id: category },
-				success:function(data)
-				{
-					console.log(data);
+jQuery(document).ready(function () {
+    jQuery('select[name="category"]').on('change', function () {
+        var category = jQuery(this).val();
+        if (category) {
+            jQuery.ajax({
+                url: '../../products/get_sub_category',
+                type: 'GET',
+                dataType: 'json',
+                data: { id: category },
+                success: function (data) {
+                    console.log(data);
 
-					jQuery('select[name="sub_category"]').empty();
-					$('select[name="sub_category"]').append('<option value="">'+ "Select" +'</option>');
-					jQuery.each(data, function(key,value){
-						console.log(value.name)
-						$('select[name="sub_category"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
-					});					
-					
-				}
-			});
-		}
-	});
+                    jQuery('select[name="sub_category"]').empty();
+                    $('select[name="sub_category"]').append('<option value="">' + "Select" + '</option>');
+                    jQuery.each(data, function (key, value) {
+                        console.log(value.name)
+                        $('select[name="sub_category"]').append('<option value="' + value.id + '">' + value.name + '</option>');
+                    });
+
+                }
+            });
+        }
+    });
 });
 
-jQuery(document).ready(function ()
-{
-	jQuery('select[name="sub_category"]').on('change',function(){
-		var category = jQuery(this).val();
-		var sub_category = jQuery('#sub_category').val();
-			jQuery.ajax({
-				url : 'get_product',
-				type: 'GET',
-				dataType: 'json',
-				data: { category: category, sub_category: sub_category },
-				success:function(data)
-				{
-					console.log(data);
+jQuery(document).ready(function () {
+    jQuery('select[name="sub_category"]').on('change', function () {
+        var category = jQuery(this).val();
+        var sub_category = jQuery('#sub_category').val();
+        jQuery.ajax({
+            url: 'get_product',
+            type: 'GET',
+            dataType: 'json',
+            data: { category: category, sub_category: sub_category },
+            success: function (data) {
+                console.log(data);
 
-					jQuery('select[name="product"]').empty();
-					$('select[name="product"]').append('<option value="">'+ "Select" +'</option>');
-					jQuery.each(data, function(key,value){
-						console.log(value.name)
-						$('select[name="product"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
-					});					
-					
-				}
-			});
-	});
+                jQuery('select[name="product"]').empty();
+                $('select[name="product"]').append('<option value="">' + "Select" + '</option>');
+                jQuery.each(data, function (key, value) {
+                    console.log(value.name)
+                    $('select[name="product"]').append('<option value="' + value.id + '">' + value.name + '</option>');
+                });
+
+            }
+        });
+    });
 });
 
 jQuery(document).ready(function ()
@@ -122,7 +117,7 @@ function calculateCosts() {
     if (tax < 0 || isNaN(tax)) {
         taxInput.value = "";
         document.getElementById("tax_error")?.classList.remove("d-none");
-        tax = 0; 
+        tax = 0;
     }
 
     // ✅ Discount validation (cannot be negative)
