@@ -19,6 +19,8 @@ use App\Http\Controllers\users\taxController;
 use App\Http\Controllers\users\metricController;
 use App\Http\Controllers\users\financeController;
 use App\Http\Controllers\users\paymentController;
+use App\Http\Controllers\users\billController;
+use App\Http\Controllers\users\generalController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -109,6 +111,8 @@ else
                                 Route::name('ledger.')->group(function () {
 
                                     Route::get('/{id}/index',[ledgerController::class, 'index'])->name('index');
+                                    Route::get('get-vendor-payments/{vendor}', [ledgerController::class, 'getPayment'])->name('getPayment');
+
                                 });
                             });
 
@@ -206,6 +210,19 @@ else
                                 });
                             });
 
+                            Route::prefix('bill')->group(function () {
+                                Route::name('bill.')->group(function () {
+                                    Route::get('/index/{branch?}',[billController::class, 'index'])->name('index');
+                                    Route::post('/store',[billController::class, 'store'])->name('store');
+                                });
+                            });
+
+                            Route::prefix('general')->group(function () {
+                                Route::name('general.')->group(function () {
+                                    Route::get('/index',[generalController::class, 'index'])->name('index');
+                                });
+                            });
+
 
                         });
                     });
@@ -274,9 +291,10 @@ else
                             });
 
                             Route::prefix('settings')->group(function () {
-                                Route::name('setting')->group(function () {
+                                Route::name('setting.')->group(function () {
 
-                                    Route::get('/',[settingController::class, 'index']);
+                                    Route::get('/',[settingController::class, 'index'])->name('index');
+                                    Route::get('/store',[settingController::class, 'store'])->name('store');
                                 });
                             });
 

@@ -117,6 +117,45 @@ class purchaseOrderController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Created','App/Models/PurchaseOrder','purchase_orders',$purchase_order->id,'Insert',null,$request,'Success','Purchase Order Created');
 
+        // --- Handle prepaid balance ---
+        $vendor = Vendor::findOrFail($request->vendor);
+        $prepaid = $vendor->prepaid_amount ?? 0;
+        $grossCost = $request->gross_cost;
+
+        if ($prepaid > 0) {
+            $allocatable = 0;
+            $comment = '';
+            $status  = 0;
+
+            if ($prepaid >= $grossCost) {
+                // Full payment from prepaid
+                $allocatable = $grossCost;
+                $vendor->update(['prepaid_amount' => $prepaid - $grossCost]);
+                $comment = 'Fully paid using prepaid balance';
+                $status  = 1;
+            } else {
+                // Partial payment from prepaid
+                $allocatable = $prepaid;
+                $vendor->update(['prepaid_amount' => 0]);
+                $comment = 'Partially paid using prepaid balance';
+                $status  = 2;
+            }
+
+            // Record the payment detail
+            VendorPaymentDetail::create([
+                'purchase_order_id' => $purchase_order->id,
+                'payment_id'        => 1,
+                'amount'            => $allocatable,
+                'paid_on'           => now(),
+                'comment'           => $comment,
+            ]);
+
+            // Update purchase order status
+            $purchase_order->update(['status' => $status]);
+
+        }
+
+
         DB::commit();
 
         return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])->with('toast_success', 'Purchase order created successfully.');

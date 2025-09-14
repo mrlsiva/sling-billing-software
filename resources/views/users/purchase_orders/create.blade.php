@@ -49,6 +49,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="invoice_date" class="form-label">Invoice Date</label>
+                                    <span class="text-danger">*</span>
                                     <input type="date" name="invoice_date" id="invoice_date" value="{{old('invoice_date')}}" class="form-control" placeholder="Enter Invoice Date" required="">
                                 </div>
                             </div>
@@ -100,15 +101,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="choices-single-groups" class="form-label text-muted">Unit</label>
-                                    <span class="text-danger">*</span>
-                                    <select class="form-control"  name="unit" id="unit" required="" readonly>
-                                        <option value=""> Select </option>
-                                    </select>
-                                </div>
-                            </div>
+                            <input type="hidden" name="unit" id="unit">
 
                             <div class="col-md-4">
                                 <div class="mb-3">
@@ -121,7 +114,9 @@
 
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="price_per_unit" class="form-label">Price Per Unit</label>
+                                    <label for="price_per_unit" class="form-label">
+                                        Price Per Unit <span id="metric_name"></span>
+                                    </label>
                                     <span class="text-danger">*</span>
                                     <input type="number" name="price_per_unit" id="price_per_unit" value="{{old('price_per_unit')}}" class="form-control" placeholder="Enter Price Per Unit" min="1" step="1" required="">
                                     <small id="price_error" class="text-danger d-none">Price must be greater than 0</small>

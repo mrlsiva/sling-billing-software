@@ -64,10 +64,10 @@ jQuery(document).ready(function ()
 				success:function(data)
 				{
 					console.log(data);
-					jQuery('select[name="unit"]').empty();	
-					$('select[name="unit"]').append('<option value="'+ data.metric.id +'">'+ data.metric.name +'</option>');			
-					
-				}
+					document.getElementById("unit").value = data.metric.id;
+					// show metric name next to label
+                	jQuery("#metric_name").text("(" + data.metric.name + ")");
+                }
 			});
 	});
 });

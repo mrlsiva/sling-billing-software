@@ -21,8 +21,10 @@ use App\Models\OrderPaymentDetail;
 use App\Models\ShopPayment;
 use App\Models\PosSetting;
 use Illuminate\Support\Str;
+use App\Models\UserDetail;
 use App\Models\User;
 use App\Models\Staff;
+use App\Models\BillSetup;
 use App\Traits\Log;
 use Carbon\Carbon;
 use Session;
@@ -198,6 +200,35 @@ class billingController extends Controller
         DB::beginTransaction();
 
         $user = User::where('id',Auth::user()->id)->first();
+        $billSetup = BillSetup::where([['branch_id',Auth::user()->id],['is_active',1]])->first();
+
+        if (!$billSetup) {
+            return response()->json([
+                'status'   => 'failure',
+                'message'  => 'No active bill setup found for this branch.'
+            ]);
+        }
+
+        // Active bill prefix
+        $billPrefix = $billSetup->bill_number;
+
+        // Get last order with this branch
+        $lastOrder = Order::where('branch_id', Auth::user()->id)->orderBy('id', 'desc')->first();
+
+        $newBillNo = $billPrefix . '01'; // default start if no orders
+
+        if ($lastOrder && $lastOrder->bill_id) {
+            $lastBillNo = $lastOrder->bill_id;
+
+            if (Str::startsWith($lastBillNo, $billPrefix)) {
+                // continue sequence
+                $lastNumber = (int) Str::replaceFirst($billPrefix, '', $lastBillNo);
+                $newBillNo = $billPrefix . str_pad($lastNumber + 1, 2, '0', STR_PAD_LEFT);
+            } else {
+                // reset sequence for new prefix
+                $newBillNo = $billPrefix . '01';
+            }
+        }
 
         $customerData = $request->input('customer');
         $customer = Customer::firstOrCreate(
@@ -221,7 +252,7 @@ class billingController extends Controller
         $order = Order::create([
             'shop_id'     => $user->parent_id,
             'branch_id'   => Auth::user()->id,
-            'bill_id'     => uniqid('BILL-'),
+            'bill_id'     => $newBillNo,
             'billed_by'   => $request->billed_by,
             'customer_id' => $customer->id,
             'bill_amount' => $billAmount,
@@ -284,7 +315,17 @@ class billingController extends Controller
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
-        return view('branches.bill',compact('user','order','order_details','order_payment_details'));
+
+        $user_detail = UserDetail::where('user_id',Auth::id())->first();
+        if($user_detail->bill_type == null || $user_detail->bill_type == 1)
+        {
+            return view('branches.bill',compact('user','order','order_details','order_payment_details'));
+        }
+        else
+        {
+            return view('branches.thermal_bill',compact('user','order','order_details','order_payment_details'));
+        }
+
 
         // $pdf = Pdf::loadView('branches.bill', [
         //     'user' => $user,

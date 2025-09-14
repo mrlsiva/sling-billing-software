@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class VendorPaymentDetail extends Model
+class VendorPayment extends Model
 {
     protected $fillable = [
-        'vendor_payment_id','purchase_order_id','payment_id','amount','paid_on','comment'
+        'vendor_id','payment_id','amount','paid_on','comment'
     ];
 
     public function payment()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\VendorPaymentDetail;
+use App\Models\VendorPayment;
 use App\Models\PurchaseOrderDetail;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
@@ -68,6 +69,14 @@ class ledgerController extends Controller
             'vendor_id' => 'required|exists:vendors,id',
         ]);
 
+        $vendor_payment = VendorPayment::create([
+            'vendor_id'    => $request->vendor_id,
+            'payment_id'   => $request->payment,
+            'amount'       => $request->payment_amount,
+            'paid_on'      => now(),
+            'comment'      => $request->comment,
+        ]);
+
         $amountToDistribute = $request->payment_amount;
         $paymentId = $request->payment;
         $comment = $request->comment;
@@ -92,6 +101,7 @@ class ledgerController extends Controller
             $allocatable = min($amountToDistribute, $remainingForOrder);
 
             VendorPaymentDetail::create([
+                'vendor_payment_id' => $vendor_payment->id,
                 'purchase_order_id' => $order->id,
                 'payment_id'        => $paymentId,
                 'amount'            => $allocatable,
@@ -121,6 +131,13 @@ class ledgerController extends Controller
         }
 
         return redirect()->back()->with('toast_success', 'Payment allocated successfully!');
+    }
+
+    public function getPayment(Request $request,$company,$id)
+    {
+        $payments = VendorPayment::with('payment')->where('vendor_id', $id)->orderBy('paid_on', 'desc')->get();
+
+        return response()->json($payments);
     }
 
 

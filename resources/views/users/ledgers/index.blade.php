@@ -89,7 +89,7 @@
                         <p class="card-title mb-0">Total Billed Paid</p>
                     </div>
                     <div class="ms-auto">
-                        <a href="#!" class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center">
+                        <a href="#!" class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center viewBill" data-vendor="{{ $vendor->id }}">
                             <i class="ri-eye-line align-middle fs-16 text-white"></i>
                         </a>
                     </div>
@@ -220,7 +220,12 @@
 
                                     <td>
                                         @if($payment_detail != null)
-                                            {{$payment_detail->payment->name}}
+
+                                            @if($payment_detail->payment_id != null)
+                                                {{$payment_detail->payment->name}}
+                                            @else
+                                                -
+                                            @endif
                                         @else
                                             -
                                         @endif
@@ -378,6 +383,34 @@
     </div>
 </div>
 
+<div class="modal fade" id="billView" tabindex="-1" aria-labelledby="billView" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">View Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 table-hover table-centered">
+                        <thead class="bg-light-subtle">
+                            <tr>
+                                <th>S.No</th>
+                                <th>Payment Method</th>
+                                <th>Amount</th>
+                                <th>Paid On</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 @section('script')
 <!-- jQuery -->
@@ -423,6 +456,48 @@ document.addEventListener('DOMContentLoaded', function () {
         purchaseEditModal.querySelector('#old_amount').value = oldAmount;
     });
 });
+</script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+    jQuery(document).on('click', '.viewBill', function () {
+        var vendorId = jQuery(this).data('vendor');
+
+        jQuery.ajax({
+            url: '../get-vendor-payments/' + vendorId,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                let tbody = jQuery('#billView tbody');
+                tbody.empty(); // clear previous data
+
+                if (data.length > 0) {
+                    jQuery.each(data, function (index, payment) {
+                        tbody.append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${payment.payment ? payment.payment.name : 'Prepaid'}</td>
+                                <td>${payment.amount}</td>
+                                <td>${payment.paid_on ? payment.paid_on : '-'}</td>
+                                <td>${payment.comment ? payment.comment : '-'}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    tbody.append(`
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No payments found</td>
+                        </tr>
+                    `);
+                }
+
+                // Show modal
+                jQuery('#billView').modal('show');
+            }
+        });
+    });
+});
+
 </script>
 
 <!-- <script>
