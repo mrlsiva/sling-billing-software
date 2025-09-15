@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Stock;
+use App\Models\Product;
 
 class stockController extends Controller
 {
@@ -29,4 +30,17 @@ class stockController extends Controller
 
         return view('branches.products.index',compact('stocks'));
     }
+
+    public function qrcode(Request $request,$company,$id)
+    {
+        $product = Product::where('id',$id)->first();
+        return view('branches.products.qrcode',compact('product'));
+    }
+
+    public function barcode(Request $request,$company,$id)
+    {
+        $product = Product::where('id',$id)->first();
+        return view('branches.products.barcode',compact('product'));
+    }
+
 }

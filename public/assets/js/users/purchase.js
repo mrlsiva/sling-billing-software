@@ -25,8 +25,8 @@ jQuery(document).ready(function () {
 
 jQuery(document).ready(function () {
     jQuery('select[name="sub_category"]').on('change', function () {
-        var category = jQuery(this).val();
-        var sub_category = jQuery('#sub_category').val();
+        var sub_category = jQuery(this).val();
+        var category = jQuery('#category').val();
         jQuery.ajax({
             url: 'get_product',
             type: 'GET',

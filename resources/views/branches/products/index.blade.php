@@ -44,6 +44,7 @@
 									<th>Price (₹)</th>
 									<th>Stock</th>
 									<th>Total Price (₹)</th>
+									<th>Action</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -65,6 +66,13 @@
 										<td>{{$stock->product->price}}</td>
 										<td>{{$stock->quantity}}</td>
 										<td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
+										<td>
+											<div class="d-flex gap-3">
+												<a href="{{ route('branch.product.qrcode', ['company' => request()->route('company'),'id' => $stock->product->id ]) }}" target="_blank" ><i class="ri-qr-code-line align-middle fs-20" title="Print QR"></i></a>
+
+												<a href="{{ route('branch.product.barcode', ['company' => request()->route('company'),'id' => $stock->product->id ]) }}" target="_blank"><i class="ri-barcode-line align-middle fs-20" title="Bar Code"></i></a>
+											</div>
+										</td>
 									</tr>
 								@endforeach
 							</tbody>
@@ -79,4 +87,27 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="modal fade" id="qrCode" tabindex="-1" aria-labelledby="qrCode" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">QR Download</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                	<div class="row">
+                		<div class="col-md-4">
+
+                		</div>
+                	</div>
+                </div>
+                <div class="modal-footer">
+                	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                	<button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection

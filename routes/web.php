@@ -253,6 +253,8 @@ else
                                 Route::name('product.')->group(function () {
 
                                     Route::get('/index',[stockController::class, 'index'])->name('index');
+                                    Route::get('/{id}/qrcode',[stockController::class, 'qrcode'])->name('qrcode');
+                                    Route::get('/{id}/barcode',[stockController::class, 'barcode'])->name('barcode');
                                 });
                             });
 
