@@ -143,6 +143,7 @@ class purchaseOrderController extends Controller
 
             // Record the payment detail
             VendorPaymentDetail::create([
+                'vendor_payment_id' => null,
                 'purchase_order_id' => $purchase_order->id,
                 'payment_id'        => 1,
                 'amount'            => $allocatable,
@@ -276,6 +277,7 @@ class purchaseOrderController extends Controller
                         } else {
                             
                             VendorPaymentDetail::create([
+                                'vendor_payment_id' => null,
                                 'purchase_order_id' => $next->id,
                                 'payment_id'        => $pid,
                                 'amount'            => $alloc,

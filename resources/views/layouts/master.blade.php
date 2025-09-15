@@ -130,7 +130,7 @@
                             <div class="collapse {{  request()->is(request()->route('company') . '/vendors*') ? 'show' : '' }}" id="sidebarVendors">
                                 <ul class="sub-menu-nav">
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link {{ request()->is(request()->route('company') . '/vendors/index') ? 'active' : '' }}" href="{{route('vendor.index', ['company' => request()->route('company')])}}">List</a>
+                                        <a class="sub-menu-link {{ ((request()->is(request()->route('company') . '/vendors/index')) || (request()->is(request()->route('company') . '/vendors/ledger/*'))) ? 'active' : '' }}" href="{{route('vendor.index', ['company' => request()->route('company')])}}">List</a>
                                     </li>
                                     <li class="sub-menu-item">
                                         <a class="sub-menu-link  {{  request()->is(request()->route('company') . '/vendors/purchase_orders*') ? 'active' : '' }}" href="{{route('vendor.purchase_order.index', ['company' => request()->route('company')])}}">Purchase Order</a>

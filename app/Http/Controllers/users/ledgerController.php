@@ -57,6 +57,8 @@ class ledgerController extends Controller
         $totalGross = PurchaseOrder::whereIn('id', $purchaseOrderIds)->sum('gross_cost');
         $totalPaid  = $payments->sum('amount');
         $balance    = $totalGross - $totalPaid;
+        $vendor_payments = VendorPayment::where('vendor_id',$id)->get();
+        $totalPaid  = $vendor_payments->sum('amount');
 
         return view('users.ledgers.index',compact('vendor','purchase_orders','payments','totalGross','totalPaid','balance','payment_methods'));
     }
