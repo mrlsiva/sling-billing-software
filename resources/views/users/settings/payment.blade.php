@@ -13,7 +13,7 @@
 						<p class="card-title">All Payment Method</p>
 					</div>
 
-					<!-- <a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#paymentEdit"><i class='bx bxs-edit'></i> Select/ Update </a> -->
+					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#paymentEdit"><i class='bx bxs-edit'></i> Select/ Update </a>
 
 				</div>
 
@@ -31,7 +31,7 @@
 
 				<div class="">
 					<div class="table-responsive">
-						<!-- <table class="table align-middle mb-0 table-hover table-centered">
+						<table class="table align-middle mb-0 table-hover table-centered">
 							<thead class="bg-light-subtle">
 								<tr>
 									<th>S.No</th>
@@ -48,8 +48,8 @@
 									</tr>
 									@endforeach
 							</tbody>
-						</table> -->
-						<table class="table align-middle mb-0 table-hover table-centered">
+						</table>
+						<!-- <table class="table align-middle mb-0 table-hover table-centered">
 							<thead>
 								<tr>
 									<th>S.No</th>
@@ -77,7 +77,7 @@
 									</tr>
 								@endforeach
 							</tbody>
-						</table>
+						</table> -->
 
 					</div>
 					<!-- end table-responsive -->
@@ -87,7 +87,7 @@
 		</div>
 	</div>
 
-    <!-- <div class="modal fade" id="paymentEdit" tabindex="-1" aria-labelledby="paymentEdit" aria-hidden="true">
+    <div class="modal fade" id="paymentEdit" tabindex="-1" aria-labelledby="paymentEdit" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" >
                 <div class="modal-header">
@@ -123,6 +123,6 @@
                 </form>
             </div>
         </div>
-    </div> -->
+    </div>
 
 @endsection

@@ -21656,11 +21656,11 @@ p.no-span::after {
         display: none !important;
     }
  }
- .form-check-input:checked + .form-check-label::after {
+ /* .form-check-input:checked + .form-check-label::after {
         content: ' Enabled';
         color: green;
     }
     .form-check-input:not(:checked) + .form-check-label::after {
         content: ' Disabled';
         color: red;
-    }
+    } */
