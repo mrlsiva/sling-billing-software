@@ -67,11 +67,18 @@
 										<td>{{$stock->quantity}}</td>
 										<td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
 										<td>
-											<div class="d-flex gap-3">
-												<a href="{{ route('branch.product.qrcode', ['company' => request()->route('company'),'id' => $stock->product->id ]) }}" target="_blank" ><i class="ri-qr-code-line align-middle fs-20" title="Print QR"></i></a>
+											@php
+												$user_detail = App\Models\UserDetail::where('user_id',Auth::user()->id)->first();
+											@endphp
+											@if($user_detail->is_scan_avaiable == 1)
+												<div class="d-flex gap-3">
+													<a href="{{ route('branch.product.qrcode', ['company' => request()->route('company'),'id' => $stock->product->id ]) }}" target="_blank" ><i class="ri-qr-code-line align-middle fs-20" title="Print QR"></i></a>
 
-												<a href="{{ route('branch.product.barcode', ['company' => request()->route('company'),'id' => $stock->product->id ]) }}" target="_blank"><i class="ri-barcode-line align-middle fs-20" title="Bar Code"></i></a>
-											</div>
+													<a href="{{ route('branch.product.barcode', ['company' => request()->route('company'),'id' => $stock->product->id ]) }}" target="_blank"><i class="ri-barcode-line align-middle fs-20" title="Bar Code"></i></a>
+												</div>
+											@else
+												-
+											@endif
 										</td>
 									</tr>
 								@endforeach

@@ -70,7 +70,7 @@
 
 					<div class="qr-body">
 						<div class="qr-left">
-							{!! QrCode::size(100)->generate($product->id) !!}
+							{!! QrCode::size(100)->generate($product->code) !!}
 						</div>
 						<div class="qr-right">
 							<p>{{ $product->name }}</p>

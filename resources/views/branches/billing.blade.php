@@ -17,6 +17,9 @@
 						<a href="{{route('branch.billing.pos', ['company' => request()->route('company')])}}" class="btn btn-primary btn-sm"><i class="ri-eye-line"></i> View All</a>
 					</div>
 				</div> -->
+
+			<input type="text" id="scanner-input" autofocus style="opacity:0;position:absolute;left:-9999px;">
+
 			<div class="row">
 				<div class="col-md-12">
 					<div class="mb-3">

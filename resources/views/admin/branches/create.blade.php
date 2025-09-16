@@ -33,8 +33,6 @@
 							    $slug_name = $user->user_name .'_'. $parent_count;
 							@endphp
 
-							<input type="hidden" name="slug_name" value="{{ $slug_name }}">
-
                             <div class="col-xl-12 col-md-12 mb-3">
                                 <label for="logo" class="form-label">Upload Branch Logo</label>
                                 <div class="input-group">
@@ -101,6 +99,14 @@
                             </div>
 
                             <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="slug_name" class="form-label">Slug Name</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="slug_name" name="slug_name" id="slug_name" class="form-control" placeholder="Enter Slug Name" value="{{ $slug_name }}">
+                                </div> 
+                            </div>
+
+                            <div class="col-md-4">
                                 
                                 <div class="mb-3">
                                     <label for="gst" class="form-label">Company GSTin</label>
@@ -111,7 +117,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="payment_method" class="form-label">Payment Method</label>
-                                    <select class="form-control" data-choices name="payment_method" id="payment_method">
+                                    <select class="form-control" name="payment_method" id="payment_method" required="">
                                         <option value=""> Choose Payment</option>
                                         <option value="1">Monthly</option>
                                         <option value="2">Quarterly</option>
@@ -150,6 +156,29 @@
                                     <input type="color" id="secondary_colour" name="secondary_colour" value="{{ $user->user_detail->secondary_colour }}" class="form-control" placeholder="Enter Secondary Color code">
                                 </div>
                             </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="bill_type" class="form-label">Bill Type</label>
+                                    <span class="text-danger">*</span>
+                                    <select class="form-control" name="bill_type" id="bill_type" required="">
+                                        <option value=""> Choose Bill Type</option>
+                                        <option value="1">Normal</option>
+                                        <option value="2">Thermal</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mt-5">
+                                        <input class="form-check-input" type="checkbox" id="is_scan_avaiable" checked="">
+                                        <label class="form-check-label" for="is_scan_avaiable">Qrcode/ Barcode scan</label>
+                                        <span class="text-danger">*</span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

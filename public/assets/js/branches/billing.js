@@ -152,6 +152,10 @@ $(document).ready(function () {
 // Add product to cart or increase quantity
 function add_to_cart(element) {
     var system_id = $(element).data("system_id");
+    if(!system_id)
+    {
+        system_id = element;
+    }
 
     // Check if already in cart
     var $existingItem = $('#cart_item').find('[data-product-id="' + system_id + '"]');
@@ -986,6 +990,25 @@ function submit() {
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    let input = document.getElementById("scanner-input");
+    input.focus();
+
+    // When scanner enters a product id
+    input.addEventListener("change", function() {
+        let productId = this.value.trim();
+
+        if(productId) {
+            add_to_cart(productId);
+
+        }
+
+        // reset for next scan
+        this.value = "";
+        this.focus();
+    });
+});
 
 
 

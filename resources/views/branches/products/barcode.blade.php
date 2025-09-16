@@ -72,8 +72,8 @@
 					<div class="qr-body">
 						<div class="qr-left">
 							{{-- Generate a barcode using product id or code --}}
-							<img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $product->id, 'C128', 2, 50) }}"alt="barcode" style="max-width: 100%; height: auto;" />
-    						<small>{{ $product->id }}</small>
+							<img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $product->code, 'C128', 2, 50) }}"alt="barcode" style="max-width: 100%; height: auto;" />
+    						<small>{{ $product->code }}</small>
 						</div>
 						<div class="qr-right">
 							<p>{{ $product->name }}</p>

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserDetail extends Model
 {
     protected $fillable = [
-        'user_id','address','gst','payment_method','payment_date','primary_colour','secondary_colour','bill_type'
+        'user_id','address','gst','payment_method','payment_date','primary_colour','secondary_colour','bill_type','is_scan_avaiable'
     ];
 
     public function user()

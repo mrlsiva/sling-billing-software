@@ -89,6 +89,8 @@ class branchController extends Controller
                 }),
             ],
 
+            'payment_method' => 'required',
+            'bill_type' => 'required',
             'bank' => 'nullable|string|max:50',
             'name' => 'nullable|string|max:50',
             'account_number' => 'nullable|numeric|digits_between:9,18|same:confirm_account_number',
@@ -196,6 +198,8 @@ class branchController extends Controller
             'payment_date' => Carbon::now(),
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'bill_type' => $request->bill_type,
+            'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
         ]);
 
         //Log
@@ -275,8 +279,9 @@ class branchController extends Controller
                 })->ignore($request->id) // Ignore current record
             ],
 
-            'payment_method' => 'nullable|required',
-            'payment_date'   => 'nullable|required|date|before_or_equal:today',
+            'payment_method' => 'required',
+            'payment_date'   => 'required|date|before_or_equal:today',
+            'bill_type' => 'required',
 
             'bank' => 'nullable|string|max:50',
             'name' => 'nullable|string|max:50',
@@ -366,6 +371,8 @@ class branchController extends Controller
             'payment_date' => $request->payment_date,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'bill_type' => $request->bill_type,
+            'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
         ]);
 
         //Log
