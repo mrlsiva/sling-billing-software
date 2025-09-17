@@ -236,6 +236,8 @@ class productController extends Controller
 
         $product = Product::find($request->id);
 
+        $stock = Stock::where([['shop_id', Auth::user()->id],['category_id', $product->category_id],['sub_category_id', $product->sub_category_id],['product_id', $request->id]])->first();
+
         $tax = Tax::where('id',$request->tax)->first();
 
         $price = $request->price; // base price
@@ -276,9 +278,13 @@ class productController extends Controller
             $product->save();
         }
 
-        $stock = Stock::where([['shop_id', Auth::user()->id],['category_id', $request->category_id],['sub_category_id', $request->sub_category],['product_id', $request->id]])->first();
+        
+
+        //$stock = Stock::where([['shop_id', Auth::user()->id],['category_id', $request->category_id],['sub_category_id', $request->sub_category],['product_id', $request->id]])->first();
 
         $stock->update([ 
+            'category_id' => $request->category_id,
+            'sub_category_id' => $request->sub_category,
             'quantity' => $request->quantity,
         ]);
 

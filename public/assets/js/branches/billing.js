@@ -187,6 +187,11 @@ function add_to_cart(element) {
                     return;
                 }
 
+                if (currentQty > maxQty) {
+                    alert("Cannot add more. Stock limit reached (" + maxQty + ").");
+                    return;
+                }
+
                 $("#cart_item").append(`
                     <div class="border border-light mt-3 p-2 rounded" 
                          data-product-id="${data.id}" 
@@ -993,21 +998,28 @@ function submit() {
 
 document.addEventListener("DOMContentLoaded", function() {
     let input = document.getElementById("scanner-input");
-    input.focus();
 
-    // When scanner enters a product id
+    // Keep focus on hidden field only if user isn't typing somewhere else
+    function refocus() {
+        if (document.activeElement === document.body || document.activeElement === input) {
+            input.focus();
+        }
+    }
+
     input.addEventListener("change", function() {
         let productId = this.value.trim();
 
-        if(productId) {
+        if (productId) {
             add_to_cart(productId);
-
         }
 
         // reset for next scan
         this.value = "";
-        this.focus();
+        refocus();
     });
+
+    // Initial focus
+    refocus();
 });
 
 
