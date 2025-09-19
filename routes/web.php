@@ -68,6 +68,7 @@ else
                             Route::get('/edit',[categoryController::class, 'edit'])->name('edit');
                             Route::post('/update',[categoryController::class, 'update'])->name('update');
                             Route::post('/status',[categoryController::class, 'status'])->name('status');
+                            Route::post('/bulk_upload',[categoryController::class, 'bulk_upload'])->name('bulk_upload');
                             
                         });
                     });
@@ -80,6 +81,7 @@ else
                             Route::get('/edit',[subCategoryController::class, 'edit'])->name('edit');
                             Route::post('/update',[subCategoryController::class, 'update'])->name('update');
                             Route::post('/status',[subCategoryController::class, 'status'])->name('status');
+                            Route::post('/bulk_upload',[subCategoryController::class, 'bulk_upload'])->name('bulk_upload');
                             
                         });
                     });
@@ -95,6 +97,7 @@ else
                             Route::post('/update',[productController::class, 'update'])->name('update');
                             Route::post('/status',[productController::class, 'status'])->name('status');
                             Route::get('/get_sub_category',[productController::class, 'get_sub_category'])->name('get_sub_category');
+                            Route::post('/bulk_upload',[productController::class, 'bulk_upload'])->name('bulk_upload');
                             
                         });
                     });
@@ -245,6 +248,7 @@ else
                                     Route::get('/{id}/edit',[customerController::class, 'edit'])->name('edit');
                                     Route::post('/update',[customerController::class, 'update'])->name('update');
                                     Route::get('/{id}/order',[customerController::class, 'order'])->name('order');
+                                    Route::post('/bulk_upload',[customerController::class, 'bulk_upload'])->name('bulk_upload');
                                     
                                 });
                             });

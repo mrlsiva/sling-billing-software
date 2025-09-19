@@ -4,6 +4,8 @@ namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\SubCategoryImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\SubCategory;
@@ -34,12 +36,15 @@ class subCategoryController extends Controller
     {
         $request->validate([
             'category' => 'required',
-            'sub_category' => 'required',
+            'sub_category' => ['required','string','max:50',
+                Rule::unique('sub_categories', 'name')->where(fn($q) => $q->where('user_id', Auth::id())->where('category_id', $request->category)),
+            ],
             'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
         ], 
         [
             'category.required' => 'Category is required.',
             'sub_category.required' => 'Sub Category is required.',
+            'sub_category.unique'   => 'You already have a sub category with this name.',
             'image.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'image.max' => 'Logo size must not exceed 2MB.',
         ]);
@@ -92,8 +97,10 @@ class subCategoryController extends Controller
         $request->validate([
             'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
             'category_id' => 'required',
-            'sub_category_name' => 'required',
-        ], 
+            'sub_category_name' => ['required','string','max:50',
+                Rule::unique('sub_categories', 'name')->where(fn($q) => $q->where('user_id', Auth::id())->where('category_id', $request->category_id))->ignore($request->sub_category_id),
+            ], 
+        ],
         [
             'category_id.required' => 'Category is required.',
             'sub_category_name.required' => 'Sub Category is required.',
@@ -148,5 +155,30 @@ class subCategoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Status Update','App/Models/SubCategory','sub_categories',$request->id,'Update',null,null,'Success',$statusText);
 
         return redirect()->back()->with('toast_success', "Sub Category Status Changed");
+    }
+
+    public function bulk_upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx|max:10000', // Allow larger files
+        ]);
+
+        $import = new SubCategoryImport();
+        Excel::import($import, $request->file('file'));
+
+        $skipped = [];
+        if ($import->failures()->isNotEmpty()) {
+            foreach ($import->failures() as $failure) {
+                $skipped[] = "Row {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+        }
+
+        if (count($skipped) > 0) {
+
+            return redirect()->back()->with('error_alert', 'Some rows were skipped: ' . implode(' | ', $skipped)); 
+        }
+
+        return redirect()->back()->with('toast_success', 'Bulk sub categories uploaded successfully.');
+
     }
 }

@@ -12,7 +12,10 @@
 					<div>
 						<p class="card-title">All Category</p>
 					</div>
-					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#categoryAdd"><i class='bx bxs-folder-plus'></i> Create Category</a>
+					<div>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#categoryAdd"><i class='bx bxs-folder-plus'></i> Create Category</a>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#bulkUpload"><i class='bx bxs-folder-plus'></i> Bulk Upload</a>
+					</div>
 				</div>
 
 				@if ($errors->any())
@@ -41,6 +44,12 @@
 					    </div>
 				    </div>
 		    	</form>
+
+		    	@if(session('error_alert'))
+		        <div class="alert alert-danger">
+		          <strong>Warning! </strong>{{ session('error_alert') }}<br>
+		        </div>
+		        @endif
 
 				<div class="">
 					<div class="table-responsive">
@@ -185,6 +194,44 @@
 	                <div class="modal-footer">
 	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 	                    <button type="submit" class="btn btn-primary">Save changes</button>
+	                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="bulkUpload" tabindex="-1" aria-labelledby="bulkUpload" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Bulk Upload</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="row" action="{{route('category.bulk_upload', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                	@csrf
+	                <div class="modal-body">
+
+	                	<div class="row">
+		                    <div class="col-md-12 d-flex justify-content-end">
+		                    	<a href="{{ asset('assets/templates/category.xlsx') }}" download="Category_Template.xlsx">Download Template</a>
+		                    </div>
+		                </div>
+
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="name" class="form-label">Upload File</label>
+	                                <div class="input-group">
+	                                    <input type="file" name="file" id="file" class="form-control" accept=".xlsx">
+	                                </div>
+		                        </div>
+		                    </div>
+	                   </div>
+	                   
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	                    <button type="submit" class="btn btn-primary">Submit</button>
 	                </div>
                 </form>
             </div>

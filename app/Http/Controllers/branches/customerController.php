@@ -4,6 +4,8 @@ namespace App\Http\Controllers\branches;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CustomerImport;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -153,5 +155,31 @@ class customerController extends Controller
         return view('branches.customers.order',compact('orders','customer'));
 
     }
+
+    public function bulk_upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx|max:10000', // Allow larger files
+        ]);
+
+        $import = new CustomerImport();
+        Excel::import($import, $request->file('file'));
+
+        $skipped = [];
+        if ($import->failures()->isNotEmpty()) {
+            foreach ($import->failures() as $failure) {
+                $skipped[] = "Row {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+        }
+
+        if (count($skipped) > 0) {
+
+            return redirect()->back()->with('error_alert', 'Some rows were skipped: ' . implode(' | ', $skipped)); 
+        }
+
+        return redirect()->back()->with('toast_success', 'Bulk customers uploaded successfully.');
+
+    }
+
 
 }

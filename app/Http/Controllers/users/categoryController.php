@@ -5,6 +5,8 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CategoryImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Category;
@@ -27,7 +29,11 @@ class categoryController extends Controller
     {
         $request->validate([
             'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // up to 2MB
-            'category' => 'required|string|max:50',
+            'category' => ['required','string','max:50',
+                Rule::unique('categories', 'name')->where(function ($query) {
+                    return $query->where('user_id', Auth::id());
+                }),
+            ],
         ], 
         [
             'category.required' => 'Name is required.',
@@ -79,7 +85,10 @@ class categoryController extends Controller
     {
         $request->validate([
             'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
-            'category_name' => 'required|string|max:50',
+            'category_name' => ['required','string','max:50',
+                Rule::unique('categories', 'name')->where(fn($query) => $query->where('user_id', Auth::id()))->ignore($request->category_id),
+            ],
+
             'category_id' => 'required',
         ], 
         [
@@ -134,5 +143,30 @@ class categoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Category Status Update','App/Models/Category','categories',$request->id,'Update',null,null,'Success',$statusText);
 
         return redirect()->back()->with('toast_success', "Category Status Changed");
+    }
+
+    public function bulk_upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx|max:10000', // Allow larger files
+        ]);
+
+        $import = new CategoryImport();
+        Excel::import($import, $request->file('file'));
+
+        $skipped = [];
+        if ($import->failures()->isNotEmpty()) {
+            foreach ($import->failures() as $failure) {
+                $skipped[] = "Row {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+        }
+
+        if (count($skipped) > 0) {
+
+            return redirect()->back()->with('error_alert', 'Some rows were skipped: ' . implode(' | ', $skipped)); 
+        }
+
+        return redirect()->back()->with('toast_success', 'Bulk categories uploaded successfully.');
+
     }
 }
