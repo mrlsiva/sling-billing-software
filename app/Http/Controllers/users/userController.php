@@ -4,6 +4,8 @@ namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CustomerExport;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Order;
@@ -54,5 +56,22 @@ class userController extends Controller
 
         return view('users.customers.order',compact('orders','customer'));
 
+    }
+
+    public function download(Request $request)
+    {
+        $users = Customer::with('gender')
+            ->where('user_id', Auth::user()->id)
+            ->when($request->customer, function ($query) use ($request) {
+                $search = $request->customer;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('id','desc')
+            ->get();
+
+        return Excel::download(new CustomerExport($users), 'Customers.xlsx'); // ✅ pass $users
     }
 }

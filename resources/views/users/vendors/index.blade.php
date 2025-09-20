@@ -162,7 +162,7 @@
 		                    <div class="col-md-6">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Phone</label>
-		                            <input type="number" id="phone" name="phone" class="form-control" required="" placeholder="Enter Phone">
+		                            <input type="text" id="phone" name="phone" class="form-control" required="" placeholder="Enter Phone">
 		                        </div>
 		                    </div>
 	                   	</div>

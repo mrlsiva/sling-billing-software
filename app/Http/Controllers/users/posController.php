@@ -75,4 +75,13 @@ class posController extends Controller
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
         return view('branches.bill',compact('user','order','order_details','order_payment_details'));
     }
+
+    public function view_bill(Request $request,$company,$id)
+    {
+        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->id)->first();
+        $order = Order::where('id',$id)->first();
+        $order_details = OrderDetail::where('order_id',$id)->get();
+        $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
+        return view('branches.view_bill',compact('user','order','order_details','order_payment_details'));
+    }
 }

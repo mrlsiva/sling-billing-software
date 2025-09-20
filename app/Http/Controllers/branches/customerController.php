@@ -5,6 +5,7 @@ namespace App\Http\Controllers\branches;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CustomerExport;
 use App\Imports\CustomerImport;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -22,9 +23,10 @@ class customerController extends Controller
 
     public function index(Request $request)
     {
-        $parent = User::where('id',Auth::user()->id)->first();
+        //$parent = User::where('id',Auth::user()->id)->first();
         $genders = Gender::where('is_active',1)->get();
-        $users = Customer::where('user_id',$parent->parent_id)
+        $customer_id = Order::where([['branch_id',Auth::user()->id],['shop_id',Auth::user()->parent_id]])->select('customer_id')->get();
+        $users = Customer::whereIn('id', $customer_id)
         ->when(request('customer'), function ($query) {
             $search = request('customer');
             $query->where(function ($q) use ($search) {
@@ -179,6 +181,23 @@ class customerController extends Controller
 
         return redirect()->back()->with('toast_success', 'Bulk customers uploaded successfully.');
 
+    }
+
+    public function download(Request $request)
+    {
+        //$parent = User::where('id',Auth::user()->id)->first();
+        $genders = Gender::where('is_active',1)->get();
+        $customer_id = Order::where([['branch_id',Auth::user()->id],['shop_id',Auth::user()->parent_id]])->select('customer_id')->get();
+        $users = Customer::whereIn('id', $customer_id)
+        ->when(request('customer'), function ($query) {
+            $search = request('customer');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        })->orderBy('id','desc')->get();
+
+        return Excel::download(new CustomerExport($users), 'Customers.xlsx');
     }
 
 

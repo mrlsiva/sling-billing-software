@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CategoriesExport;
 use App\Imports\CategoryImport;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Category;
@@ -168,5 +170,18 @@ class categoryController extends Controller
 
         return redirect()->back()->with('toast_success', 'Bulk categories uploaded successfully.');
 
+    }
+
+    public function download(Request $request)
+    {
+        $categories = Category::with('sub_categories')
+            ->where('user_id', Auth::user()->id)
+            ->when($request->name, function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->name . '%');
+            })
+            ->orderBy('id','desc')
+            ->get();
+
+        return Excel::download(new CategoriesExport($categories), 'Categories.xlsx');
     }
 }

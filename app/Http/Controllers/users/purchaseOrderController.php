@@ -345,7 +345,11 @@ class purchaseOrderController extends Controller
         }
     }
 
+    public function get_detail($company,$id)
+    {
+        $purchase = PurchaseOrder::with(['vendor', 'category', 'sub_category', 'product', 'metric']) // if relationships exist
+                    ->findOrFail($id);
 
-
-
+        return view('users.purchase_orders.detail', compact('purchase'));
+    }
 }

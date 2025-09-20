@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProductExport;
 use App\Imports\ProductImport;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
@@ -117,7 +118,9 @@ class productController extends Controller
 
         if ($tax)
         {
-            $taxAmount = $price * ((float) $tax->name / 100); 
+            $taxRate   = (float) $tax->name;
+            $taxAmount   = round($price / (1 + ($taxRate / 100)),2);
+            //$taxAmount = $price * ((float) $tax->name / 100); 
             $finalPrice = $price + $taxAmount; // if you want price including tax
         }
 
@@ -348,5 +351,23 @@ class productController extends Controller
 
         return redirect()->back()->with('toast_success', 'Bulk products uploaded successfully.');
 
+    }
+
+    public function download(Request $request)
+    {
+        $products = Product::with(['category', 'sub_category', 'metric', 'tax'])
+            ->where('user_id', Auth::user()->id)
+            ->when($request->product, function ($query) use ($request) {
+                $search = $request->product;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('code', 'like', "%{$search}%")
+                      ->orWhere('hsn_code', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return Excel::download(new ProductExport($products), 'Products.xlsx'); // ✅ pass $products
     }
 }

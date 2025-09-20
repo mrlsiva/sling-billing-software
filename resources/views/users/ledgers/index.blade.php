@@ -232,6 +232,9 @@
                                     </td>
 
                                     <td>
+                                        <a onclick="purchase_detail({{ $purchase_order->id }})" class="link-dark">
+                                            <i class="ri-eye-line align-middle fs-20" title="View Order"></i>
+                                        </a>
                                         @if($purchase_order->status != 1)
                                             <button type="button" class="btn btn-sm btn-soft-secondary me-1" data-bs-toggle="modal" data-bs-target="#purchaseEdit" data-id="{{ $purchase_order->id }}" data-old_amount="{{ $purchase_order->gross_cost }}">
                                                 <i class="bx bx-edit fs-16"></i>
@@ -411,6 +414,25 @@
     </div>
 </div>
 
+<div class="modal fade" id="purchaseDetail" tabindex="-1" aria-labelledby="purchaseDetail" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Purchase Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>  
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
 @endsection
 @section('script')
 <!-- jQuery -->
@@ -498,6 +520,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+</script>
+
+<script type="text/javascript">
+    function purchase_detail(id) {
+    $.ajax({
+        url: "../../purchase_orders/"+id + "/get_detail",   // match your route
+        type: "GET",
+        success: function (html) {
+            // insert the returned blade partial into modal body
+            $("#purchaseDetail .modal-body").html(html);
+
+            // open the modal
+            $("#purchaseDetail").modal("show");
+        },
+        error: function (xhr) {
+            alert("Failed to load details");
+            console.error(xhr.responseText);
+        }
+    });
+}
 </script>
 
 <!-- <script>

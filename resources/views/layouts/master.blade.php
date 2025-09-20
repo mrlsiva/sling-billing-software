@@ -370,7 +370,7 @@
                                 </span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{{route('my_profile', ['company' => request()->route('company')])}}">
                                     <i class="bx bx-user-circle fs-18 align-middle me-2"></i><span class="align-middle">My Account</span>
                                 </a>
                                 <a class="dropdown-item" href="#">

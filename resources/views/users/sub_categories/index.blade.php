@@ -52,6 +52,14 @@
 		        @endif
 
 				<div class="">
+
+					<div class="d-flex justify-content-end p-3">
+						<form method="get" action="{{route('sub_category.download', ['company' => request()->route('company')])}}">
+							<input type="hidden" class="form-control" name="name" value="{{ request('name') }}">
+							<button class="btn btn-success"> Download </button>
+						</form>
+					</div>
+
 					<div class="table-responsive">
 						<table class="table align-middle mb-0 table-hover table-centered">
 							<thead class="bg-light-subtle">

@@ -135,7 +135,15 @@ function calculateCosts() {
 
     // ✅ Calculation
     let netCost = quantity * price;
-    let grossCost = netCost + (netCost * tax / 100);
+    let grossCost = 0;
+    if(tax != 0)
+    {
+        grossCost = netCost + (netCost  / (1 + (tax / 100)));
+    }
+    else
+    {
+        grossCost = netCost;
+    }
 
     // Apply discount (absolute amount, not %)
     grossCost = grossCost - discount;
@@ -149,6 +157,27 @@ function calculateCosts() {
 ["quantity", "price_per_unit", "tax", "discount"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculateCosts);
 });
+
+
+
+function purchase_detail(id) {
+    $.ajax({
+        url: id + "/get_detail",   // match your route
+        type: "GET",
+        success: function (html) {
+            // insert the returned blade partial into modal body
+            $("#purchaseDetail .modal-body").html(html);
+
+            // open the modal
+            $("#purchaseDetail").modal("show");
+        },
+        error: function (xhr) {
+            alert("Failed to load details");
+            console.error(xhr.responseText);
+        }
+    });
+}
+
 
 
 

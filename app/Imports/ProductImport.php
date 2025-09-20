@@ -66,6 +66,15 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
 
         // Calculate tax amount
         $price = (float) $row['price'];
+
+        if ($tax) {
+            $taxRate   = (float) $tax->name; 
+            $taxAmount   = $price / (1 + ($taxRate / 100)); 
+        } else {
+            $taxAmount = 0;
+        }
+
+        $price = (float) $row['price'];
         $taxAmount = $tax ? ($price * ((float)$tax->name / 100)) : 0;
 
         $product = new Product([

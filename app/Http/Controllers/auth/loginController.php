@@ -78,7 +78,15 @@ class loginController extends Controller
         }
     }
 
-    public function logout(Request $request){
+    public function my_profile(Request $request)
+    {
+        $user = User::where('id',Auth::user()->id)->with(['user_detail', 'bank_detail'])->first();
+
+        return view('auth.my_profile',compact('user'));
+    }
+
+    public function logout(Request $request)
+    {
         
         if (Auth::check()) {
 

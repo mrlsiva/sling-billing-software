@@ -5,7 +5,9 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SubCategoryExport;
 use App\Imports\SubCategoryImport;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\SubCategory;
@@ -181,4 +183,24 @@ class subCategoryController extends Controller
         return redirect()->back()->with('toast_success', 'Bulk sub categories uploaded successfully.');
 
     }
+
+    public function download(Request $request)
+    {
+        $sub_categories = SubCategory::with('category')
+            ->where('user_id', Auth::user()->id)
+            ->when($request->name, function ($query) use ($request) {
+                $search = $request->name;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhereHas('category', function ($q2) use ($search) {
+                          $q2->where('name', 'like', "%{$search}%");
+                      });
+                });
+            })
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return Excel::download(new SubCategoryExport($sub_categories), 'Sub Categories.xlsx');
+    }
+
 }

@@ -56,6 +56,8 @@ else
 
             Route::group(['middleware' => ['auth']], function () {
 
+                Route::get('/my_profile',[loginController::class, 'my_profile'])->name('my_profile');
+                
                 Route::group(['middleware' => ['role:HO']], function () {
 
                     Route::get('/dashboard',[dashboardController::class, 'index'])->name('dashboard');
@@ -68,6 +70,7 @@ else
                             Route::get('/edit',[categoryController::class, 'edit'])->name('edit');
                             Route::post('/update',[categoryController::class, 'update'])->name('update');
                             Route::post('/status',[categoryController::class, 'status'])->name('status');
+                            Route::get('/download',[categoryController::class, 'download'])->name('download');
                             Route::post('/bulk_upload',[categoryController::class, 'bulk_upload'])->name('bulk_upload');
                             
                         });
@@ -81,6 +84,7 @@ else
                             Route::get('/edit',[subCategoryController::class, 'edit'])->name('edit');
                             Route::post('/update',[subCategoryController::class, 'update'])->name('update');
                             Route::post('/status',[subCategoryController::class, 'status'])->name('status');
+                            Route::get('/download',[subCategoryController::class, 'download'])->name('download');
                             Route::post('/bulk_upload',[subCategoryController::class, 'bulk_upload'])->name('bulk_upload');
                             
                         });
@@ -97,6 +101,7 @@ else
                             Route::post('/update',[productController::class, 'update'])->name('update');
                             Route::post('/status',[productController::class, 'status'])->name('status');
                             Route::get('/get_sub_category',[productController::class, 'get_sub_category'])->name('get_sub_category');
+                            Route::get('/download',[productController::class, 'download'])->name('download');
                             Route::post('/bulk_upload',[productController::class, 'bulk_upload'])->name('bulk_upload');
                             
                         });
@@ -134,6 +139,7 @@ else
                                     Route::get('/get_product_detail',[purchaseOrderController::class, 'get_product_detail'])->name('get_product_detail');
                                     Route::post('/store',[purchaseOrderController::class, 'store'])->name('store');
                                     Route::post('/update',[purchaseOrderController::class, 'update'])->name('update');
+                                    Route::get('/{id}/get_detail',[purchaseOrderController::class, 'get_detail'])->name('get_detail');
 
                                 });
                             });
@@ -158,6 +164,7 @@ else
 
                             Route::get('/{branch}/index',[posController::class, 'index'])->name('index');
                             Route::get('/{id}/get_bill',[posController::class, 'get_bill'])->name('get_bill');
+                            Route::get('/{id}/view_bill',[posController::class, 'view_bill'])->name('view_bill');
                         });
                     });
 
@@ -166,6 +173,7 @@ else
 
                             Route::get('/index',[userController::class, 'index'])->name('index');
                             Route::get('/{id}/order',[userController::class, 'order'])->name('order');
+                            Route::get('/download',[userController::class, 'download'])->name('download');
                         });
                     });
 
@@ -248,6 +256,7 @@ else
                                     Route::get('/{id}/edit',[customerController::class, 'edit'])->name('edit');
                                     Route::post('/update',[customerController::class, 'update'])->name('update');
                                     Route::get('/{id}/order',[customerController::class, 'order'])->name('order');
+                                    Route::get('/download',[customerController::class, 'download'])->name('download');
                                     Route::post('/bulk_upload',[customerController::class, 'bulk_upload'])->name('bulk_upload');
                                     
                                 });
@@ -273,6 +282,7 @@ else
                                     Route::post('/customer_store',[billingController::class, 'customer_store'])->name('customer_store');
                                     Route::post('/store',[billingController::class, 'store'])->name('store');
                                     Route::get('/{id}/get_bill',[billingController::class, 'get_bill'])->name('get_bill');
+                                    Route::get('/{id}/view_bill',[billingController::class, 'view_bill'])->name('view_bill');
                                 });
                             });
 

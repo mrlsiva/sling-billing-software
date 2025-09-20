@@ -71,6 +71,8 @@
 										</td>
 										<td>
 
+											<a href="{{ route('branch.billing.view_bill', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark" target="_blank"><i class="ri-eye-line align-middle fs-20" title="View Bill"></i></a>
+											
 											<a href="{{ route('branch.billing.get_bill', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
 
 											@if($order->is_refunded == 0)
