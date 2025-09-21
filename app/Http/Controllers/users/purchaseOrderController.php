@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Models\VendorPaymentDetail;
 use App\Models\PurchaseOrderDetail;
+use App\Models\PurchaseOrderRefund;
 use App\Models\PurchaseOrder;
 use App\Models\ShopPayment;
 use App\Models\Category;
@@ -170,6 +171,7 @@ class purchaseOrderController extends Controller
         DB::beginTransaction();
 
         try {
+
             $oldAmount = (float) $request->old_amount;
             $newAmount = (float) $request->new_amount;
 
@@ -201,9 +203,7 @@ class purchaseOrderController extends Controller
             );
 
             
-            $paymentsForThis = VendorPaymentDetail::where('purchase_order_id', $purchase->id)
-            ->orderBy('id', 'desc')
-            ->get();
+            $paymentsForThis = VendorPaymentDetail::where('purchase_order_id', $purchase->id)->orderBy('id', 'desc')->get();
 
             $alreadyPaid = (float) $paymentsForThis->sum('amount');
 
@@ -239,10 +239,7 @@ class purchaseOrderController extends Controller
                 }
 
                 
-                $nextOrders = PurchaseOrder::where('vendor_id', $purchase->vendor_id)
-                ->where('id', '>', $purchase->id)
-                ->orderBy('id')
-                ->get();
+                $nextOrders = PurchaseOrder::where('vendor_id', $purchase->vendor_id)->where('status', '!=', 1)->orderBy('id')->get();
 
                 
                 foreach ($nextOrders as $next) {
@@ -351,5 +348,54 @@ class purchaseOrderController extends Controller
                     ->findOrFail($id);
 
         return view('users.purchase_orders.detail', compact('purchase'));
+    }
+
+    public function refund(Request $request)
+    {
+        $purchase = PurchaseOrder::where('id',$request->purchase_id)->first();
+
+        $refund = PurchaseOrderRefund::create([
+            'purchase_order_id'  => $purchase->id,
+            'vendor_id'          => $request->vendor,
+            'old_amount'         => $request->purchase_amount,
+            'quantity'           => $request->refund_quantity,
+            'refunded_by'        =>  Auth::user()->id,
+            'refund_amount'      => $request->refund_amount,
+            'refund_on'          => Carbon::now(),
+            'reason'             => $request->comment,
+        ]);
+
+        $newQuantity = max(0, $purchase->quantity - $request->refund_quantity);
+        $newAmount   = max(0, $purchase->gross_cost - $request->refund_amount);
+
+        $purchase->update([
+            'quantity' => $newQuantity, 
+            'gross_cost' => $newAmount, 
+            'is_refunded' => 1
+        ]);
+
+        $purchase = PurchaseOrder::where('id',$request->purchase_id)->first();
+
+        // 🔑 Recalculate total paid for this order
+        $totalPaid = VendorPaymentDetail::where('purchase_order_id', $purchase->id)->sum('amount');
+
+        // 🔑 Update status
+        if($totalPaid == 0)
+        {
+            $purchase->update(['status' => 0]);
+        }
+        elseif ($totalPaid >= $purchase->gross_cost) 
+        {
+            $purchase->update(['status' => 1]); // fully paid
+        } 
+        elseif ($totalPaid < $order->gross_cost) 
+        {
+            $purchase->update(['status' => 2]); // partial paid
+        }
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Refund','App/Models/PurchaseOrderRefund','purchase_order_refunds',$refund->id,'Insert',null,$request,'Success','Purchase Order Refund');
+
+        return redirect()->back()->with('toast_success', 'Purchase refunded successfully!');
     }
 }

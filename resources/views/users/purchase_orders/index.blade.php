@@ -57,7 +57,7 @@
 										<td>{{$purchase_order->quantity}} ({{$purchase_order->metric->name}})</td>
 										<td>{{$purchase_order->gross_cost}}</td>
 										<td>
-										    <a onclick="purchase_detail({{ $purchase_order->id }})" class="link-dark">
+										    <a href="#!" onclick="purchase_detail({{ $purchase_order->id }})" class="link-dark">
 										        <i class="ri-eye-line align-middle fs-20" title="View Order"></i>
 										    </a>
 										</td>

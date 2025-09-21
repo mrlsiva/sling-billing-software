@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\VendorPaymentDetail;
 use App\Models\VendorPayment;
 use App\Models\PurchaseOrderDetail;
+use App\Models\PurchaseOrderRefund;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use App\Models\ShopPayment;
@@ -54,11 +55,13 @@ class ledgerController extends Controller
         $purchase_orders = $query->paginate(10);
 
         // ✅ Totals
+        $refund = PurchaseOrderRefund::whereIn('id', $purchaseOrderIds)->sum('refund_amount');
         $totalGross = PurchaseOrder::whereIn('id', $purchaseOrderIds)->sum('gross_cost');
-        $totalPaid  = $payments->sum('amount');
+        $totalPaid  = $payments->sum('amount') - $refund;
         $balance    = $totalGross - $totalPaid;
+        $refund = PurchaseOrderRefund::where('vendor_id', $id)->sum('refund_amount');
         $vendor_payments = VendorPayment::where('vendor_id',$id)->get();
-        $totalPaid  = $vendor_payments->sum('amount');
+        $totalPaid  = $vendor_payments->sum('amount') - $refund;
 
         return view('users.ledgers.index',compact('vendor','purchase_orders','payments','totalGross','totalPaid','balance','payment_methods'));
     }
@@ -84,9 +87,7 @@ class ledgerController extends Controller
         $comment = $request->comment;
 
         // get vendor purchase orders sorted by id
-        $purchaseOrders = PurchaseOrder::where('vendor_id', $request->vendor_id)
-            ->orderBy('id')
-            ->get();
+        $purchaseOrders = PurchaseOrder::where([['vendor_id', $request->vendor_id],['status','!=',1]])->orderBy('id')->get();
 
         foreach ($purchaseOrders as $order) {
             if ($amountToDistribute <= 0) break;
@@ -121,7 +122,7 @@ class ledgerController extends Controller
             if ($totalPaid >= $order->gross_cost) {
                 $order->update(['status' => 1]); // fully paid
             } elseif ($totalPaid > 0 && $totalPaid < $order->gross_cost) {
-                $order->update(['status' => 2]); // partial (changed to 3 per your rule)
+                $order->update(['status' => 2]); // partial paid
             }
         }
 

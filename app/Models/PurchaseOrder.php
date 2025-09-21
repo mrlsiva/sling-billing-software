@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PurchaseOrder extends Model
 {
     protected $fillable = [
-        'shop_id','vendor_id','payment_id','invoice_no','invoice_date','due_date','category_id','sub_category_id','product_id','imei','metric_id','quantity','price_per_unit','tax','discount','net_cost','gross_cost','status'
+        'shop_id','vendor_id','payment_id','invoice_no','invoice_date','due_date','category_id','sub_category_id','product_id','imei','metric_id','quantity','price_per_unit','tax','discount','net_cost','gross_cost','status','is_refunded'
     ];
 
     public function vendor()

@@ -193,9 +193,10 @@
                                     </td>
                                     <td>Rs. {{number_format($purchase_order->gross_cost,2)}}</td>
                                     @php
-                                        $payment_details = App\Models\VendorPaymentDetail::where('purchase_order_id', $purchase_order->id)->get();
+                                        $payment_details = App\Models\VendorPaymentDetail::where('purchase_order_id', $purchase_order->id)->sum('amount');
+                                        $refunds = App\Models\PurchaseOrderRefund::where('purchase_order_id', $purchase_order->id)->sum('refund_amount');
                                     @endphp
-                                    <td>Rs. {{number_format($payment_details->sum('amount'),2)}}</td>
+                                    <td>Rs. {{number_format($payment_details - $refunds,2)}}</td>
                                     <td>
                                         @if($purchase_order->discount != null)
                                             Rs. {{number_format($purchase_order->discount,2)}}
@@ -232,17 +233,25 @@
                                     </td>
 
                                     <td>
-                                        <a onclick="purchase_detail({{ $purchase_order->id }})" class="link-dark">
+                                        <a href="#!" onclick="purchase_detail({{ $purchase_order->id }})" class="link-dark">
                                             <i class="ri-eye-line align-middle fs-20" title="View Order"></i>
                                         </a>
                                         @if($purchase_order->status != 1)
-                                            <button type="button" class="btn btn-sm btn-soft-secondary me-1" data-bs-toggle="modal" data-bs-target="#purchaseEdit" data-id="{{ $purchase_order->id }}" data-old_amount="{{ $purchase_order->gross_cost }}">
-                                                <i class="bx bx-edit fs-16"></i>
-                                            </button>
+                                            <a href="#!" class="link-dark" data-bs-toggle="modal" data-bs-target="#purchaseEdit" data-id="{{ $purchase_order->id }}" data-old_amount="{{ $purchase_order->gross_cost }}">
+                                                <i class="ri-edit-line align-middle fs-20" title="Edit"></i>
+                                            </a>
                                         @else
-                                            -
+                                            
                                         @endif
 
+                                        @if($purchase_order->is_refunded == 0)
+                                            <a href="#!" class="link-dark" data-bs-toggle="modal" data-bs-target="#purchaseRefund" data-id="{{ $purchase_order->id }}" data-gross_amount="{{ $purchase_order->gross_cost }}" data-quantity="{{ $purchase_order->quantity }}">
+                                                <i class="ri-p2p-fill align-middle fs-20" title="Refund"></i>
+                                            </a>
+                                        @else
+                                            
+                                        @endif
+                                        
                                     </td>
                                 </tr>
 
@@ -433,6 +442,59 @@
         </div>
     </div>
 
+<div class="modal fade" id="purchaseRefund" tabindex="-1" aria-labelledby="purchaseRefund" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Refund Purchase Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form class="row" action="{{route('vendor.purchase_order.refund', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+
+                    <input type="hidden" name="purchase_id" id="purchase_id">
+                    <input type="hidden" name="vendor" id="vendor" value="{{$vendor->id}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Purchase Amount</label>
+                                <input type="text" id="purchase_amount" name="purchase_amount" class="form-control" required="" readonly="">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Refund Amount</label>
+                                <input type="number" id="refund_amount" name="refund_amount" class="form-control" required="" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Refund Quantity</label>
+                                <input type="number" id="refund_quantity" name="refund_quantity" class="form-control" required="" >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Reason</label>
+                                <input type="text" id="comment" name="comment" class="form-control" placeholder="Enter Reason">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 @section('script')
 <!-- jQuery -->
@@ -541,6 +603,62 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 }
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var purchaseRefundModal = document.getElementById('purchaseRefund');
+
+    purchaseRefundModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+
+        // Get data from button
+        var id = button.getAttribute('data-id');
+        var purchaseAmount = parseFloat(button.getAttribute('data-gross_amount')) || 0;
+        var quantity = parseInt(button.getAttribute('data-quantity')) || 0;
+
+        // Set values into modal inputs
+        purchaseRefundModal.querySelector('#purchase_id').value = id;
+        purchaseRefundModal.querySelector('#purchase_amount').value = purchaseAmount;
+
+        let refundAmountInput   = purchaseRefundModal.querySelector('#refund_amount');
+        let refundQuantityInput = purchaseRefundModal.querySelector('#refund_quantity');
+
+        // Reset values
+        refundAmountInput.value = '';
+        refundQuantityInput.value = '';
+
+        // Apply min/max attributes
+        refundAmountInput.setAttribute('min', 1);
+        refundAmountInput.setAttribute('max', purchaseAmount);
+
+        refundQuantityInput.setAttribute('min', 1);
+        refundQuantityInput.setAttribute('max', quantity);
+
+        // Live validation for refund amount
+        refundAmountInput.addEventListener('input', function () {
+            let val = parseFloat(this.value);
+
+            if (isNaN(val) || val < 1) {
+                this.value = 1;
+            } else if (val > purchaseAmount) {
+                this.value = purchaseAmount;
+            }
+        });
+
+        // Live validation for refund quantity
+        refundQuantityInput.addEventListener('input', function () {
+            let val = parseInt(this.value);
+
+            if (isNaN(val) || val < 1) {
+                this.value = 1;
+            } else if (val > quantity) {
+                this.value = quantity;
+            }
+        });
+    });
+});
+</script>
+
 
 <!-- <script>
 document.addEventListener('DOMContentLoaded', function () {
