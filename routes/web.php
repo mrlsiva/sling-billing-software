@@ -151,11 +151,24 @@ else
                     Route::prefix('inventories')->group(function () {
                         Route::name('inventory.')->group(function () {
 
-                            Route::get('/{shop}/{branch}/transfer',[inventoryController::class, 'transfer'])->name('transfer');
-                            Route::get('/get_sub_category',[inventoryController::class, 'get_sub_category'])->name('get_sub_category');
-                            Route::get('/get_product',[inventoryController::class, 'get_product'])->name('get_product');
-                            Route::get('/get_product_detail',[inventoryController::class, 'get_product_detail'])->name('get_product_detail');
-                            Route::post('/transfer',[inventoryController::class, 'transfered'])->name('transfered');
+                            Route::prefix('stocks')->group(function () {
+                                Route::name('stock')->group(function () {
+
+                                    Route::get('/{shop}/{branch}',[inventoryController::class, 'stock']);
+                                });
+                            });
+
+                            Route::prefix('transfer')->group(function () {
+                                Route::name('transfer')->group(function () {
+
+                                    Route::get('/',[inventoryController::class, 'transfer']);
+                                    Route::get('/get_sub_category',[inventoryController::class, 'get_sub_category'])->name('.get_sub_category');
+                                    Route::get('/get_product',[inventoryController::class, 'get_product'])->name('get_product');
+                                    Route::get('/get_product_detail',[inventoryController::class, 'get_product_detail'])->name('.get_product_detail');
+                                    Route::post('/store',[inventoryController::class, 'store'])->name('.store');
+
+                                });
+                            });
                             
                         });
                     });

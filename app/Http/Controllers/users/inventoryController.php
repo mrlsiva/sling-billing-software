@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\ProductHistory;
 use App\Models\SubCategory;
 use App\Models\Category;
 use App\Models\Product;
@@ -17,7 +18,7 @@ class inventoryController extends Controller
 {
     use Log;
 
-    public function transfer(Request $request,$company,$shop,$branch)
+    public function stock(Request $request,$company,$shop,$branch)
     {
 
         if ($branch != 0) {
@@ -66,7 +67,25 @@ class inventoryController extends Controller
         $branches = User::where([['parent_id',Auth::user()->id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
         $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
 
-        return view('users.inventories.transfer',compact('stocks','branches','categories'));
+        return view('users.inventories.stock',compact('stocks','branches','categories'));
+    }
+
+    public function transfer(Request $request)
+    {
+        $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
+        $branches = User::where([['parent_id',Auth::user()->id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
+
+        $transfers = ProductHistory::where('shop_id', Auth::user()->id)
+        ->when(request('product'), function ($query, $product) {
+            $query->whereHas('product', function ($q) use ($product) {
+                $q->where('name', 'like', "%{$product}%");
+            });
+        })
+        ->when(request('branch'), function ($query, $branch) {
+            $query->where('branch_id', $branch);
+        })->orderBy('branch_id', 'asc')->orderBy('transfer_on', 'desc')->paginate(10);
+
+        return view('users.inventories.transfer',compact('categories','transfers','branches'));
     }
 
     public function get_sub_category(Request $request)
@@ -85,7 +104,7 @@ class inventoryController extends Controller
         return $product = Product::with('metric')->where('id',$request->product)->first();
     }
 
-    public function transfered(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'category'      => 'required',
@@ -164,6 +183,20 @@ class inventoryController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Quantity Updated','App/Models/Poduct','products',$product->id,'Update',null,$request,'Success','Quantity Updated for this product');
+
+        $transfer = ProductHistory::create([
+            'shop_id'        => Auth::user()->id,
+            'branch_id'      => $request->branch,
+            'category_id'    => $request->category,
+            'sub_category_id'=> $request->sub_category,
+            'product_id'     => $request->product,
+            'quantity'       => $request->quantity,
+            'transfer_on'    => now(),
+            'transfer_by'    => Auth::user()->id,
+        ]);
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Product Transfer','App/Models/ProductHistory','product_histories',$transfer->id,'Create',null,$request,'Success','Product Transfered Successfully');
 
         DB::commit();
 

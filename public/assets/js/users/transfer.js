@@ -5,7 +5,7 @@ jQuery(document).ready(function ()
 		if(category)
 		{
 			jQuery.ajax({
-				url : '../../get_sub_category',
+				url : 'transfer/get_sub_category',
 				type: 'GET',
 				dataType: 'json',
 				data: { id: category },
@@ -34,7 +34,7 @@ jQuery(document).ready(function ()
 		if(sub_category)
 		{
 			jQuery.ajax({
-				url : '../../get_product',
+				url : 'transfer/get_product',
 				type: 'GET',
 				dataType: 'json',
 				data: { sub_category: sub_category, category: category },
@@ -62,7 +62,7 @@ jQuery(document).ready(function ()
 		if(product)
 		{
 			jQuery.ajax({
-				url : '../../get_product_detail',
+				url : 'transfer/get_product_detail',
 				type: 'GET',
 				dataType: 'json',
 				data: { product: product},

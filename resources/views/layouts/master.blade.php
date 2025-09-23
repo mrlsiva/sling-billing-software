@@ -148,9 +148,14 @@
                             </a>
                             <div class="collapse {{ request()->is(Auth::user()->slug_name . '/inventories/*') ? 'show' : '' }}" id="sidebarProduct">
                                 <ul class="sub-menu-nav">
+
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/*') ? 'active' : '' }}" href="{{route('inventory.transfer', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}">Product Transfer</a>
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/stock/*') ? 'active' : '' }}" href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}">Stock</a>
                                     </li>
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/transfer/*') ? 'active' : '' }}" href="{{route('inventory.transfer', ['company' => request()->route('company')])}}">Product Transfer</a>
+                                    </li>
+
                                 </ul>
                             </div>
                         </li>
@@ -370,9 +375,15 @@
                                 </span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="{{route('my_profile', ['company' => request()->route('company')])}}">
-                                    <i class="bx bx-user-circle fs-18 align-middle me-2"></i><span class="align-middle">My Account</span>
-                                </a>
+                                @if(request()->segment(1) === 'admin')
+                                    <a class="dropdown-item" href="">
+                                        <i class="bx bx-user-circle fs-18 align-middle me-2"></i><span class="align-middle">My Account</span>
+                                    </a>
+                                @else
+                                    <a class="dropdown-item" href="{{route('my_profile', ['company' => request()->route('company')])}}">
+                                        <i class="bx bx-user-circle fs-18 align-middle me-2"></i><span class="align-middle">My Account</span>
+                                    </a>
+                                @endif
                                 <a class="dropdown-item" href="#">
                                     <i class="bx bx-help-circle fs-18 align-middle me-2"></i><span class="align-middle">Help</span>
                                 </a>
