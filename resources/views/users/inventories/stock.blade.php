@@ -35,13 +35,13 @@
 
                 </ul>
 
-                <form method="get" action="{{route('inventory.transfer', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}">
+                <form method="get" action="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}">
                     <div class="row mb-2 p-3">
                         <div class="col-md-11">
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
-                                <input type="text" class="form-control" placeholder="Product/ Categoy/ Sub Category Name" name="product" value="{{ request('product') }}">
-                                <span class="input-group-text"><a href="{{route('inventory.transfer', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
+                                <input type="text" class="form-control" placeholder="Product/ Categoy/ Sub Category Name" name="product" value="{{ request('product') }}" id="searchInput">
+                                <span class="input-group-text" id="clearFilter" style="display: {{ request('product') ? 'inline-flex' : 'none' }}"><a href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
 
@@ -100,5 +100,30 @@
         </div>
     </div>
 </div>
+
+@endsection
+
+@section('script')
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchInput = document.getElementById("searchInput");
+        let clearFilter = document.getElementById("clearFilter");
+
+        function toggleClear() {
+            if (searchInput.value.trim() !== "") {
+                clearFilter.style.display = "inline-flex";
+            } else {
+                clearFilter.style.display = "none";
+            }
+        }
+
+        // Run on load (for prefilled request values)
+        toggleClear();
+
+        // Run on typing
+        searchInput.addEventListener("input", toggleClear);
+    });
+</script>
 
 @endsection

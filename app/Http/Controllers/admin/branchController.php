@@ -37,7 +37,7 @@ class branchController extends Controller
         $ownerId = $request->parent_id ?? null;
 
         $request->validate([
-            'logo' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
@@ -235,7 +235,7 @@ class branchController extends Controller
         $parent = User::where('id',$request->parent_id)->first();
 
         $request->validate([
-            'logo' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {

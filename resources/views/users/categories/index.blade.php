@@ -34,8 +34,8 @@
 				    	<div class="col-md-11">
 				    		<div class="input-group">
 				    			<span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
-				    			<input type="text" class="form-control" placeholder="Name" name="name" value="{{ request('name') }}">
-				    			<span class="input-group-text"><a href="{{route('category.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
+				    			<input type="text" class="form-control" placeholder="Name" name="name" value="{{ request('name') }}" id="searchInput">
+				    			<span class="input-group-text" id="clearFilter" style="display: {{ request('name') ? 'inline-flex' : 'none' }}"><a href="{{route('category.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
 				    		</div>
 				    	</div>
 

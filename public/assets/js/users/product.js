@@ -61,41 +61,45 @@ $(document).ready(function () {
         return this.optional(element) || (element.files[0].size <= param);
     }, "File must be less than 2MB.");
 
+    // Custom validator: no only spaces
+    jQuery.validator.addMethod("noSpace", function(value, element) {
+        return $.trim(value).length > 0;
+    }, "This field cannot be empty");
+
+    // On form submit or input, trim fields automatically
+    $("#productCreate input[type='text']").on("blur", function () {
+        $(this).val($.trim($(this).val()));
+    });
+
     $("#productCreate").validate({
         rules: {
             image: {
                 extension: "jpg|jpeg|png|gif",
                 filesize: 2048 * 1024 // 2MB
             },
-            category: {
-                required: true
-            },
-            sub_category: {
-                required: true
-            },
+            category: { required: true },
+            sub_category: { required: true },
             name: {
                 required: true,
-                maxlength: 50
-                // ❗ uniqueness can't be done on frontend, only backend
+                maxlength: 50,
+                noSpace: true   // ✅ ensure trimmed & not empty
             },
             code: {
                 required: true,
-                maxlength: 50
+                maxlength: 50,
+                noSpace: true   // ✅ ensure trimmed & not empty
             },
             hsn_code: {
-                maxlength: 50
+                maxlength: 50,
+                noSpace: true   // ✅ trimmed check
             },
             price: {
                 required: true,
                 number: true,
                 min: 1
             },
-            tax: {
-                required: true
-            },
-            metric: {
-                required: true
-            },
+            tax: { required: true },
+            metric: { required: true },
             discount_type: {
                 required: function () {
                     return $("#discount").val() !== "";
@@ -114,49 +118,19 @@ $(document).ready(function () {
             }
         },
         messages: {
-            image: {
-                extension: "Only jpg, jpeg, png, gif allowed",
-                filesize: "File must be less than 2MB"
-            },
-            category: {
-                required: "Category is required."
-            },
-            sub_category: {
-                required: "Sub Category is required."
-            },
             name: {
                 required: "Product name is required.",
-                maxlength: "Max 50 characters allowed."
+                maxlength: "Max 50 characters allowed.",
+                noSpace: "Product name cannot be empty or spaces only."
             },
             code: {
                 required: "Product code is required.",
-                maxlength: "Max 50 characters allowed."
+                maxlength: "Max 50 characters allowed.",
+                noSpace: "Product code cannot be empty or spaces only."
             },
             hsn_code: {
-                maxlength: "Max 50 characters allowed."
-            },
-            price: {
-                required: "Selling price is required.",
-                number: "Enter a valid number.",
-                min: "Price must be at least 1."
-            },
-            tax: {
-                required: "Tax is required."
-            },
-            metric: {
-                required: "Metric is required."
-            },
-            discount_type: {
-                required: "Select discount type if discount is entered."
-            },
-            discount: {
-                required: "Enter discount if discount type is selected.",
-                number: "Enter a valid number.",
-                min: "Discount cannot be negative."
-            },
-            quantity: {
-                number: "Enter a valid number.",
-                min: "Quantity cannot be negative."
+                maxlength: "Max 50 characters allowed.",
+                noSpace: "HSN code cannot be empty or spaces only."
             }
         },
         errorElement: "span",
@@ -175,6 +149,7 @@ $(document).ready(function () {
             $(element).removeClass("is-invalid");
         }
     });
+
 
 });
 
@@ -276,5 +251,24 @@ $(document).ready(function () {
         }
         return element.files[0].size <= param;
     });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    let searchInput = document.getElementById("searchInput");
+    let clearFilter = document.getElementById("clearFilter");
+
+    function toggleClear() {
+        if (searchInput.value.trim() !== "") {
+            clearFilter.style.display = "inline-flex";
+        } else {
+            clearFilter.style.display = "none";
+        }
+    }
+
+    // Run on load (for prefilled request values)
+    toggleClear();
+
+    // Run on typing
+    searchInput.addEventListener("input", toggleClear);
 });
 

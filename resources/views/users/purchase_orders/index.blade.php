@@ -20,8 +20,8 @@
 				    	<div class="col-md-11">
 				    		<div class="input-group">
 				    			<span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
-				    			<input type="text" class="form-control" placeholder="Vendor Name" name="vendor" value="{{ request('vendor') }}">
-				    			<span class="input-group-text"><a href="{{route('vendor.purchase_order.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
+				    			<input type="text" class="form-control" placeholder="Vendor Name" name="vendor" value="{{ request('vendor') }}" id="searchInput">
+				    			<span class="input-group-text" id="clearFilter" style="display: {{ request('vendor') ? 'inline-flex' : 'none' }}"><a href="{{route('vendor.purchase_order.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
 				    		</div>
 				    	</div>
 
@@ -100,4 +100,24 @@
 
 @section('script')
 <script src="{{asset('assets/js/users/purchase.js')}}"></script>
+<script type="text/javascript">
+	document.addEventListener("DOMContentLoaded", function () {
+    let searchInput = document.getElementById("searchInput");
+    let clearFilter = document.getElementById("clearFilter");
+
+    function toggleClear() {
+        if (searchInput.value.trim() !== "") {
+            clearFilter.style.display = "inline-flex";
+        } else {
+            clearFilter.style.display = "none";
+        }
+    }
+
+    // Run on load (for prefilled request values)
+    toggleClear();
+
+    // Run on typing
+    searchInput.addEventListener("input", toggleClear);
+});
+</script>
 @endsection

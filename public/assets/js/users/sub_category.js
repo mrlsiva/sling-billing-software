@@ -22,3 +22,22 @@ function sub_category_edit(element) {
         }
     });
 } 
+
+document.addEventListener("DOMContentLoaded", function () {
+    let searchInput = document.getElementById("searchInput");
+    let clearFilter = document.getElementById("clearFilter");
+
+    function toggleClear() {
+        if (searchInput.value.trim() !== "") {
+            clearFilter.style.display = "inline-flex";
+        } else {
+            clearFilter.style.display = "none";
+        }
+    }
+
+    // Run on load (for prefilled request values)
+    toggleClear();
+
+    // Run on typing
+    searchInput.addEventListener("input", toggleClear);
+});

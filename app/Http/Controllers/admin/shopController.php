@@ -43,7 +43,7 @@ class shopController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'logo' => 'required|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'logo' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => 'nullable|email|unique:users',
             'phone' => 'required|digits:10|different:phone1|unique:users',
@@ -192,7 +192,7 @@ class shopController extends Controller
         $ownerId = $request->id;
 
         $request->validate([
-            'logo' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
