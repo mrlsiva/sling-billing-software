@@ -376,7 +376,7 @@
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 @if(request()->segment(1) === 'admin')
-                                    <a class="dropdown-item" href="">
+                                    <a class="dropdown-item" href="{{route('admin.my_profile')}}">
                                         <i class="bx bx-user-circle fs-18 align-middle me-2"></i><span class="align-middle">My Account</span>
                                     </a>
                                 @else

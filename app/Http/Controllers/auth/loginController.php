@@ -80,9 +80,19 @@ class loginController extends Controller
 
     public function my_profile(Request $request)
     {
-        $user = User::where('id',Auth::user()->id)->with(['user_detail', 'bank_detail'])->first();
+        if(auth()->user()->role_id == 1)
+        {
+            $user = User::where('id',Auth::user()->id)->first();
 
-        return view('auth.my_profile',compact('user'));
+            return view('auth.admin_profile',compact('user'));
+        }
+        else
+        {
+            $user = User::where('id',Auth::user()->id)->with(['user_detail', 'bank_detail'])->first();
+
+            return view('auth.my_profile',compact('user'));
+        }
+        
     }
 
     public function logout(Request $request)

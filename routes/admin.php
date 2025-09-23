@@ -17,6 +17,8 @@ Route::group(['middleware' => ['auth','role:Super Admin']], function () {
 
 	Route::get('/dashboard',[adminController::class, 'dashboard'])->name('dashboard');
 
+	Route::get('/my_profile',[loginController::class, 'my_profile'])->name('my_profile');
+
 	Route::prefix('shops')->group(function () {
 	    Route::name('shop.')->group(function () {
 
