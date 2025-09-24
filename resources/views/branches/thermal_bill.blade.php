@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: monospace;
-            width: 80mm;
+            width: calc(100% - 10mm);
             /* Typical thermal printer width */
             padding: 5mm;
             margin: 0;
