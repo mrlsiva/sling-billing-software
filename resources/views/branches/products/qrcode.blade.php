@@ -103,8 +103,8 @@
 							{!! QrCode::size(100)->generate($product->id) !!}
 						</div>
 						<div class="qr-right">
-							<p class="name">{{ $product->name }}</p>
-							<p class="price">Rs. {{ number_format($product->price, 2) }}</p>
+							<div class="name">{{ $product->name }}</div>
+							<div class="price">Rs. {{ number_format($product->price, 2) }}</div>
 						</div>
 					</div>
 				</div>
