@@ -77,16 +77,27 @@
 		}
 
 		@media print {
+			@page {
+				size: 435px 85mm; /* width matches .qr-container, height = 1 row */
+				margin: 0;
+			}
+
 			body {
 				background: #fff !important;
+				margin: 0;
+				padding: 0;
 			}
+
 			.qr-container {
-				gap: 10px;
+				gap: 0;
+				width: 435px;
 			}
+
 			.qr-item {
 				page-break-inside: avoid;
 			}
 		}
+
 	</style>
 </head>
 
