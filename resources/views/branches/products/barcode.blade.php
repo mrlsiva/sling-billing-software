@@ -75,28 +75,29 @@
 			font-weight: bold;
 			margin-top: 5px;
 		}
-
 		@media print {
 			@page {
-				size: 435px 85mm; /* width matches .qr-container, height = 1 row */
+				size: landscape; /* force landscape */
 				margin: 0;
 			}
 
 			body {
-				background: #fff !important;
 				margin: 0;
 				padding: 0;
+				background: #fff !important;
 			}
 
 			.qr-container {
-				gap: 0;
-				width: 435px;
+				width: 435px; /* 3 labels per row */
+				display: flex;
+				flex-wrap: wrap;
 			}
 
 			.qr-item {
 				page-break-inside: avoid;
 			}
 		}
+
 
 	</style>
 </head>
