@@ -8,42 +8,73 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<style>
 		.qr-container {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 20px;
-			page-break-inside: avoid;
+			    background: gray;
+    display: flex ;
+    flex-wrap: wrap;
+    width: 435px;
 		}
 
 		.qr-item {
-			width: 260px;
-			border: 1px solid #ccc;
-			padding: 10px;
-			text-align: center;
-			page-break-inside: avoid;
-			background: #fff;
+			margin: 1px;
+    width: 132.28346457px;
+    height: 83.149606299px;
+    overflow: hidden;
+    background-color: #f6f6f6;
 		}
-
+		.qr-item p{
+			    width: calc(100% - 10px);
+    font-size: 10px;
+    padding: 5px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+		}
+		
+		.shop-title {
+			    width: calc(100% - 10px);
+    font-size: 10px;
+    padding: 5px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+		}
 		.qr-body {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-top: 10px;
-			text-align: left;
+			    width: 100%;
+    padding: 2px;
 		}
-
 		.qr-left {
-			flex: 0 0 120px;
-			text-align: center;
+			    width: 42px;
+    margin-right: 2px;
+    float: left;
+    text-align: center;
+		}
+		.qr-left img {
+			       width: 42px;
+    height: 42px;
 		}
 
 		.qr-right {
-			flex: 1;
-			padding-left: 10px;
+			    width: calc(100% - 49px);
+    display: inline-block;
+    padding-left: 5px;
 		}
 
-		.qr-right p {
-			margin: 2px 0;
-			font-size: 14px;
+		.qr-right p.name {
+			    width: 100%;
+    height: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 12px;
+		}
+		.qr-right p.price {
+			    font-size: 14px;
+    width: 100%;
+    font-weight: bold;
+    margin-top: 5px;
 		}
 
 		@media print {
@@ -66,8 +97,8 @@
 		<div class="qr-container">
 			@for ($i = 0; $i < 3; $i++) {{-- Generate 3 labels --}}
 				<div class="qr-item">
-					<p><strong>{{ Auth::user()->name }}</strong></p>
-					<p>{{ $product->code }}</p>
+					<div class="shop-title"> {{ Auth::user()->name }} </div>
+					<div class="shop-title">{{ $product->code }}</div>
 
 					<div class="qr-body">
 						<div class="qr-left">
@@ -76,8 +107,8 @@
     						<!-- <small>{{ $product->code }}</small> -->
 						</div>
 						<div class="qr-right">
-							<p>{{ $product->name }}</p>
-							<p>Rs. {{ number_format($product->price, 2) }}</p>
+							<p class="name">{{ $product->name }}</p>
+							<p class="price">Rs. {{ number_format($product->price, 2) }}</p>
 						</div>
 					</div>
 				</div>
