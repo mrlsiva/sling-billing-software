@@ -60,7 +60,7 @@
 			padding-left: 5px;
 		}
 
-		.qr-right p.name {
+		.qr-right .name {
 			width: 100%;
 			height: 24px;
 			min-height: 24px;
@@ -69,7 +69,7 @@
 			font-size: 10px;
 			line-height: 12px;
 		}
-		.qr-right p.price {
+		.qr-right .price {
 			font-size: 14px;
 			width: 100%;
 			font-weight: bold;
