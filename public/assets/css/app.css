@@ -21632,7 +21632,6 @@ p.no-span::after {
     }
 }
 @media (max-width: 575.98px) {
-
     .timeline .timeline-time .time-show {
         -webkit-box-pack: center;
         -ms-flex-pack: center;
@@ -21655,8 +21654,8 @@ p.no-span::after {
     .hide-mobile {
         display: none !important;
     }
- }
- /* .form-check-input:checked + .form-check-label::after {
+}
+/* .form-check-input:checked + .form-check-label::after {
         content: ' Enabled';
         color: green;
     }
@@ -21664,3 +21663,10 @@ p.no-span::after {
         content: ' Disabled';
         color: red;
     } */
+
+.billing-table-pos tbody tr td {
+    padding: 8px 12px;
+}
+.billing-table-pos tbody tr td p {
+    font-size: 12px;
+}

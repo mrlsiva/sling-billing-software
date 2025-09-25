@@ -76,23 +76,12 @@
 			margin-top: 5px;
 		}
 		@media print {
-			@page {
-				size: landscape; /* force landscape */
-				margin: 0;
-			}
-
 			body {
-				margin: 0;
-				padding: 0;
 				background: #fff !important;
 			}
-
 			.qr-container {
-				width: 435px; /* 3 labels per row */
-				display: flex;
-				flex-wrap: wrap;
+				gap: 10px;
 			}
-
 			.qr-item {
 				page-break-inside: avoid;
 			}

@@ -189,7 +189,13 @@
 
 				<div class="tab-pane show active" id="homeTabsJustified">
 					<div id="order_detail" class="secret">
+						<div class="d-flex justify-content-between align-items-center mb-3">
 						<h5 class="fw-semibold my-3">Order Summery</h5>
+						<button type="button" class="btn btn-sm fw-semibold d-flex align-items-center gap-2">
+							<i class="ri-focus-3-line"></i> Focus
+						</button>
+						
+					</div>
 						<div class="" data-simplebar
 							style="max-height: calc(100vh - 466px); min-height: calc(100vh - 466px);">
 							<div id="cart_item">
@@ -197,7 +203,7 @@
 							</div>
 						</div>
 						<div class="table-responsive">
-							<table class="table table-bordered bg-light-subtle">
+							<table class="table table-bordered bg-light-subtle billing-table-pos">
 								<tbody>
 									<tr>
 										<td>
@@ -238,10 +244,13 @@
 					</div>
 					<div id="empty_order_detail" class="">
 						<div class="row">
-							<div class="col-md-12 text-center d-flex justify-content-center align-items-center gap-2"
+							<div class="col-md-12 text-center d-flex flex-column justify-content-center align-items-center gap-3"
 								style="height: calc(100vh - 160px);">
-								<i class="ri-shopping-cart-line"></i>
+								<h2 class="mb-0"><i class="ri-shopping-cart-line"></i></h2>
 								<p class="mb-0">Cart is Empty</p>
+								<button type="button" class="btn btn-outline-primary btn-sm fw-semibold d-flex align-items-center gap-2" id="focus_cart">
+									<i class="ri-focus-3-line"></i> Focus
+								</button>
 							</div>
 						</div>
 					</div>
@@ -273,7 +282,7 @@
 					</div>
 
 					<div class="row"
-						style="max-height: calc(100vh - 356px); height: calc(100vh - 356px);min-height: calc(100vh - 356px); overflow-y: auto;">
+						style="max-height: calc(100vh - 336px); height: calc(100vh - 336px);min-height: calc(100vh - 336px); overflow-y: auto;">
 
 						<div class="col-md-12">
 							<div class="mb-3">
