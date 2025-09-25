@@ -20,6 +20,7 @@
             }
 			body {
 				background: #fff !important;
+				height: 83.149606299px;
 			}
 			.qr-container {
 				gap: 10px;
