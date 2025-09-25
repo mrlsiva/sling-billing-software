@@ -19,8 +19,8 @@ class paymentController extends Controller
     {
        $payments = Payment::where('is_active',1)->get();
        $shop_payments = ShopPayment::where('shop_id',Auth::user()->id)->get();
-       $shop_payment_ids = ShopPayment::where('shop_id', Auth::id())->pluck('payment_id')->toArray();
-       return view('users.settings.payment',compact('payments','shop_payments','shop_payment_ids'));
+       //$shop_payment_ids = ShopPayment::where('shop_id', Auth::id())->pluck('payment_id')->toArray();
+       return view('users.settings.payment',compact('payments','shop_payments'));
     }
 
     public function store(Request $request)
@@ -48,5 +48,24 @@ class paymentController extends Controller
 
         return redirect()->back()->with('toast_success', "Payment method added successfully");
 
+    }
+
+    public function update(Request $request)
+    {
+        $shop_payment = ShopPayment::find($request->id);
+
+        if ($shop_payment) {
+            $shop_payment->is_active = $shop_payment->is_active == 1 ? 0 : 1;
+            $shop_payment->save();
+        }
+
+        $shop_payment = ShopPayment::find($request->id);
+
+        $statusText = $shop_payment->is_active == 1 ? 'Payment method changed to active state' : 'Payment method changed to in-active state';
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Payment method Update','App/Models/Product','products',$request->id,'Update',null,null,'Success',$statusText);
+
+        return redirect()->back()->with('toast_success', $statusText);
     }
 }

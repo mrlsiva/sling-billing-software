@@ -42,7 +42,7 @@ class purchaseOrderController extends Controller
     public function create(Request $request)
     {
         $vendors = Vendor::where('shop_id', Auth::user()->id)->get();
-        $shop_payment_ids = ShopPayment::where('shop_id', Auth::user()->parent_id)->pluck('payment_id')->toArray();
+        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->parent_id],['is_active', 1]])->pluck('payment_id')->toArray();
         $payments = Payment::whereIn('id',$shop_payment_ids)->get();
         $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
         $taxes = Tax::where([['shop_id',Auth::user()->id],['is_active',1]])->get();

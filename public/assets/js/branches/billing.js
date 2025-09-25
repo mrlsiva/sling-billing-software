@@ -982,8 +982,16 @@ function submit() {
         },
         success: function (data) {
             console.log("Order stored:", data);
-            window.open(data.order_id + '/get_bill', '_blank');
-            location.reload();
+
+            if(data.status == 'success')
+            {
+                window.open(data.order_id + '/get_bill', '_blank');
+                location.reload();
+            }
+            else
+            {
+                alert(data.message);
+            }
 
             //alert('Order Saved');
             // example: redirect to success page

@@ -148,7 +148,7 @@
                     <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add New Vendor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form class="row" action="{{route('vendor.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                <form class="row" action="{{route('vendor.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data" id="addVendor">
                 	@csrf
 	                <div class="modal-body">
 
@@ -229,7 +229,7 @@
                     <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Edit Vendor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form class="row" action="{{route('vendor.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                <form class="row" action="{{route('vendor.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data" id="editVendor">
                 	@csrf
 	                <div class="modal-body">
 
@@ -244,7 +244,7 @@
 		                    <div class="col-md-6">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Phone</label>
-		                            <input type="number" id="vendor_phone" name="vendor_phone" class="form-control" required="" placeholder="Enter Phone">
+		                            <input type="text" id="vendor_phone" name="vendor_phone" class="form-control" required="" placeholder="Enter Phone">
 		                        </div>
 		                    </div>
 	                   	</div>
@@ -346,5 +346,87 @@
 		});
 
 	</script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		    let form = document.getElementById("addVendor");
+
+		    form.addEventListener("submit", function (e) {
+		        let name = document.getElementById("name").value.trim();
+		        let phone = document.getElementById("phone").value.trim();
+		        let gst = document.getElementById("gst").value.trim();
+		        let errors = [];
+
+		        // Name validation
+		        if (!name) {
+		            errors.push("Name is required");
+		        }
+
+		        // Phone validation (10 digits only)
+		        let phoneRegex = /^[0-9]{10}$/;
+		        if (!phone) {
+		            errors.push("Phone is required");
+		        } else if (!phoneRegex.test(phone)) {
+		            errors.push("Phone must be 10 digits number");
+		        }
+
+		        // GST validation (only if provided)
+		        if (gst) {
+		            let gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i;
+		            if (!gstRegex.test(gst)) {
+		                errors.push("Invalid GST format");
+		            }
+		        }
+
+		        // If errors, stop submit and alert
+		        if (errors.length > 0) {
+		            e.preventDefault();
+		            alert(errors.join("\n"));
+		        }
+		    });
+		});
+	</script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		    let editForm = document.getElementById("editVendor");
+
+		    editForm.addEventListener("submit", function (e) {
+		        let name = document.getElementById("vendor_name").value.trim();
+		        let phone = document.getElementById("vendor_phone").value.trim();
+		        let gst = document.getElementById("vendor_gst").value.trim();
+		        let errors = [];
+
+		        // Name validation
+		        if (!name) {
+		            errors.push("Name is required");
+		        }
+
+		        // Phone validation (10 digits only)
+		        let phoneRegex = /^[0-9]{10}$/;
+		        if (!phone) {
+		            errors.push("Phone is required");
+		        } else if (!phoneRegex.test(phone)) {
+		            errors.push("Phone must be a 10-digit number");
+		        }
+
+		        // GST validation (only if provided)
+		        if (gst) {
+		            let gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i;
+		            if (!gstRegex.test(gst)) {
+		                errors.push("Invalid GST format");
+		            }
+		        }
+
+		        // If errors, stop submit and alert
+		        if (errors.length > 0) {
+		            e.preventDefault();
+		            alert(errors.join("\n"));
+		        }
+		    });
+		});
+	</script>
+
+
 
 @endsection

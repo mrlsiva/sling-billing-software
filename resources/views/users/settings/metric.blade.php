@@ -32,8 +32,8 @@
                         <div class="col-md-11">
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
-                                <input type="text" class="form-control" placeholder="Name" name="metric" value="{{ request('metric') }}">
-                                <span class="input-group-text"><a href="{{route('setting.metric.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
+                                <input type="text" class="form-control" placeholder="Name" name="metric" value="{{ request('metric') }}" id="searchInput">
+                                <span class="input-group-text" id="clearFilter" style="display: {{ request('metric') ? 'inline-flex' : 'none' }}"><a href="{{route('setting.metric.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
 

@@ -20,8 +20,8 @@
                         <div class="col-md-11">
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
-                                <input type="text" class="form-control" placeholder="Product/ Categoy/ Sub Category Name" name="product" value="{{ request('product') }}">
-                                <span class="input-group-text"><a href="{{route('branch.product.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
+                                <input type="text" class="form-control" placeholder="Product/ Categoy/ Sub Category Name" name="product" value="{{ request('product') }}" id="searchInput">
+                                <span class="input-group-text" id="clearFilter" style="display: {{ request('product') ? 'inline-flex' : 'none' }}"><a href="{{route('branch.product.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
 
@@ -72,7 +72,7 @@
 											@endphp
 											@if($user_detail->is_scan_avaiable == 1)
 												<div class="d-flex gap-3">
-													<a href="{{ route('branch.product.qrcode', ['company' => request()->route('company'),'id' => $stock->product->id ]) }}" target="_blank" ><i class="ri-qr-code-line align-middle fs-20" title="Print QR"></i></a>
+													<a href="{{ route('branch.product.qrcode', ['company' => request()->route('company'),'product' => $stock->product->id ]) }}" target="_blank" ><i class="ri-qr-code-line align-middle fs-20" title="Print QR"></i></a>
 
 													<a href="{{ route('branch.product.barcode', ['company' => request()->route('company'),'id' => $stock->product->id ]) }}" target="_blank"><i class="ri-barcode-line align-middle fs-20" title="Bar Code"></i></a>
 												</div>
@@ -117,4 +117,27 @@
         </div>
     </div>
 
+@endsection
+
+@section('script')
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchInput = document.getElementById("searchInput");
+        let clearFilter = document.getElementById("clearFilter");
+
+        function toggleClear() {
+            if (searchInput.value.trim() !== "") {
+                clearFilter.style.display = "inline-flex";
+            } else {
+                clearFilter.style.display = "none";
+            }
+        }
+
+        // Run on load (for prefilled request values)
+        toggleClear();
+
+        // Run on typing
+        searchInput.addEventListener("input", toggleClear);
+    });
+</script>
 @endsection

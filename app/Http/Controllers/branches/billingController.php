@@ -38,7 +38,7 @@ class billingController extends Controller
     {
 
         $genders = Gender::where('is_active',1)->get();
-        $shop_payment_ids = ShopPayment::where('shop_id', Auth::user()->parent_id)->pluck('payment_id')->toArray();
+        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->parent_id],['is_active', 1]])->pluck('payment_id')->toArray();
         $payments = Payment::whereIn('id',$shop_payment_ids)->get();
         $finances = Finance::where([['shop_id',Auth::user()->parent_id],['is_active',1]])->get();
         $categories = Stock::where([['branch_id',Auth::user()->id],['is_active',1]])->select('category_id')->get();
@@ -177,6 +177,7 @@ class billingController extends Controller
 
         $customer = Customer::create([ 
             'user_id' => $user->parent_id,
+            'branch_id' => Auth::user()->id,
             'name' => Str::ucfirst($request->name),
             'phone' => $request->phone,
             'alt_phone' => $request->alt_phone,

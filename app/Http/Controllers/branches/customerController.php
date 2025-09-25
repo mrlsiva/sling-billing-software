@@ -25,7 +25,12 @@ class customerController extends Controller
     {
         //$parent = User::where('id',Auth::user()->id)->first();
         $genders = Gender::where('is_active',1)->get();
-        $customer_id = Order::where([['branch_id',Auth::user()->id],['shop_id',Auth::user()->parent_id]])->select('customer_id')->get();
+
+        $customer_id1 = Customer::where('branch_id',Auth::user()->id)->pluck('id')->toArray();
+        $customer_id2 = Order::where([['branch_id',Auth::user()->id],['shop_id',Auth::user()->parent_id]])->pluck('customer_id')->toArray();
+
+        $customer_id = array_unique(array_merge($customer_id1, $customer_id2));
+
         $users = Customer::whereIn('id', $customer_id)
         ->when(request('customer'), function ($query) {
             $search = request('customer');
@@ -34,6 +39,7 @@ class customerController extends Controller
                   ->orWhere('phone', 'like', "%{$search}%");
             });
         })->orderBy('id','desc')->paginate(10);
+
         return view('branches.customers.index',compact('users','genders'));
     }
 
@@ -62,6 +68,7 @@ class customerController extends Controller
 
         $customer = Customer::create([ 
             'user_id' => $parent->parent_id,
+            'branch_id' => Auth::user()->id,
             'name' => Str::ucfirst($request->name),
             'phone' => $request->phone,
             'alt_phone' => $request->alt_phone,

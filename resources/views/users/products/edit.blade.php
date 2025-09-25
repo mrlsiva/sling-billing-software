@@ -122,7 +122,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <!-- <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="choices-single-groups" class="form-label text-muted">Metric</label>
                                     <span class="text-danger">*</span>
@@ -133,7 +133,9 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>
+                            </div> -->
+
+                            <input type="hidden" name="metric" value="{{$product->metric_id}}">
 
                             <div class="col-md-4">
                                 <div class="mb-3">

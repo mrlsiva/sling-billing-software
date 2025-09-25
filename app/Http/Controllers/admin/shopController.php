@@ -9,8 +9,10 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\ShopPayment;
 use App\Models\BankDetail;
 use App\Models\UserDetail;
+use App\Models\Payment;
 use App\Traits\common;
 use App\Models\User;
 use App\Traits\Log;
@@ -157,6 +159,15 @@ class shopController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Shop Create','App/Models/BankDetail','bank_details',$bank_detail->id,'Insert',null,$request,'Success','Shop Created Successfully');
+
+        $payments = Payment::where('is_active',1)->get();
+        foreach($payments as $payment)
+        {
+            $shop_payment = ShopPayment::create([
+                'shop_id' => $user->id,
+                'payment_id' => $payment->id
+            ]);
+        }
 
         DB::commit();
 

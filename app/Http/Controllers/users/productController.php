@@ -55,7 +55,7 @@ class productController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // up to 2MB
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // up to 2MB
             'category' => 'required',
             'sub_category' => 'required',
             'name' => ['required','string','max:50',
@@ -188,7 +188,7 @@ class productController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // up to 2MB
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // up to 2MB
             'category_id' => 'required',
             'sub_category' => 'required',
             'name' => ['required','string','max:50',

@@ -41,7 +41,7 @@ class subCategoryController extends Controller
             'sub_category' => ['required','string','max:50',
                 Rule::unique('sub_categories', 'name')->where(fn($q) => $q->where('user_id', Auth::id())->where('category_id', $request->category)),
             ],
-            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
         ], 
         [
             'category.required' => 'Category is required.',
@@ -97,7 +97,7 @@ class subCategoryController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'category_id' => 'required',
             'sub_category_name' => ['required','string','max:50',
                 Rule::unique('sub_categories', 'name')->where(fn($q) => $q->where('user_id', Auth::id())->where('category_id', $request->category_id))->ignore($request->sub_category_id),

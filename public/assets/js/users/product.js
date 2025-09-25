@@ -62,9 +62,9 @@ $(document).ready(function () {
     }, "File must be less than 2MB.");
 
     // Custom validator: no only spaces
-    jQuery.validator.addMethod("noSpace", function(value, element) {
-        return $.trim(value).length > 0;
-    }, "This field cannot be empty");
+    $.validator.addMethod("noSpace", function (value, element) {
+        return value == '' || (value.trim().length > 0 && value.indexOf(" ") === -1);
+    }, "No spaces are allowed.");
 
     // On form submit or input, trim fields automatically
     $("#productCreate input[type='text']").on("blur", function () {
@@ -74,7 +74,7 @@ $(document).ready(function () {
     $("#productCreate").validate({
         rules: {
             image: {
-                extension: "jpg|jpeg|png|gif",
+                extension: "jpg|jpeg|png|gif|webp",
                 filesize: 2048 * 1024 // 2MB
             },
             category: { required: true },
@@ -82,7 +82,7 @@ $(document).ready(function () {
             name: {
                 required: true,
                 maxlength: 50,
-                noSpace: true   // ✅ ensure trimmed & not empty
+                noSpace: false   // ✅ ensure trimmed & not empty
             },
             code: {
                 required: true,
@@ -121,16 +121,16 @@ $(document).ready(function () {
             name: {
                 required: "Product name is required.",
                 maxlength: "Max 50 characters allowed.",
-                noSpace: "Product name cannot be empty or spaces only."
+                noSpace: "Product name cannot be empty."
             },
             code: {
                 required: "Product code is required.",
                 maxlength: "Max 50 characters allowed.",
-                noSpace: "Product code cannot be empty or spaces only."
+                noSpace: "Product code cannot be empty or contain spaces."
             },
             hsn_code: {
                 maxlength: "Max 50 characters allowed.",
-                noSpace: "HSN code cannot be empty or spaces only."
+                noSpace: "HSN code cannot be empty or contain spaces."
             }
         },
         errorElement: "span",
@@ -155,10 +155,23 @@ $(document).ready(function () {
 
 
 $(document).ready(function () {
+    // ✅ Custom validator for file size
+    $.validator.addMethod("filesize", function (value, element, param) {
+        if (element.files.length === 0) {
+            return true; // no file selected
+        }
+        return element.files[0].size <= param;
+    }, "File size must be less than 2MB");
+
+    // ✅ Custom validator for no spaces at all
+    $.validator.addMethod("noSpace", function (value, element) {
+        return this.optional(element) || (value.indexOf(" ") === -1);
+    }, "No spaces are allowed.");
+
     $("#productEdit").validate({
         rules: {
             image: {
-                extension: "jpg|jpeg|png|gif",
+                extension: "jpg|jpeg|png|gif|webp",
                 filesize: 2048 * 1024 // 2 MB
             },
             category_id: { required: true },
@@ -169,10 +182,12 @@ $(document).ready(function () {
             },
             code: {
                 required: true,
-                maxlength: 50
+                maxlength: 50,
+                noSpace: true // ❌ disallow spaces
             },
             hsn_code: {
-                maxlength: 50
+                maxlength: 50,
+                noSpace: true // ❌ disallow spaces
             },
             price: {
                 required: true,
@@ -200,7 +215,7 @@ $(document).ready(function () {
         },
         messages: {
             image: {
-                extension: "Only jpg, jpeg, png, gif files are allowed",
+                extension: "Only jpg, jpeg, png, gif, webp files are allowed",
                 filesize: "Image must be less than 2MB"
             },
             category_id: "Please select a category",
@@ -211,10 +226,12 @@ $(document).ready(function () {
             },
             code: {
                 required: "Product code is required",
-                maxlength: "Product code must not exceed 50 characters"
+                maxlength: "Product code must not exceed 50 characters",
+                noSpace: "Spaces are not allowed in product code"
             },
             hsn_code: {
-                maxlength: "HSN code must not exceed 50 characters"
+                maxlength: "HSN code must not exceed 50 characters",
+                noSpace: "Spaces are not allowed in HSN code"
             },
             price: {
                 required: "Selling price is required",
@@ -243,15 +260,8 @@ $(document).ready(function () {
             $(element).removeClass("is-invalid");
         }
     });
-
-    // Custom validator for file size
-    $.validator.addMethod("filesize", function (value, element, param) {
-        if (element.files.length === 0) {
-            return true; // no file selected
-        }
-        return element.files[0].size <= param;
-    });
 });
+
 
 document.addEventListener("DOMContentLoaded", function () {
     let searchInput = document.getElementById("searchInput");

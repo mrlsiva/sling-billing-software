@@ -30,7 +30,7 @@ class categoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // up to 2MB
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // up to 2MB
             'category' => ['required','string','max:50',
                 Rule::unique('categories', 'name')->where(function ($query) {
                     return $query->where('user_id', Auth::id());
@@ -86,7 +86,7 @@ class categoryController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'category_name' => ['required','string','max:50',
                 Rule::unique('categories', 'name')->where(fn($query) => $query->where('user_id', Auth::id()))->ignore($request->category_id),
             ],

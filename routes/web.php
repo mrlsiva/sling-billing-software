@@ -31,6 +31,14 @@ use App\Http\Controllers\branches\branchDashboardController;
 use App\Http\Controllers\branches\orderController;
 use App\Http\Controllers\branches\staffController;
 
+Route::get('/clear', function() {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('config:cache');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+    return "Cleared!!!";
+});
 
 Route::get('/', function () {
     return view('home');
@@ -232,6 +240,7 @@ else
 
                                     Route::get('/index',[paymentController::class, 'index'])->name('index');
                                     Route::post('/store',[paymentController::class, 'store'])->name('store');
+                                    Route::post('/update',[paymentController::class, 'update'])->name('update');
                                 });
                             });
 
@@ -280,7 +289,7 @@ else
                                 Route::name('product.')->group(function () {
 
                                     Route::get('/index',[stockController::class, 'index'])->name('index');
-                                    Route::get('/{id}/qrcode',[stockController::class, 'qrcode'])->name('qrcode');
+                                    Route::get('/{product}/qrcode',[stockController::class, 'qrcode'])->name('qrcode');
                                     Route::get('/{id}/barcode',[stockController::class, 'barcode'])->name('barcode');
                                 });
                             });

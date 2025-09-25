@@ -60,7 +60,7 @@
 				<div class="col-md-4">
 					<div class="">
 						<label for="choices-single-groups" class="form-label text-muted">Sub Category</label>
-						<select class="form-control" data-choices name="sub_category" id="sub_category">
+						<select class="form-control" name="sub_category" id="sub_category">
 							@if(request('sub_category'))
 							@php
 							$sub_categories =

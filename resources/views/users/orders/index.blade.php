@@ -74,7 +74,7 @@
 											{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
 										</td>
 										<td>
-											{{$order->branch->name}} ({{$order->branch->user_name}})
+											{{$order->branch->name}}
 										</td>
 										<td>
 											{{$order->bill_id}}
