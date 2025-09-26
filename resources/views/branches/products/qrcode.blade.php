@@ -11,6 +11,7 @@
         .qr-container {
             display: flex;
             flex-wrap: wrap;
+			height:80px;
             width: 435px; /* total container width */
             gap: 0;       /* avoid extra spacing */
             margin: 0;
