@@ -94,6 +94,7 @@
             @page {
                 size: 4.13in 0.83in landscape; /* Adjust to your label dimensions */
                 margin: 0;
+				padding:0;
             }
 
             body,
@@ -117,6 +118,83 @@
                 display: block;
                 height: 1px;
             }
+			/* Container for all labels */
+        .qr-container {
+            display: flex;
+            flex-wrap: wrap;
+			height:80px;
+            width: 435px; /* total container width */
+            gap: 0;       /* avoid extra spacing */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Each label */
+        .qr-item {
+            width: 132.28px;   /* label width */
+            height: 83.15px;   /* label height */
+            background-color: #f6f6f6;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        /* Shop Name & Product Code */
+        .shop-title {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: calc(100% - 10px);
+        }
+
+        /* QR and Product Info container */
+        .qr-body {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+
+        /* Left: QR code */
+        .qr-left {
+            width: 42px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .qr-left img,
+        .qr-left svg {
+            width: 42px;
+            height: 42px;
+        }
+
+        /* Right: Product name and price */
+        .qr-right {
+            flex-grow: 1;
+            padding-left: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .qr-right .name {
+            font-size: 10px;
+            line-height: 12px;
+            height: 24px;
+            overflow: hidden;
+        }
+
+        .qr-right .price {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
         }
     </style>
 </head>
