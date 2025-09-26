@@ -20,7 +20,7 @@
 /* Each label */
 .qr-item {
     width: 132px;       /* label width */
-    height: 150px;      /* adjusted to match physical label height */
+    height: 75px;      /* adjusted to match physical label height */
     background-color: #f6f6f6;
     margin: 0;
     overflow: hidden;
