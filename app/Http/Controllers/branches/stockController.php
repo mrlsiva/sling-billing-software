@@ -66,7 +66,7 @@ class stockController extends Controller
         file_put_contents($filename, $tspl);
 
         // Send to printer (network example)
-        $printerIp = "192.1688.1.41"; // printer IP
+        $printerIp = "192.168.1.41"; // printer IP
         $port = 9100;
         $fp = fsockopen($printerIp, $port);
         if ($fp) {
