@@ -30,13 +30,14 @@
     flex-direction: column;
     box-sizing: border-box;
     flex: 0 0 auto;       /* prevents flex-grow/shrink */
+	padding: 0px 8px;
 }
 
 /* Shop Name & Product Code */
 .shop-title {
     font-size: 10px;
     font-weight: bold;
-    padding: 5px;
+    padding: 0px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -65,7 +66,7 @@
 /* Product info on right */
 .product {
     flex-grow: 1;         /* use available space inside label */
-    padding-left: 2px;    /* reduce padding */
+    padding-left: 8px;    /* reduce padding */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -79,9 +80,9 @@
 }
 
 .product-price {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
-    margin-top: 5px;
+    margin-top: 0px;
 }
 
 /* Print-specific styles */
