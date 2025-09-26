@@ -9,7 +9,7 @@
     .container {
         display: flex;
         flex-wrap: wrap;
-        width: 435px; /* container width for 3 labels per row */
+        width: 450px; /* container width for 3 labels per row */
         background: gray;
         gap: 0;
         margin: 0;
@@ -17,7 +17,7 @@
     }
 
     .label {
-        width: 132px;       /* label width */
+        width: 150px;       /* label width */
         height: 83px;       /* label height matching TE244 60x40 mm */
         background-color: #f6f6f6;
         margin: 0;
