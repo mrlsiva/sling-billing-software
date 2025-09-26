@@ -30,7 +30,7 @@
     flex-direction: column;
     box-sizing: border-box;
     flex: 0 0 auto;       /* prevents flex-grow/shrink */
-	padding: 0px 8px;
+	padding: 4px 8px;
 }
 
 /* Shop Name & Product Code */
