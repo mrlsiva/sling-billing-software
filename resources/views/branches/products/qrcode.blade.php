@@ -42,6 +42,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
 	text-align: center;
+	min-height: 12px;
 }
 
 /* QR + Product container */
@@ -84,6 +85,10 @@
     font-size: 12px;
     font-weight: bold;
     margin-top: 0px;
+	 white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	/* text-align: center; */
 }
 
 /* Print-specific styles */
