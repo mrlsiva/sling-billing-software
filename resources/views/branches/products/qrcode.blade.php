@@ -6,27 +6,30 @@
 <title>{{ config('app.name') }} | QR Code</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-/* Container for all labels */
+	/* Container for all labels */
 .container {
     display: flex;
-    flex-wrap: wrap;
-    width: 435px; /* total width for 3 labels per row */
-    background: gray;
-    gap: 0;
+    flex-wrap: wrap;      /* allow multiple rows */
+    width: 435px;         /* enough for 3 labels of 145px */
+    gap: 0;               /* no spacing merging them */
     margin: 0;
     padding: 0;
+    background: gray;
 }
 
 /* Each label */
 .label {
-    width: 132px;      /* physical label width */
-    height: 83px;      /* label height matching TE244 60x40mm */
+    width: 145px;         /* fixed label width */
+    min-width: 145px;     /* prevent shrinking */
+    max-width: 145px;     /* prevent growing */
+    height: 83px;         /* fixed label height */
     background-color: #f6f6f6;
     margin: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    flex: 0 0 auto;       /* prevents flex-grow/shrink */
 }
 
 /* Shop Name & Product Code */
@@ -49,7 +52,7 @@
 
 /* QR code on left */
 .qr {
-    width: 35px;        /* slightly smaller to free more space for text */
+    width: 35px;          /* slightly smaller to free space */
     text-align: center;
     flex-shrink: 0;
 }
@@ -61,8 +64,8 @@
 
 /* Product info on right */
 .product {
-    flex-grow: 2;       /* take more horizontal space */
-    padding-left: 2px;  /* reduce left padding */
+    flex-grow: 1;         /* use available space inside label */
+    padding-left: 2px;    /* reduce padding */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -86,7 +89,7 @@
     * { transition: none !important; }
 
     @page {
-        size: 4.13in 1.63in landscape; /* TE244 size */
+        size: 4.13in 1.63in landscape; /* TE244 label size */
         margin: 0;
     }
 
@@ -94,11 +97,16 @@
 
     .container { gap: 0; }
 
-    .label { page-break-inside: avoid; margin: 0; }
+    .label { 
+        page-break-inside: avoid; 
+        margin: 0; 
+        flex: 0 0 auto;    /* prevent merging on print */
+    }
 
-    /* Tiny offset to fix first-row blank */
+    /* Tiny offset to fix first-row blank printing */
     .container::before { content: ""; display: block; height: 1px; }
 }
+
 </style>
 
 </head>
