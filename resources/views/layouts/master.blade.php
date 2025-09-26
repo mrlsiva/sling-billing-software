@@ -202,9 +202,9 @@
                                     <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/bill/index') ? 'active' : '' }}" href="{{route('setting.bill.index', ['company' => request()->route('company')])}}">Bill </a>
                                     </li>
-                                    <li class="sub-menu-item">
+                                    <!-- <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/general/index') ? 'active' : '' }}" href="{{route('setting.general.index', ['company' => request()->route('company')])}}">General Settings</a>
-                                    </li>
+                                    </li> -->
                                 </ul>
                             </div>
                         </li>
@@ -270,14 +270,14 @@
                             </a>
                         </li>
 
-                        <li class="menu-item">
+                        <!-- <li class="menu-item">
                             <a class="menu-link" href="{{route('branch.setting.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-settings-3-line"></i>
                                 </span>
                                 <span class="nav-text"> Settings </span>
                             </a>
-                        </li>
+                        </li> -->
                         
 
                     </ul>

@@ -64,8 +64,13 @@
 										<td>
 											{{ $order->billedBy->name }}
 										</td>
-										
-										<td> - </td>
+										@php
+										    $payment_ids = App\Models\OrderPaymentDetail::where('order_id', $order->id)->pluck('payment_id');
+
+										    $payments = App\Models\Payment::whereIn('id', $payment_ids)->pluck('name')->toArray();
+										@endphp
+
+										<td>{{ implode(', ', $payments) }}</td>
 										<td>
 											{{ $order->customer->phone }} ({{ $order->customer->name }})
 										</td>
