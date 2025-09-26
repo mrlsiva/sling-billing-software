@@ -92,7 +92,7 @@
     }
 
     @page {
-        size: 4.13in 0.63in landscape; /* label dimensions */
+        size: 2.13in 1.63in landscape; /* label dimensions */
         margin: 0;
     }
 
