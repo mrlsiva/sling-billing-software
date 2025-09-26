@@ -82,12 +82,13 @@
             }
 
             @page {
-                size: 4.13in;
-            }
-			body {
-				background: #fff !important;
-				height: 83.149606299px;
-			}
+    size: 4.13in 1.63in landscape; /* width x height in inches */
+    margin: 0;
+}
+body {
+    margin: 0;
+}
+
 			.qr-container {
 				gap: 10px;
 			}
