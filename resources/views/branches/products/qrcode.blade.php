@@ -7,97 +7,116 @@
 	<title>{{ config('app.name')}} | QR Code</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<style>
-		
+/* Container for all labels */
 .qr-container {
-			background: gray;
-			display: flex ;
-			flex-wrap: wrap;
-			width: 435px;
-		}
-
-		.qr-item {
-			margin: 1px;
-			width: 132.28346457px;
-			height: 83.149606299px;
-			overflow: hidden;
-			background-color: #f6f6f6;
-		}
-		.qr-item p{
-			width: calc(100% - 10px);
-			font-size: 10px;
-			padding: 5px;
-			font-weight: bold;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-
-		.shop-title {
-			width: calc(100% - 10px);
-			font-size: 10px;
-			padding: 5px;
-			font-weight: bold;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-		.qr-body {
-			width: 100%;
-			padding: 2px;
-		}
-		.qr-left {
-			width: 42px;
-			margin-right: 2px;
-			float: left;
-			text-align: center;
-		}
-		.qr-left img, .qr-left svg {
-			width: 42px;
-			height: 42px;
-		}
-		.qr-right {
-			width: calc(100% - 49px);
-			display: inline-block;
-			padding-left: 5px;
-		}
-
-		.qr-right .name {
-			width: 100%;
-			height: 24px;
-			min-height: 24px;
-			max-height: 24px;
-			overflow: hidden;
-			font-size: 10px;
-			line-height: 12px;
-		}
-		.qr-right .price {
-			font-size: 14px;
-			width: 100%;
-			font-weight: bold;
-			margin-top: 5px;
-		}
-		@media print {
-			* {
-                transition: none !important;
-            }
-
-            @page {
-    size: 4.13in 1.63in landscape; /* width x height in inches */
+    display: flex;
+    flex-wrap: wrap;
+    width: 435px; /* total container width */
+    gap: 0;       /* avoid extra spacing */
     margin: 0;
-}
-body {
-    margin: 0;
+    padding: 0;
 }
 
-			.qr-container {
-				gap: 10px;
-			}
-			.qr-item {
-				page-break-inside: avoid;
-			}
-			
-		}
-	</style>
+/* Each label */
+.qr-item {
+    width: 132.28px;   /* label width */
+    height: 83.15px;   /* label height */
+    background-color: #f6f6f6;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* Shop Name & Product Code */
+.shop-title {
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - 10px);
+}
+
+/* QR and Product Info container */
+.qr-body {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+/* Left: QR code */
+.qr-left {
+    width: 42px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.qr-left img, .qr-left svg {
+    width: 42px;
+    height: 42px;
+}
+
+/* Right: Product name and price */
+.qr-right {
+    flex-grow: 1;
+    padding-left: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.qr-right .name {
+    font-size: 10px;
+    line-height: 12px;
+    height: 24px;
+    overflow: hidden;
+}
+
+.qr-right .price {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Print specific styles */
+@media print {
+    * {
+        transition: none !important;
+    }
+
+    @page {
+        size: 4.13in 1.63in landscape; /* Adjust to your label dimensions */
+        margin: 0;
+    }
+
+    body, html {
+        margin: 0;
+        padding: 0;
+    }
+
+    .qr-container {
+        gap: 0; /* remove extra spacing */
+    }
+
+    .qr-item {
+        page-break-inside: avoid;
+        margin: 0;
+    }
+
+    /* Optional tiny offset to fix first row blank */
+    .qr-container::before {
+        content: "";
+        display: block;
+        height: 1px;
+    }
+}
+</style>
+
 </head>
 
 <body class="bg-light">
