@@ -33,50 +33,8 @@ class stockController extends Controller
 
     public function qrcode(Request $request,$company,Product $product)
     {
-        // $product = Product::where('id',$id)->first();
-        // return view('branches.products.qrcode',compact('product'));
-
-        $userName = Auth::user()->name;
-
-        $tspl = "
-        SIZE 60 mm,40 mm
-        GAP 2 mm,0
-        CLS
-
-        // Shop Name
-        TEXT 20,20,\"3\",0,1,1,\"{$userName}\"
-
-        // Product Code
-        TEXT 20,50,\"3\",0,1,1,\"{$product->code}\"
-
-        // QR Code on Left
-        QRCODE 20,80,L,5,A,0,\"{$product->id}\"
-
-        // Product Name on Right of QR
-        TEXT 140,80,\"3\",0,1,1,\"{$product->name}\"
-
-        // Price below product name
-        TEXT 140,120,\"3\",0,1,1,\"Rs. " . number_format($product->price, 2) . "\"
-
-        PRINT 5
-        ";
-
-        // Save file
-        $filename = storage_path("app/label.tspl");
-        file_put_contents($filename, $tspl);
-
-        // Send to printer (network example)
-        $printerIp = "192.168.1.41"; // printer IP
-        $port = 9100;
-        $fp = fsockopen($printerIp, $port);
-        if ($fp) {
-            fwrite($fp, $tspl);
-            fclose($fp);
-        }
-
-        return redirect()->back()->with('toast_success', 'Label sent to printer!');
-
-        //return back()->with('success', 'Label sent to printer!');
+        //$product = Product::where('id',$id)->first();
+        return view('branches.products.qrcode',compact('product'));
 
     }
 
