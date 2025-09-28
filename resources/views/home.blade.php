@@ -17,7 +17,7 @@
 <!-- Hero Section -->
 <section class="hero animate__animated animate__fadeIn">
   <div class="container">
-    <h1 class="display-4 fw-bold">Sling Billing Software Testing</h1>
+    <h1 class="display-4 fw-bold">Sling Billing Software</h1>
     <p class="lead">Simple • Smart • Secure Billing for Your Business</p>
     <a href="#plans" class="btn btn-warning btn-lg mt-3">Start Free Trial</a>
   </div>
