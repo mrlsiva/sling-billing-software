@@ -5,156 +5,74 @@
 @endsection
 
 @section('body')
-
-  <!-- Header -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+ <div class="d-flex align-items-center justify-content-center vh-100">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="#">Sling Billing Software</a>
-    <a href="{{ route('admin.login') }}" class="btn btn-warning btn-md ">Admin</a>
+      <div class="row align-items-center">
+        <div class="col-lg-2"></div>
+        <div class="col-lg-8">
+          <div class="p-4 p-md-5 card-plain glass rounded-3">
+            <div class="d-flex align-items-center mb-3">
+              <div class="brand-logo me-3"><img src="https://slinggroups.in/img/Share.png" width="68px"></div>
+              <div>
+                <h1 class="h4 mb-0" style="color:var(--brand-1)">Sling Billing</h1>
+                <small class="text-white-50">Billing software · POS · Inventory</small>
+              </div>
+            </div>
 
-    </div>
-  </nav>
-<!-- Hero Section -->
-<section class="hero animate__animated animate__fadeIn">
-  <div class="container">
-    <h1 class="display-4 fw-bold">Sling Billing Software</h1>
-    <p class="lead">Simple • Smart • Secure Billing for Your Business</p>
-    <a href="#plans" class="btn btn-warning btn-lg mt-3">Start Free Trial</a>
-  </div>
-</section>
-<!-- Features -->
-<section class="py-5">
-  <div class="container">
-    <h2 class="text-center mb-5 animate__animated animate__fadeInUp">Core Features</h2>
-    <div class="row g-4">
-      <div class="col-md-4 animate__animated animate__zoomIn">
-        <div class="card h-100 shadow-sm p-4">
-          <div class="feature-icon mb-3">📄</div>
-          <h5>GST‑Compliant Invoicing</h5>
-          <p>Create professional invoices in seconds with templates and branding.</p>
-        </div>
-      </div>
-      <div class="col-md-4 animate__animated animate__zoomIn animate__delay-1s">
-        <div class="card h-100 shadow-sm p-4">
-          <div class="feature-icon mb-3">📦</div>
-          <h5>Inventory Management</h5>
-          <p>Track stock in real time, get low‑stock alerts, and barcode support.</p>
-        </div>
-      </div>
-      <div class="col-md-4 animate__animated animate__zoomIn animate__delay-2s">
-        <div class="card h-100 shadow-sm p-4">
-          <div class="feature-icon mb-3">💳</div>
-          <h5>Payment Tracking</h5>
-          <p>Monitor dues, send reminders, and improve cash flow effortlessly.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- Why Choose -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="text-center mb-5 animate__animated animate__fadeIn">Why Choose Sling?</h2>
-    <div class="row text-center">
-      <div class="col-md-3 animate__animated animate__fadeInUp">
-        <h5>🇮🇳 Designed for SMBs</h5>
-        <p>Localized for GST, languages, and business needs.</p>
-      </div>
-      <div class="col-md-3 animate__animated animate__fadeInUp animate__delay-1s">
-        <h5>💸 Flexible Pricing</h5>
-        <p>Free mobile plan to scalable enterprise options.</p>
-      </div>
-      <div class="col-md-3 animate__animated animate__fadeInUp animate__delay-2s">
-        <h5>🔒 Secure & Reliable</h5>
-        <p>Daily backup, encryption, and 24/7 support.</p>
-      </div>
-      <div class="col-md-3 animate__animated animate__fadeInUp animate__delay-3s">
-        <h5>👌 Easy to Use</h5>
-        <p>No accounting degree required—intuitive UI.</p>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- Plans -->
-<section id="plans" class="py-5">
-  <div class="container">
-    <h2 class="text-center mb-5 animate__animated animate__fadeIn">Plans at a Glance</h2>
-    <div class="row g-4">
-      <div class="col-md-3 animate__animated animate__fadeInUp">
-        <div class="card pricing-card shadow-sm text-center p-4">
-          <h5>Free Mobile</h5>
-          <p>Best for freelancers & kirana shops.</p>
-          <p class="fw-bold">₹0</p>
-          <a href="#" class="btn btn-outline-primary">Get Started</a>
-        </div>
-      </div>
-      <div class="col-md-3 animate__animated animate__fadeInUp animate__delay-1s">
-        <div class="card pricing-card shadow-sm text-center p-4">
-          <h5>Standard</h5>
-          <p>Best for small traders.</p>
-          <p class="fw-bold">₹999/year</p>
-          <a href="#" class="btn btn-outline-primary">Choose Plan</a>
-        </div>
-      </div>
-      <div class="col-md-3 animate__animated animate__fadeInUp animate__delay-2s">
-        <div class="card pricing-card shadow-sm text-center p-4">
-          <h5>Pro</h5>
-          <p>For growing SMBs.</p>
-          <p class="fw-bold">₹2499/year</p>
-          <a href="#" class="btn btn-primary">Choose Plan</a>
-        </div>
-      </div>
-      <div class="col-md-3 animate__animated animate__fadeInUp animate__delay-3s">
-        <div class="card pricing-card shadow-sm text-center p-4">
-          <h5>Enterprise</h5>
-          <p>For multi‑location businesses.</p>
-          <p class="fw-bold">Custom</p>
-          <a href="#" class="btn btn-outline-primary">Contact Us</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+            <h2 class="display-6 fw-bold">Our app is <span style="color:var(--brand-2)">coming soon</span></h2>
+            <p class="lead text-white-50">We're building a faster, simpler billing experience for small businesses. Join the waitlist to get early access, exclusive discounts, and product updates.</p>
 
-<!-- Testimonials -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="text-center mb-5 animate__animated animate__fadeIn">What Our Customers Say</h2>
-    <div class="row g-4">
-      <div class="col-md-4 animate__animated animate__fadeInLeft">
-        <div class="card shadow-sm p-4 h-100">
-          <p>“Sling streamlined billing across outlets—real‑time visibility on receivables.”</p>
-          <h6>- Retail Chain Owner</h6>
+            <div class="row gy-3 align-items-center">
+              <div class="col-12 col-sm-12">
+                <form id="subscribeForm" class="d-flex" onsubmit="subscribe(event)">
+                  <input id="emailInput" type="email" class="form-control me-2" placeholder="Enter your email" aria-label="Email" required>
+                  <button class="btn btn-light" type="submit">Request Demo</button>
+                </form>
+                <div id="msg" class="mt-2 small text-success" style="display:none;">Thanks — we'll be in touch!</div>
+              </div>
+              
+            </div>
+
+            <hr class="my-4" style="border-color:rgba(255,255,255,0.06)">
+
+            <div class="d-flex align-items-center justify-content-between flex-wrap">
+              <div class="d-flex countdown text-center">
+                <div class="unit me-3">
+                  <div class="h3 mb-0" id="days">00</div>
+                  <small class="text-white-50">Days</small>
+                </div>
+                <div class="unit me-3">
+                  <div class="h3 mb-0" id="hours">00</div>
+                  <small class="text-white-50">Hours</small>
+                </div>
+                <div class="unit me-3">
+                  <div class="h3 mb-0" id="minutes">00</div>
+                  <small class="text-white-50">Mins</small>
+                </div>
+                <div class="unit">
+                  <div class="h3 mb-0" id="seconds">00</div>
+                  <small class="text-white-50">Secs</small>
+                </div>
+              </div>
+
+              <div class="social mt-3 mt-sm-0">
+                <a href="#" aria-label="twitter"><i class="bi bi-twitter"></i></a>
+                <a href="#" aria-label="linkedin"><i class="bi bi-linkedin"></i></a>
+                <a href="#" aria-label="facebook"><i class="bi bi-facebook"></i></a>
+                <!-- <a href="#" aria-label="youtube"><i class="bi bi-youtube"></i></a> -->
+                <!-- <a href="#" aria-label="github"><i class="bi bi-github"></i></a> -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-lg-2 mt-4 mt-lg-0 text-center text-lg-start">
+
         </div>
       </div>
-      <div class="col-md-4 animate__animated animate__fadeInUp">
-        <div class="card shadow-sm p-4 h-100">
-          <p>“Inventory restocks instantly after each invoice—no more stockouts!”</p>
-          <h6>- Wholesaler</h6>
-        </div>
-      </div>
-      <div class="col-md-4 animate__animated animate__fadeInRight">
-        <div class="card shadow-sm p-4 h-100">
-          <p>“Automated filing‑ready GST reports saved us hours every month.”</p>
-          <h6>- Small Business Owner</h6>
-        </div>
-      </div>
+
+      <div class="mt-4 text-center text-white-50 small">© <span id="year"></span> Sling Groups · All rights reserved</div>
     </div>
   </div>
-</section>
-
-<!-- CTA -->
-<section class="py-5 text-center">
-  <div class="container">
-    <h2 class="animate__animated animate__fadeIn">Ready to Simplify Your Billing?</h2>
-    <p class="lead">Start your free trial now—or book a personalized demo today!</p>
-    <a href="#" class="btn btn-lg btn-success animate__animated animate__pulse animate__infinite">Get Started Free</a>
-  </div>
-</section>
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-        <p>&copy; 2025 Sling Billing Software. All rights reserved.</p>
-  </div>
-  </footer>
 @endsection

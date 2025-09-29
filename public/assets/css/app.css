@@ -15944,6 +15944,7 @@ fieldset:disabled .btn {
 .topbar .logo-box {
     position: fixed;
     left: 0;
+    width: 245px;
 }
 .topbar .navbar-header {
     display: -webkit-box;
@@ -16085,8 +16086,9 @@ fieldset:disabled .btn {
     height: var(--bs-logo-sm-height);
 }
 .logo-box .logo-lg {
-    margin-left: 6px;
-    height: var(--bs-logo-lg-height);
+    margin-left: 0px;
+    height: auto;
+    max-height: 40px ;
 }
 .logo-box .logo-light {
     display: none;
