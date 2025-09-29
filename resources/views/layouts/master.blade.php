@@ -40,7 +40,7 @@
 
                     <a href="#" class="logo-light">
                         <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
-                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light" >
                     </a>
                     
                 @else
@@ -291,12 +291,13 @@
                 @if(request()->segment(1) === 'admin')
                     <a href="#" class="logo-dark">
                         <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
-                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo dark">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo dark" >
                     </a>
 
                     <a href="#" class="logo-light">
                         <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
-                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light" >
+                        <!-- style="background: #1B1E2C;" -->
                     </a>
                     
                 @else

@@ -16089,6 +16089,13 @@ fieldset:disabled .btn {
     margin-left: 0px;
     height: auto;
     max-height: 40px ;
+    margin-left: 0px;
+    height: auto;
+    max-height: 60px;
+    /* background: #ffff; */
+    border-radius: 8px;
+    display: inline-block;
+    padding: 4px 24px;
 }
 .logo-box .logo-light {
     display: none;
