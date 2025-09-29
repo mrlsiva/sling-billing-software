@@ -31,7 +31,7 @@
                 $user = App\Models\User::where('slug_name',request()->segment(1))->first();
             @endphp
             <!-- Sidebar Logo -->
-            <div class="logo-box">
+            <!-- <div class="logo-box">
                 @if(request()->segment(1) === 'admin')
                     <a href="#" class="logo-dark">
                         <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
@@ -54,7 +54,7 @@
                         <img src="{{ asset('storage/' . $user->logo) }}" class="logo-lg" alt="logo light">
                     </a>
                 @endif
-            </div>
+            </div> -->
 
             <div class="h-100" data-simplebar>
                 @if(Auth::user()->hasRole('Super Admin'))
