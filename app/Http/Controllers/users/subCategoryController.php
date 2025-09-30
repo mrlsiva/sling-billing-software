@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SubCategoryExport;
 use App\Imports\SubCategoryImport;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\SubCategory;
@@ -17,7 +18,7 @@ use DB;
 
 class subCategoryController extends Controller
 {
-    use Log; 
+    use Log, Notifications; 
 
     public function index(Request $request)
     {
@@ -76,7 +77,10 @@ class subCategoryController extends Controller
         DB::commit();
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Create','App/Models/SubCategory','sub_categories',$sub_category->id,'Insert',null,$request,'Success','Sub Category Created Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Create','App/Models/SubCategory','sub_categories',$sub_category->id,'Insert',null, json_encode($request->all()),'Success','Sub Category Created Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category created successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Sub Category created successfully.');
     }
@@ -137,6 +141,9 @@ class subCategoryController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Update','App/Models/SubCategory','sub_categories',$sub_category->id,'Update',null,$request,'Success','Sub Category Updated Successfully');
 
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category updated successfully',null, null);
+
         return redirect()->back()->with('toast_success', 'Sub Category Updated Successfully.');
     }
 
@@ -155,6 +162,9 @@ class subCategoryController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Status Update','App/Models/SubCategory','sub_categories',$request->id,'Update',null,null,'Success',$statusText);
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, $sub_category->name.' '.$statusText,null, null);
 
         return redirect()->back()->with('toast_success', "Sub Category Status Changed");
     }

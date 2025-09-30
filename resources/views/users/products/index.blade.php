@@ -56,7 +56,7 @@
 									<th>S.No</th>
 									<th>Item Code</th>
 									<th>Image</th>
-									<th>category >> subcategory</th>
+									<th>Category >> Subcategory</th>
 									<th>Name</th>
 									<th>Price (₹)</th>
 									<th>Tax</th>

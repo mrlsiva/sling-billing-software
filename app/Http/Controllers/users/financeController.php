@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\Finance;
 use App\Traits\Log;
@@ -12,7 +13,7 @@ use DB;
 
 class financeController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request)
     {
@@ -49,7 +50,10 @@ class financeController extends Controller
         DB::commit();
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Finance Create','App/Models/Finance','finances',$finance->id,'Insert',null,$request,'Success','Finance Created Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Finance Create','App/Models/Finance','finances',$finance->id,'Insert',null,json_encode($request->all()),'Success','Finance Created Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' finance created successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Finance created successfully.');
     }
@@ -69,6 +73,9 @@ class financeController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Finance Status Update','App/Models/Finance','metrics',$request->id,'Update',null,null,'Success',$statusText);
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $finance->name.' '.$statusText,null, null);
 
         return redirect()->back()->with('toast_success', "Finance Status Changed");
     }
@@ -110,6 +117,9 @@ class financeController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Finance Update','App/Models/Finance','metrics',$finance->id,'Update',null,$request,'Success','Finance Updated Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->finance.' finance updated successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Finance updated successfully.');
     }

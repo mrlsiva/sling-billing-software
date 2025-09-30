@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\Tax;
 use App\Traits\Log;
@@ -12,7 +13,7 @@ use DB;
 
 class taxController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request)
     {
@@ -50,7 +51,10 @@ class taxController extends Controller
         DB::commit();
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Tax Create','App/Models/Tax','taxes',$tax->id,'Insert',null,$request,'Success','Tax Created Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Tax Create','App/Models/Tax','taxes',$tax->id,'Insert',null,json_encode($request->all()),'Success','Tax Created Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.'% tax created successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Tax created successfully.');
     }
@@ -70,6 +74,9 @@ class taxController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Tax Status Update','App/Models/Tax','taxes',$request->id,'Update',null,null,'Success',$statusText);
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $tax->name.'% '.$statusText,null, null);
 
         return redirect()->back()->with('toast_success', "Tax Status Changed");
     }
@@ -112,6 +119,9 @@ class taxController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Tax Update','App/Models/Tax','taxes',$tax->id,'Update',null,$request,'Success','Tax Updated Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->tax.'% tax updated successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Tax updated successfully.');
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\VendorPaymentDetail;
 use App\Models\PurchaseOrderDetail;
@@ -23,7 +24,7 @@ use DB;
 
 class purchaseOrderController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request)
     {
@@ -118,6 +119,9 @@ class purchaseOrderController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Created','App/Models/PurchaseOrder','purchase_orders',$purchase_order->id,'Insert',null,$request,'Success','Purchase Order Created');
 
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase_order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully',null, null);
+
         // --- Handle prepaid balance ---
         $vendor = Vendor::findOrFail($request->vendor);
         $prepaid = $vendor->prepaid_amount ?? 0;
@@ -201,6 +205,9 @@ class purchaseOrderController extends Controller
                 'Success',
                 'Purchase Order Updated'
             );
+
+            //Notifiction
+            $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase->id, null, json_encode($request->all()), now(), Auth::user()->id, 'purchase order updated for product '.$purchase->product->name.' done successfully',null, null);
 
             
             $paymentsForThis = VendorPaymentDetail::where('purchase_order_id', $purchase->id)->orderBy('id', 'desc')->get();
@@ -394,7 +401,7 @@ class purchaseOrderController extends Controller
         }
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Refund','App/Models/PurchaseOrderRefund','purchase_order_refunds',$refund->id,'Insert',null,$request,'Success','Purchase Order Refund');
+        $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Refund','App/Models/PurchaseOrderRefund','purchase_order_refunds',$refund->id,'Insert',null,json_encode($request->all()),'Success','Purchase Order Refund');
 
         return redirect()->back()->with('toast_success', 'Purchase refunded successfully!');
     }

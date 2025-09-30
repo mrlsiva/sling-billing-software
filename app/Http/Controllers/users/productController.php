@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductExport;
 use App\Imports\ProductImport;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\SubCategory;
@@ -23,7 +24,7 @@ use DB;
 
 class productController extends Controller
 {
-    use Log, common;
+    use Log, common, Notifications;
 
     public function index(Request $request)
     {
@@ -165,12 +166,15 @@ class productController extends Controller
         ]);
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Stock Added','App/Models/Stock','stocks',$stock->id,'Insert',null,$request,'Success','Stock Added for this product');
-
-        DB::commit();
+        $this->addToLog($this->unique(),Auth::user()->id,'Stock Added','App/Models/Stock','stocks',$stock->id,'Insert',null,json_encode($request->all()),'Success','Stock Added for this product');
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Product Create','App/Models/Product','products',$product->id,'Insert',null,$request,'Success','Product Created Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Product Create','App/Models/Product','products',$product->id,'Insert',null,json_encode($request->all()),'Success','Product Created Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Created Successfully',null, null);
+
+        DB::commit();
 
         return redirect()->back()->with('toast_success', 'Product created successfully.');
         
@@ -293,14 +297,18 @@ class productController extends Controller
             'quantity' => $request->quantity,
         ]);
 
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Stock Updated','App/Models/Stock','stocks',$stock->id,'Update',null, json_encode($request->all()),'Success','Stock Updated for this product');
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Product Update','App/Models/Product','products',$product->id,'Update',null, json_encode($request->all()),'Success','Product Updated Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Updated Successfully',null, null);
+
         DB::commit();
-
-        //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Stock Updated','App/Models/Stock','stocks',$stock->id,'Update',null,$request,'Success','Stock Updated for this product');
-
-        //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Product Update','App/Models/Product','products',$product->id,'Update',null,$request,'Success','Product Updated Successfully');
-
+        
         return redirect()->back()->with('toast_success', 'Product updated successfully.');
     }
 
@@ -319,6 +327,9 @@ class productController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Product Status Update','App/Models/Product','products',$request->id,'Update',null,null,'Success',$statusText);
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $statusText,null, null);
 
         return redirect()->back()->with('toast_success', $statusText);
     }

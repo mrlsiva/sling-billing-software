@@ -12,12 +12,13 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Category;
+use App\Traits\Notifications;
 use App\Traits\Log;
 use DB;
 
 class categoryController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request)
     {
@@ -65,7 +66,10 @@ class categoryController extends Controller
         DB::commit();
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Category Create','App/Models/Category','categories',$category->id,'Insert',null,$request,'Success','Category Created Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Category Create','App/Models/Category','categories',$category->id,'Insert',null,json_encode($request->all()),'Success','Category Created Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category). ' category created successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Category created successfully.');
     }
@@ -123,7 +127,10 @@ class categoryController extends Controller
         DB::commit();
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Category Update','App/Models/Category','categories',$category->id,'Update',null,$request,'Success','Category Updated Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Category Update','App/Models/Category','categories',$category->id,'Update',null,json_encode($request->all()),'Success','Category Updated Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category_name).' category updated successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Category updated successfully.');
     }
@@ -142,7 +149,10 @@ class categoryController extends Controller
         $statusText = $category->is_active == 1 ? 'Category changed to active state' : 'Category changed to in-active state';
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Category Status Update','App/Models/Category','categories',$request->id,'Update',null,null,'Success',$statusText);
+        $this->addToLog($this->unique(),Auth::user()->id,'Category Status Update','App/Models/Category','categories',$request->id,'Update',null,null,'Success',$category->name.' '.$statusText);
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, $category->name.' '.$statusText,null, null);
 
         return redirect()->back()->with('toast_success', "Category Status Changed");
     }
