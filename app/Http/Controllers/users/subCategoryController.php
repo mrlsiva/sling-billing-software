@@ -4,12 +4,14 @@ namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SubCategoryExport;
 use App\Imports\SubCategoryImport;
 use Illuminate\Validation\Rule;
 use App\Traits\Notifications;
 use Illuminate\Http\Request;
+use App\Models\BulkUploadLog;
 use Illuminate\Support\Str;
 use App\Models\SubCategory;
 use App\Models\Category;
@@ -172,12 +174,19 @@ class subCategoryController extends Controller
     public function bulk_upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx|max:10000', // Allow larger files
+            'file' => 'required|mimes:xlsx|max:10000',
         ]);
 
-        $import = new SubCategoryImport();
+        // Generate unique run_id
+        do {
+            $run_id = rand(100000, 999999);
+        } while (BulkUploadLog::where('run_id', $run_id)->exists());
+
+        // Pass run_id to import
+        $import = new SubCategoryImport($run_id);
         Excel::import($import, $request->file('file'));
 
+        // Collect skipped rows
         $skipped = [];
         if ($import->failures()->isNotEmpty()) {
             foreach ($import->failures() as $failure) {
@@ -185,14 +194,71 @@ class subCategoryController extends Controller
             }
         }
 
-        if (count($skipped) > 0) {
+        // Counts
+        $totalRecords      = $import->getRowCount(); // make sure import counts ALL rows
+        $errorRecords      = count($skipped);
+        $successfulRecords = max(0, $totalRecords - $errorRecords);
 
-            return redirect()->back()->with('error_alert', 'Some rows were skipped: ' . implode(' | ', $skipped)); 
+        // Directory for this run
+        $directory = "bulk_uploads/sub_categories/{$run_id}";
+
+        // Ensure directory exists on public disk
+        if (!Storage::disk('public')->exists($directory)) {
+            Storage::disk('public')->makeDirectory($directory);
+        }
+
+        // Save uploaded Excel file
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $excelPath    = $uploadedFile->storeAs($directory, $originalName, 'public');
+
+        // Build log content
+        $logContent  = "======================" . PHP_EOL;
+        $logContent .= "Bulk SubCategory Upload Report" . PHP_EOL;
+        $logContent .= "Uploaded On: " . now() . PHP_EOL;
+        $logContent .= "Run ID: {$run_id}" . PHP_EOL;
+        $logContent .= "Uploaded File: {$originalName}" . PHP_EOL;
+        $logContent .= "Total Records: {$totalRecords}" . PHP_EOL;
+        $logContent .= "Successful Records: {$successfulRecords}" . PHP_EOL;
+        $logContent .= "Error Records: {$errorRecords}" . PHP_EOL;
+
+        if ($errorRecords > 0) {
+            $logContent .= "Error Details:" . PHP_EOL;
+            foreach ($skipped as $error) {
+                $logContent .= "- {$error}" . PHP_EOL;
+            }
+        }
+
+        $logContent .= "======================" . PHP_EOL . PHP_EOL;
+
+        // Save log file
+        $logFile = "{$directory}/log.txt";
+        Storage::disk('public')->put($logFile, $logContent);
+
+        // Save record in BulkUploadLog table
+        $bulk_upload = BulkUploadLog::create([
+            'user_id'            => auth()->id(),
+            'run_id'             => $run_id,
+            'run_on'             => now(),
+            'module'             => 'Sub Category',
+            'total_record'       => $totalRecords,
+            'successfull_record' => $successfulRecords,
+            'error_record'       => $errorRecords,
+            'excel'              => $excelPath,
+            'log'                => $logFile,
+        ]);
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/BulkUploadLog', $bulk_upload->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bulk upload done for sub category',null, $logFile);
+
+        // Return response
+        if ($errorRecords > 0) {
+            return redirect()->back()->with('error_alert', 'Some rows were skipped: ' . implode(' | ', $skipped));
         }
 
         return redirect()->back()->with('toast_success', 'Bulk sub categories uploaded successfully.');
-
     }
+
 
     public function download(Request $request)
     {

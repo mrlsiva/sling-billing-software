@@ -17,12 +17,25 @@ class CategoryImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
 {
     use SkipsFailures;
 
+    private int $rowCount = 0;
+    private int $runId;
+
+    // 👇 accept run_id in constructor
+    public function __construct(int $runId)
+    {
+        $this->runId = $runId;
+    }
+
     public function model(array $row)
     {
+        ++$this->rowCount;
+
         return new Category([
-            'user_id'   => Auth::id(),
-            'name'      => Str::ucfirst(trim($row['name'])),
-            'is_active' => 1,
+            'user_id'        => Auth::id(),
+            'name'           => Str::ucfirst(trim($row['name'])),
+            'is_active'      => 1,
+            'is_bulk_upload' => 1,
+            'run_id'         => $this->runId, // 👈 store run_id
         ]);
     }
 
@@ -46,5 +59,10 @@ class CategoryImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             'name.required' => 'Category name is required.',
             'name.unique'   => 'You already have a category with this name.',
         ];
+    }
+
+    public function getRowCount(): int
+    {
+        return $this->rowCount;
     }
 }

@@ -23,56 +23,59 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
 {
     use SkipsFailures, SkipsErrors;
 
+    private int $rowCount = 0;
+    private int $runId;
+    private array $currentRow = [];
+
+    public function __construct(int $runId)
+    {
+        $this->runId = $runId;
+    }
+
+    // Keep row data for validation closures
+    public function prepareForValidation($data, $index)
+    {
+        $this->currentRow = $data;
+        return $data;
+    }
+
     public function model(array $row)
     {
+        $this->rowCount++;
         $userId = Auth::id();
 
-        $category = Category::where('user_id', $userId)->whereRaw('LOWER(name) = ?', [strtolower(trim($row['category']))])->first();
+        $category = Category::where('user_id', $userId)
+            ->whereRaw('LOWER(name) = ?', [strtolower(trim($row['category']))])
+            ->first();
+        if (!$category) return null;
 
-        if (!$category) {
-            return null; // Skipped
-        }
+        $subCategory = SubCategory::where('user_id', $userId)
+            ->where('category_id', $category->id)
+            ->whereRaw('LOWER(name) = ?', [strtolower(trim($row['sub_category']))])
+            ->first();
+        if (!$subCategory) return null;
 
-        $subCategory = SubCategory::where('user_id', $userId)->where('category_id', $category->id)->whereRaw('LOWER(name) = ?', [strtolower(trim($row['sub_category']))])->first();
+        $tax = Tax::where('shop_id', $userId)
+            ->whereRaw('LOWER(name) = ?', [strtolower(trim($row['tax']))])
+            ->first();
+        if (!$tax) return null;
 
-        if (!$subCategory) {
-            return null; // Skipped
-        }
+        $metric = Metric::where('shop_id', $userId)
+            ->whereRaw('LOWER(name) = ?', [strtolower(trim($row['metric']))])
+            ->first();
+        if (!$metric) return null;
 
-        $tax = Tax::where('shop_id', $userId)->whereRaw('LOWER(name) = ?', [strtolower(trim($row['tax']))])->first();
+        // Skip duplicate product
+        $exists = Product::where('user_id', $userId)
+            ->where('category_id', $category->id)
+            ->where('sub_category_id', $subCategory->id)
+            ->whereRaw('LOWER(name) = ?', [strtolower(trim($row['name']))])
+            ->exists();
+        if ($exists) return null;
 
-        if (!$tax) {
-            return null; // Skipped
-        }
-
-        $metric = Metric::where('shop_id', $userId)->whereRaw('LOWER(name) = ?', [strtolower(trim($row['metric']))])->first();
-
-        if (!$metric) {
-            return null; // Skipped
-        }
-
-        // Prevent duplicate product name in same category/sub-category
-        $exists = Product::where('user_id', $userId)->where('category_id', $category->id)->where('sub_category_id', $subCategory->id)->whereRaw('LOWER(name) = ?', [strtolower(trim($row['name']))])->exists();
-
-        if ($exists) {
-            return null; // Skipped duplicate
-        }
-
-        // Map discount type to integer
-        $discountType = null;
-        if (!empty($row['discount_type'])) {
-            $discountType = strtolower(trim($row['discount_type'])) === 'flat' ? 1 : 2;
-        }
-
-        // Calculate tax amount
-        $price = (float) $row['price'];
-
-        if ($tax) {
-            $taxRate   = (float) $tax->name; 
-            $taxAmount   = $price / (1 + ($taxRate / 100)); 
-        } else {
-            $taxAmount = 0;
-        }
+        $discountType = !empty($row['discount_type']) 
+            ? (strtolower(trim($row['discount_type'])) === 'flat' ? 1 : 2) 
+            : null;
 
         $price = (float) $row['price'];
         $taxAmount = $tax ? ($price * ((float)$tax->name / 100)) : 0;
@@ -87,15 +90,16 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             'hsn_code'       => $row['hsn_code'] ?? null,
             'price'          => $price,
             'tax_amount'     => $taxAmount,
-            'tax_id'         => $tax ? $tax->id : null,
-            'metric_id'      => $metric ? $metric->id : null,
+            'tax_id'         => $tax->id,
+            'metric_id'      => $metric->id,
             'discount_type'  => $discountType,
             'discount'       => $row['discount'] ?? null,
             'quantity'       => $row['quantity'] ?? 0,
             'is_active'      => 1,
+            'is_bulk_upload' => 1,
+            'run_id'         => $this->runId,
         ]);
 
-        // After product is created, also create stock entry
         $product->save();
 
         Stock::create([
@@ -113,31 +117,25 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
     public function rules(): array
     {
         $userId = Auth::id();
+        $row = $this->currentRow;
 
         return [
             '*.name' => ['required','string','max:50',
-                function ($attribute, $value, $fail) {
-                    $rowIndex = explode('.', $attribute)[0]; // e.g. "3.name" → "3"
-                    $rowData = request()->all()[$rowIndex] ?? null;
+                function ($attribute, $value, $fail) use ($row, $userId) {
+                    $categoryName = trim($row['category'] ?? '');
+                    $subCategoryName = trim($row['sub_category'] ?? '');
 
-                    if (!$rowData) return;
-
-                    $userId = Auth::id();
-                    $categoryName = trim($rowData['category'] ?? '');
-                    $subCategoryName = trim($rowData['sub_category'] ?? '');
-
-                    // Find category
-                    $category = Category::where('user_id', $userId)->whereRaw('LOWER(name) = ?', [strtolower($categoryName)])->first();
-
+                    $category = Category::where('user_id', $userId)->whereRaw('LOWER(name)=?', [strtolower($categoryName)])->first();
                     if (!$category) return;
 
-                    // Find subcategory
-                    $subCategory = SubCategory::where('user_id', $userId)->where('category_id', $category->id)->whereRaw('LOWER(name) = ?', [strtolower($subCategoryName)])->first();
-
+                    $subCategory = SubCategory::where('user_id', $userId)->where('category_id', $category->id)->whereRaw('LOWER(name)=?', [strtolower($subCategoryName)])->first();
                     if (!$subCategory) return;
 
-                    // Check if product already exists
-                    $exists = Product::where('user_id', $userId)->where('category_id', $category->id)->where('sub_category_id', $subCategory->id)->whereRaw('LOWER(name) = ?', [strtolower(trim($value))])->exists();
+                    $exists = Product::where('user_id', $userId)
+                        ->where('category_id', $category->id)
+                        ->where('sub_category_id', $subCategory->id)
+                        ->whereRaw('LOWER(name)=?', [strtolower(trim($value))])
+                        ->exists();
 
                     if ($exists) {
                         $fail("You already have a product '{$value}' in sub category '{$subCategoryName}' under '{$categoryName}'.");
@@ -147,108 +145,47 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
 
             '*.category' => ['required','string','max:50',
                 function ($attribute, $value, $fail) use ($userId) {
-                    $exists = Category::where('user_id', $userId)->whereRaw('LOWER(name) = ?', [strtolower(trim($value))])->exists();
-
-                    if (!$exists) {
-                        $fail("Category '{$value}' does not exist.");
-                    }
+                    $exists = Category::where('user_id', $userId)->whereRaw('LOWER(name)=?', [strtolower(trim($value))])->exists();
+                    if (!$exists) $fail("Category '{$value}' does not exist.");
                 },
             ],
 
             '*.sub_category' => ['required','string','max:50',
-                function ($attribute, $value, $fail) use ($userId) {
-                    // Find the category from the row
-                    $rowIndex = explode('.', $attribute)[0]; // e.g. "3.sub_category" → "3"
-                    $rowData = request()->all()[$rowIndex] ?? null;
-
-                    $categoryName = $rowData['category'] ?? null;
-                    if (!$categoryName) return;
-
-                    $category = Category::where('user_id', $userId)->whereRaw('LOWER(name) = ?', [strtolower(trim($categoryName))])->first();
-
+                function ($attribute, $value, $fail) use ($row, $userId) {
+                    $categoryName = trim($row['category'] ?? '');
+                    $category = Category::where('user_id', $userId)->whereRaw('LOWER(name)=?', [strtolower($categoryName)])->first();
                     if (!$category) return;
 
-                    $exists = SubCategory::where('user_id', $userId)->where('category_id', $category->id)->whereRaw('LOWER(name) = ?', [strtolower(trim($value))])->exists();
-
-                    if (!$exists) {
-                        $fail("Sub category '{$value}' does not exist in category '{$categoryName}'.");
-                    }
+                    $exists = SubCategory::where('user_id', $userId)->where('category_id', $category->id)->whereRaw('LOWER(name)=?', [strtolower($value)])->exists();
+                    if (!$exists) $fail("Sub category '{$value}' does not exist in category '{$categoryName}'.");
                 },
             ],
 
-            '*.code' => ['required','max:50',
-                Rule::unique('products', 'code')->where(fn($q) => $q->where('user_id', $userId)),
-            ],
-
-            '*.hsn_code' => ['nullable','max:50',
-                Rule::unique('products', 'hsn_code')->where(fn($q) => $q->where('user_id', $userId)),
-            ],
-
-            '*.price' => ['required', 'numeric', 'min:1'],
-
-            '*.tax' => ['required',
-                function ($attribute, $value, $fail) use ($userId) {
-                    $exists = Tax::where('shop_id', $userId)->where('is_active', 1)->whereRaw('LOWER(name) = ?', [strtolower(trim($value))])->exists();
-
-                    if (!$exists) {
-                        $fail("Tax '{$value}' is not valid.");
-                    }
-                },
-            ],
-
-            '*.metric' => ['required',
-                function ($attribute, $value, $fail) use ($userId) {
-                    $exists = Metric::where('shop_id', $userId)->where('is_active', 1)->whereRaw('LOWER(name) = ?', [strtolower(trim($value))])->exists();
-
-                    if (!$exists) {
-                        $fail("Metric '{$value}' is not valid.");
-                    }
-                },
-            ],
-
-            '*.discount_type' => [
-                function ($attribute, $value, $fail) use (&$row) {
-                    $discount = $row['discount'] ?? null;
-
-                    if ($discount && empty($value)) {
-                        $fail('Discount Type is required when Discount is provided.');
-                    }
-
-                    if (!empty($value) && !in_array(strtolower($value), ['flat','percentage'])) {
-                        $fail('Discount Type must be either Flat or Percentage.');
-                    }
-                },
-            ],
-
-            '*.discount' => [
-                function ($attribute, $value, $fail) use (&$row) {
-                    $discountType = $row['discount_type'] ?? null;
-
-                    if ($discountType && ($value === null || $value === '')) {
-                        $fail('Discount value is required when Discount Type is provided.');
-                    }
-
-                    if ($value !== null && !is_numeric($value)) {
-                        $fail('Discount must be numeric.');
-                    }
-
-                    if ($value < 0) {
-                        $fail('Discount cannot be negative.');
-                    }
-                },
-            ],
-
-
-            'quantity' => ['numeric','min:0'],
+            '*.code' => ['required','max:50', Rule::unique('products','code')->where(fn($q) => $q->where('user_id',$userId))],
+            '*.hsn_code' => ['nullable','max:50', Rule::unique('products','hsn_code')->where(fn($q) => $q->where('user_id',$userId))],
+            '*.price' => ['required','numeric','min:0'],
+            '*.tax' => ['required', function($attr,$val,$fail) use($userId){ 
+                if(!Tax::where('shop_id',$userId)->whereRaw('LOWER(name)=?',[strtolower($val)])->exists()) 
+                    $fail("Tax '{$val}' is not valid.");
+            }],
+            '*.metric' => ['required', function($attr,$val,$fail) use($userId){ 
+                if(!Metric::where('shop_id',$userId)->whereRaw('LOWER(name)=?',[strtolower($val)])->exists()) 
+                    $fail("Metric '{$val}' is not valid.");
+            }],
         ];
     }
 
     public function customValidationMessages()
     {
         return [
-            '*.name.required' => 'Product Name is required.',
-            '*.code.required' => 'Product Code is required.',
-            '*.price.required'=> 'Price is required.',
+            '*.name.required'  => 'Product Name is required.',
+            '*.code.required'  => 'Product Code is required.',
+            '*.price.required' => 'Price is required.',
         ];
+    }
+
+    public function getRowCount(): int
+    {
+        return $this->rowCount;
     }
 }
