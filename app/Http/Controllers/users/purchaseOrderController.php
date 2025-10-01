@@ -359,6 +359,8 @@ class purchaseOrderController extends Controller
 
     public function refund(Request $request)
     {
+        DB::beginTransaction();
+
         $purchase = PurchaseOrder::where('id',$request->purchase_id)->first();
 
         $refund = PurchaseOrderRefund::create([
@@ -371,6 +373,13 @@ class purchaseOrderController extends Controller
             'refund_on'          => Carbon::now(),
             'reason'             => $request->comment,
         ]);
+
+        $paid = VendorPaymentDetail::where('purchase_order_id', $purchase->id)->first();
+
+        if($paid)
+        {
+            $refund->update(['need_to_deduct' => 1]);
+        }
 
         $newQuantity = max(0, $purchase->quantity - $request->refund_quantity);
         $newAmount   = max(0, $purchase->gross_cost - $request->refund_amount);
@@ -402,6 +411,11 @@ class purchaseOrderController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Refund','App/Models/PurchaseOrderRefund','purchase_order_refunds',$refund->id,'Insert',null,json_encode($request->all()),'Success','Purchase Order Refund');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrderRefund', $refund->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Purchase order return for product '.$purchase->product->name.' done successfully',null, null);
+        
+        DB::commit();
 
         return redirect()->back()->with('toast_success', 'Purchase refunded successfully!');
     }

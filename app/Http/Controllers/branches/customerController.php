@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CustomerExport;
 use App\Imports\CustomerImport;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Customer;
@@ -19,7 +20,7 @@ use DB;
 
 class customerController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request)
     {
@@ -83,6 +84,9 @@ class customerController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Customer Create','App/Models/Customer','customers',$customer->id,'Insert',null,$request,'Success','Customer Created Successfully');
 
+        //Notifiction
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Customer', $customer->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' created new customer '.Str::ucfirst($request->name),null, null);
+
         return redirect()->back()->with('toast_success', 'Customer created successfully.');
     }
 
@@ -134,6 +138,9 @@ class customerController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Customer Update','App/Models/Customer','customers',$customer->id,'Update',null,$request,'Success','Customer Updated Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Customer', $customer->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' updated customer '.Str::ucfirst($request->name),null, null);
 
         return redirect()->back()->with('toast_success', 'Customer updated successfully.');
 
