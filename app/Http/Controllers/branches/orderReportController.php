@@ -13,7 +13,7 @@ use App\Traits\Log;
 use Carbon\Carbon;
 use DB;
 
-class reportController extends Controller
+class orderReportController extends Controller
 {
     use Log;
     
@@ -35,7 +35,7 @@ class reportController extends Controller
         return view('branches.reports.index', compact('orders'));
     }
 
-    public function download_order_excel(Request $request)
+    public function download_excel(Request $request)
     {
         $query = Order::where('branch_id', Auth::user()->id);
 
@@ -53,7 +53,7 @@ class reportController extends Controller
         return Excel::download(new OrdersExport($orders), 'orders.xlsx');
     }
 
-    public function download_order_pdf(Request $request)
+    public function download_pdf(Request $request)
     {
         $query = Order::where('branch_id', Auth::user()->id);
 

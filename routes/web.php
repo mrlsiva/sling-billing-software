@@ -21,6 +21,7 @@ use App\Http\Controllers\users\financeController;
 use App\Http\Controllers\users\paymentController;
 use App\Http\Controllers\users\billController;
 use App\Http\Controllers\users\generalController;
+use App\Http\Controllers\users\orderReportsController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -30,7 +31,7 @@ use App\Http\Controllers\branches\settingController;
 use App\Http\Controllers\branches\branchDashboardController;
 use App\Http\Controllers\branches\orderController;
 use App\Http\Controllers\branches\staffController;
-use App\Http\Controllers\branches\reportController;
+use App\Http\Controllers\branches\orderReportController;
 
 Route::get('/clear', function() {
     Artisan::call('cache:clear');
@@ -258,7 +259,20 @@ else
                                 });
                             });
 
+                        });
+                    });
 
+                    Route::prefix('reports')->group(function () {
+                        Route::name('report.')->group(function () {
+
+                            Route::prefix('orders')->group(function () {
+                                Route::name('order')->group(function () {
+
+                                    Route::get('/{branch}',[orderReportsController::class, 'order']);
+                                    Route::get('/{branch}/download/pdf',[orderReportsController::class, 'download_pdf'])->name('.download_pdf');
+                                    Route::get('/{branch}/download/excel',[orderReportsController::class, 'download_excel'])->name('.download_excel');
+                                });
+                            });
                         });
                     });
 
@@ -341,9 +355,14 @@ else
                             Route::prefix('reports')->group(function () {
                                 Route::name('report.')->group(function () {
 
-                                    Route::get('/order',[reportController::class, 'order'])->name('order');
-                                    Route::get('/download_order/pdf',[reportController::class, 'download_order_pdf'])->name('download_order_pdf');
-                                    Route::get('/download_order/excel',[reportController::class, 'download_order_excel'])->name('download_order_excel');
+                                    Route::prefix('orders')->group(function () {
+                                        Route::name('order')->group(function () {
+
+                                            Route::get('/',[orderReportController::class, 'order']);
+                                            Route::get('/download/pdf',[orderReportController::class, 'download_pdf'])->name('.download_pdf');
+                                            Route::get('/download/excel',[orderReportController::class, 'download_excel'])->name('.download_excel');
+                                        });
+                                    });
                                 });
                             });
 

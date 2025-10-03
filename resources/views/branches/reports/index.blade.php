@@ -40,12 +40,12 @@
 				<div class="">
 
 					<div class="d-flex justify-content-end p-3">
-						<form method="get" action="{{route('branch.report.download_order_excel', ['company' => request()->route('company')])}}">
+						<form method="get" action="{{route('branch.report.order.download_excel', ['company' => request()->route('company')])}}">
 							<input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
 							<input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
 							<button class="btn btn-success"> <i class="ri-file-excel-2-line"></i> Excel </button>
 						</form>
-						<form method="get" action="{{route('branch.report.download_order_pdf', ['company' => request()->route('company')])}}">
+						<form method="get" action="{{route('branch.report.order.download_pdf', ['company' => request()->route('company')])}}">
 							<input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
 							<input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
 							<button class="btn btn-success"> <i class="ri-file-pdf-2-line"></i> PDF </button>
@@ -107,4 +107,25 @@
 			</div>
 		</div>
 	</div>
+@endsection
+
+@section('script')
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fromInput = document.getElementById("from");
+            const toInput = document.getElementById("to");
+
+            fromInput.addEventListener("change", function () {
+                toInput.min = fromInput.value; // set min date
+                if (toInput.value && toInput.value < fromInput.value) {
+                    toInput.value = fromInput.value; // auto-correct if invalid
+                }
+            });
+
+            // If "from" already has a value on load, set "to" min accordingly
+            if (fromInput.value) {
+                toInput.min = fromInput.value;
+            }
+        });
+    </script>
 @endsection

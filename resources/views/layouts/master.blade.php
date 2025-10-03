@@ -178,6 +178,15 @@
                             </a>
                         </li>
 
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/reports/orders/*') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{route('report.order', ['company' => request()->route('company'),'branch' => 0])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-file-chart-line"></i>
+                                </span>
+                                <span class="nav-text"> Reports </span>
+                            </a>
+                        </li>
+
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/settings/*') ? 'active' : '' }}">
                             <a class="menu-link menu-arrow" href="#sidebarSetting" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSetting">
                                 <span class="nav-icon">
@@ -208,6 +217,8 @@
                                 </ul>
                             </div>
                         </li>
+
+
                         
 
                     </ul>
@@ -270,15 +281,6 @@
                             </a>
                         </li>
 
-                        <!-- <li class="menu-item">
-                            <a class="menu-link" href="{{route('branch.setting.index', ['company' => request()->route('company')])}}">
-                                <span class="nav-icon">
-                                    <i class="ri-settings-3-line"></i>
-                                </span>
-                                <span class="nav-text"> Settings </span>
-                            </a>
-                        </li> -->
-
                         <li class="menu-item">
                             <a class="menu-link" href="{{route('branch.report.order', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
@@ -287,7 +289,15 @@
                                 <span class="nav-text"> Reports </span>
                             </a>
                         </li>
-                        
+
+                        <!-- <li class="menu-item">
+                            <a class="menu-link" href="{{route('branch.setting.index', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-settings-3-line"></i>
+                                </span>
+                                <span class="nav-text"> Settings </span>
+                            </a>
+                        </li> -->
 
                     </ul>
                 @endif
