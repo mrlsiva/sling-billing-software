@@ -30,6 +30,7 @@ use App\Http\Controllers\branches\settingController;
 use App\Http\Controllers\branches\branchDashboardController;
 use App\Http\Controllers\branches\orderController;
 use App\Http\Controllers\branches\staffController;
+use App\Http\Controllers\branches\reportController;
 
 Route::get('/clear', function() {
     Artisan::call('cache:clear');
@@ -334,6 +335,15 @@ else
 
                                     Route::get('/',[settingController::class, 'index'])->name('index');
                                     Route::get('/store',[settingController::class, 'store'])->name('store');
+                                });
+                            });
+
+                            Route::prefix('reports')->group(function () {
+                                Route::name('report.')->group(function () {
+
+                                    Route::get('/order',[reportController::class, 'order'])->name('order');
+                                    Route::get('/download_order/pdf',[reportController::class, 'download_order_pdf'])->name('download_order_pdf');
+                                    Route::get('/download_order/excel',[reportController::class, 'download_order_excel'])->name('download_order_excel');
                                 });
                             });
 

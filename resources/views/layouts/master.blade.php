@@ -278,6 +278,15 @@
                                 <span class="nav-text"> Settings </span>
                             </a>
                         </li> -->
+
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('branch.report.order', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-file-chart-line"></i>
+                                </span>
+                                <span class="nav-text"> Reports </span>
+                            </a>
+                        </li>
                         
 
                     </ul>
