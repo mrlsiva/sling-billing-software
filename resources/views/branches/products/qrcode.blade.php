@@ -97,7 +97,7 @@
 
     @page {
         size: 4.13in 1.63in landscape; /* TE244 label size */
-        margin: 7px 0 0 0;
+        margin: 5px 0 0 0;
     }
 
     body, html { margin: 0; padding: 0; }
