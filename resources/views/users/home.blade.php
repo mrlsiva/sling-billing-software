@@ -10,21 +10,105 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand fw-bold" href="#">{{$user->name}}</a>
-        <a href="{{ route('login', ['company' => request()->route('company')]) }}" class="btn btn-warning btn-md ">Login</a>
+        <a href="{{ route('login', ['company' => request()->route('company')]) }}" class="btn btn-warning btn-md ">HO Login</a>
     </div>
   </nav>
 <!-- Hero Section -->
-<section class="hero animate__animated animate__fadeIn" 
+<section class="hero animate__animated animate__fadeIn py-5" 
     style="background: linear-gradient(135deg, 
         {{ $user->user_detail->primary_colour ?? '#000000' }}, 
         {{ $user->user_detail->secondary_colour ?? '#1B1E2C' }} );">
   <div class="container">
-    <h1 class="display-4 fw-bold">{{$user->name}} Billing Software</h1>
-    <p class="lead">{{$user->phone}} | {{$user->email}} | {{$user->user_detail->address}}</p>
-    <a href="{{ route('login', ['company' => request()->route('company')]) }}" class="btn btn-warning btn-lg mt-3">Login</a>
+    <h1 class="display-4 fw-bold text-white">{{$user->name}} Billing Software</h1>
+    <p class="lead text-white">{{$user->phone}} | {{$user->email}} | {{$user->user_detail->address}}</p>
+    <!-- <a href="{{ route('login', ['company' => request()->route('company')]) }}" class="btn btn-warning btn-lg mt-3">Login</a> -->
   </div>
 </section>
+<section class="hero animate__animated animate__fadeIn py-5">
+  <div class="container">
+    <div class="row">
+	<div class="col-xl-12">
+		<div class="card">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<div>
+					<p class="card-title mb-0">Welcome to {{$user->name}}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+    <div class="row">
+        <div class="col-md-3 col-md-3">
+            <div class="card">
+                <div class="card-body pt-3 pb-2 px-4">
+                    <div class="d-flex align-items-center justify-content-between w-100">
+                    <h4 class="fw-bold d-flex align-items-center gap-2 mb-0"><img src="http://localhost/sling-billing-software/public/storage/billing/vasantham/logo/1757494022_logo-1.png" class="logo-dark me-1" alt="Branch" height="30"></h4>
+                    <div class="d-flex flex-column align-items-center justify-content-center  gap-2">
+                            <div class="d-flex align-items-center gap-2 pt-2">
+                                <div class="box" style="background-color: #ff0000;"></div>
+                                <div class="box" style="background-color: #1a21ff;"></div>
 
+                            </div>
+                            <a href="http://localhost/sling-billing-software/public/admin/shops/2/view"> <i
+                                    class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="card-Footer border p-3 pt-2">
+                    <div class="d-flex align-items-center justify-content-between w-100">
+                         <div class="w-100 text-center my-3">
+                            <p class="mb-0 card-title">Branch 1 Name</p>
+                            
+                        </div>
+                        
+                        
+                    </div>
+                    <div class="mt-3 w-100">
+                        <a href="" class="btn btn-warning btn-xs w-100">Login</a>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-md-3">
+            <div class="card">
+                <div class="card-body pt-3 pb-2 px-4">
+                    <div class="d-flex align-items-center justify-content-between w-100">
+                    <h4 class="fw-bold d-flex align-items-center gap-2 mb-0"><img src="http://localhost/sling-billing-software/public/storage/billing/vasantham/logo/1757494022_logo-1.png" class="logo-dark me-1" alt="Branch" height="30"></h4>
+                    <div class="d-flex flex-column align-items-center justify-content-center  gap-2">
+                            <div class="d-flex align-items-center gap-2 pt-2">
+                                <div class="box" style="background-color: #ff0000;"></div>
+                                <div class="box" style="background-color: #1a21ff;"></div>
+
+                            </div>
+                            <a href="http://localhost/sling-billing-software/public/admin/shops/2/view"> <i
+                                    class="ri-arrow-right-circle-line fs-32 text-muted"></i></a>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="card-Footer border p-3 pt-2">
+                    <div class="d-flex align-items-center justify-content-between w-100">
+                        <div class="w-100 text-center my-3">
+                            <p class="mb-0 card-title">Branch 2 Name</p>
+                            
+                        </div>
+                        
+                        
+                    </div>
+                    <div class="mt-3 w-100">
+                        <a href="" class="btn btn-warning btn-xs w-100">Login</a>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</section>
 @endsection
 <div class="card" style="display:none">
     <a href="{{ route('login', ['company' => request()->route('company')]) }}">
