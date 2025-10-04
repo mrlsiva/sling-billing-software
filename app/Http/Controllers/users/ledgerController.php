@@ -55,11 +55,11 @@ class ledgerController extends Controller
         $purchase_orders = $query->paginate(10);
 
         // ✅ Totals
-        $refund = PurchaseOrderRefund::whereIn('id', $purchaseOrderIds)->sum('refund_amount');
+        $refund = PurchaseOrderRefund::whereIn('id', $purchaseOrderIds)->where('need_to_deduct',1)->sum('refund_amount');
         $totalGross = PurchaseOrder::whereIn('id', $purchaseOrderIds)->sum('gross_cost');
         $totalPaid  = $payments->sum('amount') - $refund;
         $balance    = $totalGross - $totalPaid;
-        $refund = PurchaseOrderRefund::where('vendor_id', $id)->sum('refund_amount');
+        $refund = PurchaseOrderRefund::where([['vendor_id', $id],['need_to_deduct',1]])->sum('refund_amount');
         $vendor_payments = VendorPayment::where('vendor_id',$id)->get();
         $totalPaid  = $vendor_payments->sum('amount') - $refund;
 

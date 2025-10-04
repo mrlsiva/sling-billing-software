@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Traits\Notifications;
 use App\Models\ProductHistory;
 use App\Models\SubCategory;
 use App\Models\Category;
@@ -16,7 +17,7 @@ use DB;
 
 class inventoryController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function stock(Request $request,$company,$shop,$branch)
     {
@@ -197,6 +198,12 @@ class inventoryController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Product Transfer','App/Models/ProductHistory','product_histories',$transfer->id,'Create',null,$request,'Success','Product Transfered Successfully');
+
+        //Notification
+        $this->notification(Auth::user()->owner_id, null,'App/Models/ProductHistory', $transfer->id, null, json_encode($request->all()), now(), Auth::user()->id, $transfer->product->name.' has been successfully transfered to branch '.$transfer->branch->name,null, null);
+
+        //Notification
+        $this->notification(null, $request->branch,'App/Models/ProductHistory', $transfer->id, null, json_encode($request->all()), now(), Auth::user()->id, $transfer->product->name.' has been successfully transfered to your branch '.$transfer->branch->name,null, null);
 
         DB::commit();
 

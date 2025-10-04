@@ -31,7 +31,7 @@
                 $user = App\Models\User::where('slug_name',request()->segment(1))->first();
             @endphp
             <!-- Sidebar Logo -->
-            <div class="logo-box">
+            <!-- <div class="logo-box">
                 @if(request()->segment(1) === 'admin')
                     <a href="#" class="logo-dark">
                         <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
@@ -40,7 +40,7 @@
 
                     <a href="#" class="logo-light">
                         <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
-                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light" >
                     </a>
                     
                 @else
@@ -54,7 +54,7 @@
                         <img src="{{ asset('storage/' . $user->logo) }}" class="logo-lg" alt="logo light">
                     </a>
                 @endif
-            </div>
+            </div> -->
 
             <div class="h-100" data-simplebar>
                 @if(Auth::user()->hasRole('Super Admin'))
@@ -178,6 +178,15 @@
                             </a>
                         </li>
 
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/reports/orders/*') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{route('report.order', ['company' => request()->route('company'),'branch' => 0])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-file-chart-line"></i>
+                                </span>
+                                <span class="nav-text"> Reports </span>
+                            </a>
+                        </li>
+
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/settings/*') ? 'active' : '' }}">
                             <a class="menu-link menu-arrow" href="#sidebarSetting" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSetting">
                                 <span class="nav-icon">
@@ -208,6 +217,8 @@
                                 </ul>
                             </div>
                         </li>
+
+
                         
 
                     </ul>
@@ -270,6 +281,15 @@
                             </a>
                         </li>
 
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('branch.report.order', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-file-chart-line"></i>
+                                </span>
+                                <span class="nav-text"> Reports </span>
+                            </a>
+                        </li>
+
                         <!-- <li class="menu-item">
                             <a class="menu-link" href="{{route('branch.setting.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
@@ -278,7 +298,6 @@
                                 <span class="nav-text"> Settings </span>
                             </a>
                         </li> -->
-                        
 
                     </ul>
                 @endif
@@ -291,12 +310,13 @@
                 @if(request()->segment(1) === 'admin')
                     <a href="#" class="logo-dark">
                         <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
-                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo dark">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo dark" >
                     </a>
 
                     <a href="#" class="logo-light">
                         <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-sm" alt="logo sm">
-                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light">
+                        <img src="{{asset('assets/images/sling-logo.png')}}" class="logo-lg" alt="logo light" >
+                        <!-- style="background: #1B1E2C;" -->
                     </a>
                     
                 @else

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $fillable = [
-        'user_id','name','image','is_active'
+        'user_id','name','image','is_active','is_bulk_upload','run_id'
     ];
 
     public function sub_categories()

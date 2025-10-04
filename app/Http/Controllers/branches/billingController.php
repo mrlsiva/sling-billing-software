@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use App\Traits\Notifications;
 use App\Models\SubCategory;
 use App\Models\Category;
 use App\Models\Product;
@@ -32,7 +33,7 @@ use DB;
 
 class billingController extends Controller
 {
-    use Log;
+    use Log, Notifications;
     
     public function billing(Request $request)
     {
@@ -296,12 +297,16 @@ class billingController extends Controller
             ]);
         }
 
-        DB::commit();
+        
 
         //Log
         $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
 
+        //Notifiction
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null);
 
+        DB::commit();
+        
         return response()->json([
             'status'   => 'success',
             'message'  => 'Order saved successfully',

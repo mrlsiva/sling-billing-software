@@ -5,6 +5,7 @@ namespace App\Http\Controllers\branches;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderPaymentDetail;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\RefundDetail;
 use App\Models\OrderDetail;
@@ -20,7 +21,7 @@ use DB;
 
 class orderController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request)
     {
@@ -95,6 +96,9 @@ class orderController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::id(),'Refund','App/Models/Refund','refunds',$refund->id,'Insert',null,null,'Success','Refund done Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Refund', $refund->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' refunded order '.$refund->order->bill_id.' to customer '.$refund->order->customer->name,null, null);
 
         return redirect()->route('branch.order.index', request()->route('company'))->with('toast_success', 'Refund done successfully.');
     }

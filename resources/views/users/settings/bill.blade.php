@@ -14,8 +14,8 @@
                 </div>
             </div>
             <div class="card-body pt-2 ">
+                @if($branches->count() != 0)
                 <ul class="nav nav-tabs nav-justified">
-
                     @foreach($branches as $Branch)
                     	<li class="nav-item">
 	                        <a href="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => $Branch->id])}}" class="nav-link {{ $branch == $Branch->id ? 'active' : '' }}" id="{{$Branch->id}}">
@@ -24,8 +24,6 @@
 	                        </a>
                     	</li>
                     @endforeach
-                    
-
                 </ul>
 
                 <div class="tab-content pt-2 text-muted">
@@ -77,6 +75,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
             <div class="card-footer border-0">
                 {!! $bills->withQueryString()->links('pagination::bootstrap-5') !!}

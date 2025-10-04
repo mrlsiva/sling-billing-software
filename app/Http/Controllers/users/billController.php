@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\BillSetup;
@@ -14,7 +15,7 @@ use DB;
 
 class billController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request,$company,$branch = null)
     {
@@ -61,8 +62,13 @@ class billController extends Controller
             'is_active'   => 1,
         ]);
 
+        $branch = User::where('id',$request->branch_id)->first();
+
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Bill number setup','App/Models/BillSetup','bill_setups',$bill->id,'Insert',null,$request,'Success','Bill number set successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/BillSetup', $bill->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bill number set successfully for branch '. $branch->name,null, null);
 
         DB::commit();
 

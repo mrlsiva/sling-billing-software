@@ -5,12 +5,15 @@ namespace App\Http\Controllers\branches;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 use App\Exports\CustomerExport;
 use App\Imports\CustomerImport;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Customer;
+use App\Models\BulkUploadLog;
 use App\Models\Gender;
 use App\Models\User;
 use App\Models\Order;
@@ -19,7 +22,7 @@ use DB;
 
 class customerController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request)
     {
@@ -83,6 +86,9 @@ class customerController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Customer Create','App/Models/Customer','customers',$customer->id,'Insert',null,$request,'Success','Customer Created Successfully');
 
+        //Notifiction
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Customer', $customer->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' created new customer '.Str::ucfirst($request->name),null, null);
+
         return redirect()->back()->with('toast_success', 'Customer created successfully.');
     }
 
@@ -135,6 +141,9 @@ class customerController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Customer Update','App/Models/Customer','customers',$customer->id,'Update',null,$request,'Success','Customer Updated Successfully');
 
+        //Notifiction
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Customer', $customer->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' updated customer '.Str::ucfirst($request->name),null, null);
+
         return redirect()->back()->with('toast_success', 'Customer updated successfully.');
 
     }
@@ -168,10 +177,15 @@ class customerController extends Controller
     public function bulk_upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx|max:10000', // Allow larger files
+            'file' => 'required|mimes:xlsx|max:10000',
         ]);
 
-        $import = new CustomerImport();
+        // Generate unique run_id
+        do {
+            $run_id = rand(100000, 999999);
+        } while (BulkUploadLog::where('run_id', $run_id)->exists());
+
+        $import = new CustomerImport($run_id);
         Excel::import($import, $request->file('file'));
 
         $skipped = [];
@@ -181,14 +195,82 @@ class customerController extends Controller
             }
         }
 
-        if (count($skipped) > 0) {
+        // Counts
+        $totalRecords      = $import->getRowCount(); // make sure your import counts ALL rows
+        $errorRecords      = count($skipped);
+        $successfulRecords = max(0, $totalRecords - $errorRecords);
 
-            return redirect()->back()->with('error_alert', 'Some rows were skipped: ' . implode(' | ', $skipped)); 
+        // Base directory for this run
+        $directory = "bulk_uploads/customers/{$run_id}";
+
+        // Ensure directory exists
+        if (!Storage::disk('public')->exists($directory)) {
+            Storage::disk('public')->makeDirectory($directory);
+        }
+
+        // 1️⃣ Save uploaded Excel file
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $excelPath    = $uploadedFile->storeAs($directory, $originalName, 'public');
+
+        // 2️⃣ Build log content
+        $logContent  = "======================" . PHP_EOL;
+        $logContent .= "Bulk Upload Report" . PHP_EOL;
+        $logContent .= "Uploaded On: " . now() . PHP_EOL;
+        $logContent .= "Run ID: {$run_id}" . PHP_EOL;
+        $logContent .= "Uploaded File: {$originalName}" . PHP_EOL;
+        $logContent .= "Total Records: {$totalRecords}" . PHP_EOL;
+        $logContent .= "Successful Records: {$successfulRecords}" . PHP_EOL;
+        $logContent .= "Error Records: {$errorRecords}" . PHP_EOL;
+
+        if ($errorRecords > 0) {
+            $logContent .= "Error Details:" . PHP_EOL;
+            foreach ($skipped as $error) {
+                $logContent .= "- {$error}" . PHP_EOL;
+            }
+        }
+
+        $logContent .= "======================" . PHP_EOL . PHP_EOL;
+
+        // 3️⃣ Save log file
+        $logFile = "{$directory}/log.txt";
+        Storage::disk('public')->put($logFile, $logContent);
+
+        // 4️⃣ Save into BulkUploadLog table
+        $bulk_upload = BulkUploadLog::create([
+            'user_id'            => auth()->id(),
+            'run_id'             => $run_id,
+            'run_on'             => now(),
+            'module'             => 'Customer',
+            'total_record'       => $totalRecords,
+            'successfull_record' => $successfulRecords,
+            'error_record'       => $errorRecords,
+            'excel'              => $excelPath,
+            'log'                => $logFile,
+        ]);
+
+        // 5️⃣ Notification
+        $this->notification(
+            null,
+            Auth::user()->parent_id,
+            'App/Models/BulkUploadLog',
+            $bulk_upload->id,
+            null,
+            json_encode($request->all()),
+            now(),
+            Auth::user()->id,
+            'Bulk upload done for customers',
+            null,
+            $logFile
+        );
+
+        if ($errorRecords > 0) {
+            return redirect()->back()->with('error_alert', 'Some rows were skipped: ' . implode(' | ', $skipped));
         }
 
         return redirect()->back()->with('toast_success', 'Bulk customers uploaded successfully.');
-
     }
+
 
     public function download(Request $request)
     {
