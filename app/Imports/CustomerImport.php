@@ -15,42 +15,47 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Carbon\Carbon;
 
 class CustomerImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, SkipsEmptyRows
 {
     use SkipsFailures;
 
-    protected $parentId;
-    protected $validGenders;
+    private int $rowCount = 0;
+    private int $runId;
+    protected int $parentId;
+    protected array $validGenders;
 
-    public function __construct()
+    public function __construct(int $runId)
     {
+        $this->runId = $runId;
+
         $parent = User::find(Auth::id());
         $this->parentId = $parent->parent_id ?? Auth::id();
 
-        // Fetch all active genders
-        $this->validGenders = Gender::where('is_active', 1)->pluck('id', 'name')->mapWithKeys(function ($id, $name) {
-            return [strtolower($name) => $id];
-        })->toArray();
+        // Fetch active genders
+        $this->validGenders = Gender::where('is_active', 1)
+            ->pluck('id', 'name')
+            ->mapWithKeys(fn($id, $name) => [strtolower($name) => $id])
+            ->toArray();
     }
 
     public function model(array $row)
     {
-        $name       = Str::ucfirst(trim($row['name'] ?? ''));
-        $phone      = trim($row['phone'] ?? '');
-        $altPhone   = trim($row['alternate_phone'] ?? null);
-        $address    = trim($row['address'] ?? '');
-        $pincode    = trim($row['pincode'] ?? null);
-        $gender     = trim($row['gender'] ?? null);
-        $dobExcel = $row['dob'] ?? null;
-        $dob = null;
+        ++$this->rowCount;
 
-        if ($dobExcel != null) {
+        $name     = Str::ucfirst(trim($row['name'] ?? ''));
+        $phone    = trim($row['phone'] ?? '');
+        $altPhone = trim($row['alternate_phone'] ?? null);
+        $address  = trim($row['address'] ?? '');
+        $pincode  = trim($row['pincode'] ?? null);
+        $gender   = trim($row['gender'] ?? null);
+        $dobExcel = $row['dob'] ?? null;
+        $dob      = null;
+
+        if ($dobExcel !== null) {
             $dobObj = Date::excelToDateTimeObject($dobExcel);
             $dob = $dobObj->format('Y-m-d');
         }
-        
 
         // Map gender
         $genderId = null;
@@ -63,56 +68,46 @@ class CustomerImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             }
         }
 
-        if (!empty($altPhone)) 
-        {
-            if($phone === $altPhone) 
-            {
-                return null;
-            }
+        if (!empty($altPhone) && $altPhone === $phone) {
+            return null; // skip invalid row
         }
 
         return new Customer([
-            'user_id'   => $this->parentId,
-            'name'      => $name,
-            'phone'     => $phone,
-            'alt_phone' => $altPhone,
-            'address'   => $address,
-            'pincode'   => $pincode,
-            'gender_id' => $genderId,
-            'dob'       => $dob,
+            'user_id'         => $this->parentId,
+            'branch_id'       => Auth::user()->id,
+            'name'            => $name,
+            'phone'           => $phone,
+            'alt_phone'       => $altPhone,
+            'address'         => $address,
+            'pincode'         => $pincode,
+            'gender_id'       => $genderId,
+            'dob'             => $dob,
+            'is_bulk_upload'  => 1,           // track bulk upload
+            'run_id'          => $this->runId, // associate with run_id
         ]);
     }
 
-
     public function rules(): array
     {
-        $parentId = $this->parentId;
-        $validGenderNames = array_keys($this->validGenders);
-
         return [
             '*.name' => ['required', 'string', 'max:50'],
             '*.phone' => [
                 'required',
                 'digits:10',
-                function ($attribute, $value, $fail) use ($parentId, &$row) {
-                    $exists = Customer::where('user_id', $parentId)
+                function ($attribute, $value, $fail) {
+                    $exists = Customer::where('user_id', $this->parentId)
                         ->where('phone', $value)
                         ->exists();
                     if ($exists) {
                         $fail("Phone '{$value}' is already used by another customer.");
-                    }
-
-                    $altPhone = trim($row['alternate_phone'] ?? '');
-                    if ($altPhone && $altPhone === $value) {
-                        $fail('Phone and Alternate Phone must be different.');
                     }
                 }
             ],
             '*.alternate_phone' => [
                 'nullable',
                 'digits:10',
-                function ($attribute, $value, $fail) use (&$row) {
-                    $phone = trim($row['phone'] ?? '');
+                function ($attribute, $value, $fail) {
+                    $phone = trim(request()->input(str_replace('.alternate_phone', '.phone', $attribute)) ?? '');
                     if ($value && $value === $phone) {
                         $fail('Alternate Phone must be different from Phone.');
                     }
@@ -121,7 +116,7 @@ class CustomerImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             '*.address' => ['required', 'string', 'max:200'],
             '*.pincode' => ['nullable', 'digits:6', 'regex:/^[1-9][0-9]{5}$/'],
             '*.dob' => [
-                function($attribute, $value, $fail) {
+                function ($attribute, $value, $fail) {
                     if (!empty($value)) {
                         try {
                             $date = Date::excelToDateTimeObject($value);
@@ -134,12 +129,11 @@ class CustomerImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
                     }
                 }
             ],
-
             '*.gender' => [
                 'nullable',
                 'string',
-                function ($attribute, $value, $fail) use ($validGenderNames) {
-                    if (!empty($value) && !in_array(strtolower($value), $validGenderNames)) {
+                function ($attribute, $value, $fail) {
+                    if (!empty($value) && !isset($this->validGenders[strtolower($value)])) {
                         $fail("Gender '{$value}' is invalid.");
                     }
                 }
@@ -150,14 +144,18 @@ class CustomerImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
     public function customValidationMessages()
     {
         return [
-            'name.required' => 'Name is required.',
-            'phone.required' => 'Phone is required.',
-            'phone.digits' => 'Phone must be exactly 10 digits.',
-            'alternate_phone.digits' => 'Alternate Phone must be exactly 10 digits.',
-            'address.required' => 'Address is required.',
-            'pincode.digits' => 'Pincode must be exactly 6 digits.',
-            'pincode.regex' => 'Pincode is invalid.',
-            'dob.date' => 'DOB must be a valid date.',
+            'name.required'            => 'Name is required.',
+            'phone.required'           => 'Phone is required.',
+            'phone.digits'             => 'Phone must be exactly 10 digits.',
+            'alternate_phone.digits'   => 'Alternate Phone must be exactly 10 digits.',
+            'address.required'         => 'Address is required.',
+            'pincode.digits'           => 'Pincode must be exactly 6 digits.',
+            'pincode.regex'            => 'Pincode is invalid.',
         ];
+    }
+
+    public function getRowCount(): int
+    {
+        return $this->rowCount;
     }
 }

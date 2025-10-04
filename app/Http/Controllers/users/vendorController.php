@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\Vendor;
 use App\Traits\Log;
@@ -12,7 +13,7 @@ use DB;
 
 class vendorController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request)
     {
@@ -69,7 +70,10 @@ class vendorController extends Controller
         DB::commit();
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Vendor Create','App/Models/Vendor','vendors',$vendor->id,'Insert',null,$request,'Success','Vendor Created Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Vendor Create','App/Models/Vendor','vendors',$vendor->id,'Insert',null,json_encode($request->all()),'Success','Vendor Created Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' vendor created successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Vendor created successfully.');
     }
@@ -89,6 +93,9 @@ class vendorController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Vendor Status Update','App/Models/Vendor','vendors',$request->id,'Update',null,null,'Success',$statusText);
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $vendor->name.' '.$statusText,null, null);
 
         return redirect()->back()->with('toast_success', "Vendor Status Changed");
     }
@@ -137,6 +144,9 @@ class vendorController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Vendor Update','App/Models/Vendor','vendors',$vendor->id,'Update',null,$request,'Success','Vendor Updated Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->vendor_name. ' vendor updated successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Vendor updated successfully.');
 

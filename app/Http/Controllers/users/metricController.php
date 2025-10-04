@@ -5,6 +5,7 @@ namespace App\Http\Controllers\users;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\Metric;
 use App\Traits\Log;
@@ -12,7 +13,7 @@ use DB;
 
 class metricController extends Controller
 {
-    use Log;
+    use Log, Notifications;
     
     public function index(Request $request)
     {
@@ -49,7 +50,10 @@ class metricController extends Controller
         DB::commit();
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Metric Create','App/Models/Metric','metrics',$metric->id,'Insert',null,$request,'Success','Metric Created Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Metric Create','App/Models/Metric','metrics',$metric->id,'Insert',null, json_encode($request->all()),'Success','Metric Created Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' metric created successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Metric created successfully.');
     }
@@ -69,6 +73,9 @@ class metricController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Metric Status Update','App/Models/Metric','metrics',$request->id,'Update',null,null,'Success',$statusText);
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $metric->name.' '.$statusText,null, null);
 
         return redirect()->back()->with('toast_success', "Metric Status Changed");
     }
@@ -110,6 +117,9 @@ class metricController extends Controller
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Metric Update','App/Models/Metric','metrics',$metric->id,'Update',null,$request,'Success','Metric Updated Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->metric.' metric updated successfully',null, null);
 
         return redirect()->back()->with('toast_success', 'Metric updated successfully.');
     }

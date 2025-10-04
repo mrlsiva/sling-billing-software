@@ -194,7 +194,7 @@
                                     <td>Rs. {{number_format($purchase_order->gross_cost,2)}}</td>
                                     @php
                                         $payment_details = App\Models\VendorPaymentDetail::where('purchase_order_id', $purchase_order->id)->sum('amount');
-                                        $refunds = App\Models\PurchaseOrderRefund::where('purchase_order_id', $purchase_order->id)->sum('refund_amount');
+                                        $refunds = App\Models\PurchaseOrderRefund::where([['purchase_order_id', $purchase_order->id],['need_to_deduct',1]])->sum('refund_amount');
                                     @endphp
                                     <td>Rs. {{number_format($payment_details - $refunds,2)}}</td>
                                     <td>

@@ -114,6 +114,7 @@ class shopController extends Controller
         ]);
 
         $user->update([
+            'owner_id' => $user->id,
             'created_by' => $user->id
         ]);
 
