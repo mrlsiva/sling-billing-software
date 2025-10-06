@@ -41,6 +41,17 @@
                                 <img src="{{ asset('storage/' . $user->logo) }}" class="logo-dark me-1" alt="user-profile-image" height="50">
                             </div>
 
+                            <div class="col-xl-12 col-md-12 mb-3">
+                                <label for="name" class="form-label">Upload Branch Fav Icon</label>
+                                <div class="input-group">
+                                    <input type="file" name="fav_icon" id="fav_icon" class="form-control" accept="image/*">
+                                </div>
+                            </div>
+
+                            <div class="p-4">
+                                <img src="{{ asset('storage/' . $user->fav_icon) }}" class="logo-dark me-1" alt="user-profile-image" height="50">
+                            </div>
+
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Branch Name</label>
