@@ -74,6 +74,10 @@
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Secondary Color :</h5>
                             <p class="fw-medium mb-0">@if($user->user_detail->secondary_colour != null) {{$user->user_detail->secondary_colour}} @else - @endif</p>
                     </div>
+                    <div class="pt-3">
+                            <h5 class="text-dark fs-12 text-uppercase fw-bold">Is Bill Enabled:</h5>
+                            <p class="fw-medium mb-0">@if($user->user_detail->is_bill_enabled == 1) <span class="badge bg-soft-success text-success">Enabled</span> @else <span class="badge bg-soft-danger text-danger">Disabled</span> @endif</p>
+                    </div>
                 </div>
             </div>
         </div>

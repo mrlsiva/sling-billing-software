@@ -12,6 +12,13 @@
 					<div>
 						<p class="card-title">All Customer</p>
 					</div>
+
+					@if(Auth::user()->user_detail->is_bill_enabled == 1)
+					<div>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#customerAdd"><i class='bx bxs-folder-plus'></i> Create Customer</a>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#bulkUpload"><i class='bx bxs-folder-plus'></i> Bulk Upload</a>
+					</div>
+					@endif
 				</div>
 
 				<form method="get" action="{{route('customer.index', ['company' => request()->route('company')])}}">
@@ -112,6 +119,138 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="modal fade" id="customerAdd" tabindex="-1" aria-labelledby="customerAdd" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="row" action="{{route('customer.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                	@csrf
+	                <div class="modal-body">
+
+	                   	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Name</label>
+		                            <span class="text-danger">*</span>
+		                            <input type="text" id="name" name="name" class="form-control" required="">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                   	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Phone</label>
+		                            <span class="text-danger">*</span>
+		                            <input type="tel" name="phone" id="phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                   	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Alternate Phone</label>
+		                            <input type="tel" id="alt_phone" name="alt_phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+	                   	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="choices-single-groups" class="form-label text-muted">Address</label>
+		                            <span class="text-danger">*</span>
+		                            <input type="text" id="address" name="address" class="form-control" required="">
+		                        </div>
+		                    </div>
+	                   	</div>
+
+		                <div class="row">
+		                	<div class="col-md-12">
+		                		<div class="mb-3">
+		                			<label for="choices-single-groups" class="form-label text-muted">Pincode</label>
+		                			<input type="number" id="pincode" name="pincode" class="form-control" min="1">
+		                		</div>
+		                	</div>
+		                </div>
+
+		                <div class="row">
+		                	<div class="col-md-12">
+		                		<div class="mb-3">
+		                			 <label for="payment_method" class="form-label">Gender</label>
+                                    <select class="form-control" data-choices name="gender" id="gender">
+                                        <option value="">Select</option>
+                                        @foreach($genders as $gender)
+                                        	<option value="{{$gender->id}}">{{$gender->name}}</option>
+                                        @endforeach
+                                    </select>
+		                		</div>
+		                	</div>
+		                </div>
+
+		                <div class="row">
+		                	<div class="col-md-12">
+		                		<div class="mb-3">
+		                			<label for="choices-single-groups" class="form-label text-muted">DOB</label>
+		                			<input type="date" id="dob" name="dob" class="form-control" max="{{ date('Y-m-d') }}">
+		                		</div>
+		                	</div>
+		                </div>
+
+		            </div>
+
+		            <div class="modal-footer">
+		            	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		            	<button type="submit" class="btn btn-primary">Submit</button>
+		            </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="bulkUpload" tabindex="-1" aria-labelledby="bulkUpload" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Bulk Upload</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="row" action="{{route('branch.customer.bulk_upload', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                	@csrf
+	                <div class="modal-body">
+
+	                	<div class="row">
+		                    <div class="col-md-12 d-flex justify-content-end">
+		                    	<a href="{{ asset('assets/templates/customer.xlsx') }}" download="Customer_Template.xlsx">Download Template</a>
+		                    </div>
+		                </div>
+
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="name" class="form-label">Upload File</label>
+	                                <div class="input-group">
+	                                    <input type="file" name="file" id="file" class="form-control" accept=".xlsx">
+	                                </div>
+		                        </div>
+		                    </div>
+	                   </div>
+	                   
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	                    <button type="submit" class="btn btn-primary">Submit</button>
+	                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('script')

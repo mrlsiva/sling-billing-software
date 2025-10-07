@@ -21,6 +21,7 @@ use App\Http\Controllers\users\financeController;
 use App\Http\Controllers\users\paymentController;
 use App\Http\Controllers\users\billController;
 use App\Http\Controllers\users\generalController;
+use App\Http\Controllers\users\staffsController;
 use App\Http\Controllers\users\orderReportsController;
 
 
@@ -196,8 +197,20 @@ else
                         Route::name('customer.')->group(function () {
 
                             Route::get('/index',[userController::class, 'index'])->name('index');
+                            Route::post('/store',[userController::class, 'store'])->name('store');
                             Route::get('/{id}/order',[userController::class, 'order'])->name('order');
                             Route::get('/download',[userController::class, 'download'])->name('download');
+                        });
+                    });
+
+                    Route::prefix('staffs')->group(function () {
+                        Route::name('staff.')->group(function () {
+
+                            Route::get('/index',[staffsController::class, 'index'])->name('index');
+                            Route::post('/store',[staffsController::class, 'store'])->name('store');
+                            Route::post('/status',[staffsController::class, 'status'])->name('status');
+                            Route::post('/update',[staffsController::class, 'update'])->name('update');
+
                         });
                     });
 

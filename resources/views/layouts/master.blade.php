@@ -182,6 +182,28 @@
                             </a>
                         </li>
 
+                        @if(Auth::user()->user_detail->is_bill_enabled == 1)
+
+                            <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/staffs/*') ? 'active' : '' }}">
+                                <a class="menu-link" href="{{route('staff.index', ['company' => request()->route('company')])}}">
+                                    <span class="nav-icon">
+                                        <i class="ri-group-line"></i>
+                                    </span>
+                                    <span class="nav-text"> Staff </span>
+                                </a>
+                            </li>
+
+                            <li class="menu-item ">
+                                <a class="menu-link" href="#">
+                                    <span class="nav-icon">
+                                        <i class="ri-shopping-cart-line"></i>
+                                    </span>
+                                    <span class="nav-text"> POS </span>
+                                </a>
+                            </li>
+
+                        @endif
+
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/reports/orders/*') ? 'active' : '' }}">
                             <a class="menu-link" href="{{route('report.order', ['company' => request()->route('company'),'branch' => 0])}}">
                                 <span class="nav-icon">
