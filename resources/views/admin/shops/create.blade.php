@@ -26,13 +26,21 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-xl-12 col-md-12 mb-3">
-                                <label for="name" class="form-label">Upload Shop Logo</label>
+                                <label for="logo" class="form-label">Upload Shop Logo</label>
                                 <span class="text-danger">*</span>
                                 <div class="input-group">
                                     <input type="file" name="logo" id="logo" class="form-control" accept="image/*">
                                 </div>
-                                <div class="alert bg-soft-success m-2 secret" id="fileNameDisplay" role="alert"></div>
                             </div>
+
+                            <div class="col-xl-12 col-md-12 mb-3">
+                                <label for="name" class="form-label">Upload Shop Fav Icon</label>
+                                <span class="text-danger">*</span>
+                                <div class="input-group">
+                                    <input type="file" name="fav_icon" id="fav_icon" class="form-control" accept="image/*">
+                                </div>
+                            </div>
+
                             <div class="col-md-4">
                                 
                                 <div class="mb-3">

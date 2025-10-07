@@ -46,6 +46,7 @@ class shopController extends Controller
     {
         $request->validate([
             'logo' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'fav_icon' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => 'nullable|email|unique:users',
             'phone' => 'required|digits:10|different:phone1|unique:users',
@@ -67,6 +68,10 @@ class shopController extends Controller
             'logo.required' => 'Logo is required.',
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'logo.max' => 'Logo size must not exceed 2MB.',
+
+            'fav_icon.required' => 'Fav Icon is required.',
+            'fav_icon.mimes' => 'Fav Icon must be a JPG, JPEG or PNG file.',
+            'fav_icon.max' => 'Fav Icon size must not exceed 2MB.',
             
             'name.required' => 'Name is required.',
             'phone.required' => 'Phone number is required.',
@@ -128,6 +133,19 @@ class shopController extends Controller
 
             // Save to user
             $user->logo = $filePath; // This is relative to storage/app/public
+            $user->save();
+        }
+
+        if ($request->hasFile('fav_icon')) {
+            $file = $request->file('fav_icon');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = config('path.root') . '/' . $request->slug_name . '/' . config('path.fav_icon');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            // Save to user
+            $user->fav_icon = $filePath; // This is relative to storage/app/public
             $user->save();
         }
 
@@ -205,6 +223,7 @@ class shopController extends Controller
 
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'fav_icon' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
@@ -258,6 +277,10 @@ class shopController extends Controller
         [
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'logo.max' => 'Logo size must not exceed 2MB.',
+
+            'fav_icon.required' => 'Fav Icon is required.',
+            'fav_icon.mimes' => 'Fav Icon must be a JPG, JPEG or PNG file.',
+            'fav_icon.max' => 'Fav Icon size must not exceed 2MB.',
             
             'name.required' => 'Name is required.',
             'phone.required' => 'Phone number is required.',
@@ -311,6 +334,19 @@ class shopController extends Controller
             $user->update([ 
                 'logo' => $filePath,
             ]);
+        }
+
+        if ($request->hasFile('fav_icon')) {
+            $file = $request->file('fav_icon');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = config('path.root') . '/' . $request->slug_name . '/' . config('path.fav_icon');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            // Save to user
+            $user->fav_icon = $filePath; // This is relative to storage/app/public
+            $user->save();
         }
 
         if($request->password != null)

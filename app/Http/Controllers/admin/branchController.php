@@ -38,6 +38,7 @@ class branchController extends Controller
 
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'fav_icon' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
@@ -101,6 +102,10 @@ class branchController extends Controller
         [
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'logo.max' => 'Logo size must not exceed 2MB.',
+
+            'fav_icon.required' => 'Fav Icon is required.',
+            'fav_icon.mimes' => 'Fav Icon must be a JPG, JPEG or PNG file.',
+            'fav_icon.max' => 'Fav Icon size must not exceed 2MB.',
             
             'name.required' => 'Name is required.',
             'phone.required' => 'Phone number is required.',
@@ -178,6 +183,31 @@ class branchController extends Controller
         }
 
 
+        if ($request->hasFile('fav_icon')) {
+            $file = $request->file('fav_icon');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = config('path.root') . '/' . $parent->slug_name . '/' . config('path.branch') . '/' . $request->slug_name . '/' . config('path.fav_icon');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            // Save to user
+            $user->fav_icon = $filePath; // This is relative to storage/app/public
+            $user->save();
+        }
+        else
+        {
+            $sourceRelativePath = $parent->fav_icon;
+            $destinationRelativePath = '/'. config('path.root') . '/' . $parent->slug_name . '/' . config('path.branch') . '/' . $request->slug_name . '/' . config('path.fav_icon') . '/' . basename($parent->fav_icon);
+            Storage::disk('public')->makeDirectory(dirname($destinationRelativePath));
+            if (Storage::disk('public')->exists($sourceRelativePath)) {
+                Storage::disk('public')->copy($sourceRelativePath, $destinationRelativePath);
+            }
+            $user->fav_icon = $parent->fav_icon; // This is relative to storage/app/public
+            $user->save();
+        }
+
+
         $role = Role::where('id',3)->first()->name;
         $user->assignRole($role);
 
@@ -236,6 +266,7 @@ class branchController extends Controller
 
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'fav_icon' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
@@ -293,6 +324,10 @@ class branchController extends Controller
         [
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'logo.max' => 'Logo size must not exceed 2MB.',
+
+            'fav_icon.required' => 'Fav Icon is required.',
+            'fav_icon.mimes' => 'Fav Icon must be a JPG, JPEG or PNG file.',
+            'fav_icon.max' => 'Fav Icon size must not exceed 2MB.',
             
             'name.required' => 'Name is required.',
             'phone.required' => 'Phone number is required.',
@@ -344,13 +379,29 @@ class branchController extends Controller
 
             $path = config('path.root') . '/' . $parent->slug_name . '/' . config('path.branch') . '/' . $request->slug_name . '/' . config('path.logo');
 
-            $path = config('path.root') . '/' . $request->slug_name . '/' . config('path.logo');
+            //$path = config('path.root') . '/' . $request->slug_name . '/' . config('path.logo');
 
             // Save the file
             $filePath = $file->storeAs($path, $filename, 'public');
 
             $user->update([ 
                 'logo' => $filePath,
+            ]);
+        }
+
+        if ($request->hasFile('fav_icon')) {
+            $file = $request->file('fav_icon');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            $path = config('path.root') . '/' . $parent->slug_name . '/' . config('path.branch') . '/' . $request->slug_name . '/' . config('path.fav_icon');
+
+            //$path = config('path.root') . '/' . $request->slug_name . '/' . config('path.fav_icon');
+
+            // Save the file
+            $filePath = $file->storeAs($path, $filename, 'public');
+
+            $user->update([ 
+                'fav_icon' => $filePath,
             ]);
         }
 

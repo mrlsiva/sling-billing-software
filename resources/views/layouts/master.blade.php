@@ -5,6 +5,11 @@
 	@yield('title')
 
 	@yield('style')
+
+    @php
+        $user = App\Models\User::where('slug_name',request()->segment(1))->first();
+    @endphp
+
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="A fully responsive premium Bootstrap admin dashboard template for modern web applications." />
 	<meta name="author" content="FoxPixel" />
@@ -15,6 +20,8 @@
 	<link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
     <script src="{{ asset('assets/js/config.min.js') }}"></script>
+    <link rel="icon" type="image/png" href="{{ asset('storage/' . $user->fav_icon) }}">
+
 
     <style type="text/css">
         .secret{
@@ -27,9 +34,6 @@
 	
 	<div class="wrapper">
         <div class="main-nav">
-            @php
-                $user = App\Models\User::where('slug_name',request()->segment(1))->first();
-            @endphp
             <!-- Sidebar Logo -->
             <!-- <div class="logo-box">
                 @if(request()->segment(1) === 'admin')

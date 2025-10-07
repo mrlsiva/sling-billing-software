@@ -28,6 +28,11 @@ $(document).ready(function () {
                 extension: "jpg|jpeg|png|gif",
                 filesize: 2048 * 1024 // 2MB
             },
+            fav_icon: {
+                required: true,
+                extension: "jpg|jpeg|png|gif",
+                filesize: 2048 * 1024 // 2MB
+            },
             name: {
                 required: true,
                 maxlength: 50
@@ -98,6 +103,11 @@ $(document).ready(function () {
         messages: {
             logo: {
                 required: "Shop logo is required",
+                extension: "Only jpg, jpeg, png, gif are allowed",
+                filesize: "File must be less than 2MB"
+            },
+            fav_icon: {
+                required: "Shop fav icon is required",
                 extension: "Only jpg, jpeg, png, gif are allowed",
                 filesize: "File must be less than 2MB"
             },
@@ -185,6 +195,11 @@ $(document).ready(function () {
                 extension: "jpg|jpeg|png|gif",
                 filesize: 2048 * 1024 // 2MB
             },
+            fav_icon: {
+                required: "Shop fav icon is required",
+                extension: "jpg|jpeg|png|gif",
+                filesize: 2048 * 1024 // 2MB
+            },
             name: {
                 required: true,
                 maxlength: 50
@@ -269,6 +284,11 @@ $(document).ready(function () {
         messages: {
             logo: {
                 extension: "Only jpg, jpeg, png, gif allowed",
+                filesize: "File must be less than 2MB"
+            },
+            fav_icon: {
+                required: "Shop fav icon is required",
+                extension: "Only jpg, jpeg, png, gif are allowed",
                 filesize: "File must be less than 2MB"
             },
             name: {

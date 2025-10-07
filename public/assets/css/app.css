@@ -328,6 +328,9 @@ h1,
     font-size: calc(1.35rem + 1.2vw);
 }
 @media (min-width: 1200px) {
+    .mobile-width-profile {
+        width: 500px;
+    }
     h1,
     .h1 {
         font-size: 2.25rem;
@@ -21679,4 +21682,10 @@ p.no-span::after {
 }
 .billing-table-pos tbody tr td p {
     font-size: 12px;
+}
+.mobile-width-profile {
+    width: 500px;
+}
+.mobile-width-profile {
+    width: 300px;
 }
