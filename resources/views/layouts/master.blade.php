@@ -193,8 +193,8 @@
                                 </a>
                             </li>
 
-                            <li class="menu-item ">
-                                <a class="menu-link" href="#">
+                            <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/billings/*') ? 'active' : '' }}">
+                                <a class="menu-link" href="{{route('billing.pos', ['company' => request()->route('company')])}}">
                                     <span class="nav-icon">
                                         <i class="ri-shopping-cart-line"></i>
                                     </span>

@@ -162,6 +162,8 @@ class shopController extends Controller
             'gst' => $request->gst,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'bill_type' => $request->bill_type,
+            'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
             'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
         ]);
 
@@ -364,6 +366,8 @@ class shopController extends Controller
             'gst' => $request->gst,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'bill_type' => $request->bill_type,
+            'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
             'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
         ]);
 
