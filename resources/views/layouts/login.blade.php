@@ -18,7 +18,7 @@
 	 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
 	<link rel="stylesheet" href="{{asset('assets/css/login.css')}}">
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $user->fav_icon) }}">
+    <link rel="icon" type="image/png" href="{{ $user->fav_icon ? asset('storage/' . $user->fav_icon) : asset('assets/images/favicon.png') }}">
 </head>
 <body>
 	@yield('body')
