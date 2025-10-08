@@ -145,6 +145,39 @@
                                     <input type="color" id="secondary_colour" name="secondary_colour" value="{{old('secondary_colour')}}" class="form-control" placeholder="Enter Secondary Color code">
                                 </div>
                             </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="bill_type" class="form-label">Bill Type</label>
+                                    <span class="text-danger">*</span>
+                                    <select class="form-control" name="bill_type" id="bill_type" required="">
+                                        <option value=""> Choose Bill Type</option>
+                                        <option value="1">Normal</option>
+                                        <option value="2">Thermal</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mt-5">
+                                        <input class="form-check-input" type="checkbox" id="is_scan_avaiable" checked="">
+                                        <label class="form-check-label" for="is_scan_avaiable">Qrcode/ Barcode scan</label>
+                                        <span class="text-danger">*</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mt-5">
+                                        <input class="form-check-input" type="checkbox" id="is_bill_enabled" checked="">
+                                        <label class="form-check-label" for="is_bill_enabled">Is Bill Enabled</label>
+                                        <span class="text-danger">*</span>
+                                    </div>
+                                </div>
+                            </div> -->
+
                         </div>
                     </div>
                 </div>
@@ -196,11 +229,11 @@
                                 
                             </div>
                             <div class="col-md-4">
-                                
-                                    <div class="mb-3">
-                                        <label for="ifsc_code" class="form-label">IFSC Code</label>
-                                        <input type="text" id="ifsc_code" name="ifsc_code" class="form-control" value="{{old('ifsc_code')}}" placeholder="Enter IFSC Code">
-                                    </div>
+
+                                <div class="mb-3">
+                                    <label for="ifsc_code" class="form-label">IFSC Code</label>
+                                    <input type="text" id="ifsc_code" name="ifsc_code" class="form-control" value="{{old('ifsc_code')}}" placeholder="Enter IFSC Code">
+                                </div>
                                 
                             </div>
                         </div>

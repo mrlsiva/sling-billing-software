@@ -20,7 +20,7 @@
 	<link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
     <script src="{{ asset('assets/js/config.min.js') }}"></script>
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $user->fav_icon) }}">
+    <link rel="icon" type="image/png" href="{{ $user->fav_icon ? asset('storage/' . $user->fav_icon) : asset('assets/images/favicon.png') }}">
 
 
     <style type="text/css">
@@ -181,6 +181,28 @@
                                 <span class="nav-text"> Customers </span>
                             </a>
                         </li>
+
+                        @if(Auth::user()->user_detail->is_bill_enabled == 1)
+
+                            <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/staffs/*') ? 'active' : '' }}">
+                                <a class="menu-link" href="{{route('staff.index', ['company' => request()->route('company')])}}">
+                                    <span class="nav-icon">
+                                        <i class="ri-group-line"></i>
+                                    </span>
+                                    <span class="nav-text"> Staff </span>
+                                </a>
+                            </li>
+
+                            <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/billings/*') ? 'active' : '' }}">
+                                <a class="menu-link" href="{{route('billing.pos', ['company' => request()->route('company')])}}">
+                                    <span class="nav-icon">
+                                        <i class="ri-shopping-cart-line"></i>
+                                    </span>
+                                    <span class="nav-text"> POS </span>
+                                </a>
+                            </li>
+
+                        @endif
 
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/reports/orders/*') ? 'active' : '' }}">
                             <a class="menu-link" href="{{route('report.order', ['company' => request()->route('company'),'branch' => 0])}}">
@@ -392,7 +414,10 @@
                         <div class="dropdown topbar-item">
                             <a type="button" class="topbar-button p-0" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="d-flex align-items-center gap-2">
-                                    <img class="rounded-circle" width="32" src="{{asset('assets/images/users/avatar-1.jpg')}}" alt="user-image">
+
+                                    <img class="rounded-circle" width="32" src="{{ $user->fav_icon ? asset('storage/' . $user->fav_icon) : asset('assets/images/favicon.png') }}" alt="user-image">
+
+
                                     <span class="d-lg-flex flex-column gap-1 d-none">
                                         <h5 class="my-0 fs-13 text-uppercase text-reset fw-bold">{{Auth::user()->name}}</h5>
                                     </span>

@@ -162,6 +162,9 @@ class shopController extends Controller
             'gst' => $request->gst,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'bill_type' => $request->bill_type,
+            'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
+            'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
         ]);
 
         //Log
@@ -223,7 +226,7 @@ class shopController extends Controller
 
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
-            'fav_icon' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'fav_icon' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
@@ -277,8 +280,7 @@ class shopController extends Controller
         [
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'logo.max' => 'Logo size must not exceed 2MB.',
-
-            'fav_icon.required' => 'Fav Icon is required.',
+            
             'fav_icon.mimes' => 'Fav Icon must be a JPG, JPEG or PNG file.',
             'fav_icon.max' => 'Fav Icon size must not exceed 2MB.',
             
@@ -364,6 +366,9 @@ class shopController extends Controller
             'gst' => $request->gst,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'bill_type' => $request->bill_type,
+            'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
+            'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
         ]);
 
         //Log
