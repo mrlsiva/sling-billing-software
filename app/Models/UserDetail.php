@@ -14,4 +14,9 @@ class UserDetail extends Model
     {
         return $this->belongsTo('App\Models\User');
     }
+
+    public function billType()
+    {
+        return $this->belongsTo('App\Models\PrinterType','bill_type');
+    }
 }

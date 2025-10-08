@@ -263,25 +263,8 @@ class billingsController extends Controller
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
         $user_detail = UserDetail::where('user_id',Auth::id())->first();
-        if($user_detail->bill_type == null || $user_detail->bill_type == 1)
-        {
-            return view('branches.bill',compact('user','order','order_details','order_payment_details'));
-        }
-        else
-        {
-            return view('branches.thermal_bill',compact('user','order','order_details','order_payment_details'));
-        }
 
-
-        // $pdf = Pdf::loadView('branches.bill', [
-        //     'user' => $user,
-        //     'order' => $order,
-        //     'order_details' => $order_details,
-        //     'order_payment_details' => $order_payment_details,
-        // ])->setPaper('a4', 'landscape');
- 
-        // return $pdf->stream('bill.pdf'); // to open in browser
-        // return $pdf->download('bill.pdf'); // to force download
+        return view('bills.'.$user_detail->billType->blade,compact('user','order','order_details','order_payment_details'));
     }
 
     public function view_bill(Request $request,$company,$id)
@@ -292,7 +275,7 @@ class billingsController extends Controller
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
         $user_detail = UserDetail::where('user_id',Auth::id())->first();
-        return view('branches.view_bill',compact('user','order','order_details','order_payment_details'));
+        return view('bills.view_bill',compact('user','order','order_details','order_payment_details'));
     }
     
 }

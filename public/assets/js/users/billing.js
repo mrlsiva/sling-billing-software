@@ -214,7 +214,7 @@ function add_to_cart(element) {
                         </div>
                         <div class="d-flex align-items-center justify-content-between px-1">
                             <div>
-                                <p class="text-dark fw-semibold fs-16 mb-0">₹${data.price} <span class="fs-10">(${data.tax.name})</span></p>
+                                <p class="text-dark fw-semibold fs-16 mb-0">₹${data.price} <span class="fs-10">(${data.tax.name}%)</span></p>
                             </div>
                             <div class="d-flex align-content-center gap-1">
                                 <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center remove-item">
