@@ -68,17 +68,16 @@
                     <div class="card-footer border p-3 pt-2">
                         <div class="d-flex align-items-center justify-content-between w-100">
                             <div class="w-100 text-center my-3">
-                                <p class="mb-0 card-title">{{$user->name}}</p>
+                                <p class="mb-0 card-title">{{$branch->name}}</p>
                             </div>
                         </div>
                         <div class="mt-3 w-100">
-                            <a href="{{route('login', ['company' => request()->route('company')])}}"
-                                class="btn btn-warning btn-xs w-100">Login</a>
+                            <a href="{{ route('login', ['company' => $branch['slug_name']]) }}" class="btn btn-warning btn-xs w-100">Login</a>
                         </div>
                     </div>
-                    </div>
+                </div>
             </div>
-                @endforeach
+            @endforeach
         </div>
     </div>
 </section>
