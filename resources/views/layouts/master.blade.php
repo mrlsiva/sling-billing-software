@@ -235,7 +235,7 @@
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/payments/index') ? 'active' : '' }}" href="{{route('setting.payment.index', ['company' => request()->route('company')])}}">Payment Method</a>
                                     </li>
                                     <li class="sub-menu-item">
-                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/bill/index') ? 'active' : '' }}" href="{{route('setting.bill.index', ['company' => request()->route('company')])}}">Bill </a>
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/bill/index') ? 'active' : '' }}" href="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => 0])}}">Bill </a>
                                     </li>
                                     <!-- <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/general/index') ? 'active' : '' }}" href="{{route('setting.general.index', ['company' => request()->route('company')])}}">General Settings</a>

@@ -14,17 +14,30 @@
                 </div>
             </div>
             <div class="card-body pt-2 ">
-                @if($branches->count() != 0)
                 <ul class="nav nav-tabs nav-justified">
-                    @foreach($branches as $Branch)
-                    	<li class="nav-item">
-	                        <a href="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => $Branch->id])}}" class="nav-link {{ $branch == $Branch->id ? 'active' : '' }}" id="{{$Branch->id}}">
-	                            <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
-	                            <span class="d-none d-sm-block"><i class="ri-shopping-basket-line me-2"></i></i>{{$Branch->user_name}}</span>
-	                        </a>
-                    	</li>
-                    @endforeach
+
+                    <li class="nav-item">
+                        <a href="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => 0])}}" class="nav-link {{ $branch == 0 ? 'active' : '' }}" id="{{$branch}}">
+                            <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
+                            @php
+                            $ho =  App\Models\User::where('id',Auth::user()->owner_id)->first();
+                            @endphp
+                            <span class="d-none d-sm-block"><i class="ri-shopping-basket-line me-2"></i>{{$ho->user_name}}</span>
+                        </a>
+                    </li>
+
+                    @if($branches->count() != 0)
+                        @foreach($branches as $Branch)
+                        	<li class="nav-item">
+    	                        <a href="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => $Branch->id])}}" class="nav-link {{ $branch == $Branch->id ? 'active' : '' }}" id="{{$Branch->id}}">
+    	                            <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
+    	                            <span class="d-none d-sm-block"><i class="ri-shopping-basket-line me-2"></i></i>{{$Branch->user_name}}</span>
+    	                        </a>
+                        	</li>
+                        @endforeach
+                    @endif
                 </ul>
+                
 
                 <div class="tab-content pt-2 text-muted">
                     <div class="tab-pane show active" id="homeTabsJustified">
@@ -75,7 +88,7 @@
                         </div>
                     </div>
                 </div>
-                @endif
+                
             </div>
             <div class="card-footer border-0">
                 {!! $bills->withQueryString()->links('pagination::bootstrap-5') !!}
