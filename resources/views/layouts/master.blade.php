@@ -156,9 +156,11 @@
                                     <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/stock/*') ? 'active' : '' }}" href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}">Stock</a>
                                     </li>
-                                    <li class="sub-menu-item">
-                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/transfer/*') ? 'active' : '' }}" href="{{route('inventory.transfer', ['company' => request()->route('company')])}}">Product Transfer</a>
-                                    </li>
+                                    @if(Auth::user()->user_detail->is_bill_enabled == 0)
+                                        <li class="sub-menu-item">
+                                            <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/transfer/*') ? 'active' : '' }}" href="{{route('inventory.transfer', ['company' => request()->route('company')])}}">Product Transfer</a>
+                                        </li>
+                                    @endif
 
                                 </ul>
                             </div>
@@ -184,14 +186,14 @@
 
                         @if(Auth::user()->user_detail->is_bill_enabled == 1)
 
-                            <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/staffs/*') ? 'active' : '' }}">
+                            <!-- <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/staffs/*') ? 'active' : '' }}">
                                 <a class="menu-link" href="{{route('staff.index', ['company' => request()->route('company')])}}">
                                     <span class="nav-icon">
                                         <i class="ri-group-line"></i>
                                     </span>
                                     <span class="nav-text"> Staff </span>
                                 </a>
-                            </li>
+                            </li> -->
 
                             <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/billings/*') ? 'active' : '' }}">
                                 <a class="menu-link" href="{{route('billing.pos', ['company' => request()->route('company')])}}">
@@ -220,8 +222,14 @@
                                 </span>
                                 <span class="nav-text"> Settings </span>
                             </a>
-                            <div class="collapse {{ request()->is(Auth::user()->slug_name . '/settings/*') ? 'show' : '' }}" id="sidebarSetting">
+                            <div class="collapse {{ (request()->is(Auth::user()->slug_name . '/settings/*') || request()->is(Auth::user()->slug_name . '/staffs/*')) ? 'show' : '' }}" id="sidebarSetting">
                                 <ul class="sub-menu-nav">
+
+                                    @if(Auth::user()->user_detail->is_bill_enabled == 1)
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/staffs/*') ? 'active' : '' }}" href="{{route('staff.index', ['company' => request()->route('company')])}}">Staff </a>
+                                    </li>
+                                    @endif
                                     <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/taxes/index') ? 'active' : '' }}" href="{{route('setting.tax.index', ['company' => request()->route('company')])}}">Tax</a>
                                     </li>

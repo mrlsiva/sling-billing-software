@@ -251,14 +251,36 @@ class billingController extends Controller
             return ($item['qty'] * $item['price']);
         });
 
+        // ✅ Calculate total product discount
+        $totalProductDiscount = collect($cart)->sum(function ($item) {
+            $product = Product::find($item['product_id']);
+            if (!$product) {
+                return 0;
+            }
+
+            // Calculate per-item discount
+            if ($product->discount_type == 1) {
+                // Flat discount per unit
+                $discount = $product->discount * $item['qty'];
+            } elseif ($product->discount_type == 2) {
+                // Percentage discount
+                $discount = (($product->discount / 100) * $item['price']) * $item['qty'];
+            } else {
+                $discount = 0;
+            }
+
+            return $discount;
+        });
+
         $order = Order::create([
-            'shop_id'     => $user->parent_id,
-            'branch_id'   => Auth::user()->id,
-            'bill_id'     => $newBillNo,
-            'billed_by'   => $request->billed_by,
-            'customer_id' => $customer->id,
-            'bill_amount' => $billAmount,
-            'billed_on'   => Carbon::now(),
+            'shop_id'                   => $user->parent_id,
+            'branch_id'                 => Auth::user()->id,
+            'bill_id'                   => $newBillNo,
+            'billed_by'                 => $request->billed_by,
+            'customer_id'               => $customer->id,
+            'total_product_discount'    => $totalProductDiscount,
+            'bill_amount'               => $billAmount,
+            'billed_on'                 => Carbon::now(),
         ]);
 
 
@@ -267,12 +289,15 @@ class billingController extends Controller
             $product = Product::where('id',$item['product_id'])->first();
 
             OrderDetail::create([
-                'order_id'   => $order->id,
-                'product_id' => $item['product_id'],
-                'name'       => $product->name,
-                'quantity'   => $item['qty'],
-                'price'      => $item['price'],
-                'tax_amount' => $item['tax_amount'],
+                'order_id'      => $order->id,
+                'product_id'    => $item['product_id'],
+                'name'          => $product->name,
+                'quantity'      => $item['qty'],
+                'price'         => $item['price'],
+                'selling_price' => $item['price'],
+                'tax_amount'    => $item['tax_amount'],
+                'discount_type' => $product->discount_type,
+                'discount'      => $product->discount,
             ]);
 
             $stock = Stock::where([['shop_id',$user->parent_id],['branch_id',Auth::user()->id],['product_id',$item['product_id']]])->first();

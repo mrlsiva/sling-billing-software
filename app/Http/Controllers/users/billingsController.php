@@ -192,13 +192,14 @@ class billingsController extends Controller
         });
 
         $order = Order::create([
-            'shop_id'     => $user->id,
-            'branch_id'   => null,
-            'bill_id'     => $newBillNo,
-            'billed_by'   => $request->billed_by,
-            'customer_id' => $customer->id,
-            'bill_amount' => $billAmount,
-            'billed_on'   => Carbon::now(),
+            'shop_id'                   => $user->id,
+            'branch_id'                 => null,
+            'bill_id'                   => $newBillNo,
+            'billed_by'                 => $request->billed_by,
+            'customer_id'               => $customer->id,
+            'total_product_discount'    => $totalProductDiscount,
+            'bill_amount'               => $billAmount,
+            'billed_on'                 => Carbon::now(),
         ]);
 
 
@@ -207,12 +208,15 @@ class billingsController extends Controller
             $product = Product::where('id',$item['product_id'])->first();
 
             OrderDetail::create([
-                'order_id'   => $order->id,
-                'product_id' => $item['product_id'],
-                'name'       => $product->name,
-                'quantity'   => $item['qty'],
-                'price'      => $item['price'],
-                'tax_amount' => $item['tax_amount'],
+                'order_id'      => $order->id,
+                'product_id'    => $item['product_id'],
+                'name'          => $product->name,
+                'quantity'      => $item['qty'],
+                'price'         => $item['price'],
+                'selling_price' => $item['price'],
+                'tax_amount'    => $item['tax_amount'],
+                'discount_type' => $product->discount_type,
+                'discount'      => $product->discount,
             ]);
 
             $stock = Stock::where([['shop_id',$user->id],['branch_id',null],['product_id',$item['product_id']]])->first();

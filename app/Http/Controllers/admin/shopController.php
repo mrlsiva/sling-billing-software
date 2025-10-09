@@ -221,7 +221,8 @@ class shopController extends Controller
     public function edit(Request $request,$id)
     {
         $user = User::with(['user_detail', 'bank_detail'])->where('id', $id)->first();
-        return view('admin.shops.edit',compact('user'));
+        $printer_types = PrinterType::where('is_active',1)->get();
+        return view('admin.shops.edit',compact('user','printer_types'));
     }
 
     public function update(Request $request)
