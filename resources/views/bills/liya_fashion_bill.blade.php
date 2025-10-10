@@ -70,6 +70,12 @@
         .d-flex {
             display: flex;
         }
+        .flex-column {
+            flex-direction: column;
+        }
+        .flex-row{
+            flex-direction: row;
+        }
     </style>
 </head>
 <body>
