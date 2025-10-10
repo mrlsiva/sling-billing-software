@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use App\Models\BankDetail;
 use App\Models\UserDetail;
 use App\Models\PosSetting;
+use App\Models\PrinterType;
 use App\Traits\common;
 use App\Models\User;
 use App\Traits\Log;
@@ -27,7 +28,8 @@ class branchController extends Controller
     public function create(Request $request,$id)
     {
         $user = User::with(['user_detail', 'bank_detail'])->where('id', $id)->first();
-        return view('admin.branches.create',compact('user'));
+        $printer_types = PrinterType::where('is_active',1)->get();
+        return view('admin.branches.create',compact('user','printer_types'));
     }
 
     public function store(Request $request)
@@ -255,7 +257,8 @@ class branchController extends Controller
     public function edit(Request $request,$id)
     {
         $user = User::with(['user_detail', 'bank_detail'])->where('id', $id)->first();
-        return view('admin.branches.edit',compact('user'));
+        $printer_types = PrinterType::where('is_active',1)->get();
+        return view('admin.branches.edit',compact('user','printer_types'));
     }
 
     public function update(Request $request)

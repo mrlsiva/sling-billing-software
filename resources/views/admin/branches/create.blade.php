@@ -174,8 +174,9 @@
                                     <span class="text-danger">*</span>
                                     <select class="form-control" name="bill_type" id="bill_type" required="">
                                         <option value=""> Choose Bill Type</option>
-                                        <option value="1">Normal</option>
-                                        <option value="2">Thermal</option>
+                                        @foreach($printer_types as $printer_type)
+                                        <option value="{{$printer_type->id}}">{{$printer_type->name}}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
