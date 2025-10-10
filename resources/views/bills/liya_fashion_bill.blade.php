@@ -80,8 +80,15 @@
         <div class="company-info">
             <strong>{{ $user->name }}</strong><br>
             {{ $user->user_detail->address }}<br>
-            Mobile: {{ $user->phone }}<br>
-            Mobile: {{ $user->alt_phone }}<br>
+            <div class="d-flex flex-row">
+                <div>Mobile: </div>
+                <div class="d-flex flex-column">
+                    <div>{{ $user->phone }}</div>
+                    <div>{{ $user->alt_phone }}</div>
+                </div>
+                
+            </div><br>
+            
             @if($user->user_detail->gst)
                 GST: {{ $user->user_detail->gst }}
             @endif
