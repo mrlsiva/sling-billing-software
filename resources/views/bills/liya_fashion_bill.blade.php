@@ -140,11 +140,7 @@
                 <td class="right">₹ {{number_format($order_detail->price * $order_detail->quantity,2)}}</td>
             </tr>
             @endforeach
-        </tbody>
-    </table>
-
-    <table width="100%">
-        <tr>
+            <tr>
             <td class="bold">Total Items</td>
             <td class="bold">=</td>
             <td class="">{{ number_format($order_details->sum(fn($d) => (int)$d->quantity))}}</td>
@@ -160,7 +156,12 @@
             <td class="bold">=</td>
             <td class="">₹ {{number_format($order->total_product_discount,2)}}</td>
         </tr>
+        </tbody>
     </table>
+
+    <!-- <table width="100%">
+        
+    </table> -->
 
     <hr>
 
