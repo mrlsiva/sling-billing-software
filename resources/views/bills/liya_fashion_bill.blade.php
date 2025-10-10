@@ -127,7 +127,7 @@
         </tr>
         <tr>
             <td class="bold">Total Amount (Inclusive of all tax)</td>
-            <td class="right">₹ {{ number_format($order_details->sum(fn($d) => (int)$d->price),2)}}</td>
+            <td class="right">₹ {{ number_format($order_details->sum(fn($d) => $d->price * $d->quantity), 2) }}</td>
         </tr>
         <tr>
             <td class="bold">Discount Amount</td>

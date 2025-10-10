@@ -191,6 +191,27 @@ class billingsController extends Controller
             return ($item['qty'] * $item['price']);
         });
 
+        // ✅ Calculate total product discount
+        $totalProductDiscount = collect($cart)->sum(function ($item) {
+            $product = Product::find($item['product_id']);
+            if (!$product) {
+                return 0;
+            }
+
+            // Calculate per-item discount
+            if ($product->discount_type == 1) {
+                // Flat discount per unit
+                $discount = $product->discount * $item['qty'];
+            } elseif ($product->discount_type == 2) {
+                // Percentage discount
+                $discount = (($product->discount / 100) * $item['price']) * $item['qty'];
+            } else {
+                $discount = 0;
+            }
+
+            return $discount;
+        });
+
         $order = Order::create([
             'shop_id'                   => $user->id,
             'branch_id'                 => null,
