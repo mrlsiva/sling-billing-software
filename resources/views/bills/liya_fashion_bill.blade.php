@@ -78,10 +78,10 @@
 
         <!-- Right: Company Info -->
         <div class="company-info">
-            <strong>{{ $user }}</strong><br>
             <strong>{{ $user->name }}</strong><br>
             {{ $user->user_detail->address }}<br>
             Mobile: {{ $user->phone }}<br>
+            Mobile: {{ $user->alt_phone }}<br>
             @if($user->user_detail->gst)
                 GST: {{ $user->user_detail->gst }}
             @endif
