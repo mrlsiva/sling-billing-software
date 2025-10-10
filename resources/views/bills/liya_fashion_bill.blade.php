@@ -51,17 +51,20 @@
             max-width: 280px;
             max-height: 90px;
         }
-
+        .print-logo {
+            margin-right: 8px;
+            max-width: 40%;
+        }
         /* ✅ Flex container for header */
         .print-header {
             display: flex;
-            justify-content: space-between;
+            /* justify-content: space-between; */
             align-items: flex-start; /* top align */
             width: 100%;
         }
 
         .company-info {
-            text-align: right;
+            text-align: left;
             line-height: 1.4;
         }
     </style>
@@ -75,9 +78,10 @@
 
         <!-- Right: Company Info -->
         <div class="company-info">
+            <strong>{{ $user }}</strong><br>
             <strong>{{ $user->name }}</strong><br>
             {{ $user->user_detail->address }}<br>
-            Phone: {{ $user->phone }}<br>
+            Mobile: {{ $user->phone }}<br>
             @if($user->user_detail->gst)
                 GST: {{ $user->user_detail->gst }}
             @endif
