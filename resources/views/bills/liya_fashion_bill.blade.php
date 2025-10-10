@@ -128,7 +128,7 @@
             @foreach($order_details as $order_detail)
             <tr>
                 <td>{{$order_detail->name}}</td>
-                <td class="right">₹ {{ number_format($order_detail->price,2) }}</td>
+                <td class="right"> {{ number_format($order_detail->price,2) }}</td>
                 <td class="right">{{$order_detail->quantity}}</td>
                 @if($order_detail->discount_type == 1)
                     <td class="right">{{$order_detail->discount}}</td>
@@ -146,15 +146,19 @@
     <table width="100%">
         <tr>
             <td class="bold">Total Items</td>
-            <td class="right">{{ number_format($order_details->sum(fn($d) => (int)$d->quantity))}}</td>
+            <td class="bold">=</td>
+            <td class="">{{ number_format($order_details->sum(fn($d) => (int)$d->quantity))}}</td>
         </tr>
         <tr>
             <td class="bold">Total Amount (Inclusive of all tax)</td>
+            <td class="bold">=</td>
+
             <td class="right">₹ {{ number_format($order_details->sum(fn($d) => $d->price * $d->quantity), 2) }}</td>
         </tr>
         <tr>
             <td class="bold">Discount Amount</td>
-            <td class="right">₹ {{number_format($order->total_product_discount,2)}}</td>
+            <td class="bold">=</td>
+            <td class="">₹ {{number_format($order->total_product_discount,2)}}</td>
         </tr>
     </table>
 
@@ -162,7 +166,7 @@
 
     <div class="center">
         No Exchange<br>
-        வாங்கிய பொருட்கள் வபஸ் வாங்கப்படாது
+        வாங்கிய பொருட்கள் வாபஸ் வாங்கப்படாது
     </div>
 
     <script>
