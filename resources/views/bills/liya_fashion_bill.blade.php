@@ -141,7 +141,7 @@
                 @else
                     <td class="right">-</td>
                 @endif
-                <td class="right">₹ {{number_format($order_detail->price * $order_detail->quantity,2)}}</td>
+                <td class="right"> {{number_format($order_detail->price * $order_detail->quantity,2)}}</td>
             </tr>
             @endforeach
         </tbody>
@@ -162,7 +162,7 @@
         <tr>
             <td class="bold">Discount Amount</td>
             <td class="bold">=</td>
-            <td class="">₹ {{number_format($order->total_product_discount,2)}}</td>
+            <td class="right">₹ {{number_format($order->total_product_discount,2)}}</td>
         </tr>
     </table>
 
