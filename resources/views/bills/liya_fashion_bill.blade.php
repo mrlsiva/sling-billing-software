@@ -48,7 +48,7 @@
         }
 
         .print-logo img {
-            max-width: 280px;
+            max-width: 100%;
             max-height: 90px;
         }
         .print-logo {
