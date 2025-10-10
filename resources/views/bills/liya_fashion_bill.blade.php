@@ -98,9 +98,7 @@
                     <div>{{ $user->phone }}</div>
                     <div>{{ $user->alt_phone }}</div>
                 </div>
-                
             </div><br>
-            
             @if($user->user_detail->gst)
                 <strong>GST: </strong> {{ $user->user_detail->gst }}
             @endif
@@ -128,7 +126,12 @@
         <tbody>
             @foreach($order_details as $order_detail)
             <tr>
-                <td>{{ $loop->iteration }}. {{$order_detail->name}}</td>
+                <td>
+                    <div class="d-flex flex-row">
+                        <div>{{ $loop->iteration }}.</div>
+                        <div>{{$order_detail->name}}</div>
+                    </div>
+                </td>
                 <td class="right"> {{ number_format($order_detail->price,2) }}</td>
                 <td class="right">{{$order_detail->quantity}}</td>
                 @if($order_detail->discount_type == 1)
