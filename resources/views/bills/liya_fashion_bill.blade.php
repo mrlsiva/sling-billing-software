@@ -102,14 +102,14 @@
             </div><br>
             
             @if($user->user_detail->gst)
-                GST: {{ $user->user_detail->gst }}
+                <strong>GST: </strong> {{ $user->user_detail->gst }}
             @endif
         </div>
     </div>
 
     <table width="100%">
         <tr>
-            <td>Invoice #: {{$order->bill_id}}</td>
+            <td>Invoice: #{{$order->bill_id}}</td>
             <td class="right">Date: {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y h:i A') }}</td>
         </tr>
     </table>
