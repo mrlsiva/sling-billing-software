@@ -117,6 +117,7 @@
     <table class="items" width="100%">
         <thead>
             <tr>
+                
                 <th>Items</th>
                 <th class="right">Rate</th>
                 <th class="right">Qty</th>
@@ -127,7 +128,7 @@
         <tbody>
             @foreach($order_details as $order_detail)
             <tr>
-                <td>{{$order_detail->name}}</td>
+                <td>{{ $loop->iteration }}. {{$order_detail->name}}</td>
                 <td class="right"> {{ number_format($order_detail->price,2) }}</td>
                 <td class="right">{{$order_detail->quantity}}</td>
                 @if($order_detail->discount_type == 1)
@@ -140,7 +141,11 @@
                 <td class="right">₹ {{number_format($order_detail->price * $order_detail->quantity,2)}}</td>
             </tr>
             @endforeach
-            <tr>
+        </tbody>
+    </table>
+
+    <table width="100%">
+        <tr>
             <td class="bold">Total Items</td>
             <td class="bold">=</td>
             <td class="">{{ number_format($order_details->sum(fn($d) => (int)$d->quantity))}}</td>
@@ -156,12 +161,7 @@
             <td class="bold">=</td>
             <td class="">₹ {{number_format($order->total_product_discount,2)}}</td>
         </tr>
-        </tbody>
     </table>
-
-    <!-- <table width="100%">
-        
-    </table> -->
 
     <hr>
 
