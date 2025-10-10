@@ -51,18 +51,33 @@
             max-width: 280px;
             max-height: 90px;
         }
-
+        .print-logo {
+            margin-right: 8px;
+            max-width: 40%;
+        }
         /* ✅ Flex container for header */
         .print-header {
             display: flex;
-            justify-content: space-between;
+            /* justify-content: space-between; */
             align-items: flex-start; /* top align */
             width: 100%;
         }
 
         .company-info {
-            text-align: right;
+            text-align: left;
             line-height: 1.4;
+        }
+        .d-flex {
+            display: flex;
+        }
+        .flex-column {
+            flex-direction: column;
+        }
+        .flex-row{
+            flex-direction: row;
+        }
+        .mr-2 {
+            margin-right: 8px;
         }
     </style>
 </head>
@@ -77,16 +92,22 @@
         <div class="company-info">
             <strong>{{ $user->name }}</strong><br>
             {{ $user->user_detail->address }}<br>
-            Phone: {{ $user->phone }}<br>
+            <div class="d-flex flex-row">
+                <div class="mr-2"><strong>Mobile: </strong></div>
+                <div class="d-flex flex-column">
+                    <div>{{ $user->phone }}</div>
+                    <div>{{ $user->alt_phone }}</div>
+                </div>
+            </div><br>
             @if($user->user_detail->gst)
-                GST: {{ $user->user_detail->gst }}
+                <strong>GST: </strong> {{ $user->user_detail->gst }}
             @endif
         </div>
     </div>
 
     <table width="100%">
         <tr>
-            <td>Invoice #: {{$order->bill_id}}</td>
+            <td>Invoice: #{{$order->bill_id}}</td>
             <td class="right">Date: {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y h:i A') }}</td>
         </tr>
     </table>
@@ -94,6 +115,7 @@
     <table class="items" width="100%">
         <thead>
             <tr>
+                
                 <th>Items</th>
                 <th class="right">Rate</th>
                 <th class="right">Qty</th>
@@ -104,8 +126,13 @@
         <tbody>
             @foreach($order_details as $order_detail)
             <tr>
-                <td>{{$order_detail->name}}</td>
-                <td class="right">₹ {{ number_format($order_detail->price,2) }}</td>
+                <td>
+                    <div class="d-flex flex-row">
+                        <div>{{ $loop->iteration }}.</div>
+                        <div>{{$order_detail->name}}</div>
+                    </div>
+                </td>
+                <td class="right"> {{ number_format($order_detail->price,2) }}</td>
                 <td class="right">{{$order_detail->quantity}}</td>
                 @if($order_detail->discount_type == 1)
                     <td class="right">{{$order_detail->discount}}</td>
@@ -114,7 +141,7 @@
                 @else
                     <td class="right">-</td>
                 @endif
-                <td class="right">₹ {{number_format($order_detail->price * $order_detail->quantity,2)}}</td>
+                <td class="right"> {{number_format($order_detail->price * $order_detail->quantity,2)}}</td>
             </tr>
             @endforeach
         </tbody>
@@ -123,14 +150,18 @@
     <table width="100%">
         <tr>
             <td class="bold">Total Items</td>
-            <td class="right">{{ number_format($order_details->sum(fn($d) => (int)$d->quantity))}}</td>
+            <td class="bold">=</td>
+            <td class="">{{ number_format($order_details->sum(fn($d) => (int)$d->quantity))}}</td>
         </tr>
         <tr>
             <td class="bold">Total Amount (Inclusive of all tax)</td>
+            <td class="bold">=</td>
+
             <td class="right">₹ {{ number_format($order_details->sum(fn($d) => $d->price * $d->quantity), 2) }}</td>
         </tr>
         <tr>
             <td class="bold">Discount Amount</td>
+            <td class="bold">=</td>
             <td class="right">₹ {{number_format($order->total_product_discount,2)}}</td>
         </tr>
     </table>
@@ -139,7 +170,7 @@
 
     <div class="center">
         No Exchange<br>
-        வாங்கிய பொருட்கள் வபஸ் வாங்கப்படாது
+        வாங்கிய பொருட்கள் வாபஸ் வாங்கப்படாது
     </div>
 
     <script>
