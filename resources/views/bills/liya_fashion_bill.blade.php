@@ -98,9 +98,14 @@
                     <div>{{ $user->phone }}</div>
                     <div>{{ $user->alt_phone }}</div>
                 </div>
-            </div><br>
+            </div>
             @if($user->user_detail->gst)
-                <strong>GST: </strong> {{ $user->user_detail->gst }}
+            <div class="d-flex flex-row">
+                <div class="mr-2"><strong>GST: </strong></div>
+                <div class="d-flex flex-column">
+                    <div>{{ $user->user_detail->gst }}</div>
+                </div>
+            </div>
             @endif
         </div>
     </div>
