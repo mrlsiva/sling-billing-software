@@ -67,6 +67,9 @@
             text-align: left;
             line-height: 1.4;
         }
+        .d-flex {
+            display: flex;
+        }
     </style>
 </head>
 <body>
