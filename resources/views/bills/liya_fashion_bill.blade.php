@@ -76,6 +76,9 @@
         .flex-row{
             flex-direction: row;
         }
+        .mr-2 {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -90,7 +93,7 @@
             <strong>{{ $user->name }}</strong><br>
             {{ $user->user_detail->address }}<br>
             <div class="d-flex flex-row">
-                <div>Mobile: </div>
+                <div class="mr-2"><strong>Mobile: </strong></div>
                 <div class="d-flex flex-column">
                     <div>{{ $user->phone }}</div>
                     <div>{{ $user->alt_phone }}</div>
