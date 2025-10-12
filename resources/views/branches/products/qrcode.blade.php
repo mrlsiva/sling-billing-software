@@ -126,10 +126,10 @@
             <div class="shop">
                 <div class="qr">
                     {!! QrCode::size(42)->generate($product->id) !!}
-                    @if($order_detail->discount_type == 1)
-                    <td class="right">{{$order_detail->discount}}</td>
-                @elseif($order_detail->discount_type == 2)
-                    <td class="right">{{$order_detail->discount}}%</td>
+                    @if($product->discount_type == 1)
+                    <td class="right">{{$product->discount}}</td>
+                @elseif($product->discount_type == 2)
+                    <td class="right">{{$product->discount}}%</td>
                 @else
                     <td class="right"> </td>
                 @endif
