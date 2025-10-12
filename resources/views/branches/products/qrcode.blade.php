@@ -55,7 +55,7 @@
 
 /* QR code on left */
 .qr {
-    width: 35px;          /* slightly smaller to free space */
+    width: 42px;          /* slightly smaller to free space */
     text-align: center;
     flex-shrink: 0;
 }
@@ -82,7 +82,7 @@
 }
 
 .product-price {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: bold;
     margin-top: 0px;
 	 white-space: nowrap;
