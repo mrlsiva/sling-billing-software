@@ -49,7 +49,7 @@
 
         .print-logo img {
             max-width: 100%;
-            max-height: 90px;
+            max-height: 120px;
         }
         .print-logo {
             margin-right: 8px;
