@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\branches;
+namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -31,32 +31,24 @@ use Carbon\Carbon;
 use Session;
 use DB;
 
-class billingController extends Controller
+class billingsController extends Controller
 {
     use Log, Notifications;
-    
+
     public function billing(Request $request)
     {
 
         $genders = Gender::where('is_active',1)->get();
-        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->parent_id],['is_active', 1]])->pluck('payment_id')->toArray();
+        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->id],['is_active', 1]])->pluck('payment_id')->toArray();
         $payments = Payment::whereIn('id',$shop_payment_ids)->get();
-        $finances = Finance::where([['shop_id',Auth::user()->parent_id],['is_active',1]])->get();
-        $categories = Stock::where([['branch_id',Auth::user()->id],['is_active',1]])->select('category_id')->get();
+        $finances = Finance::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
+        $categories = Stock::where([['shop_id',Auth::user()->id],['branch_id',null],['is_active',1]])->select('category_id')->get();
         $categories = Category::whereIn('id',$categories)->get();
-        $staffs = Staff::where([['branch_id',Auth::user()->id],['is_active',1]])->get();
+        $staffs = Staff::where([['shop_id',Auth::user()->id],['branch_id',null],['is_active',1]])->get();
 
-        $pagination = PosSetting::where('branch_id',Auth::user()->id)->first();
-        if($pagination)
-        {
-            $pagination = $pagination->pagination;
-        }
-        else
-        {
-            $pagination = 21;
-        }
+        $pagination = 21;
 
-        $stocks = Stock::where('branch_id', Auth::user()->id)->where('is_active', 1)
+        $stocks = Stock::where([['shop_id',Auth::user()->id],['branch_id',null],['is_active',1]])
             ->when($request->category, function ($query, $category) {
                 $query->where('category_id', $category);
             })
@@ -78,7 +70,7 @@ class billingController extends Controller
 
         ->paginate($pagination);
 
-        return view('branches.billing',compact('stocks','categories','genders','payments','finances','staffs'));
+        return view('users.billing',compact('stocks','categories','genders','payments','finances','staffs'));
     }
 
     public function get_sub_category(Request $request)
@@ -88,20 +80,10 @@ class billingController extends Controller
 
     public function get_product(Request $request)
     {
-
-        $pagination = PosSetting::where('branch_id',Auth::user()->id)->first();
-        if($pagination)
-        {
-            $pagination = $pagination->pagination;
-        }
-        else
-        {
-            $pagination = 21;
-        }
+        $pagination = 21;
         
         $stocks = Stock::with(['product.category', 'product.sub_category'])
-            ->where('branch_id', Auth::id())
-            ->where('is_active', 1)
+            ->where([['shop_id',Auth::user()->id],['branch_id',null],['is_active',1]])
             ->when($request->category, fn($q, $category) => $q->where('category_id', $category))
             ->when($request->sub_category, fn($q, $subCategory) => $q->where('sub_category_id', $subCategory))
             ->when($request->filter == 1, fn($q) => $q->where('quantity', '>', 0))
@@ -123,14 +105,14 @@ class billingController extends Controller
         ]);
 
         // Else load Blade normally
-        return view('branches.billing', compact('stocks'));
+        return view('users.billing', compact('stocks'));
     }
 
 
     public function get_product_detail(Request $request)
     {
         return $products = Product::with(['tax','sub_category','category','stock' => function ($query) use ($request) {
-                $query->where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id);
+                $query->where('shop_id', Auth::user()->id)->where('branch_id', null);
             },
         ])->where('id', $request->id)->first();
     }
@@ -138,7 +120,7 @@ class billingController extends Controller
     public function suggestPhone(Request $request)
     {
         $phones = Customer::where('phone', 'like', $request->phone . '%')
-            ->where('user_id', Auth::user()->parent_id)
+            ->where('user_id', Auth::user()->id)
             ->orderBy('phone')
             ->limit(5)
             ->pluck('phone'); // returns array-like collection
@@ -150,50 +132,7 @@ class billingController extends Controller
 
     public function get_customer_detail(Request $request)
     {
-        return $customer = Customer::with('gender')->where('phone', $request->phone)->where('user_id', Auth::user()->parent_id)->first();
-    }
-
-    public function customer_store(Request $request)
-    {
-        $user = User::where('id',Auth::user()->id)->first();
-
-        $request->validate([
-            'name' => 'required|string|max:50',
-            'phone' => ['required','digits:10','different:alt_phone',
-                Rule::unique('customers', 'phone')->where(function ($query) use ($user) {
-                    return $query->where('user_id', $user->parent_id);
-                }),
-            ],
-            'alt_phone' => 'nullable|digits:10|different:phone',
-            'address' => 'required|string|max:200',
-            'pincode' => 'nullable|digits:6|regex:/^[1-9][0-9]{5}$/',
-        ], 
-        [
-            'name.required' => 'Name is required.',
-            'phone.required' => 'Phone is required.',
-            'address.required' => 'Phone is required.',
-        ]);
-
-        DB::beginTransaction();
-
-        $customer = Customer::create([ 
-            'user_id' => $user->parent_id,
-            'branch_id' => Auth::user()->id,
-            'name' => Str::ucfirst($request->name),
-            'phone' => $request->phone,
-            'alt_phone' => $request->alt_phone,
-            'address' => $request->address,
-            'pincode' => $request->pincode,
-            'gender_id' => $request->gender,
-            'dob' => $request->dob,
-        ]);
-
-        DB::commit();
-
-        //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Customer Create','App/Models/Customer','customers',$customer->id,'Insert',null,$request,'Success','Customer Created Successfully');
-
-        return true;
+        return $customer = Customer::with('gender')->where('phone', $request->phone)->where('user_id', Auth::user()->id)->first();
     }
 
     public function store(Request $request)
@@ -202,12 +141,12 @@ class billingController extends Controller
         DB::beginTransaction();
 
         $user = User::where('id',Auth::user()->id)->first();
-        $billSetup = BillSetup::where([['branch_id',Auth::user()->id],['is_active',1]])->first();
+        $billSetup = BillSetup::where([['shop_id', Auth::user()->id],['branch_id', null],['is_active',1]])->first();
 
         if (!$billSetup) {
             return response()->json([
                 'status'   => 'failure',
-                'message'  => 'No active bill setup found for this branch.'
+                'message'  => 'No active bill setup found.'
             ]);
         }
 
@@ -215,7 +154,7 @@ class billingController extends Controller
         $billPrefix = $billSetup->bill_number;
 
         // Get last order with this branch
-        $lastOrder = Order::where('branch_id', Auth::user()->id)->orderBy('id', 'desc')->first();
+        $lastOrder = Order::where([['shop_id', Auth::user()->id],['branch_id', null]])->orderBy('id', 'desc')->first();
 
         $newBillNo = $billPrefix . '01'; // default start if no orders
 
@@ -236,7 +175,8 @@ class billingController extends Controller
         $customer = Customer::firstOrCreate(
             ['phone' => $customerData['phone']], // unique by phone
             [
-                'user_id' => $user->parent_id,
+                'user_id' => $user->id,
+                'branch_id' => null,
                 'alt_phone' => $customerData['alt_phone'] ?? null,
                 'name'      => $customerData['name'],
                 'address'   => $customerData['address'],
@@ -273,8 +213,8 @@ class billingController extends Controller
         });
 
         $order = Order::create([
-            'shop_id'                   => $user->parent_id,
-            'branch_id'                 => Auth::user()->id,
+            'shop_id'                   => $user->id,
+            'branch_id'                 => null,
             'bill_id'                   => $newBillNo,
             'billed_by'                 => $request->billed_by,
             'customer_id'               => $customer->id,
@@ -300,7 +240,7 @@ class billingController extends Controller
                 'discount'      => $product->discount,
             ]);
 
-            $stock = Stock::where([['shop_id',$user->parent_id],['branch_id',Auth::user()->id],['product_id',$item['product_id']]])->first();
+            $stock = Stock::where([['shop_id',$user->id],['branch_id',null],['product_id',$item['product_id']]])->first();
 
             $stock->update(['quantity' => $stock->quantity - $item['qty'] ]);
 
@@ -328,7 +268,7 @@ class billingController extends Controller
         $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->parent_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null);
+        $this->notification(Auth::user()->id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null);
 
         DB::commit();
         
@@ -362,7 +302,5 @@ class billingController extends Controller
         $user_detail = UserDetail::where('user_id',Auth::id())->first();
         return view('bills.view_bill',compact('user','order','order_details','order_payment_details'));
     }
-
-
-
+    
 }

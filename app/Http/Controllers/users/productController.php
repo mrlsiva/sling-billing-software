@@ -107,7 +107,6 @@ class productController extends Controller
 
 
         DB::beginTransaction();
-
         $tax = Tax::where('id',$request->tax)->first();
         $price = $request->price; // base price
 
@@ -118,13 +117,15 @@ class productController extends Controller
         //     $taxAmount = $price * $taxRate / 100;
         // }
 
-        if ($tax)
-        {
+        if ($tax && $tax->name != 0)
+        {            
             $taxRate   = (float) $tax->name;
             $taxAmount   = round($price / (1 + ($taxRate / 100)),2);
             //$taxAmount = $price * ((float) $tax->name / 100); 
-            $finalPrice = $price + $taxAmount; // if you want price including tax
+            //$finalPrice = $price + $taxAmount; // if you want price including tax
         }
+
+        //return $taxAmount;
 
         $product = Product::create([ 
             'user_id' => Auth::user()->id,

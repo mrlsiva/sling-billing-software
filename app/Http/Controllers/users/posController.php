@@ -73,7 +73,7 @@ class posController extends Controller
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
-        return view('branches.bill',compact('user','order','order_details','order_payment_details'));
+        return view('bills.bill',compact('user','order','order_details','order_payment_details'));
     }
 
     public function view_bill(Request $request,$company,$id)
@@ -82,6 +82,6 @@ class posController extends Controller
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
-        return view('branches.view_bill',compact('user','order','order_details','order_payment_details'));
+        return view('bills.view_bill',compact('user','order','order_details','order_payment_details'));
     }
 }

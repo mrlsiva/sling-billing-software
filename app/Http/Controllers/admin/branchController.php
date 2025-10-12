@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use App\Models\BankDetail;
 use App\Models\UserDetail;
 use App\Models\PosSetting;
+use App\Models\PrinterType;
 use App\Traits\common;
 use App\Models\User;
 use App\Traits\Log;
@@ -27,7 +28,8 @@ class branchController extends Controller
     public function create(Request $request,$id)
     {
         $user = User::with(['user_detail', 'bank_detail'])->where('id', $id)->first();
-        return view('admin.branches.create',compact('user'));
+        $printer_types = PrinterType::where('is_active',1)->get();
+        return view('admin.branches.create',compact('user','printer_types'));
     }
 
     public function store(Request $request)
@@ -38,7 +40,7 @@ class branchController extends Controller
 
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
-            'fav_icon' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'fav_icon' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
@@ -103,7 +105,6 @@ class branchController extends Controller
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'logo.max' => 'Logo size must not exceed 2MB.',
 
-            'fav_icon.required' => 'Fav Icon is required.',
             'fav_icon.mimes' => 'Fav Icon must be a JPG, JPEG or PNG file.',
             'fav_icon.max' => 'Fav Icon size must not exceed 2MB.',
             
@@ -256,7 +257,8 @@ class branchController extends Controller
     public function edit(Request $request,$id)
     {
         $user = User::with(['user_detail', 'bank_detail'])->where('id', $id)->first();
-        return view('admin.branches.edit',compact('user'));
+        $printer_types = PrinterType::where('is_active',1)->get();
+        return view('admin.branches.edit',compact('user','printer_types'));
     }
 
     public function update(Request $request)
@@ -266,7 +268,7 @@ class branchController extends Controller
 
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
-            'fav_icon' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'fav_icon' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
@@ -325,7 +327,6 @@ class branchController extends Controller
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'logo.max' => 'Logo size must not exceed 2MB.',
 
-            'fav_icon.required' => 'Fav Icon is required.',
             'fav_icon.mimes' => 'Fav Icon must be a JPG, JPEG or PNG file.',
             'fav_icon.max' => 'Fav Icon size must not exceed 2MB.',
             

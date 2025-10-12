@@ -157,6 +157,39 @@
                                 
                             </div>
 
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="bill_type" class="form-label">Bill Type</label>
+                                    <span class="text-danger">*</span>
+                                    <select class="form-control" name="bill_type" id="bill_type" required="">
+                                        <option value=""> Choose Bill Type</option>
+                                        @foreach($printer_types as $printer_type)
+                                        <option value="{{$printer_type->id}}" {{$user->user_detail->bill_type == $printer_type->id ? 'selected' : '' }}>{{$printer_type->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mt-5">
+                                        <input class="form-check-input" type="checkbox" id="is_scan_avaiable" name="is_scan_avaiable" {{ $user->user_detail->is_scan_avaiable == 1 ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="is_scan_avaiable">Qrcode/ Barcode scan</label>
+                                        <span class="text-danger">*</span>
+                                    </div>.
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mt-5">
+                                        <input class="form-check-input" type="checkbox" id="is_bill_enabled" name="is_bill_enabled" {{ $user->user_detail->is_bill_enabled == 1 ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="is_bill_enabled">Is Bill Enabled</label>
+                                        <span class="text-danger">*</span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

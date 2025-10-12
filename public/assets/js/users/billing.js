@@ -391,43 +391,6 @@ $(document).ready(function () {
     });
 });
 
-$(document).ready(function () {
-    // Handle form submission via AJAX
-    $('#customer_add').on('submit', function (e) {
-        e.preventDefault(); // Prevent normal form submit
-
-        $.ajax({
-            url: 'customer_store', // Change to your actual route
-            method: 'POST',
-            data: $(this).serialize(),
-            success: function (response) {
-                alert('Customer added successfully');
-                $('#customerAdd').modal('hide');
-                $('#customer_add')[0].reset();
-            },
-            error: function (xhr) {
-                alert('Something went wrong!');
-            }
-        });
-    });
-
-    // If you want to trigger submit from JS somewhere else:
-    function submitCustomerForm() {
-        document.getElementById('customer_add').requestSubmit(); // With validation
-    }
-
-    $("#phone").on("input", function () {
-        if ($(this).val().trim() === "") {
-            $("#customer").val("");
-            $("#alt_phone").val("").prop('disabled', false);
-            $("#name").val("").prop('disabled', false);
-            $("#address").val("").prop('disabled', false);
-            $('select[name="gender"]').empty().append('<option value="">Select</option>').append('<option value="1">' + "Female" + '</option>').append('<option value="2">' + "Male" + '</option>').prop('disabled', false);
-            $("#dob").val("").prop('disabled', false);
-        }
-    });
-});
-
 document.getElementById('next_tab_user_info').addEventListener('click', function (e) {
     e.preventDefault();
     let nextTab = document.querySelector('a[href="#messagesTabsJustified"]');
@@ -836,40 +799,6 @@ function upi_add() {
     $("#upi_amount").val("");
     $("#upi_fill").prop("checked", false);
 }
-
-// function saveCartToSession() {
-//     let cartData = [];
-
-//     $('#cart_item').find('[data-product-id]').each(function () {
-//         let qty = parseInt($(this).find('.qty-input').val());
-//         let price = parseFloat($(this).data('price'));
-//         let tax_amount = parseFloat($(this).data('tax_amount'));
-
-//         cartData.push({
-//             product_id: $(this).data('product-id'),
-//             qty: qty,
-//             price: price,
-//             tax_amount: tax_amount
-//         });
-//     });
-
-//     console.log(cartData);
-
-//     let paymentData = [];
-//     $("#payment-info-body tr").each(function () {
-//         let method = $(this).data("method");
-//         let amt = parseFloat($(this).find("td").eq(1).text().replace("₹", "")) || 0;
-//         let extra = $(this).data("extra") ? JSON.parse($(this).attr("data-extra")) : {};
-
-//         paymentData.push({
-//             method: method,
-//             amount: amt,
-//             extra: extra
-//         });
-//     });
-
-//     console.log(paymentData);
-// }
 
 
 function submit() {

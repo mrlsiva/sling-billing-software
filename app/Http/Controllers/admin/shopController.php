@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use App\Models\ShopPayment;
 use App\Models\BankDetail;
 use App\Models\UserDetail;
+use App\Models\PrinterType;
 use App\Models\Payment;
 use App\Traits\common;
 use App\Models\User;
@@ -39,7 +40,8 @@ class shopController extends Controller
 
     public function create(Request $request)
     {
-        return view('admin.shops.create');
+        $printer_types = PrinterType::where('is_active',1)->get();
+        return view('admin.shops.create',compact('printer_types'));
     }
 
     public function store(Request $request)
@@ -63,6 +65,7 @@ class shopController extends Controller
             'confirm_account_number' => 'nullable|same:account_number',
             'branch' => 'nullable|string|max:50',
             'ifsc_code' => 'nullable|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/i',
+            'bill_type' => 'required',
         ], 
         [
             'logo.required' => 'Logo is required.',
@@ -99,6 +102,7 @@ class shopController extends Controller
             'account_number.same' => 'Account numbers do not match.',
             'confirm_account_number.same' => 'Account numbers do not match.',
             'ifsc_code.regex' => 'Invalid IFSC code format.',
+            'bill_type.required' => 'Bill Type is required.',
         ]);
 
         DB::beginTransaction();
@@ -162,6 +166,9 @@ class shopController extends Controller
             'gst' => $request->gst,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'bill_type' => $request->bill_type,
+            'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
+            'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
         ]);
 
         //Log
@@ -214,7 +221,8 @@ class shopController extends Controller
     public function edit(Request $request,$id)
     {
         $user = User::with(['user_detail', 'bank_detail'])->where('id', $id)->first();
-        return view('admin.shops.edit',compact('user'));
+        $printer_types = PrinterType::where('is_active',1)->get();
+        return view('admin.shops.edit',compact('user','printer_types'));
     }
 
     public function update(Request $request)
@@ -223,7 +231,7 @@ class shopController extends Controller
 
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
-            'fav_icon' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
+            'fav_icon' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
             'email' => ['nullable','email',
                 Rule::unique('users', 'email')->where(function ($query) use ($ownerId) {
@@ -273,12 +281,12 @@ class shopController extends Controller
             'confirm_account_number' => 'nullable|same:account_number',
             'branch' => 'nullable|string|max:50',
             'ifsc_code' => 'nullable|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/i',
+            'bill_type' => 'required',
         ], 
         [
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'logo.max' => 'Logo size must not exceed 2MB.',
-
-            'fav_icon.required' => 'Fav Icon is required.',
+            
             'fav_icon.mimes' => 'Fav Icon must be a JPG, JPEG or PNG file.',
             'fav_icon.max' => 'Fav Icon size must not exceed 2MB.',
             
@@ -306,6 +314,7 @@ class shopController extends Controller
             'account_number.same' => 'Account numbers do not match.',
             'confirm_account_number.same' => 'Account numbers do not match.',
             'ifsc_code.regex' => 'Invalid IFSC code format.',
+            'bill_type.required' => 'Bill Type is required.',
         ]);
 
         $user = User::where('id',$request->id)->first();
@@ -364,6 +373,9 @@ class shopController extends Controller
             'gst' => $request->gst,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'bill_type' => $request->bill_type,
+            'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
+            'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
         ]);
 
         //Log

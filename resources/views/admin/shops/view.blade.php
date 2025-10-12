@@ -74,32 +74,17 @@
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Secondary Color :</h5>
                             <p class="fw-medium mb-0">@if($user->user_detail->secondary_colour != null) {{$user->user_detail->secondary_colour}} @else - @endif</p>
                     </div>
+                    <div class="pt-3">
+                            <h5 class="text-dark fs-12 text-uppercase fw-bold">Is Bill Enabled:</h5>
+                            <p class="fw-medium mb-0">@if($user->user_detail->is_bill_enabled == 1) <span class="badge bg-soft-success text-success">Enabled</span> @else <span class="badge bg-soft-danger text-danger">Disabled</span> @endif</p>
+                    </div>
                 </div>
             </div>
         </div>
+        
         <div class="col-md-8">
+            
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title mb-0">Bank Info</h4>
-                    <div class="d-flex gap-3">
-                        <a class="link-dark"  data-toast data-toast-text="Bank Details Copied Successfully!" data-toast-gravity="bottom" data-toast-position="center" data-toast-duration="3000" data-toast-close="close" href="javascript:void(0);" onclick="copyBankDetails()" ><i class="ri-file-copy-line align-middle fs-14"></i> Copy</a>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="" id="bank-details">
-                        <p class="fw-medium mb-0">@if($user->bank_detail->name != null) {{$user->bank_detail->name}} @else - @endif</p>
-                        <p class="fw-medium mb-0">@if($user->bank_detail->holder_name != null) {{$user->bank_detail->holder_name}} @else - @endif</p>
-                        <p class="fw-medium mb-0">@if($user->bank_detail->branch != null) {{$user->bank_detail->branch}} @else - @endif</p>
-                        <p class="fw-medium mb-0">@if($user->bank_detail->account_no != null) {{$user->bank_detail->account_no}} @else - @endif</p>
-                        <p class="fw-medium mb-0">@if($user->bank_detail->ifsc_code != null) {{$user->bank_detail->ifsc_code}} @else - @endif</p>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-
-
-
-
                 <div class="card-header d-flex justify-content-between align-items-center">
                     @php
                         $branch_count = App\Models\User::where('parent_id', $user->id)->count();
@@ -126,16 +111,16 @@
                     </div>
                 </form>
 
-                <div class="card-body">
+                <div class="card-body py-0">
                     <div class="table-responsive">
                         <table class="table align-middle mb-0 table-hover table-centered">
                             <thead class="bg-light-subtle">
                                 <tr>
-                                    <th>Image</th>
-                                    <th>Branch Name</th>
+                                    <!-- <th>Branch Name</th> -->
                                     <th>Slug Name</th>
                                     <th>User Name</th>
-                                    <th>Mobile Number</th>
+                                    <!-- <th>Mobile Number</th> -->
+                                    <th>Payment Date</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -143,13 +128,15 @@
                             <tbody>
                                 @foreach($branches as $branch)
                                     <tr>
-                                        <td>
+                                        <!-- <td>
                                             <img src="{{ asset('storage/'.$branch->logo) }}" class="logo-dark me-1" alt="Branch" height="30">
-                                        </td>
-                                        <td>{{$branch->name}}</td>
+                                        </td> -->
+                                        <!-- <td>{{$branch->name}}</td> -->
                                         <td>{{$branch->slug_name}}</td>
                                         <td>{{$branch->user_name}}</td>
-                                        <td>{{$branch->phone}}</td>
+                                        <!-- <td>{{$branch->phone}}</td> -->
+                                        <td>{{$branch->user_detail->payment_date}}</td>
+
                                         <td>
                                             @if($branch->is_lock == 1)
                                                 <span class="badge bg-soft-danger text-danger">Locked</span>
@@ -178,6 +165,25 @@
                     </div>
                     <div class="card-footer border-0">
                         {!! $branches->withQueryString()->links('pagination::bootstrap-5') !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Bank Info</h4>
+                    <div class="d-flex gap-3">
+                        <a class="link-dark"  data-toast data-toast-text="Bank Details Copied Successfully!" data-toast-gravity="bottom" data-toast-position="center" data-toast-duration="3000" data-toast-close="close" href="javascript:void(0);" onclick="copyBankDetails()" ><i class="ri-file-copy-line align-middle fs-14"></i> Copy</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="" id="bank-details">
+                        <p class="fw-medium mb-0">@if($user->bank_detail->name != null) {{$user->bank_detail->name}} @else - @endif</p>
+                        <p class="fw-medium mb-0">@if($user->bank_detail->holder_name != null) {{$user->bank_detail->holder_name}} @else - @endif</p>
+                        <p class="fw-medium mb-0">@if($user->bank_detail->branch != null) {{$user->bank_detail->branch}} @else - @endif</p>
+                        <p class="fw-medium mb-0">@if($user->bank_detail->account_no != null) {{$user->bank_detail->account_no}} @else - @endif</p>
+                        <p class="fw-medium mb-0">@if($user->bank_detail->ifsc_code != null) {{$user->bank_detail->ifsc_code}} @else - @endif</p>
                     </div>
                 </div>
             </div>

@@ -21,7 +21,9 @@ use App\Http\Controllers\users\financeController;
 use App\Http\Controllers\users\paymentController;
 use App\Http\Controllers\users\billController;
 use App\Http\Controllers\users\generalController;
+use App\Http\Controllers\users\staffsController;
 use App\Http\Controllers\users\orderReportsController;
+use App\Http\Controllers\users\billingsController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -183,6 +185,21 @@ else
                         });
                     });
 
+                    Route::prefix('billing')->group(function () {
+                        Route::name('billing.')->group(function () {
+                            Route::get('/pos',[billingsController::class, 'billing'])->name('pos');
+                            Route::get('/get_sub_category',[billingsController::class, 'get_sub_category'])->name('get_sub_category');
+                            Route::get('/get_product',[billingsController::class, 'get_product'])->name('get_product');
+                            Route::get('/get_product_detail',[billingsController::class, 'get_product_detail'])->name('get_product_detail');
+                            Route::get('/suggest-customer-phone', [billingsController::class, 'suggestPhone'])->name('suggestPhone');
+                            Route::get('/get_customer_detail',[billingsController::class, 'get_customer_detail'])->name('get_customer_detail');
+                            Route::post('/customer_store',[billingsController::class, 'customer_store'])->name('customer_store');
+                            Route::post('/store',[billingsController::class, 'store'])->name('store');
+                            Route::get('/{id}/get_bill',[billingsController::class, 'get_bill'])->name('get_bill');
+                            Route::get('/{id}/view_bill',[billingsController::class, 'view_bill'])->name('view_bill');
+                        });
+                    });
+
                     Route::prefix('orders')->group(function () {
                         Route::name('order.')->group(function () {
 
@@ -196,8 +213,20 @@ else
                         Route::name('customer.')->group(function () {
 
                             Route::get('/index',[userController::class, 'index'])->name('index');
+                            Route::post('/store',[userController::class, 'store'])->name('store');
                             Route::get('/{id}/order',[userController::class, 'order'])->name('order');
                             Route::get('/download',[userController::class, 'download'])->name('download');
+                        });
+                    });
+
+                    Route::prefix('staffs')->group(function () {
+                        Route::name('staff.')->group(function () {
+
+                            Route::get('/index',[staffsController::class, 'index'])->name('index');
+                            Route::post('/store',[staffsController::class, 'store'])->name('store');
+                            Route::post('/status',[staffsController::class, 'status'])->name('status');
+                            Route::post('/update',[staffsController::class, 'update'])->name('update');
+
                         });
                     });
 
