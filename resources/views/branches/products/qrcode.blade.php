@@ -55,7 +55,7 @@
 
 /* QR code on left */
 .qr {
-    width: 42px;          /* slightly smaller to free space */
+    width: 50px;          /* slightly smaller to free space */
     text-align: center;
     flex-shrink: 0;
 }
