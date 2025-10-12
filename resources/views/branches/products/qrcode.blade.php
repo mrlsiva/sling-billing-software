@@ -127,9 +127,9 @@
                 <div class="qr">
                     {!! QrCode::size(42)->generate($product->id) !!}
                     @if($product->discount_type == 1)
-                    <td class="right">{{$product->discount}}</td>
+                    <td class="right"><div class="product-price">{{$product->discount}}</div></td>
                 @elseif($product->discount_type == 2)
-                    <td class="right">{{$product->discount}}%</td>
+                    <td class="right"><div class="product-price">{{$product->discount}}%</div></td>
                 @else
                     <td class="right"> </td>
                 @endif
