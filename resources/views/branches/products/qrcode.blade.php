@@ -55,7 +55,7 @@
 
 /* QR code on left */
 .qr {
-    width: 35px;          /* slightly smaller to free space */
+    width: 50px;          /* slightly smaller to free space */
     text-align: center;
     flex-shrink: 0;
 }
@@ -82,7 +82,7 @@
 }
 
 .product-price {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: bold;
     margin-top: 0px;
 	 white-space: nowrap;
@@ -126,6 +126,13 @@
             <div class="shop">
                 <div class="qr">
                     {!! QrCode::size(42)->generate($product->id) !!}
+                    @if($product->discount_type == 1)
+                    <td class="right"><div class="product-price">Rs.{{$product->discount}} Off</div></td>
+                @elseif($product->discount_type == 2)
+                    <td class="right"><div class="product-price">{{$product->discount}}% Off</div></td>
+                @else
+                    <td class="right"> </td>
+                @endif
                 </div>
                 <div class="product">
                     <div class="product-name">{{ $product->name }}</div>
