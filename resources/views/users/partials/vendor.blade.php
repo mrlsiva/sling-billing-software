@@ -1,0 +1,1 @@
+vendor.blade.php

@@ -279,6 +279,7 @@ else
                                 Route::name('bill.')->group(function () {
                                     Route::get('/index/{branch?}',[billController::class, 'index'])->name('index');
                                     Route::post('/store',[billController::class, 'store'])->name('store');
+                                    Route::post('/set_bank_status',[billController::class, 'set_bank_status'])->name('set_bank_status');
                                 });
                             });
 
@@ -335,6 +336,17 @@ else
                                     Route::get('/index',[stockController::class, 'index'])->name('index');
                                     Route::get('/{product}/qrcode',[stockController::class, 'qrcode'])->name('qrcode');
                                     Route::get('/{id}/barcode',[stockController::class, 'barcode'])->name('barcode');
+                                });
+                            });
+
+                            Route::prefix('stock_transfer')->group(function () {
+                                Route::name('stock_transfer.')->group(function () {
+
+                                    Route::get('/transfer',[stockController::class, 'transfer'])->name('transfer');
+                                    Route::get('/get_sub_category',[stockController::class, 'get_sub_category'])->name('get_sub_category');
+                                    Route::get('/get_product',[stockController::class, 'get_product'])->name('get_product');
+                                    Route::get('/get_product_detail',[stockController::class, 'get_product_detail'])->name('get_product_detail');
+                                    Route::post('/store',[stockController::class, 'store'])->name('store');
                                 });
                             });
 

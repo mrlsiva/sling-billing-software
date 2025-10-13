@@ -279,12 +279,22 @@
                             </a>
                         </li>
 
-                        <li class="menu-item {{ request()->is(request()->route('company') . '/products*') ? 'active' : '' }}">
+
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/products*') ? 'active' : '' }}">
                             <a class="menu-link" href="{{route('branch.product.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-shopping-basket-line"></i>
                                 </span>
                                 <span class="nav-text"> Products </span>
+                            </a>
+                        </li>
+
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/stock_transfer*') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{route('branch.stock_transfer.transfer', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-hand-coin-fill"></i>
+                                </span>
+                                <span class="nav-text"> Stocks </span>
                             </a>
                         </li>
 

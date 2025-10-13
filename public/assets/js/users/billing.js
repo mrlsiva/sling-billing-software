@@ -384,6 +384,7 @@ $(document).ready(function () {
                     }
                     $('select[name="gender"]').prop('disabled', true);
                     $("#dob").val(data.dob).prop('disabled', true);
+                    $("#gst").val(data.gst).prop('disabled', true);
 
                 }
             });
@@ -684,38 +685,82 @@ function updateTotal() {
 // The rest stays the same
 function cash_add() {
     let cash_amount = $("#cash_amount").val().trim();
+
+    // Validate amount
     if (cash_amount === "" || isNaN(cash_amount) || parseFloat(cash_amount) <= 0) {
         alert('Amount is required');
         return;
     }
+
+    // Convert to number
+    cash_amount = parseFloat(cash_amount);
+
+    // Get current values
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+    // Validate against payable amount
+    if ((cash_amount + received) > payable) {
+        alert("Received amount should not be greater than payable amount.");
+        return;
+    }
+
+    // Add payment row
     appendPaymentRow("Cash", cash_amount);
+
+    // Clear input and uncheck "Full Amount"
     $("#cash_amount").val("");
-    // uncheck "Full Amount"
     $("#amount_fill").prop("checked", false);
 }
+
 
 function card_add() {
     let card_number = $("#card_number").val().trim();
     let card_name = $("#card_name").val().trim();
     let card_amount = $("#card_amount").val().trim();
 
-    if (card_number === "" || card_name === "" || card_amount === "" || isNaN(card_amount) || parseFloat(card_amount) <= 0) {
-        alert('Invalid Input');
-        return;
-    }
-    if (!/^\d{13,19}$/.test(card_number)) {
-        alert('Invalid Card Number (must be 13–19 digits)');
+    // Validate card name
+    if (card_name === "") {
+        alert('Card name cannot be empty');
         return;
     }
 
+    // Validate amount
+    if (card_amount === "" || isNaN(card_amount) || parseFloat(card_amount) <= 0) {
+        alert('Please enter a valid positive amount');
+        return;
+    }
+
+    // Convert to number
+    card_amount = parseFloat(card_amount);
+
+    // Validate card number only if entered
+    if (card_number !== "" && !/^\d{13,19}$/.test(card_number)) {
+        alert('Invalid card number (must be 13–19 digits)');
+        return;
+    }
+
+    // Get current received and payable amounts
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+    // Check total does not exceed payable
+    if ((card_amount + received) > payable) {
+        alert("Received amount should not be greater than payable amount.");
+        return;
+    }
+
+    // Add payment row
     appendPaymentRow("Card", card_amount, {
         card_name: card_name,
         card_number: card_number
     });
 
+    // Clear inputs and uncheck "Full Amount"
     $("#card_number, #card_name, #card_amount").val("");
     $("#card_fill").prop("checked", false);
 }
+
 
 
 function finance_add() {
@@ -723,49 +768,99 @@ function finance_add() {
     let finance_type = $("#finance_type").val().trim();
     let finance_amount = $("#finance_amount").val().trim();
 
-    if (finance_card === "" || finance_type === "" || finance_amount === "" || isNaN(finance_amount) || parseFloat(finance_amount) <= 0) {
+    // Basic validation
+    if (finance_type === "" || finance_amount === "" || isNaN(finance_amount) || parseFloat(finance_amount) <= 0) {
         alert('Invalid Input');
         return;
     }
-    if (!/^\d{8,}$/.test(finance_card)) {
+
+    // Convert amount to number
+    finance_amount = parseFloat(finance_amount);
+
+    // Validate finance card only if entered
+    if (finance_card !== "" && !/^\d{8,}$/.test(finance_card)) {
         alert('Invalid Finance Card Number (min 8 digits)');
         return;
     }
 
+    // Get readable finance type name
     let finance_type_text = $("#finance_type option:selected").text();
 
+    // Get current totals
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+    // Prevent overpayment
+    if ((finance_amount + received) > payable) {
+        alert("Received amount should not be greater than payable amount.");
+        return;
+    }
+
+    // Add finance payment row
     appendPaymentRow("Finance", finance_amount, {
-        finance_type: finance_type,         // keep ID for DB
-        finance_type_name: finance_type_text, // add readable name for UI
+        finance_type: finance_type,         // ID for DB
+        finance_type_name: finance_type_text, // Display name for UI
         finance_card: finance_card
     });
 
+    // Reset inputs and checkbox
     $("#finance_card, #finance_type, #finance_amount").val("");
     $("#finance_fill").prop("checked", false);
 }
 
 
+
 function exchange_add() {
     let exchange_amount = $("#exchange_amount").val().trim();
+
+    // Validate amount
     if (exchange_amount === "" || isNaN(exchange_amount) || parseFloat(exchange_amount) <= 0) {
         alert('Invalid Input');
         return;
     }
+
+    exchange_amount = parseFloat(exchange_amount);
+
+    // Check payable vs received
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+    if ((exchange_amount + received) > payable) {
+        alert("Received amount should not be greater than payable amount.");
+        return;
+    }
+
     appendPaymentRow("Exchange", exchange_amount);
+
     $("#exchange_amount").val("");
     $("#exchange_fill").prop("checked", false);
 }
 
+
 function credit_add() {
     let credit_amount = $("#credit_amount").val().trim();
+
     if (credit_amount === "" || isNaN(credit_amount) || parseFloat(credit_amount) <= 0) {
         alert('Invalid Input');
         return;
     }
+
+    credit_amount = parseFloat(credit_amount);
+
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+    if ((credit_amount + received) > payable) {
+        alert("Received amount should not be greater than payable amount.");
+        return;
+    }
+
     appendPaymentRow("Credit", credit_amount);
+
     $("#credit_amount").val("");
     $("#credit_fill").prop("checked", false);
 }
+
 
 function cheque_add() {
     let cheque_number = $("#cheque_number").val().trim();
@@ -775,8 +870,19 @@ function cheque_add() {
         alert('Invalid Input');
         return;
     }
+
+    cheque_amount = parseFloat(cheque_amount);
+
     if (!/^\d{6,}$/.test(cheque_number)) {
         alert('Invalid Cheque Number (min 6 digits)');
+        return;
+    }
+
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+    if ((cheque_amount + received) > payable) {
+        alert("Received amount should not be greater than payable amount.");
         return;
     }
 
@@ -791,14 +897,28 @@ function cheque_add() {
 
 function upi_add() {
     let upi_amount = $("#upi_amount").val().trim();
+
     if (upi_amount === "" || isNaN(upi_amount) || parseFloat(upi_amount) <= 0) {
         alert('Invalid Input');
         return;
     }
+
+    upi_amount = parseFloat(upi_amount);
+
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+    if ((upi_amount + received) > payable) {
+        alert("Received amount should not be greater than payable amount.");
+        return;
+    }
+
     appendPaymentRow("UPI", upi_amount);
+
     $("#upi_amount").val("");
     $("#upi_fill").prop("checked", false);
 }
+
 
 
 function submit() {
@@ -810,6 +930,7 @@ function submit() {
     let pincode = $("#pincode").val().trim();
     let gender = $("#gender").val();
     let dob = $("#dob").val();
+    let gst = $("#gst").val();
     let billed_by = $("#billed_by").val();
 
     // --- Customer validation ---
@@ -891,6 +1012,7 @@ function submit() {
         pincode: $("#pincode").val().trim(),
         gender: $("#gender").val(),
         dob: $("#dob").val(),
+        gst: $("#gst").val(),
 
     };
 

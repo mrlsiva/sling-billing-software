@@ -347,6 +347,13 @@
 							</div>
 						</div>
 
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="gst" class="form-label">GST</label>
+								<input type="text" id="gst" name="gst" class="form-control" placeholder="GST">
+							</div>
+						</div>
+
 					</div>
 
 					<div class=" gap-1 hstack mt-3">
@@ -402,7 +409,7 @@
 						<div class="col-md-12">
 							<div class="mb-3">
 								<label for="card_number" class="form-label">Card Number</label>
-								<span class="text-danger">*</span>
+								<!-- <span class="text-danger">*</span> -->
 								<input type="number" name="card_number" id="card_number" value="{{old('card_number')}}"
 									class="form-control" placeholder="Card Number">
 							</div>
@@ -442,11 +449,11 @@
 					<div class="row g-2 secret" id="finance">
 						<div class="col-md-12">
 							<div class="mb-3">
-								<label for="finance_card" class="form-label">Finance Card Number</label>
-								<span class="text-danger">*</span>
-								<input type="number" name="finance_card" id="finance_card"
+								<label for="finance_card" class="form-label">Finance Reference Number</label>
+								<!-- <span class="text-danger">*</span> -->
+								<input type="text" name="finance_card" id="finance_card"
 									value="{{old('finance_card')}}" class="form-control"
-									placeholder="Finance Card Number">
+									placeholder="Finance Reference Number">
 							</div>
 						</div>
 						<div class="col-md-12">

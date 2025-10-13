@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-<title>{{ config('app.name')}} | Product Transfer</title>
+<title>{{ config('app.name')}} | Stock Transfer</title>
 @endsection
 
 @section('body')
@@ -10,34 +10,10 @@
 			<div class="card">
 				<div class="card-header d-flex justify-content-between align-items-center">
 					<div>
-						<p class="card-title">Product Transfer</p>
+						<p class="card-title">Stock Transfer</p>
 					</div>
-					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#productTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Product Transfer</a>
+					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#stockTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Stock Transfer</a>
 				</div>
-
-				<form method="get" action="{{route('inventory.transfer', ['company' => request()->route('company')])}}">
-				    <div class="row mb-3 p-3">
-				    	<div class="col-md-6">
-				    		<div class="input-group">
-				    			<span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
-				    			<input type="text" class="form-control" placeholder="Product Name" name="product" value="{{ request('product') }}" id="searchInput">
-				    			<span class="input-group-text" id="clearFilter" style="display: {{ request('product') ? 'inline-flex' : 'none' }}"><a href="{{route('inventory.transfer', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
-				    		</div>
-				    	</div>
-				    	<div class="col-md-5">
-				    		<select class="form-control" name="branch" id="branch">
-				    			<option value=""> Select Branch </option>
-				    			@foreach($branches as $branch)
-				    			<option value="{{$branch->id}}" {{ request('branch') == $branch->id ? 'selected' : '' }}>{{$branch->user_name}}</option>
-				    			@endforeach
-				    		</select>
-				    	</div>
-
-					    <div class="col-md-1">
-					    	<button class="btn btn-primary"> Search </button>
-					    </div>
-				    </div>
-		    	</form>
 
 		    	@if(session('error_alert'))
 		        <div class="alert alert-danger">
@@ -51,7 +27,8 @@
 							<thead class="bg-light-subtle">
 								<tr>
 									<th>S.No</th>
-									<th>Branch</th>
+									<th>From</th>
+									<th>To</th>
                                    	<th>Image</th>
                                     <th>Categoy</th>
                                     <th>Product</th>
@@ -65,6 +42,8 @@
 										<td>
 											{{ ($transfers->currentPage() - 1) * $transfers->perPage() + $loop->iteration }}
 										</td>
+
+										<td>{{$transfer->transfer_from->user_name}}</td>
 
 										<td>{{$transfer->transfer_to->user_name}}</td>
 
@@ -100,21 +79,21 @@
 		</div>
 	</div>
 
-	<div class="modal fade" id="productTransfer" tabindex="-1" aria-labelledby="productTransfer" aria-hidden="true">
+	<div class="modal fade" id="stockTransfer" tabindex="-1" aria-labelledby="stockTransfer" aria-hidden="true">
 	    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
 	        <div class="modal-content">
 	            <div class="modal-header">
 	                <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Transfer Product</h5>
 	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	            </div>
-	            <form class="row" action="{{route('inventory.transfer.store', ['company' => request()->route('company')])}}" method="post" id="transfer_submit">
+	            <form class="row" action="{{route('branch.stock_transfer.store', ['company' => request()->route('company')])}}" method="post" id="transfer_submit">
 	                @csrf
 	                <div class="modal-body">
 
 	                    <div class="row">
 	                        <div class="col-md-12">
 	                            <div class="mb-3">
-	                                <label for="choices-single-groups" class="form-label text-muted">Select Branch</label>
+	                                <label for="choices-single-groups" class="form-label text-muted">To</label>
 	                                <select class="form-control" data-choices name="branch" id="branch">
 	                                    <option value=""> Select </option>
 	                                    @foreach($branches as $branch)
@@ -190,8 +169,9 @@
 	        </div>
 	    </div>
 	</div>
+
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/users/transfer.js')}}"></script>
+<script src="{{asset('assets/js/branches/transfer.js')}}"></script>
 @endsection

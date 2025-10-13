@@ -52,10 +52,38 @@
                                 </ul>
                             </div>
                         @endif
-                
-                        <div class="d-flex justify-content-end p-3">
-                            <a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#BillAdd"><i class='bx bxs-folder-plus'></i> Bill Setup</a>
+
+                        <div class="d-flex justify-content-between align-items-center p-3">
+                            <div class="form-check form-switch m-0">
+                                @if($branch == 0)
+                                    @php
+                                        $user = App\Models\UserDetail::where('user_id', Auth::user()->owner_id)->first();
+                                    @endphp
+                                @else
+                                    @php
+                                        $user = App\Models\UserDetail::where('user_id', $branch)->first();
+                                    @endphp
+                                @endif
+
+                                <form action="{{ route('setting.bill.set_bank_status', ['company' => request()->route('company')]) }}" method="post">
+                                    @csrf
+                                    <div class="form-check form-switch d-flex align-items-center">
+                                        <input type="hidden" name="id" value="{{ $user->user_id }}">
+                                        <input class="form-check-input" type="checkbox" name="show_bank_detail"
+                                            onchange="if(confirm('Are you sure you want to change bank detail visibility in bill?')) { this.form.submit(); } else { this.checked = !this.checked; }"
+                                            {{ $user->show_bank_detail == 1 ? 'checked' : '' }}>
+                                        <label class="form-check-label ms-2" for="show_bank_detail">Show Bank Detail in Bill</label>
+                                        <span class="text-danger ms-1">*</span>
+                                    </div>
+                                </form>
+
+                            </div>
+
+                            <a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#BillAdd">
+                                <i class='bx bxs-folder-plus'></i> Bill Setup
+                            </a>
                         </div>
+
                         <div class="table-responsive">
                             <table class="table align-middle mb-0 table-hover table-centered">
                                 <thead class="bg-light-subtle">

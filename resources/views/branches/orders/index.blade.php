@@ -20,7 +20,7 @@
                         <div class="col-md-11">
                             <div class="input-group ">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
-                                <input type="text" class="form-control" placeholder="Customer Name/ Customer Phone/ Bill No" name="order" value="{{ request('order') }}" id="searchInput">
+                                <input type="text" class="form-control" placeholder="Customer Name/ Customer Phone/ Customer GST/ Bill No" name="order" value="{{ request('order') }}" id="searchInput">
                                 <span class="input-group-text" id="clearFilter" style="display: {{ request('order') ? 'inline-flex' : 'none' }}"><a href="{{route('branch.order.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
@@ -43,6 +43,7 @@
 									<th>Billed by</th>
 									<th>Mode of payment</th>
 									<th>Customer</th>
+									<th>Customer GST</th>
 									<th>Action</th>
 								</tr>
 							</thead>
@@ -73,6 +74,13 @@
 										<td>{{ implode(', ', $payments) }}</td>
 										<td>
 											{{ $order->customer->phone }} ({{ $order->customer->name }})
+										</td>
+										<td>
+											@if($order->customer->gst != null)
+												{{ $order->customer->gst }}
+											@else
+												-
+											@endif
 										</td>
 										<td>
 

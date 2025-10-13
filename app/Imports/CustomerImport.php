@@ -49,6 +49,7 @@ class CustomerImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
         $address  = trim($row['address'] ?? '');
         $pincode  = trim($row['pincode'] ?? null);
         $gender   = trim($row['gender'] ?? null);
+        $gst   = trim($row['gst'] ?? null);
         $dobExcel = $row['dob'] ?? null;
         $dob      = null;
 
@@ -82,6 +83,7 @@ class CustomerImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             'pincode'         => $pincode,
             'gender_id'       => $genderId,
             'dob'             => $dob,
+            'gst'             => $gst,
             'is_bulk_upload'  => 1,           // track bulk upload
             'run_id'          => $this->runId, // associate with run_id
         ]);
@@ -115,6 +117,7 @@ class CustomerImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             ],
             '*.address' => ['required', 'string', 'max:200'],
             '*.pincode' => ['nullable', 'digits:6', 'regex:/^[1-9][0-9]{5}$/'],
+            '*.gst' => ['nullable', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i'],
             '*.dob' => [
                 function ($attribute, $value, $fail) {
                     if (!empty($value)) {
@@ -151,6 +154,7 @@ class CustomerImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             'address.required'         => 'Address is required.',
             'pincode.digits'           => 'Pincode must be exactly 6 digits.',
             'pincode.regex'            => 'Pincode is invalid.',
+            'gst.regex'                => 'GST is invalid.',
         ];
     }
 

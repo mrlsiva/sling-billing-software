@@ -34,7 +34,8 @@ class orderController extends Controller
                   // Customer Name / Phone
                   ->orWhereHas('customer', function ($q2) use ($search) {
                       $q2->where('name', 'like', "%{$search}%")
-                         ->orWhere('phone', 'like', "%{$search}%");
+                         ->orWhere('phone', 'like', "%{$search}%")
+                         ->orWhere('gst', 'like', "%{$search}%");
                   });
             });
         })->orderBy('id','desc')->paginate(10);

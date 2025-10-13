@@ -40,7 +40,7 @@
                         <div class="col-md-11">
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
-                                <input type="text" class="form-control" placeholder="Branch Name/ Branch Username/ Customer Name/ Customer Phone/ Bill No" name="order" value="{{ request('order') }}" id="searchInput">
+                                <input type="text" class="form-control" placeholder="Branch Name/ Branch Username/ Customer Name/ Customer Phone/ Customer GST/ Bill No" name="order" value="{{ request('order') }}" id="searchInput">
                                 <span class="input-group-text" id="clearFilter" style="display: {{ request('order') ? 'inline-flex' : 'none' }}"><a href="{{route('order.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
@@ -64,6 +64,7 @@
 										<th>Billed On</th>
 										<th>Billed By</th>
 										<th>Customer</th>
+                                        <th>Customer GST</th>
 										<th>Action</th>
                                     </tr>
                                 </thead> 
@@ -95,6 +96,13 @@
 										<td>
 											{{ $order->customer->phone }} ({{ $order->customer->name }})
 										</td>
+                                        <td>
+                                            @if($order->customer->gst != null)
+                                                {{ $order->customer->gst }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
 										<td>
 
                                             <a href="{{ route('order.view_bill', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark" target="_blank"><i class="ri-eye-line align-middle fs-20" title="View Bill"></i></a>

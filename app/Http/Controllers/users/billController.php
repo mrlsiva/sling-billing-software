@@ -9,6 +9,7 @@ use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\BillSetup;
+use App\Models\UserDetail;
 use App\Traits\Log;
 use Carbon\Carbon;
 use DB;
@@ -81,5 +82,55 @@ class billController extends Controller
         return redirect()->back()->with('toast_success', 'Bill setup saved successfully!');
 
     }
+
+    public function set_bank_status(Request $request)
+    {
+        $user = UserDetail::where('user_id',$request->id)->first();
+
+        if (!$user) {
+            return redirect()->back()->with('toast_error', 'User not found.');
+        }
+
+        // Toggle bank detail visibility
+        $user->show_bank_detail = $user->show_bank_detail == 1 ? 0 : 1;
+        $user->save();
+
+        $statusText = $user->show_bank_detail == 1 
+            ? 'Bank detail display enabled in bill.'
+            : 'Bank detail display disabled in bill.';
+
+        // Log the action
+        $this->addToLog(
+            $this->unique(),
+            Auth::user()->id,
+            'Bank Detail Visibility Update',
+            'App/Models/UserDetail',
+            'user_details',
+            $user->id,
+            'Update',
+            null,
+            null,
+            'Success',
+            $statusText
+        );
+
+        // Notification to owner (optional)
+        $this->notification(
+            Auth::user()->owner_id,
+            null,
+            'App/Models/UserDetail',
+            $user->id,
+            null,
+            json_encode($request->all()),
+            now(),
+            Auth::user()->id,
+            $statusText,
+            null,
+            null
+        );
+
+        return redirect()->back()->with('toast_success', $statusText);
+    }
+
 
 }

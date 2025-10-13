@@ -220,6 +220,15 @@
 		                	</div>
 		                </div>
 
+		                <div class="row">
+		                	<div class="col-md-12">
+		                		<div class="mb-3">
+		                			<label for="gst" class="form-label text-muted">GST</label>
+		                			<input type="text" id="gst" name="gst" class="form-control" >
+		                		</div>
+		                	</div>
+		                </div>
+
 		            </div>
 
 		            <div class="modal-footer">

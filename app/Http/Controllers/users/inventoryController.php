@@ -73,18 +73,18 @@ class inventoryController extends Controller
 
     public function transfer(Request $request)
     {
-        $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
-        $branches = User::where([['parent_id',Auth::user()->id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
+        $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
+        $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
 
-        $transfers = ProductHistory::where('shop_id', Auth::user()->id)
+        $transfers = ProductHistory::where('from', Auth::user()->owner_id)
         ->when(request('product'), function ($query, $product) {
             $query->whereHas('product', function ($q) use ($product) {
                 $q->where('name', 'like', "%{$product}%");
             });
         })
-        ->when(request('branch'), function ($query, $branch) {
-            $query->where('branch_id', $branch);
-        })->orderBy('branch_id', 'asc')->orderBy('transfer_on', 'desc')->paginate(10);
+        ->when(request('transfer_to'), function ($query, $branch) {
+            $query->where('to', $branch);
+        })->orderBy('to', 'asc')->orderBy('transfer_on', 'desc')->paginate(10);
 
         return view('users.inventories.transfer',compact('categories','transfers','branches'));
     }
@@ -141,7 +141,7 @@ class inventoryController extends Controller
         if ($branchStock) 
         {
             $branchStock->update([
-                'shop_id'        => Auth::user()->id,
+                'shop_id'        => Auth::user()->owner_id,
                 'branch_id'      => $request->branch,
                 'category_id'    => $request->category,
                 'sub_category_id'=> $request->sub_category,
@@ -156,7 +156,7 @@ class inventoryController extends Controller
         else 
         {
             $branchStock = Stock::create([
-                'shop_id'        => Auth::user()->id,
+                'shop_id'        => Auth::user()->owner_id,
                 'branch_id'      => $request->branch,
                 'category_id'    => $request->category,
                 'sub_category_id'=> $request->sub_category,
@@ -186,8 +186,8 @@ class inventoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Quantity Updated','App/Models/Poduct','products',$product->id,'Update',null,$request,'Success','Quantity Updated for this product');
 
         $transfer = ProductHistory::create([
-            'shop_id'        => Auth::user()->id,
-            'branch_id'      => $request->branch,
+            'from'           => Auth::user()->id,
+            'to'             => $request->branch,
             'category_id'    => $request->category,
             'sub_category_id'=> $request->sub_category,
             'product_id'     => $request->product,
@@ -200,10 +200,10 @@ class inventoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Product Transfer','App/Models/ProductHistory','product_histories',$transfer->id,'Create',null,$request,'Success','Product Transfered Successfully');
 
         //Notification
-        $this->notification(Auth::user()->owner_id, null,'App/Models/ProductHistory', $transfer->id, null, json_encode($request->all()), now(), Auth::user()->id, $transfer->product->name.' has been successfully transfered to branch '.$transfer->branch->name,null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/ProductHistory', $transfer->id, null, json_encode($request->all()), now(), Auth::user()->id, $transfer->product->name.' has been successfully transfered to branch '.$transfer->transfer_to->name,null, null);
 
         //Notification
-        $this->notification(null, $request->branch,'App/Models/ProductHistory', $transfer->id, null, json_encode($request->all()), now(), Auth::user()->id, $transfer->product->name.' has been successfully transfered to your branch '.$transfer->branch->name,null, null);
+        $this->notification(null, $request->branch,'App/Models/ProductHistory', $transfer->id, null, json_encode($request->all()), now(), Auth::user()->id, $transfer->product->name.' has been successfully transfered to your branch '.$transfer->transfer_to->name,null, null);
 
         DB::commit();
 

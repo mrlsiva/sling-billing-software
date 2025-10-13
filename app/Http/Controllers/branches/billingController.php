@@ -186,6 +186,7 @@ class billingController extends Controller
             'pincode' => $request->pincode,
             'gender_id' => $request->gender,
             'dob' => $request->dob,
+            'gst' => $request->gst,
         ]);
 
         DB::commit();
@@ -243,6 +244,7 @@ class billingController extends Controller
                 'pincode'   => $customerData['pincode'] ?? null,
                 'gender_id' => $customerData['gender'] ?? null,
                 'dob'       => $customerData['dob'] ?? null,
+                'gst'       => $customerData['gst'] ?? null,
             ]
         );
 

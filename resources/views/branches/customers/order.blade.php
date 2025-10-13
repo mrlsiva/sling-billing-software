@@ -23,7 +23,7 @@
                         <div class="col-md-11">
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
-                                <input type="text" class="form-control" placeholder="Customer Name/ Customer Phone/ Bill No" name="order" value="{{ request('order') }}">
+                                <input type="text" class="form-control" placeholder="Customer Name/ Customer Phone/ Customer GST/ Bill No" name="order" value="{{ request('order') }}">
                                 <span class="input-group-text"><a href="{{route('branch.customer.order', ['company' => request()->route('company'),'id' => request()->route('id')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
@@ -45,6 +45,7 @@
 									<th>Billed On</th>
 									<th>Billed By</th>
 									<th>Customer</th>
+									<th>Customer GST</th>
 									<th>Action</th>
 								</tr>
 							</thead>
@@ -68,6 +69,13 @@
 										</td>
 										<td>
 											{{ $order->customer->phone }} ({{ $order->customer->name }})
+										</td>
+										<td>
+											@if($order->customer->gst != null)
+												{{ $order->customer->gst }}
+											@else
+												-
+											@endif
 										</td>
 										<td>
 

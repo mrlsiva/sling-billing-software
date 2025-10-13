@@ -98,8 +98,9 @@
             </tr>
             <!-- Buyer Info -->
             <tr>
-                <td colspan="3"><strong>Buyer Name:</strong> {{$order->customer->name}} </td>
-                <td colspan="3"><strong>Mobile No:</strong> {{$order->customer->phone}} </td>
+                <td colspan="2"><strong>Buyer Name:</strong> {{$order->customer->name}} </td>
+                <td colspan="2"><strong>GST:</strong> @if($order->customer->gst != null) {{$order->customer->gst}} @else - @endif </td>
+                <td colspan="2"><strong>Mobile No:</strong> {{$order->customer->phone}} </td>
                 <td colspan="2"><strong>Inv. No:</strong> {{$order->bill_id}} </td>
                 <td colspan="2">
                     <strong>Inv. Date:</strong> {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}
@@ -107,27 +108,37 @@
             </tr>
             <tr>
                 <td colspan="4"><strong>Address:</strong> {{$order->customer->address}} @if($order->customer->pincode != null) - {{$order->customer->pincode}}@endif</td>
-                <td colspan="2"><strong>Terms of Delivery:</strong> -</td>
-                <td colspan="4"><strong>Mode of Payment:</strong>@foreach($order_payment_details as $order_payment_detail) {{$order_payment_detail->payment->name}} @if($order_payment_detail->card != null)({{$order_payment_detail->card}})@endif @if($order_payment_detail->finance_id != null)({{$order_payment_detail->finance->name}})@endif, @endforeach</td>
+                <td colspan="6"><strong>Mode of Payment:</strong>
+                    @foreach($order_payment_details as $order_payment_detail)
+                        <strong>
+                            {{ $order_payment_detail->payment->name }}
+                            @if($order_payment_detail->card)
+                                ({{ $order_payment_detail->card }})
+                            @endif
+                            @if($order_payment_detail->finance_id)
+                                ({{ $order_payment_detail->finance->name }})
+                            @endif:
+                        </strong>
+                        ₹ {{ $order_payment_detail->amount }}
+                        @if(! $loop->last), @endif
+                    @endforeach
+
+                </td>
             </tr>
             <tr>
-                <td colspan="2">
+                <td colspan="4">
                 	<strong>Sales Person:</strong> {{$order->billedBy->name}}
                 </td>
-                <td colspan="6">
-                	@foreach($order_payment_details as $order_payment_detail) 
-                		<strong>{{$order_payment_detail->payment->name}}@if($order_payment_detail->card != null)({{$order_payment_detail->card}})@endif @if($order_payment_detail->finance_id != null)({{$order_payment_detail->finance->name}})@endif:</strong> ₹ {{$order_payment_detail->amount}}, 
-                	@endforeach
-                </td>
+                
                 @if($order->is_refunded == 0)
-                    <td colspan="2" class="right"><strong>Total:</strong> ₹ {{number_format($order->bill_amount,2)}}</td>
+                    <td colspan="6"><strong>Total:</strong> ₹ {{number_format($order->bill_amount,2)}}</td>
                 @else
                     @php
                         $refundAmount = App\Models\Refund::where('order_id', $order->id)->sum('refund_amount');
                         $refundIds = App\Models\Refund::where('order_id',$order->id)->pluck('payment_id')->toArray();
                         $refund_details = App\Models\RefundDetail::whereIn('refund_id',$refundIds)->get();
                     @endphp
-                    <td colspan="2"><strong>Order Amount:</strong> ₹ {{number_format($order->bill_amount,2)}}<strong>Refunded Amount:</strong> ₹ {{ number_format($refundAmount, 2) }}<strong>Total:</strong> ₹ {{ number_format($order->bill_amount - $refundAmount, 2) }}</td>
+                    <td colspan="6"><strong>Order Amount:</strong> ₹ {{number_format($order->bill_amount,2)}}<strong>Refunded Amount:</strong> ₹ {{ number_format($refundAmount, 2) }}<strong>Total:</strong> ₹ {{ number_format($order->bill_amount - $refundAmount, 2) }}</td>
                 @endif
             </tr>
             <!-- Column Headings -->
@@ -237,6 +248,19 @@
                 <td colspan="5">₹ {{number_format($order->bill_amount,2)}}</td>
             </tr>
             @endif
+
+            @if($order->branch_id == null)
+                @php
+                    $user_detail = App\Models\UserDetail::where('user_id', $order->shop_id)->first();
+                @endphp
+            @else
+                @php
+                    $user_detail = App\Models\UserDetail::where('user_id', $order->branch_id)->first();
+                @endphp
+            @endif
+
+            @if($user_detail->show_bank_detail == 1)
+
             <tr>
                 <td colspan="5" class="no-border">
                     <div class="foot-box">
@@ -248,12 +272,9 @@
                         IFSC Code: @if($user->bank_detail->ifsc_code != null) {{$user->bank_detail->ifsc_code}} @else - @endif
                     </div>
                 </td>
-                <td colspan="5" class="no-border right">
-                    <div class="foot-box">
-                        <strong>Authorised Signature</strong><br><br><br>
-                    </div>
-                </td>
             </tr>
+
+            @endif
         </tfoot>
     </table>
 	<script>

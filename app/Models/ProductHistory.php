@@ -7,17 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class ProductHistory extends Model
 {
     protected $fillable = [
-        'shop_id','branch_id','category_id','sub_category_id','product_id','quantity','transfer_on','transfer_by'
+        'from','to','category_id','sub_category_id','product_id','quantity','transfer_on','transfer_by'
     ];
 
-    public function shop()
+    public function transfer_from()
     {
-        return $this->belongsTo('App\Models\User','shop_id');
+        return $this->belongsTo('App\Models\User','from');
     }
 
-    public function branch()
+    public function transfer_to()
     {
-        return $this->belongsTo('App\Models\User','branch_id');
+        return $this->belongsTo('App\Models\User','to');
     }
 
     public function sub_category()

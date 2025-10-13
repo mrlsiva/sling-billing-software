@@ -384,6 +384,7 @@ $(document).ready(function () {
                     }
                     $('select[name="gender"]').prop('disabled', true);
                     $("#dob").val(data.dob).prop('disabled', true);
+                    $("#gst").val(data.gst).prop('disabled', true);
 
                 }
             });
@@ -424,6 +425,7 @@ $(document).ready(function () {
             $("#address").val("").prop('disabled', false);
             $('select[name="gender"]').empty().append('<option value="">Select</option>').append('<option value="1">' + "Female" + '</option>').append('<option value="2">' + "Male" + '</option>').prop('disabled', false);
             $("#dob").val("").prop('disabled', false);
+            $("#gst").val("").prop('disabled', false);
         }
     });
 });
@@ -736,12 +738,21 @@ function card_add() {
     let card_name = $("#card_name").val().trim();
     let card_amount = $("#card_amount").val().trim();
 
-    if (card_number === "" || card_name === "" || card_amount === "" || isNaN(card_amount) || parseFloat(card_amount) <= 0) {
-        alert('Invalid Input');
+    // Validate name
+    if (card_name === "") {
+        alert('Card name cannot be empty');
         return;
     }
-    if (!/^\d{13,19}$/.test(card_number)) {
-        alert('Invalid Card Number (must be 13–19 digits)');
+
+    // Validate amount
+    if (card_amount === "" || isNaN(card_amount) || parseFloat(card_amount) <= 0) {
+        alert('Please enter a valid positive amount');
+        return;
+    }
+
+    // Validate card number only if entered
+    if (card_number !== "" && !/^\d{13,19}$/.test(card_number)) {
+        alert('Invalid card number (must be 13–19 digits)');
         return;
     }
 
@@ -760,11 +771,11 @@ function finance_add() {
     let finance_type = $("#finance_type").val().trim();
     let finance_amount = $("#finance_amount").val().trim();
 
-    if (finance_card === "" || finance_type === "" || finance_amount === "" || isNaN(finance_amount) || parseFloat(finance_amount) <= 0) {
+    if (finance_type === "" || finance_amount === "" || isNaN(finance_amount) || parseFloat(finance_amount) <= 0) {
         alert('Invalid Input');
         return;
     }
-    if (!/^\d{8,}$/.test(finance_card)) {
+    if (finance_card !== "" && !/^\d{8,}$/.test(finance_card)) {
         alert('Invalid Finance Card Number (min 8 digits)');
         return;
     }
@@ -881,6 +892,7 @@ function submit() {
     let pincode = $("#pincode").val().trim();
     let gender = $("#gender").val();
     let dob = $("#dob").val();
+    let gst = $("#gst").val();
     let billed_by = $("#billed_by").val();
 
     // --- Customer validation ---
@@ -962,6 +974,7 @@ function submit() {
         pincode: $("#pincode").val().trim(),
         gender: $("#gender").val(),
         dob: $("#dob").val(),
+        gst: $("#gst").val(),
 
     };
 

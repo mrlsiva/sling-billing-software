@@ -183,6 +183,7 @@ class billingsController extends Controller
                 'pincode'   => $customerData['pincode'] ?? null,
                 'gender_id' => $customerData['gender'] ?? null,
                 'dob'       => $customerData['dob'] ?? null,
+                'gst'       => $customerData['gst'] ?? null,
             ]
         );
 

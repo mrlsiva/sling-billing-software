@@ -60,6 +60,7 @@ class customerController extends Controller
             'alt_phone' => 'nullable|digits:10|different:phone',
             'address' => 'required|string|max:200',
             'pincode' => 'nullable|digits:6|regex:/^[1-9][0-9]{5}$/',
+            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
         ], 
         [
             'name.required' => 'Name is required.',
@@ -79,6 +80,7 @@ class customerController extends Controller
             'pincode' => $request->pincode,
             'gender_id' => $request->gender,
             'dob' => $request->dob,
+            'gst' => $request->gst,
         ]);
 
         DB::commit();
@@ -109,6 +111,7 @@ class customerController extends Controller
                 Rule::unique('customers', 'phone')->ignore($request->id)->where(function ($query) use ($parent) {
                     return $query->where('user_id', $parent->parent_id);
                 }),
+            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
             ],
             'alt_phone' => 'nullable|digits:10|different:phone',
             'address' => 'required|string|max:200',
@@ -133,6 +136,7 @@ class customerController extends Controller
             'pincode' => $request->pincode,
             'gender_id' => $request->gender,
             'dob' => $request->dob,
+            'gst' => $request->gst,
 
         ]);
 
@@ -165,7 +169,8 @@ class customerController extends Controller
                   // Customer Name / Phone
                   ->orWhereHas('customer', function ($q2) use ($search) {
                       $q2->where('name', 'like', "%{$search}%")
-                         ->orWhere('phone', 'like', "%{$search}%");
+                         ->orWhere('phone', 'like', "%{$search}%")
+                         ->orWhere('gst', 'like', "%{$search}%");
                   });
             });
         })->orderBy('id','desc')->paginate(10);
