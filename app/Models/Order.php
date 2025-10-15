@@ -12,7 +12,7 @@ class Order extends Model
 
     public function shop()
     {
-        return $this->belongsTo('App\Models\User','user_id');
+        return $this->belongsTo('App\Models\User','shop_id');
     }
 
     public function branch()

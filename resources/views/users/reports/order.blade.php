@@ -78,7 +78,7 @@
                                 <thead class="bg-light-subtle">
                                     <tr>
                                         <th>S.No</th>
-                                        <th>Branch</th>
+                                        <th>Branch/ HO</th>
 										<th>Bill ID</th>
 										<th>Amount (In ₹)</th>
 										<th>Billed On</th>
@@ -93,7 +93,11 @@
 											{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
 										</td>
 										<td>
-											{{$order->branch->name}}
+                                            @if($order->branch_id != null)
+											     {{$order->branch->user_name}}
+                                            @else
+                                                {{$order->shop->user_name}}
+                                            @endif
 										</td>
 										<td>
 											{{$order->bill_id}}
