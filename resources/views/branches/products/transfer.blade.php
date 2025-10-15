@@ -129,28 +129,33 @@
 	                @csrf
 	                <div class="modal-body">
 
-	                    <div class="row">
-	                        <div class="col-md-12">
-	                            <div class="mb-3">
-	                                <label for="choices-single-groups" class="form-label text-muted">To</label>
-	                                <select class="form-control" data-choices name="branch" id="branch">
-	                                    <option value=""> Select </option>
-	                                    @foreach($branches as $branch)
-	                                    <option value="{{$branch->id}}">{{$branch->user_name}}</option>
-	                                    @endforeach
-	                                </select>
-	                            </div>
-	                        </div>
-	                    </div>
+	                	<div class="row">
+						    <div class="col-md-12">
+						        <div class="mb-3">
+						            <label for="transfer_to" class="form-label text-muted">Transfer to</label>
+						            <select class="form-control" id="transfer_to" name="transfer_to">
+						                <option value="">Select</option>
+						                <option value="1">Branch</option>
+						                <option value="2">HO</option>
+						            </select>
+						        </div>
+						    </div>
+						</div>
 
-	                    <div class="row">
-	                    	<div class="col-md-12">
-	                    		<div class="form-check form-switch mt-2 mb-3">
-	                    			<input class="form-check-input" type="checkbox" id="is_transfer_to_ho" name="is_transfer_to_ho">
-	                    			<label class="form-check-label" for="is_transfer_to_ho">Is Transfer to HO</label>
-	                    		</div>
-	                    	</div>
-	                    </div>
+						<div class="row" id="branch_field" style="display: none;">
+						    <div class="col-md-12">
+						        <div class="mb-3">
+						            <label for="branch_select" class="form-label text-muted">To</label>
+						            <select class="form-control" id="branch_select" name="branch">
+						                <option value="">Select</option>
+						                @foreach($branches as $branch)
+						                    <option value="{{ $branch->id }}">{{ $branch->user_name }}</option>
+						                @endforeach
+						            </select>
+						        </div>
+						    </div>
+						</div>
+
 
 	                    <div class="row">
 	                        <div class="col-md-12">

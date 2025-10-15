@@ -121,3 +121,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // Run on typing
     searchInput.addEventListener("input", toggleClear);
 });
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const transferTo = document.getElementById('transfer_to');
+    const branchField = document.getElementById('branch_field');
+
+    transferTo.addEventListener('change', function() {
+        if (this.value === '1') {
+            branchField.style.display = 'block'; // show when "Branch" is selected
+        } else {
+            branchField.style.display = 'none'; // hide otherwise
+        }
+    });
+});

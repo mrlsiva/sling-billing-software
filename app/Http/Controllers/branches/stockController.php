@@ -76,7 +76,7 @@ class stockController extends Controller
             });
         })
         ->with(['product.metric', 'transfer_from', 'transfer_to'])
-        ->orderBy('transfer_on', 'asc')
+        ->orderBy('transfer_on', 'desc')
         ->paginate(10);
 
         return view('branches.products.transfer',compact('categories','branches','transfers'));
@@ -116,7 +116,7 @@ class stockController extends Controller
             'quantity.min'          => 'Quantity cannot be negative.',
         ]);
 
-        if(!$request->has('is_transfer_to_ho'))
+        if($request->transfer_to == 1)
         {
             $request->validate([
                 'branch'  => 'required',
@@ -140,7 +140,7 @@ class stockController extends Controller
 
         DB::beginTransaction();
 
-        if($request->has('is_transfer_to_ho'))
+        if($request->transfer_to == 2)
         {
             // Update or create branch stock
             $hoStock = Stock::where([['shop_id', Auth::user()->parent_id],['branch_id', null],['product_id', $request->product]])->first();
