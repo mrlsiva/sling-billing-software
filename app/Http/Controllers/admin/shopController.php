@@ -17,6 +17,7 @@ use App\Models\Payment;
 use App\Traits\common;
 use App\Models\User;
 use App\Traits\Log;
+use Carbon\Carbon;
 use DB;
 
 class shopController extends Controller
@@ -66,6 +67,7 @@ class shopController extends Controller
             'branch' => 'nullable|string|max:50',
             'ifsc_code' => 'nullable|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/i',
             'bill_type' => 'required',
+            'payment_method' => 'required',
         ], 
         [
             'logo.required' => 'Logo is required.',
@@ -103,6 +105,7 @@ class shopController extends Controller
             'confirm_account_number.same' => 'Account numbers do not match.',
             'ifsc_code.regex' => 'Invalid IFSC code format.',
             'bill_type.required' => 'Bill Type is required.',
+            'payment_method.required' => 'Payment Method is required.',
         ]);
 
         DB::beginTransaction();
@@ -166,6 +169,8 @@ class shopController extends Controller
             'gst' => $request->gst,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'payment_method' => $request->payment_method,
+            'payment_date' => Carbon::now(),
             'bill_type' => $request->bill_type,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
             'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
@@ -371,6 +376,8 @@ class shopController extends Controller
         $user_detail->update([
             'address' => $request->address,
             'gst' => $request->gst,
+            'payment_method' => $request->payment_method,
+            'payment_date' => $request->payment_date,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
             'bill_type' => $request->bill_type,

@@ -66,6 +66,54 @@
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Company GSTin :</h5>
                             <p class="fw-medium mb-0">@if($user->user_detail->gst != null) {{$user->user_detail->gst}} @else - @endif</p>
                     </div>
+                    <div class="py-3 border-bottom">
+                        <h5 class="text-dark fs-12 text-uppercase fw-bold">Payment Method:</h5>
+                        @if($user->user_detail->payment_method == 1)
+                            <span class="badge bg-soft-primary text-primary">Monthly</span>
+                        @elseif($user->user_detail->payment_method == 2)
+                            <span class="badge bg-soft-primary text-primary">Quarterly</span>
+                        @elseif($user->user_detail->payment_method == 3)
+                            <span class="badge bg-soft-primary text-primary">Semi-Yearly</span>
+                        @elseif($user->user_detail->payment_method == 4)
+                            <span class="badge bg-soft-primary text-primary">Yearly</span>
+                        @else
+                            -
+                        @endif
+                    </div>
+
+                    <div class="py-3 border-bottom">
+                        <h5 class="text-dark fs-12 text-uppercase fw-bold">Payment Date:</h5>
+                        <p class="fw-medium mb-0">@if($user->user_detail->payment_date != null) {{ \Carbon\Carbon::parse($user->user_detail->payment_date)->format('d M Y') }} @else - @endif</p>
+                    </div>
+
+                    @php
+                        use Carbon\Carbon;
+
+                        $paymentDate = Carbon::parse($user->user_detail->payment_date);
+                        $paymentMethod = $user->user_detail->payment_method;
+
+                        switch ($paymentMethod) {
+                            case 1:
+                                $nextPaymentDate = $paymentDate->copy()->addMonth();
+                                break;
+                            case 2:
+                                $nextPaymentDate = $paymentDate->copy()->addMonths(3);
+                                break;
+                            case 3:
+                                $nextPaymentDate = $paymentDate->copy()->addMonths(6);
+                                break;
+                            case 4:
+                                $nextPaymentDate = $paymentDate->copy()->addYear();
+                                break;
+                            default:
+                                $nextPaymentDate = null;
+                        }
+                    @endphp
+
+                    <div class="py-3 border-bottom">
+                        <h5 class="text-dark fs-12 text-uppercase fw-bold">Next Payment Date:</h5>
+                        <p class="fw-medium mb-0">{{ $nextPaymentDate ? $nextPaymentDate->format('d M Y') : '-' }}</p>
+                    </div>
                     <div class="pt-3">
                             <h5 class="text-dark fs-12 text-uppercase fw-bold">Primary Color :</h5>
                             <p class="fw-medium mb-0">@if($user->user_detail->primary_colour != null) {{$user->user_detail->primary_colour}} @else - @endif</p>
