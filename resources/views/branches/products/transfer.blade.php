@@ -15,10 +15,49 @@
 					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#stockTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Stock Transfer</a>
 				</div>
 
+				<form method="get" action="{{route('branch.stock_transfer.transfer', ['company' => request()->route('company')])}}">
+				    <div class="row mb-3 p-3">
+				    	<div class="col-md-6">
+				    		<div class="input-group">
+				    			<span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
+				    			<input type="text" class="form-control" placeholder="Product Name" name="product" value="{{ request('product') }}" id="searchInput">
+				    			<span class="input-group-text" id="clearFilter" style="display: {{ request('product') ? 'inline-flex' : 'none' }}"><a href="{{route('branch.stock_transfer.transfer', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
+				    		</div>
+				    	</div>
+				    	<div class="col-md-5">
+				    		@php
+						        $user = App\Models\User::where('id', Auth::user()->parent_id)->first();
+						    @endphp
+				    		<select class="form-control" name="branch" id="branch">
+				    			<option value=""> Select Branch </option>
+				    			<option value="{{$user->id}}" {{ request('branch') == $user->id ? 'selected' : '' }}> {{$user->user_name}} </option>
+				    			@foreach($branches as $branch)
+				    			<option value="{{$branch->id}}" {{ request('branch') == $branch->id ? 'selected' : '' }}>{{$branch->user_name}}</option>
+				    			@endforeach
+				    		</select>
+				    	</div>
+
+					    <div class="col-md-1">
+					    	<button class="btn btn-primary"> Search </button>
+					    </div>
+				    </div>
+		    	</form>
+
 		    	@if(session('error_alert'))
 		        <div class="alert alert-danger">
 		          <strong>Warning! </strong>{{ session('error_alert') }}<br>
 		        </div>
+		        @endif
+
+		        @if ($errors->any())
+		            <div class="alert alert-danger">
+		                <strong>Whoops!</strong> There were some problems with your input.<br><br>
+		                <ul>
+		                    @foreach ($errors->all() as $error)
+		                        <li>{{ $error }}</li>
+		                    @endforeach
+		                </ul>
+		            </div>
 		        @endif
 
 				<div class="">
@@ -103,6 +142,16 @@
 	                            </div>
 	                        </div>
 	                    </div>
+
+	                    <div class="row">
+	                    	<div class="col-md-12">
+	                    		<div class="form-check form-switch mt-2 mb-3">
+	                    			<input class="form-check-input" type="checkbox" id="is_transfer_to_ho" name="is_transfer_to_ho">
+	                    			<label class="form-check-label" for="is_transfer_to_ho">Is Transfer to HO</label>
+	                    		</div>
+	                    	</div>
+	                    </div>
+
 	                    <div class="row">
 	                        <div class="col-md-12">
 	                            <div class="mb-3">

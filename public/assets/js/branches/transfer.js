@@ -34,7 +34,7 @@ jQuery(document).ready(function ()
 		if(sub_category)
 		{
 			jQuery.ajax({
-				url : 'stock_transfer/get_product',
+				url : 'get_product',
 				type: 'GET',
 				dataType: 'json',
 				data: { sub_category: sub_category, category: category },
@@ -62,14 +62,14 @@ jQuery(document).ready(function ()
 		if(product)
 		{
 			jQuery.ajax({
-				url : 'stock_transfer/get_product_detail',
+				url : 'get_product_detail',
 				type: 'GET',
 				dataType: 'json',
 				data: { product: product},
 				success:function(data)
 				{
 					console.log(data);
-					document.getElementById("unit").value = data.metric.name;
+					document.getElementById("unit").value = data.product.metric.name;
 					document.getElementById("available").value = data.quantity;	
 					if(data.quantity == 0)
 					{

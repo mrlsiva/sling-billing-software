@@ -76,15 +76,27 @@ class inventoryController extends Controller
         $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
         $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
 
-        $transfers = ProductHistory::where('from', Auth::user()->owner_id)
-        ->when(request('product'), function ($query, $product) {
+        $transfers = ProductHistory::where(function ($q) {
+            $q->where('from', Auth::user()->owner_id)
+              ->orWhere('to', Auth::user()->owner_id);
+        })
+        ->when(request()->filled('product'), function ($query) {
+            $product = request('product');
             $query->whereHas('product', function ($q) use ($product) {
                 $q->where('name', 'like', "%{$product}%");
             });
         })
-        ->when(request('transfer_to'), function ($query, $branch) {
-            $query->where('to', $branch);
-        })->orderBy('to', 'asc')->orderBy('transfer_on', 'desc')->paginate(10);
+        ->when(request()->filled('branch'), function ($query) {
+            $branch = request('branch');
+            $query->where(function ($q) use ($branch) {
+                $q->where('to', $branch)
+                  ->orWhere('from', $branch);
+            });
+        })
+        ->with(['product.metric', 'transfer_from', 'transfer_to']) // eager load for performance
+        ->orderBy('transfer_on', 'desc') // sort by latest transfer
+        ->paginate(10);
+
 
         return view('users.inventories.transfer',compact('categories','transfers','branches'));
     }
