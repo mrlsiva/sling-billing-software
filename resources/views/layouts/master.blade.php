@@ -303,7 +303,7 @@
                                 <span class="nav-icon">
                                     <i class="ri-shopping-cart-line"></i>
                                 </span>
-                                <span class="nav-text"> Billing </span>
+                                <span class="nav-text"> POS </span>
                             </a>
                         </li>
 
