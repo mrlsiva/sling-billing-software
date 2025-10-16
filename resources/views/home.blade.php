@@ -2,6 +2,70 @@
 
 @section('title')
 	<title>{{ config('app.name')}} | Home</title>
+  <style>
+    :root {
+    --brand-1: #19ad9f; /* teal */
+    --brand-2: #f8931d; /* orange */
+    --brand-3: #1b1e2c; /* deep navy */
+}
+html,
+body {
+    height: 100%;
+}
+body {
+    background: radial-gradient(
+            1200px 600px at 10% 10%,
+            rgba(25, 173, 159, 0.12),
+            transparent
+        ),
+        radial-gradient(
+            1000px 500px at 90% 90%,
+            rgba(248, 147, 29, 0.1),
+            transparent
+        ),
+        var(--brand-3) !important;
+    color: #fff !important;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial;
+}
+.brand-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #06221b;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+.card-plain {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.countdown {
+    letter-spacing: 0.03em;
+}
+.countdown .unit {
+    min-width: 72px;
+}
+.glass {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+.social a {
+    color: rgba(255, 255, 255, 0.85);
+    margin-right: 12px;
+    font-size: 1.25rem;
+}
+@media (max-width: 576px) {
+    .countdown .unit {
+        min-width: 54px;
+        padding: 0.4rem;
+    }
+}
+    </style>
 @endsection
 
 @section('body')
@@ -12,7 +76,7 @@
         <div class="col-lg-8">
           <div class="p-4 p-md-5 card-plain glass rounded-3">
             <div class="d-flex align-items-center mb-3">
-              <div class="brand-logo me-3"><img src="https://slinggroups.in/img/Share.png" width="68px"></div>
+              <div class="brand-logo me-3"><img src="{{ asset('assets/images/share.png') }}" width="68px"></div>
               <div>
                 <h1 class="h4 mb-0" style="color:var(--brand-1)">Sling Billing</h1>
                 <small class="text-white-50">Billing software · POS · Inventory</small>
