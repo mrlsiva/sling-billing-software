@@ -76,9 +76,9 @@
 										</td>
 										<td>
                                             @if($order->branch_id != null)
-										        {{$order->branch->name}}
+										        {{$order->branch->name}} ({{$order->branch->user_name}})
                                             @else
-                                                -
+                                                {{$order->shop->name}} ({{$order->shop->user_name}})
                                             @endif
 										</td>
 										<td>

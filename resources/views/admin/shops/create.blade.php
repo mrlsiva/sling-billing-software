@@ -102,6 +102,19 @@
                             </div>
 
                             <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="payment_method" class="form-label">Payment Method</label>
+                                    <select class="form-control" name="payment_method" id="payment_method" required="">
+                                        <option value=""> Choose Payment</option>
+                                        <option value="1">Monthly</option>
+                                        <option value="2">Quarterly</option>
+                                        <option value="3">Semi-Yearly</option>
+                                        <option value="4">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
                                 
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Password</label>

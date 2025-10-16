@@ -24,7 +24,7 @@ class PaymentSeeder extends Seeder
             ['name' => 'Card'],
             ['name' => 'UPI'],
             ['name' => 'Exchange'],
-            ['name' => 'Finanace'],
+            ['name' => 'Finance'],
             ['name' => 'Credit'],
             ['name' => 'Cheque'],
         ];

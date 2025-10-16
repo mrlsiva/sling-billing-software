@@ -57,7 +57,11 @@
 											{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
 										</td>
 										<td>
-											{{$order->branch->name}} ({{$order->branch->user_name}})
+											@if($order->branch_id != null)
+												{{$order->branch->name}} ({{$order->branch->user_name}})
+											@else
+												{{$order->shop->name}} ({{$order->shop->user_name}})
+											@endif
 										</td>
 										<td>
 											{{$order->bill_id}}
