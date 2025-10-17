@@ -234,9 +234,11 @@ class billingController extends Controller
 
         $customerData = $request->input('customer');
         $customer = Customer::firstOrCreate(
-            ['phone' => $customerData['phone']], // unique by phone
             [
-                'user_id' => $user->parent_id,
+                'user_id' => $user->parent_id,     // include user_id for composite uniqueness
+                'phone'   => $customerData['phone'],
+            ],
+            [
                 'alt_phone' => $customerData['alt_phone'] ?? null,
                 'name'      => $customerData['name'],
                 'address'   => $customerData['address'],
@@ -245,6 +247,7 @@ class billingController extends Controller
                 'dob'       => $customerData['dob'] ?? null,
             ]
         );
+
 
         $cart = $request->input('cart', []);
         $billAmount = collect($cart)->sum(function ($item) {

@@ -23,6 +23,52 @@
                         @else
                             <a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i> Deleted </a>   
                         @endif
+
+                        @php
+                            $today = now()->format('Y-m-d');
+                            $status = '';
+                            $isExpired = false;
+
+                            // Basic status checks
+                            if ($user->is_lock == 1) {
+                                $status = '<span class="badge bg-soft-danger text-danger">Locked</span>';
+                            } elseif ($user->is_delete == 1) {
+                                $status = '<span class="badge bg-soft-danger text-danger">Deleted</span>';
+                            } elseif ($user->is_active == 0) {
+                                $status = '<span class="badge bg-soft-danger text-danger">In-active</span>';
+                            } else {
+                                // Check plan validity
+                                $Branches = \App\Models\User::where('parent_id', $user->id)->get();
+
+                                if ($Branches->isNotEmpty()) {
+                                    // Check each branch's plan
+                                    $isActivePlan = false;
+                                    foreach ($Branches as $branch) {
+                                        $branchDetail = \App\Models\UserDetail::where('user_id', $branch->id)->first();
+                                        if ($branchDetail && $branchDetail->plan_end >= $today) {
+                                            $isActivePlan = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if ($isActivePlan) {
+                                        $status = '';
+                                    } else {
+                                        $status = '<p class="text-danger"><i class="ri-lock-line align-middle fs-20"></i> Expired</p>';
+                                    }
+                                } else {
+                                    // No Branches → check shop plan
+                                    if ($user->user_detail && $user->user_detail->plan_end >= $today) {
+                                        $status = '';
+                                    } else {
+                                        $status = '<p class="text-danger"><i class="ri-lock-line align-middle fs-20"></i> Expired</p>';
+                                    }
+                                }
+                            }
+                        @endphp
+
+                        {!! $status !!}
+
                         
                         <a href="{{route('admin.shop.edit', ['id' => $user->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i>Edit Shop</a>
                     </div>
@@ -186,16 +232,29 @@
                                         <td>{{$branch->user_detail->payment_date}}</td>
 
                                         <td>
+                                            @php
+                                                $today = now()->format('Y-m-d');
+                                                $isExpired = false;
+
+                                                // check plan validity for branch
+                                                if ($branch->user_detail && $branch->user_detail->plan_end < $today) {
+                                                    $isExpired = true;
+                                                }
+                                            @endphp
+
                                             @if($branch->is_lock == 1)
                                                 <span class="badge bg-soft-danger text-danger">Locked</span>
                                             @elseif($branch->is_delete == 1)
                                                 <span class="badge bg-soft-danger text-danger">Deleted</span>
                                             @elseif($branch->is_active == 0)
                                                 <span class="badge bg-soft-danger text-danger">In-active</span>
+                                            @elseif($isExpired)
+                                                <p class="text-danger mb-0"><i class="ri-lock-line align-middle fs-20"></i> Expired</p>
                                             @else
                                                 <span class="badge bg-soft-success text-success">Active</span>
                                             @endif
                                         </td>
+
                                         <td>
                                             <div class="d-flex gap-3">
                                                 <a href="{{route('admin.branch.view', ['id' => $branch->id])}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>

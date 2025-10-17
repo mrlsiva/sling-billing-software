@@ -23,6 +23,23 @@
                         @else
                             <a href="#!" class="link-danger"><i class="ri-delete-bin-5-line align-middle fs-20"></i> Deleted </a>   
                         @endif
+
+                        @php
+    $today = now()->format('Y-m-d');
+    $isExpired = false;
+
+    if ($user->user_detail && $user->user_detail->plan_end < $today) {
+        $isExpired = true;
+    }
+@endphp
+
+
+@if($isExpired)
+    <p class="text-danger mb-0"><i class="ri-lock-line align-middle fs-20"></i> Expired</p>
+
+@endif
+
+
                         
                         <a href="{{route('admin.branch.edit', ['id' => $user->id])}}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i>Edit Branch</a>
 
