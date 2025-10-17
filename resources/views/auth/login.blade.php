@@ -74,7 +74,58 @@
               <label for="password" class="form-label">Password</label>
               <input type="password" class="form-control" name="password" placeholder="Enter your password" required="">
             </div>
-            <button type="submit" class="btn btn-primary w-100 border-0">Login</button>
+            
+            @if(request()->segment(1) === 'admin')
+              <button type="submit" class="btn btn-primary w-100 border-0">Login</button>
+            @else
+                @php
+                    $today = date('Y-m-d');
+                    $able_to_login = 0;
+
+                    $user = \App\Models\User::where('slug_name', request()->segment(1))->first();
+
+                    if ($user) {
+                        if ($user->role_id == 2) {
+                            // get branches
+                            $branches = \App\Models\User::where('parent_id', $user->id)->get();
+
+                            if ($branches->isNotEmpty()) {
+                                // check each branch; if any branch has plan_end >= today, allow login
+                                foreach ($branches as $branch) {
+                                    $branchDetail = \App\Models\UserDetail::where('user_id', $branch->id)->first();
+                                    if ($branchDetail && !empty($branchDetail->plan_end) && strtotime($branchDetail->plan_end) >= strtotime($today)) {
+                                        $able_to_login = 1;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                // no branches — check owner's own plan_end
+                                $userDetail = \App\Models\UserDetail::where('user_id', $user->id)->first();
+                                if ($userDetail && !empty($userDetail->plan_end) && strtotime($userDetail->plan_end) >= strtotime($today)) {
+                                    $able_to_login = 1;
+                                }
+                            }
+                        } else {
+                            // non-role_id=2 users
+                            $userDetail = \App\Models\UserDetail::where('user_id', $user->id)->first();
+                            if ($userDetail && !empty($userDetail->plan_end) && strtotime($userDetail->plan_end) >= strtotime($today)) {
+                                $able_to_login = 1;
+                            }
+                        }
+                    }
+                @endphp
+
+                @if($able_to_login == 1)
+                    <button type="submit" class="btn btn-primary w-100 border-0">Login</button>
+                @else
+                  <button type="button" class="btn btn-secondary w-100 border-0" disabled>Login</button>
+                  <div class="alert alert-danger mt-2 p-2" role="alert">
+                      Payment not done, please contact admin
+                  </div>
+                @endif
+            @endif
+
+
           </form>
           <!-- <div class="text-center mt-3">
             <a href="#">Forgot password?</a>

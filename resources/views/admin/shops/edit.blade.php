@@ -121,6 +121,26 @@
                             </div>
 
                             <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="secondary_colour" class="form-label">Payment Method</label>
+                                    <select class="form-control"  name="payment_method" id="payment_method">
+                                        <option value=""> Choose Payment</option>
+                                        <option value="1"  {{$user->user_detail->payment_method == 1 ? 'selected' : '' }}>Monthly</option>
+                                        <option value="2" {{$user->user_detail->payment_method == 2 ? 'selected' : '' }}>Quarterly</option>
+                                        <option value="3" {{$user->user_detail->payment_method == 3 ? 'selected' : '' }}>Semi-Yearly</option>
+                                        <option value="4" {{$user->user_detail->payment_method == 4 ? 'selected' : '' }}>Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="payment_date" class="form-label">Payment Date</label>
+                                    <input type="date" id="payment_date" name="payment_date" value="{{ $user->user_detail->payment_date }}" class="form-control" placeholder="Enter Payment Date" max="{{ date('Y-m-d') }}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
                                 
                                 <div class="mb-3">
                                     <label for="primary_colour" class="form-label">Primary Color</label>
