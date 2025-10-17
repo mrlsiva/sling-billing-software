@@ -221,6 +221,26 @@ class branchController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Branch Create','App/Models/User','users',$user->id,'Insert',null,$request,'Success','Branch Created Successfully');
 
+        $paymentDate = Carbon::now();
+        $paymentMethod = $request->payment_method;
+
+        switch ($paymentMethod) {
+            case 1:
+                $nextPaymentDate = $paymentDate->copy()->addMonth();
+            break;
+            case 2:
+                $nextPaymentDate = $paymentDate->copy()->addMonths(3);
+            break;
+            case 3:
+                $nextPaymentDate = $paymentDate->copy()->addMonths(6);
+            break;
+            case 4:
+                $nextPaymentDate = $paymentDate->copy()->addYear();
+            break;
+            default:
+                $nextPaymentDate = null;
+        }
+
         $user_detail = UserDetail::create([
             'user_id' => $user->id,
             'address' => $request->address,
@@ -229,6 +249,8 @@ class branchController extends Controller
             'payment_date' => Carbon::now(),
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'plan_start' => $request->payment_date,
+            'plan_end' => $nextPaymentDate,
             'bill_type' => $request->bill_type,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
         ]);
@@ -416,6 +438,26 @@ class branchController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Shop Update','App/Models/User','users',$user->id,'Update',null,$request,'Success','Shop Updated Successfully');
 
+        $paymentDate = Carbon::parse($request->payment_date);
+        $paymentMethod = $request->payment_method;
+
+        switch ($paymentMethod) {
+            case 1:
+                $nextPaymentDate = $paymentDate->copy()->addMonth();
+            break;
+            case 2:
+                $nextPaymentDate = $paymentDate->copy()->addMonths(3);
+            break;
+            case 3:
+                $nextPaymentDate = $paymentDate->copy()->addMonths(6);
+            break;
+            case 4:
+                $nextPaymentDate = $paymentDate->copy()->addYear();
+            break;
+            default:
+                $nextPaymentDate = null;
+        }
+
         $user_detail->update([
             'address' => $request->address,
             'gst' => $request->gst,
@@ -423,6 +465,8 @@ class branchController extends Controller
             'payment_date' => $request->payment_date,
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
+            'plan_start' => $request->payment_date,
+            'plan_end' => $nextPaymentDate,
             'bill_type' => $request->bill_type,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
         ]);

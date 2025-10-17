@@ -163,6 +163,26 @@ class shopController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Shop Create','App/Models/User','users',$user->id,'Insert',null,$request,'Success','Shop Created Successfully');
 
+        $paymentDate = Carbon::now();
+        $paymentMethod = $request->payment_method;
+
+        switch ($paymentMethod) {
+            case 1:
+                $nextPaymentDate = $paymentDate->copy()->addMonth();
+            break;
+            case 2:
+                $nextPaymentDate = $paymentDate->copy()->addMonths(3);
+            break;
+            case 3:
+                $nextPaymentDate = $paymentDate->copy()->addMonths(6);
+            break;
+            case 4:
+                $nextPaymentDate = $paymentDate->copy()->addYear();
+            break;
+            default:
+                $nextPaymentDate = null;
+        }
+
         $user_detail = UserDetail::create([
             'user_id' => $user->id,
             'address' => $request->address,
@@ -171,6 +191,8 @@ class shopController extends Controller
             'secondary_colour' => $request->secondary_colour,
             'payment_method' => $request->payment_method,
             'payment_date' => Carbon::now(),
+            'plan_start' => $request->payment_date,
+            'plan_end' => $nextPaymentDate,
             'bill_type' => $request->bill_type,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
             'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
@@ -287,6 +309,8 @@ class shopController extends Controller
             'branch' => 'nullable|string|max:50',
             'ifsc_code' => 'nullable|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/i',
             'bill_type' => 'required',
+            'payment_method' => 'required',
+            'payment_date'   => 'required|date|before_or_equal:today',
         ], 
         [
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
@@ -373,6 +397,26 @@ class shopController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Branch Update','App/Models/Branch','users',$user->id,'Update',null,$request,'Success','Branch Updated Successfully');
 
+        $paymentDate = Carbon::parse($request->payment_date);
+        $paymentMethod = $request->payment_method;
+
+        switch ($paymentMethod) {
+            case 1:
+                $nextPaymentDate = $paymentDate->copy()->addMonth();
+            break;
+            case 2:
+                $nextPaymentDate = $paymentDate->copy()->addMonths(3);
+            break;
+            case 3:
+                $nextPaymentDate = $paymentDate->copy()->addMonths(6);
+            break;
+            case 4:
+                $nextPaymentDate = $paymentDate->copy()->addYear();
+            break;
+            default:
+                $nextPaymentDate = null;
+        }
+
         $user_detail->update([
             'address' => $request->address,
             'gst' => $request->gst,
@@ -381,6 +425,8 @@ class shopController extends Controller
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
             'bill_type' => $request->bill_type,
+            'plan_start' => $request->payment_date,
+            'plan_end' => $nextPaymentDate,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
             'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
         ]);
@@ -401,7 +447,7 @@ class shopController extends Controller
 
         DB::commit();
 
-        return redirect()->back()->with('toast_success', 'Branch updated successfully.');
+        return redirect()->back()->with('toast_success', 'Shop updated successfully.');
 
     }
 
