@@ -122,7 +122,6 @@ class billingsController extends Controller
         $phones = Customer::where('phone', 'like', $request->phone . '%')
             ->where('user_id', Auth::user()->id)
             ->orderBy('phone')
-            ->limit(5)
             ->pluck('phone'); // returns array-like collection
 
         return response()->json([

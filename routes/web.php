@@ -51,7 +51,7 @@ Route::get('/', function () {
 if (request()->segment(1) === 'admin') 
 {
     require __DIR__.'/admin.php';
-} 
+}
 else 
 {
     Route::middleware(['is_company_valid'])->group(function () {
