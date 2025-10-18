@@ -172,19 +172,21 @@ class billingsController extends Controller
 
         $customerData = $request->input('customer');
         $customer = Customer::firstOrCreate(
-            ['phone' => $customerData['phone']], // unique by phone
-            [
-                'user_id' => $user->id,
-                'branch_id' => null,
-                'alt_phone' => $customerData['alt_phone'] ?? null,
-                'name'      => $customerData['name'],
-                'address'   => $customerData['address'],
-                'pincode'   => $customerData['pincode'] ?? null,
-                'gender_id' => $customerData['gender'] ?? null,
-                'dob'       => $customerData['dob'] ?? null,
-                'gst'       => $customerData['gst'] ?? null,
-            ]
-        );
+        [
+            'user_id' => $user->id, // include user_id in the unique key
+            'phone'   => $customerData['phone'],
+        ],
+        [
+            'branch_id' => null,
+            'alt_phone' => $customerData['alt_phone'] ?? null,
+            'name'      => $customerData['name'],
+            'address'   => $customerData['address'],
+            'pincode'   => $customerData['pincode'] ?? null,
+            'gender_id' => $customerData['gender'] ?? null,
+            'dob'       => $customerData['dob'] ?? null,
+        ]
+    );
+
 
         $cart = $request->input('cart', []);
         $billAmount = collect($cart)->sum(function ($item) {

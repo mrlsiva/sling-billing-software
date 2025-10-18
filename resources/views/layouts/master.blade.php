@@ -156,7 +156,12 @@
                                     <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/stock/*') ? 'active' : '' }}" href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}">Stock</a>
                                     </li>
-                                    @if(Auth::user()->user_detail->is_bill_enabled == 0)
+
+                                    @php
+                                        $branches = \App\Models\User::where('parent_id', Auth::user()->id)->get();
+                                    @endphp
+
+                                    @if($branches->isNotEmpty())
                                         <li class="sub-menu-item">
                                             <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/transfer/*') ? 'active' : '' }}" href="{{route('inventory.transfer', ['company' => request()->route('company')])}}">Product Transfer</a>
                                         </li>
