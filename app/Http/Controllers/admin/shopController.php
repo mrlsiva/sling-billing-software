@@ -191,7 +191,7 @@ class shopController extends Controller
             'secondary_colour' => $request->secondary_colour,
             'payment_method' => $request->payment_method,
             'payment_date' => Carbon::now(),
-            'plan_start' => $request->payment_date,
+            'plan_start' => Carbon::now(),
             'plan_end' => $nextPaymentDate,
             'bill_type' => $request->bill_type,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,

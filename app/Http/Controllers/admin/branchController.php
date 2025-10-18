@@ -249,7 +249,7 @@ class branchController extends Controller
             'payment_date' => Carbon::now(),
             'primary_colour' => $request->primary_colour,
             'secondary_colour' => $request->secondary_colour,
-            'plan_start' => $request->payment_date,
+            'plan_start' => Carbon::now(),
             'plan_end' => $nextPaymentDate,
             'bill_type' => $request->bill_type,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,

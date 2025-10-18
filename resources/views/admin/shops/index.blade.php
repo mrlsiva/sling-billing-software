@@ -57,16 +57,47 @@
 										<td>{{$shop->user_name}}</td>
 										<td>{{$shop->phone}}</td>
 										<td>
-											@if($shop->is_lock == 1)
-												<span class="badge bg-soft-danger text-danger">Locked</span>
-											@elseif($shop->is_delete == 1)
-												<span class="badge bg-soft-danger text-danger">Deleted</span>
-											@elseif($shop->is_active == 0)
-												<span class="badge bg-soft-danger text-danger">In-active</span>
-											@else
-												<span class="badge bg-soft-success text-success">Active</span>
-											@endif
+										    @php
+										        $today = now()->format('Y-m-d');
+										        $status = '';
+
+										        if ($shop->is_lock == 1) {
+										            $status = '<span class="badge bg-soft-danger text-danger">Locked</span>';
+										        } elseif ($shop->is_delete == 1) {
+										            $status = '<span class="badge bg-soft-danger text-danger">Deleted</span>';
+										        } elseif ($shop->is_active == 0) {
+										            $status = '<span class="badge bg-soft-danger text-danger">In-active</span>';
+										        } else {
+										            // Check plan validity
+										            $branches = \App\Models\User::where('parent_id', $shop->id)->get();
+										            $isActive = false;
+
+										            if ($branches->isNotEmpty()) {
+										                foreach ($branches as $branch) {
+										                    $branchDetail = \App\Models\UserDetail::where('user_id', $branch->id)->first();
+										                    if ($branchDetail && $branchDetail->plan_end >= $today) {
+										                        $isActive = true;
+										                        break;
+										                    }
+										                }
+										            } else {
+										                // No branches → check shop plan
+										                if ($shop->user_detail && $shop->user_detail->plan_end >= $today) {
+										                    $isActive = true;
+										                }
+										            }
+
+										            if ($isActive) {
+										                $status = '<span class="badge bg-soft-success text-success">Active</span>';
+										            } else {
+										                $status = '<span class="badge bg-soft-danger text-danger">Expired</span>';
+										            }
+										        }
+										    @endphp
+
+										    {!! $status !!}
 										</td>
+
 										<td>
 											<div class="d-flex gap-3">
 												<a href="{{route('admin.shop.view', ['id' => $shop->id])}}" class="text-muted"><i class="ri-eye-line align-middle fs-20"></i></a>
