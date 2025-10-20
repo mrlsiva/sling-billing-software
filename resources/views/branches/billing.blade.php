@@ -390,12 +390,22 @@
 							</div>
 						</div>
 
-						<div class="col-md-12">
-							<div class="form-check mb-3">
-								<input type="checkbox" class="form-check-input" id="amount_fill" name="amount_fill">
-								<label class="form-check-label" for="amount_fill">
-									Full Amount
-								</label>
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="amount_fill" name="amount_fill">
+									<label class="form-check-label" for="amount_fill">
+										Full Amount
+									</label>
+								</div>
+							</div>
+							<div class="col-md-8">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="remaining_amount" name="remaining_amount">
+									<label class="form-check-label" for="remaining_amount">
+										Remaining Amount
+									</label>
+								</div>
 							</div>
 						</div>
 
@@ -431,12 +441,22 @@
 							</div>
 						</div>
 
-						<div class="col-md-12">
-							<div class="form-check mb-3">
-								<input type="checkbox" class="form-check-input" id="card_fill" name="card_fill">
-								<label class="form-check-label" for="card_fill">
-									Full Amount
-								</label>
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="card_fill" name="card_fill">
+									<label class="form-check-label" for="card_fill">
+										Full Amount
+									</label>
+								</div>
+							</div>
+							<div class="col-md-8">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="card_remaining_amount" name="card_remaining_amount">
+									<label class="form-check-label" for="card_remaining_amount">
+										Remaining Amount
+									</label>
+								</div>
 							</div>
 						</div>
 
@@ -476,14 +496,27 @@
 									value="{{old('finance_amount')}}" class="form-control" placeholder="Amount">
 							</div>
 						</div>
-						<div class="col-md-12">
-							<div class="form-check mb-3">
-								<input type="checkbox" class="form-check-input" id="finance_fill" name="finance_fill">
-								<label class="form-check-label" for="finance_fill">
-									Full Amount
-								</label>
+						
+
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="finance_fill" name="finance_fill">
+									<label class="form-check-label" for="finance_fill">
+										Full Amount
+									</label>
+								</div>
+							</div>
+							<div class="col-md-8">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="finance_remaining_amount" name="finance_remaining_amount">
+									<label class="form-check-label" for="finance_remaining_amount">
+										Remaining Amount
+									</label>
+								</div>
 							</div>
 						</div>
+
 						<div class=" d-flex justify-content-center">
 							<button type="btn" class="btn btn-primary" id="finance_add" onclick="finance_add()"><i
 									class="ri-bank-line"></i> Add</button>
@@ -500,14 +533,26 @@
 									placeholder="Exchange Amount">
 							</div>
 						</div>
-						<div class="col-md-12">
-							<div class="form-check mb-3">
-								<input type="checkbox" class="form-check-input" id="exchange_fill" name="exchange_fill">
-								<label class="form-check-label" for="exchange_fill">
-									Full Amount
-								</label>
+
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="exchange_fill" name="exchange_fill">
+									<label class="form-check-label" for="exchange_fill">
+										Full Amount
+									</label>
+								</div>
+							</div>
+							<div class="col-md-8">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="exchange_remaining_amount" name="exchange_remaining_amount">
+									<label class="form-check-label" for="exchange_remaining_amount">
+										Remaining Amount
+									</label>
+								</div>
 							</div>
 						</div>
+
 						<div class=" d-flex justify-content-center">
 							<button type="btn" class="btn btn-primary" id="exchange_add" onclick="exchange_add()"><i
 									class="ri-bank-line"></i> Add</button>
@@ -523,14 +568,26 @@
 									value="{{old('credit_amount')}}" class="form-control" placeholder="Credit">
 							</div>
 						</div>
-						<div class="col-md-12">
-							<div class="form-check mb-3">
-								<input type="checkbox" class="form-check-input" id="credit_fill" name="credit_fill">
-								<label class="form-check-label" for="credit_fill">
-									Full Amount
-								</label>
+
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="credit_fill" name="credit_fill">
+									<label class="form-check-label" for="credit_fill">
+										Full Amount
+									</label>
+								</div>
+							</div>
+							<div class="col-md-8">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="credit_remaining_amount" name="credit_remaining_amount">
+									<label class="form-check-label" for="credit_remaining_amount">
+										Remaining Amount
+									</label>
+								</div>
 							</div>
 						</div>
+
 						<div class=" d-flex justify-content-center">
 							<button type="btn" class="btn btn-primary" id="credit_add" onclick="credit_add()"><i
 									class="ri-bank-line"></i> Add</button>
@@ -554,14 +611,26 @@
 									value="{{old('cheque_amount')}}" class="form-control" placeholder="Amount">
 							</div>
 						</div>
-						<div class="col-md-12">
-							<div class="form-check mb-3">
-								<input type="checkbox" class="form-check-input" id="cheque_fill" name="cheque_fill">
-								<label class="form-check-label" for="cheque_fill">
-									Full Amount
-								</label>
+
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="cheque_fill" name="cheque_fill">
+									<label class="form-check-label" for="cheque_fill">
+										Full Amount
+									</label>
+								</div>
+							</div>
+							<div class="col-md-8">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="cheque_remaining_amount" name="cheque_remaining_amount">
+									<label class="form-check-label" for="cheque_remaining_amount">
+										Remaining Amount
+									</label>
+								</div>
 							</div>
 						</div>
+
 						<div class=" d-flex justify-content-center">
 							<button type="btn" class="btn btn-primary" id="cheque_add" onclick="cheque_add()"><i
 									class="ri-bank-line"></i> Add</button>
@@ -577,14 +646,26 @@
 									class="form-control" placeholder="UPI Amount">
 							</div>
 						</div>
-						<div class="col-md-12">
-							<div class="form-check mb-3">
-								<input type="checkbox" class="form-check-input" id="upi_fill" name="upi_fill">
-								<label class="form-check-label" for="upi_fill">
-									Full Amount
-								</label>
+
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="upi_fill" name="upi_fill">
+									<label class="form-check-label" for="upi_fill">
+										Full Amount
+									</label>
+								</div>
+							</div>
+							<div class="col-md-8">
+								<div class="form-check mb-3">
+									<input type="checkbox" class="form-check-input" id="upi_remaining_amount" name="upi_remaining_amount">
+									<label class="form-check-label" for="upi_remaining_amount">
+										Remaining Amount
+									</label>
+								</div>
 							</div>
 						</div>
+
 						<div class=" d-flex justify-content-center">
 							<button type="btn" class="btn btn-primary" id="upi_add" onclick="upi_add()"><i
 									class="ri-bank-line"></i> Add</button>

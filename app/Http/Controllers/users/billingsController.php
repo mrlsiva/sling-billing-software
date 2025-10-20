@@ -238,6 +238,7 @@ class billingsController extends Controller
                 'price'         => $item['price'],
                 'selling_price' => $item['price'],
                 'tax_amount'    => $item['tax_amount'],
+                'tax_percent'   => $product->tax->name,
                 'discount_type' => $product->discount_type,
                 'discount'      => $product->discount,
             ]);

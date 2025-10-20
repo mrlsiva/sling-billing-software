@@ -129,17 +129,8 @@
                 <td colspan="4">
                     <strong>Sales Person:</strong> {{$order->billedBy->name}}
                 </td>
-                
-                @if($order->is_refunded == 0)
-                    <td colspan="6"><strong>Total:</strong> ₹ {{number_format($order->bill_amount,2)}}</td>
-                @else
-                    @php
-                        $refundAmount = App\Models\Refund::where('order_id', $order->id)->sum('refund_amount');
-                        $refundIds = App\Models\Refund::where('order_id',$order->id)->pluck('payment_id')->toArray();
-                        $refund_details = App\Models\RefundDetail::whereIn('refund_id',$refundIds)->get();
-                    @endphp
-                    <td colspan="6"><strong>Order Amount:</strong> ₹ {{number_format($order->bill_amount,2)}}<strong>Refunded Amount:</strong> ₹ {{ number_format($refundAmount, 2) }}<strong>Total:</strong> ₹ {{ number_format($order->bill_amount - $refundAmount, 2) }}</td>
-                @endif
+
+                <td colspan="6"><strong>Total:</strong> ₹ {{number_format($order->bill_amount,2)}}</td>
             </tr>
             <!-- Column Headings -->
             <tr>
@@ -164,48 +155,27 @@
                 <td>{{$order_detail->quantity}}</td>
                 <td>₹ {{ $order_detail->price - $order_detail->tax_amount }}</td>
                 <td>₹ {{$order_detail->tax_amount}}</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
+                <td>₹ {{ number_format((float)($order_detail->tax_percent / 2), 2) }}</td>
+                <td>₹ {{ number_format((float)($order_detail->tax_amount / 2), 2) }}</td>
+                <td>₹ {{ number_format((float)($order_detail->tax_percent / 2), 2) }}</td>
+                <td>₹ {{ number_format((float)($order_detail->tax_amount / 2), 2) }}</td>
                 <td>₹ {{$order_detail->price * $order_detail->quantity}}</td>
             </tr>
             @endforeach
-            @if($order->is_refunded == 1)
-
-                @php
-                    $refundIds = App\Models\Refund::where('order_id',$order->id)->pluck('payment_id')->toArray();
-                    $refund_details = App\Models\RefundDetail::whereIn('refund_id',$refundIds)->get();
-                @endphp
-
-                @foreach($refund_details as $refund_detail)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{$refund_detail->name}} (Refunded - {{ \Carbon\Carbon::parse($refund_detail->created_at)->format('d M Y') }})</td>
-                        <td>{{$refund_detail->quantity}}</td>
-                        <td>₹ {{ $refund_detail->price - $refund_detail->tax_amount }}</td>
-                        <td>₹ {{$refund_detail->tax_amount}}</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>₹ {{$refund_detail->price * $refund_detail->quantity}}</td>
-                    </tr>
-                @endforeach
-
-            @endif
-            <!-- Add many more rows here (5…25…100). The header/footer will repeat per page automatically. -->
         </tbody>
 
         <tfoot>
-            <tr>
-                <td colspan="5"><strong>Total CGST:</strong></td>
-                <td colspan="5">-</td>
-            </tr>
-            <tr>
-                <td colspan="5"><strong>Total SGST:</strong></td>
-                <td colspan="5">-</td>
-            </tr>
+
+            @php
+                $taxGroups = App\Models\OrderDetail::select('tax_percent', \DB::raw('SUM(CAST(tax_amount AS DECIMAL(10,2))) as total_tax'))->where('order_id', $order->id)->groupBy('tax_percent')->get();
+            @endphp
+
+            @foreach($taxGroups as $tax)
+                <tr>
+                    <td colspan="5"><strong>Total {{ $tax->tax_percent }}% Tax:</strong></td>
+                    <td colspan="5">₹ {{ number_format($tax->total_tax, 2) }}</td>
+                </tr>
+            @endforeach
 
             <tr>
                 <td colspan="5"><strong>Total Tax:</strong></td>
@@ -213,41 +183,10 @@
                     ₹ {{ number_format($order_details->sum(fn($d) => (float)$d->tax_amount * (int)$d->quantity),2)}}
                 </td>
             </tr>
-            @if($order->is_refunded == 1)
-                @php
-                    $refundAmount = App\Models\Refund::where('order_id', $order->id)->sum('refund_amount');
-                    $refundIds = App\Models\Refund::where('order_id',$order->id)->pluck('payment_id')->toArray();
-                    $refund_details = App\Models\RefundDetail::whereIn('refund_id',$refundIds)->get();
-                @endphp
-
-                <tr>
-                    <td colspan="5"><strong>REFUNDED TAX:</strong></td>
-                    <td colspan="5">
-                        ₹ {{ number_format($refund_details->sum(fn($d) => (float)$d->tax_amount * (int)$d->quantity),2) }}
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="5"><strong>ORDER AMOUNT:</strong></td>
-                    <td colspan="5">₹ {{number_format($order->bill_amount,2)}}</td>
-                </tr>
-
-                <tr>
-                    <td colspan="5"><strong>REFUNDED AMOUNT:</strong></td>
-                    <td colspan="5">₹ {{number_format($refundAmount,2)}}</td>
-                </tr>
-
-                <tr>
-                    <td colspan="5"><strong>NET TOTAL:</strong></td>
-                    <td colspan="5">₹ {{ number_format($order->bill_amount - $refundAmount, 2) }}</td>
-                </tr>
-
-            @else
             <tr>
                 <td colspan="5"><strong>NET TOTAL:</strong></td>
                 <td colspan="5">₹ {{number_format($order->bill_amount,2)}}</td>
             </tr>
-            @endif
 
             @if($order->branch_id == null)
                 @php
