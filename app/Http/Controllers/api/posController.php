@@ -155,7 +155,7 @@ class posController extends Controller
         }
         if(Auth::user()->role_id == 3)
         {
-            $customers = Customer::with('gender')->where('phone', 'like', $request->phone . '%')->where('user_id', Auth::user()->parent_id)->orderBy('phone')->first();
+            $customers = Customer::with('gender')->where('phone', 'like', $request->phone . '%')->where('user_id', Auth::user()->parent_id)->orderBy('phone')->get();
         }
 
         return $this->successResponse($customers, 200, 'Successfully returned all customers');
