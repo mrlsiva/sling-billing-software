@@ -710,8 +710,13 @@ function appendPaymentRow(method, amount, extraData = {}) {
 
     let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
     let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+    let amt = parseFloat(amount) || 0; // Convert the incoming amount to number
 
-    if(received + amount > payable)
+    console.log(payable);
+    console.log(received);
+    console.log(amount);
+    console.log("Total after adding:", received + amt);
+    if ((received + amt) > payable) 
     {
         alert("Received amount cant be greater than payable amount.");
         return;
@@ -1078,7 +1083,7 @@ function submit() {
     console.log(cartData);
     console.log(paymentData);
 
-    // ajax submit
+    ajax submit
     $.ajax({
         url: "store",
         method: "POST",

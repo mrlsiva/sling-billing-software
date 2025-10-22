@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\notificationController;
+
 //Controller
 use App\Http\Controllers\auth\loginController;
 use App\Http\Controllers\auth\homeController;
@@ -69,6 +71,8 @@ else
             Route::group(['middleware' => ['auth']], function () {
 
                 Route::get('/my_profile',[loginController::class, 'my_profile'])->name('my_profile');
+
+                Route::get('/notification',[notificationController::class, 'notification'])->name('notification');
                 
                 Route::group(['middleware' => ['role:HO']], function () {
 

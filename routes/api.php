@@ -11,6 +11,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/pos/product', 'App\Http\Controllers\api\posController@product');
 	Route::get('/pos/{product}/get_product_detail', 'App\Http\Controllers\api\posController@get_product_detail');
 	Route::get('/pos/customer', 'App\Http\Controllers\api\posController@customer');
+	Route::post('/pos/store', 'App\Http\Controllers\api\posController@store');
 
 	//General
 	Route::get('gender', 'App\Http\Controllers\api\generalController@gender');
