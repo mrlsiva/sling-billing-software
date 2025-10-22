@@ -14,6 +14,7 @@ use App\Models\Finance;
 use App\Models\Gender;
 use App\Models\Stock;
 use App\Models\Staff;
+use App\Models\User;
 
 class generalController extends Controller
 {
@@ -113,5 +114,15 @@ class generalController extends Controller
         }
 
         return $this->successResponse($staffs, 200, 'Successfully returned all Staffs');
+    }
+
+    public function branch(Request $request)
+    {
+        if(Auth::user()->role_id == 2)
+        {
+            $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
+
+            return $this->successResponse($branches, 200, 'Successfully returned all branches.');
+        }
     }
 }

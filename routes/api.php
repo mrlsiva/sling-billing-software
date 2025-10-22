@@ -13,13 +13,23 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/pos/customer', 'App\Http\Controllers\api\posController@customer');
 	Route::post('/pos/store', 'App\Http\Controllers\api\posController@store');
 
+	//Customer
+	Route::get('/customers', 'App\Http\Controllers\api\customerController@customer');
+	Route::get('/customers/{customer}/order', 'App\Http\Controllers\api\customerController@order');
+
+	//Order
+	Route::get('/orders', 'App\Http\Controllers\api\orderController@order');
+	Route::get('/orders/{order}/view', 'App\Http\Controllers\api\orderController@view');
+
+
 	//General
-	Route::get('gender', 'App\Http\Controllers\api\generalController@gender');
+	Route::get('genders', 'App\Http\Controllers\api\generalController@gender');
 	Route::get('payment_list', 'App\Http\Controllers\api\generalController@payment_list');
-	Route::get('finance', 'App\Http\Controllers\api\generalController@finance');
-	Route::get('category', 'App\Http\Controllers\api\generalController@category');
-	Route::get('{category}/sub_category', 'App\Http\Controllers\api\generalController@sub_category');
-	Route::get('staff', 'App\Http\Controllers\api\generalController@staff');
+	Route::get('finances', 'App\Http\Controllers\api\generalController@finance');
+	Route::get('categories', 'App\Http\Controllers\api\generalController@category');
+	Route::get('{category}/sub_categories', 'App\Http\Controllers\api\generalController@sub_category');
+	Route::get('staffs', 'App\Http\Controllers\api\generalController@staff');
+	Route::get('branches', 'App\Http\Controllers\api\generalController@branch'); //For HO
 
 	Route::post('logout', 'App\Http\Controllers\api\authController@logout');
 

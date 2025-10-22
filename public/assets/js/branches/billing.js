@@ -1083,7 +1083,7 @@ function submit() {
     console.log(cartData);
     console.log(paymentData);
 
-    ajax submit
+    //ajax submit
     $.ajax({
         url: "store",
         method: "POST",

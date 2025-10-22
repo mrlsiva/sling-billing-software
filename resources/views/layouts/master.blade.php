@@ -455,11 +455,23 @@
                                     <span class="align-middle">Photos</span>
                                     <span class="align-middle float-end badge badge-soft-danger">New</span>
                                 </a>
-                                <a class="dropdown-item" href="{{route('notification', ['company' => request()->route('company')])}}">
-                                    <i class="bx bx-photo-album fs-18 align-middle me-2"></i>
-                                    <span class="align-middle">Notification</span>
-                                    <span class="align-middle float-end badge badge-soft-danger">0</span>
-                                </a>
+                                @if(request()->segment(1) === 'admin')
+
+                                    <a class="dropdown-item" href="{{route('admin.notification', ['company' => request()->route('company')])}}">
+                                        <i class="bx bx-photo-album fs-18 align-middle me-2"></i>
+                                        <span class="align-middle">Notification</span>
+                                        <span class="align-middle float-end badge badge-soft-danger">0</span>
+                                    </a>
+
+                                @else
+
+                                    <a class="dropdown-item" href="{{route('notification', ['company' => request()->route('company')])}}">
+                                        <i class="bx bx-photo-album fs-18 align-middle me-2"></i>
+                                        <span class="align-middle">Notification</span>
+                                        <span class="align-middle float-end badge badge-soft-danger">0</span>
+                                    </a>
+                                @endif
+
                                 <div class="dropdown-divider my-1"></div>
                                 <a class="dropdown-item" href="#">
                                     <i class="bx bx-lock fs-18 align-middle me-2"></i><span class="align-middle">Lock screen</span>

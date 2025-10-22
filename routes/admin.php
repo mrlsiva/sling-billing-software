@@ -2,7 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\auth\loginController;
+
 use App\Http\Controllers\admin\adminController;
+
+use App\Http\Controllers\admin\notificationsController;
 
 use App\Http\Controllers\admin\shopController;
 use App\Http\Controllers\admin\branchController;
@@ -18,6 +21,8 @@ Route::group(['middleware' => ['auth','role:Super Admin']], function () {
 	Route::get('/dashboard',[adminController::class, 'dashboard'])->name('dashboard');
 
 	Route::get('/my_profile',[loginController::class, 'my_profile'])->name('my_profile');
+
+	Route::get('/notification',[notificationsController::class, 'notification'])->name('notification');
 
 	Route::prefix('shops')->group(function () {
 	    Route::name('shop.')->group(function () {
