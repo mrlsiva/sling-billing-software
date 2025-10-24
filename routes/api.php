@@ -7,6 +7,20 @@ Route::post('login', 'App\Http\Controllers\api\authController@login');
 
 Route::middleware('auth:sanctum')->group(function () {
 
+	//Category
+	Route::get('/categories/list', 'App\Http\Controllers\api\categoryController@list');
+	Route::post('/categories/store', 'App\Http\Controllers\api\categoryController@store');
+	Route::get('/categories/{category}/view', 'App\Http\Controllers\api\categoryController@view');
+	Route::get('/categories/{category}/status', 'App\Http\Controllers\api\categoryController@status');
+	Route::post('/categories/update', 'App\Http\Controllers\api\categoryController@update');
+
+	//Sub Category
+	Route::get('/sub_categories/list', 'App\Http\Controllers\api\subCategoryController@list');
+	Route::post('/sub_categories/store', 'App\Http\Controllers\api\subCategoryController@store');
+	Route::get('/sub_categories/{sub_category}/view', 'App\Http\Controllers\api\subCategoryController@view');
+	Route::get('/sub_categories/{sub_category}/status', 'App\Http\Controllers\api\subCategoryController@status');
+	Route::post('/sub_categories/update', 'App\Http\Controllers\api\subCategoryController@update');
+
 	//POS
 	Route::get('/pos/product', 'App\Http\Controllers\api\posController@product');
 	Route::get('/pos/{product}/get_product_detail', 'App\Http\Controllers\api\posController@get_product_detail');
