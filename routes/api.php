@@ -21,11 +21,33 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/sub_categories/{sub_category}/status', 'App\Http\Controllers\api\subCategoryController@status');
 	Route::post('/sub_categories/update', 'App\Http\Controllers\api\subCategoryController@update');
 
+	//Tax
+	Route::get('/taxes/list', 'App\Http\Controllers\api\taxController@list');
+	Route::post('/taxes/store', 'App\Http\Controllers\api\taxController@store');
+	Route::get('/taxes/{tax}/view', 'App\Http\Controllers\api\taxController@view');
+	Route::get('/taxes/{tax}/status', 'App\Http\Controllers\api\taxController@status');
+	Route::post('/taxes/update', 'App\Http\Controllers\api\taxController@update');
+
+	//Metric
+	Route::get('/metrics/list', 'App\Http\Controllers\api\metricController@list');
+	Route::post('/metrics/store', 'App\Http\Controllers\api\metricController@store');
+	Route::get('/metrics/{metric}/view', 'App\Http\Controllers\api\metricController@view');
+	Route::get('/metrics/{metric}/status', 'App\Http\Controllers\api\metricController@status');
+	Route::post('/metrics/update', 'App\Http\Controllers\api\metricController@update');
+
+	//Finance
+	Route::get('/finances/list', 'App\Http\Controllers\api\financeController@list');
+	Route::post('/finances/store', 'App\Http\Controllers\api\financeController@store');
+	Route::get('/finances/{finance}/view', 'App\Http\Controllers\api\financeController@view');
+	Route::get('/finances/{finance}/status', 'App\Http\Controllers\api\financeController@status');
+	Route::post('/finances/update', 'App\Http\Controllers\api\financeController@update');
+
 	//POS
 	Route::get('/pos/product', 'App\Http\Controllers\api\posController@product');
 	Route::get('/pos/{product}/get_product_detail', 'App\Http\Controllers\api\posController@get_product_detail');
 	Route::get('/pos/customer', 'App\Http\Controllers\api\posController@customer');
 	Route::post('/pos/store', 'App\Http\Controllers\api\posController@store');
+	Route::post('/pos/pagination_setting', 'App\Http\Controllers\api\posController@pagination_setting');
 
 	//Customer
 	Route::get('/customers', 'App\Http\Controllers\api\customerController@customer');

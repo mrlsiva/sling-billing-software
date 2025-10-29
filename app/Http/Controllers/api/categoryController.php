@@ -103,10 +103,12 @@ class categoryController extends Controller
         }
     }
 
-    public function view(Request $request, Category $category)
+    public function view(Request $request, $category)
     {
         if(Auth::user()->role_id == 2)
         {
+            $category = Category::where([['id',$category],['user_id',Auth::user()->owner_id]])->first();
+
             if ($category) {
 
                 $category->image = $category->image ? asset('storage/' . $category->image) : asset('no-image-icon.jpg');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderPaymentDetail;
 use App\Traits\ResponseHelper;
@@ -455,6 +456,89 @@ class posController extends Controller
             DB::commit();
         
             return $this->successResponse($order->id, 200, 'Order Placed Successfully');
+
+        }
+
+    }
+
+    public function pagination_setting(Request $request)
+    {
+        $rules = [
+            'pagination' => ['required','numeric'],
+        ];
+
+        $messages = [
+            'pagination.required' => 'Pagination is required.',
+        ];
+
+        $validator=Validator::make($request->all(),$rules,$messages);
+
+        if ($validator->fails()) {
+            return $this->validationFailed($validator->errors(),"The given data was invalid.");
+        }
+
+        if(Auth::user()->role_id == 2)
+        {
+            DB::beginTransaction();
+
+            $pagination = PosSetting::where([['shop_id',Auth::user()->owner_id],['branch_id',null]])->first();
+
+            if($pagination)
+            {
+                PosSetting::where([['shop_id',Auth::user()->owner_id],['branch_id',null]])->update(['pagination' => $request->pagination]);
+            }
+            else
+            {
+                $pagination = PosSetting::create([ 
+                    'shop_id'   => Auth::user()->owner_id,
+                    'branch_id' => null,
+                    'pagination' => $request->pagination,
+                ]);
+            }
+
+            DB::commit();
+
+            $pagination = PosSetting::where([['shop_id',Auth::user()->owner_id],['branch_id',null]])->first();
+
+            //Log
+            $this->addToLog($this->unique(),Auth::user()->id,'POS Setting','App/Models/PosSetting','pos_settings',$pagination->id,'Update',null,json_encode($request->all()),'Success','POS Setting done Successfully');
+
+            //Notifiction
+            $this->notification(Auth::user()->owner_id, null,'App/Models/PosSetting', $pagination->id, null, json_encode($request->all()), now(), Auth::user()->id, Auth::user()->name.' updated POS setting',null, null);
+
+            return $this->successResponse($pagination, 200, 'POS Setting done Successfully');
+        }
+
+        if(Auth::user()->role_id == 3)
+        {
+            DB::beginTransaction();
+
+            $pagination = PosSetting::where([['shop_id',Auth::user()->parent_id],['branch_id',Auth::user()->id]])->first();
+
+            if($pagination)
+            {
+                PosSetting::where([['shop_id',Auth::user()->parent_id],['branch_id',Auth::user()->id]])->update(['pgination' => $request->pagination]);
+            }
+            else
+            {
+                $pagination = PosSetting::create([ 
+                    'shop_id'   => Auth::user()->parent_id,
+                    'branch_id' => Auth::user()->id,
+                    'pagination' => $request->pagination,
+                ]);
+            }
+
+            DB::commit();
+
+            $pagination = PosSetting::where([['shop_id',Auth::user()->parent_id],['branch_id',Auth::user()->id]])->first();
+
+            //Log
+            $this->addToLog($this->unique(),Auth::user()->id,'POS Setting','App/Models/PosSetting','pos_settings',$pagination->id,'Update',null,json_encode($request->all()),'Success','POS Setting done Successfully');
+
+            //Notifiction
+            $this->notification(Auth::user()->owner_id, null,'App/Models/PosSetting', $pagination->id, null, json_encode($request->all()), now(), Auth::user()->id, Auth::user()->name.' updated POS setting',null, null);
+
+            return $this->successResponse($pagination, 200, 'POS Setting done Successfully');
 
         }
 

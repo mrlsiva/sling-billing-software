@@ -116,10 +116,12 @@ class subCategoryController extends Controller
         }
     }
 
-    public function view(Request $request, SubCategory $sub_category)
+    public function view(Request $request, $sub_category)
     {
         if(Auth::user()->role_id == 2)
         {
+            $sub_category = SubCategory::where([['id',$sub_category],['user_id',Auth::user()->owner_id]])->first();
+
             if ($sub_category) {
 
                 $sub_category->image = $sub_category->image ? asset('storage/' . $sub_category->image) : asset('no-image-icon.jpg');
