@@ -543,11 +543,37 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $("#remaining_amount").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+        let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#cash_amount").val(payable-received);
+        } else {
+            $("#cash_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
     $("#card_fill").on("change", function () {
         let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
             $("#card_amount").val(payable);
+        } else {
+            $("#card_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
+    $("#card_remaining_amount").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+        let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#card_amount").val(payable-received);
         } else {
             $("#card_amount").val(""); // clear if unchecked
         }
@@ -567,11 +593,37 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $("#finance_remaining_amount").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+        let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#finance_amount").val(payable-received);
+        } else {
+            $("#finance_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
     $("#exchange_fill").on("change", function () {
         let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
             $("#exchange_amount").val(payable);
+        } else {
+            $("#exchange_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
+    $("#exchange_remaining_amount").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+        let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#exchange_amount").val(payable-received);
         } else {
             $("#exchange_amount").val(""); // clear if unchecked
         }
@@ -591,6 +643,19 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $("#cheque_remaining_amount").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+        let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#cheque_amount").val(payable-received);
+        } else {
+            $("#cheque_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
+$(document).ready(function () {
     $("#credit_fill").on("change", function () {
         let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
 
@@ -603,11 +668,12 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $("#credit_fill").on("change", function () {
+    $("#credit_remaining_amount").on("change", function () {
         let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+        let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
-            $("#credit_amount").val(payable);
+            $("#credit_amount").val(payable-received);
         } else {
             $("#credit_amount").val(""); // clear if unchecked
         }
@@ -626,8 +692,36 @@ $(document).ready(function () {
     });
 });
 
+$(document).ready(function () {
+    $("#upi_remaining_amount").on("change", function () {
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+        let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if ($(this).is(":checked")) {
+            $("#upi_amount").val(payable-received);
+        } else {
+            $("#upi_amount").val(""); // clear if unchecked
+        }
+    });
+});
+
 
 function appendPaymentRow(method, amount, extraData = {}) {
+
+    let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+    let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
+    let amt = parseFloat(amount) || 0; // Convert the incoming amount to number
+
+    console.log(payable);
+    console.log(received);
+    console.log(amount);
+    console.log("Total after adding:", received + amt);
+    if ((received + amt) > payable) 
+    {
+        alert("Received amount cant be greater than payable amount.");
+        return;
+    }
+
     let tbody = $("#payment-info-body");
     let rowId = Date.now(); // unique row id for multiple entries
 
@@ -731,6 +825,7 @@ function cash_add() {
     $("#cash_amount").val("");
     // uncheck "Full Amount"
     $("#amount_fill").prop("checked", false);
+    $("#remaining_amount").prop("checked", false);
 }
 
 function card_add() {
@@ -763,6 +858,7 @@ function card_add() {
 
     $("#card_number, #card_name, #card_amount").val("");
     $("#card_fill").prop("checked", false);
+    $("#card_remaining_amount").prop("checked", false);
 }
 
 
@@ -790,6 +886,7 @@ function finance_add() {
 
     $("#finance_card, #finance_type, #finance_amount").val("");
     $("#finance_fill").prop("checked", false);
+    $("#finance_remaining_amount").prop("checked", false);
 }
 
 
@@ -802,6 +899,7 @@ function exchange_add() {
     appendPaymentRow("Exchange", exchange_amount);
     $("#exchange_amount").val("");
     $("#exchange_fill").prop("checked", false);
+    $("#exchange_remaining_amount").prop("checked", false);
 }
 
 function credit_add() {
@@ -813,6 +911,7 @@ function credit_add() {
     appendPaymentRow("Credit", credit_amount);
     $("#credit_amount").val("");
     $("#credit_fill").prop("checked", false);
+    $("#credit_remaining_amount").prop("checked", false);
 }
 
 function cheque_add() {
@@ -834,6 +933,7 @@ function cheque_add() {
 
     $("#cheque_number, #cheque_amount").val("");
     $("#cheque_fill").prop("checked", false);
+    $("#cheque_remaining_amount").prop("checked", false);
 }
 
 
@@ -846,6 +946,7 @@ function upi_add() {
     appendPaymentRow("UPI", upi_amount);
     $("#upi_amount").val("");
     $("#upi_fill").prop("checked", false);
+    $("#upi_remaining_amount").prop("checked", false);
 }
 
 // function saveCartToSession() {
@@ -982,7 +1083,7 @@ function submit() {
     console.log(cartData);
     console.log(paymentData);
 
-    // ajax submit
+    //ajax submit
     $.ajax({
         url: "store",
         method: "POST",

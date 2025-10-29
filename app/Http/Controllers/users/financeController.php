@@ -116,7 +116,7 @@ class financeController extends Controller
         DB::commit();
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Finance Update','App/Models/Finance','metrics',$finance->id,'Update',null,$request,'Success','Finance Updated Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Finance Update','App/Models/Finance','finances',$finance->id,'Update',null,$request,'Success','Finance Updated Successfully');
 
         //Notifiction
         $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->finance.' finance updated successfully',null, null);

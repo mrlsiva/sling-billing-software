@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\notificationController;
+
 //Controller
 use App\Http\Controllers\auth\loginController;
 use App\Http\Controllers\auth\homeController;
@@ -51,7 +53,7 @@ Route::get('/', function () {
 if (request()->segment(1) === 'admin') 
 {
     require __DIR__.'/admin.php';
-} 
+}
 else 
 {
     Route::middleware(['is_company_valid'])->group(function () {
@@ -69,6 +71,8 @@ else
             Route::group(['middleware' => ['auth']], function () {
 
                 Route::get('/my_profile',[loginController::class, 'my_profile'])->name('my_profile');
+
+                Route::get('/notification',[notificationController::class, 'notification'])->name('notification');
                 
                 Route::group(['middleware' => ['role:HO']], function () {
 

@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('web')->prefix('admin')->name('admin.')->group(base_path('routes/admin.php'));
         },
         api: __DIR__.'/../routes/api.php',
-        apiPrefix: '',
+        apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
