@@ -30,7 +30,7 @@ class categoryController extends Controller
             {
                 $category->image = $category->image
                 ? asset('storage/' . $category->image)
-                : asset('no-image-icon.png');
+                : asset('no-image-icon.svg');
             }
 
             return $this->successResponse($categories, 200, 'Successfully returned all categories');
@@ -89,7 +89,7 @@ class categoryController extends Controller
 
             $category->image = $category->image
                 ? asset('storage/' . $category->image)
-                : asset('no-image-icon.png');
+                : asset('no-image-icon.svg');
 
             DB::commit();
 
@@ -111,7 +111,7 @@ class categoryController extends Controller
 
             if ($category) {
 
-                $category->image = $category->image ? asset('storage/' . $category->image) : asset('no-image-icon.png');
+                $category->image = $category->image ? asset('storage/' . $category->image) : asset('no-image-icon.svg');
                 return $this->successResponse($category, 200, 'Category returned successfully');
             }
         }
@@ -175,7 +175,7 @@ class categoryController extends Controller
             //Notifiction
             $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category_name).' category updated successfully',null, null);
 
-            $category->image = $category->image ? asset('storage/' . $category->image) : asset('no-image-icon.png');
+            $category->image = $category->image ? asset('storage/' . $category->image) : asset('no-image-icon.svg');
 
             return $this->successResponse($category, 200, 'Category updated successfully');
         }

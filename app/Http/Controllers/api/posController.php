@@ -95,20 +95,20 @@ class posController extends Controller
                 // Product image
                 $stock->product->image = $stock->product->image
                     ? asset('storage/' . $stock->product->image)
-                    : asset('no-image-icon.png');
+                    : asset('no-image-icon.svg');
 
                 // Category image
                 if ($stock->product->category) {
                     $stock->product->category->image = $stock->product->category->image
                         ? asset('storage/' . $stock->product->category->image)
-                        : asset('no-image-icon.png');
+                        : asset('no-image-icon.svg');
                 }
 
                 // Sub-category image
                 if ($stock->product->sub_category) {
                     $stock->product->sub_category->image = $stock->product->sub_category->image
                         ? asset('storage/' . $stock->product->sub_category->image)
-                        : asset('no-image-icon.png');
+                        : asset('no-image-icon.svg');
                 }
             }
         }
@@ -144,15 +144,15 @@ class posController extends Controller
         {
             $product->image = $product->image
             ? asset('storage/' . $product->image)
-            : asset('no-image-icon.png');
+            : asset('no-image-icon.svg');
 
             $product->category->image = $product->category->image
             ? asset('storage/' . $product->category->image)
-            : asset('no-image-icon.png');
+            : asset('no-image-icon.svg');
 
             $product->sub_category->image = $product->sub_category->image
             ? asset('storage/' . $product->sub_category->image)
-            : asset('no-image-icon.png');
+            : asset('no-image-icon.svg');
         }
 
         return $this->successResponse($product, 200, 'Successfully returned the requested product');

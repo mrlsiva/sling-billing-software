@@ -80,7 +80,7 @@ class generalController extends Controller
         {
             $category->image = $category->image
             ? asset('storage/' . $category->image)
-            : asset('no-image-icon.png');
+            : asset('no-image-icon.svg');
         }
 
         return $this->successResponse($categories, 200, 'Successfully returned all categories');
@@ -95,7 +95,7 @@ class generalController extends Controller
         {
             $sub_category->image = $sub_category->image
             ? asset('storage/' . $sub_category->image)
-            : asset('no-image-icon.png');
+            : asset('no-image-icon.svg');
         }
 
         return $this->successResponse($sub_categories, 200, 'Successfully returned all Sub Categories');

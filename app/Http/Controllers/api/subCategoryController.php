@@ -38,7 +38,7 @@ class subCategoryController extends Controller
             {
                 $sub_category->image = $sub_category->image
                 ? asset('storage/' . $sub_category->image)
-                : asset('no-image-icon.png');
+                : asset('no-image-icon.svg');
             }
 
             return $this->successResponse($sub_categories, 200, 'Successfully returned all sub_categories');
@@ -104,7 +104,7 @@ class subCategoryController extends Controller
 
             $sub_category->image = $sub_category->image
                 ? asset('storage/' . $sub_category->image)
-                : asset('no-image-icon.png');
+                : asset('no-image-icon.svg');
 
             //Log
             $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Create','App/Models/SubCategory','sub_categories',$sub_category->id,'Insert',null, json_encode($request->all()),'Success','Sub Category Created Successfully');
@@ -124,7 +124,7 @@ class subCategoryController extends Controller
 
             if ($sub_category) {
 
-                $sub_category->image = $sub_category->image ? asset('storage/' . $sub_category->image) : asset('no-image-icon.png');
+                $sub_category->image = $sub_category->image ? asset('storage/' . $sub_category->image) : asset('no-image-icon.svg');
                 return $this->successResponse($sub_category, 200, 'Sub Category returned successfully');
             }
         }
@@ -218,7 +218,7 @@ class subCategoryController extends Controller
 
             $sub_category->image = $sub_category->image
                 ? asset('storage/' . $sub_category->image)
-                : asset('no-image-icon.png');
+                : asset('no-image-icon.svg');
 
             return $this->successResponse($sub_category, 200, 'Sub Category updated successfully');
         }
