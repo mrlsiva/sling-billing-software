@@ -138,7 +138,8 @@ function calculateCosts() {
     let grossCost = 0;
     if(tax != 0)
     {
-        grossCost = netCost + (netCost  / (1 + (tax / 100)));
+        grossCost = netCost * (1 + (tax / 100));
+        //console.log(grossCost);
     }
     else
     {
