@@ -42,6 +42,22 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/finances/{finance}/status', 'App\Http\Controllers\api\financeController@status');
 	Route::post('/finances/update', 'App\Http\Controllers\api\financeController@update');
 
+	//Payment
+	Route::get('/payments/list', 'App\Http\Controllers\api\paymentController@list');
+	Route::get('/payments/{payment}/update', 'App\Http\Controllers\api\paymentController@update');
+
+	//Staff
+	Route::get('/staffs/list', 'App\Http\Controllers\api\staffController@list');
+	Route::post('/staffs/store', 'App\Http\Controllers\api\staffController@store');
+	Route::get('/staffs/{staff}/view', 'App\Http\Controllers\api\staffController@view');
+	Route::get('/staffs/{staff}/status', 'App\Http\Controllers\api\staffController@status');
+	Route::post('/staffs/update', 'App\Http\Controllers\api\staffController@update');
+
+	//Bill Setting
+	Route::get('/bills/{branch}/list', 'App\Http\Controllers\api\billController@list');
+	Route::post('/bills/store', 'App\Http\Controllers\api\billController@store');
+
+
 	//POS
 	Route::get('/pos/product', 'App\Http\Controllers\api\posController@product');
 	Route::get('/pos/{product}/get_product_detail', 'App\Http\Controllers\api\posController@get_product_detail');
