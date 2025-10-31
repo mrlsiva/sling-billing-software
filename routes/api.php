@@ -35,6 +35,13 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/metrics/{metric}/status', 'App\Http\Controllers\api\metricController@status');
 	Route::post('/metrics/update', 'App\Http\Controllers\api\metricController@update');
 
+	//Product
+	Route::get('/products/list', 'App\Http\Controllers\api\productController@list');
+	Route::post('/products/store', 'App\Http\Controllers\api\productController@store');
+	Route::get('/products/{product}/view', 'App\Http\Controllers\api\productController@view');
+	Route::get('/products/{product}/status', 'App\Http\Controllers\api\productController@status');
+	Route::post('/products/update', 'App\Http\Controllers\api\productController@update');
+
 	//Finance
 	Route::get('/finances/list', 'App\Http\Controllers\api\financeController@list');
 	Route::post('/finances/store', 'App\Http\Controllers\api\financeController@store');
@@ -67,11 +74,21 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	//Customer
 	Route::get('/customers', 'App\Http\Controllers\api\customerController@customer');
+	Route::post('/customers/store', 'App\Http\Controllers\api\customerController@store');
+	Route::get('/customers/{customer}/view', 'App\Http\Controllers\api\customerController@view');
+	Route::post('/customers/update', 'App\Http\Controllers\api\customerController@update');
 	Route::get('/customers/{customer}/order', 'App\Http\Controllers\api\customerController@order');
 
 	//Order
 	Route::get('/orders', 'App\Http\Controllers\api\orderController@order');
 	Route::get('/orders/{order}/view', 'App\Http\Controllers\api\orderController@view');
+
+	//Vendor
+	Route::get('/vendors/list', 'App\Http\Controllers\api\vendorController@list');
+	Route::post('/vendors/store', 'App\Http\Controllers\api\vendorController@store');
+	Route::get('/vendors/{vendor}/view', 'App\Http\Controllers\api\vendorController@view');
+	Route::get('/vendors/{vendor}/status', 'App\Http\Controllers\api\vendorController@status');
+	Route::post('/vendors/update', 'App\Http\Controllers\api\vendorController@update');
 
 
 	//General
