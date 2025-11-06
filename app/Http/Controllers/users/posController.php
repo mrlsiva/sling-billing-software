@@ -19,11 +19,11 @@ class posController extends Controller
     public function index(Request $request,$company,$branch)
     {
 
-        $branches = User::where([['parent_id',Auth::user()->id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
+        $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
 
         if($branch != 0)
         {
-            $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->id]])
+            $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->owner_id]])
             ->when(request('order'), function ($query) {
                 $search = request('order');
                 $query->where(function ($q) use ($search) {
@@ -46,7 +46,7 @@ class posController extends Controller
         }
         else
         {
-            $orders = Order::where('shop_id',Auth::user()->id)
+            $orders = Order::where('shop_id',Auth::user()->owner_id)
             ->when(request('order'), function ($query) {
                 $search = request('order');
                 $query->where(function ($q) use ($search) {
@@ -71,7 +71,7 @@ class posController extends Controller
 
     public function get_bill(Request $request,$company,$id)
     {
-        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->id)->first();
+        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
@@ -80,7 +80,7 @@ class posController extends Controller
 
     public function view_bill(Request $request,$company,$id)
     {
-        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->id)->first();
+        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();

@@ -67,7 +67,7 @@ class metricController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Metric Create','App/Models/Metric','metrics',$metric->id,'Insert',null, json_encode($request->all()),'Success','Metric Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' metric created successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' metric created successfully',null, null,4);
 
             return $this->successResponse($metric, 200, 'Metric created successfully');
         }
@@ -102,7 +102,7 @@ class metricController extends Controller
                 $this->addToLog($this->unique(),Auth::user()->id,'Metric Status Update','App/Models/Metric','metrics',$metric->id,'Update',null,null,'Success',$metric->name.' '.$statusText);
 
                 //Notifiction
-                $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $metric->name.' '.$statusText,null, null);
+                $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $metric->name.' '.$statusText,null, null,4);
 
                 return $this->successResponse("Success", 200, $statusText);
             }
@@ -148,7 +148,7 @@ class metricController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Metric Update','App/Models/Metric','metrics',$metric->id,'Update',null,$request,'Success','Metric Updated Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->metric.' metric updated successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->metric.' metric updated successfully',null, null,4);
 
             return $this->successResponse($metric, 200, 'Metric updated successfully');
 

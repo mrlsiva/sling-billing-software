@@ -29,7 +29,7 @@ class productController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::where('user_id',Auth::user()->id)->when(request('product'), function ($query) {
+        $products = Product::where('user_id',Auth::user()->owner_id)->when(request('product'), function ($query) {
             $search = request('product');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -42,8 +42,8 @@ class productController extends Controller
 
     public function create(Request $request)
     {
-        $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
-        $taxes = Tax::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
+        $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
+        $taxes = Tax::where([['shop_id',Auth::user()->owner_id],['is_active',1]])->get();
         $metrics = Metric::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
 
         return view('users.products.create',compact('categories','taxes','metrics'));
@@ -51,7 +51,7 @@ class productController extends Controller
 
     public function get_sub_category(Request $request)
     {
-        return $sub_categories = SubCategory::where([['user_id',Auth::user()->id],['category_id',$request->id],['is_active',1]])->get();
+        return $sub_categories = SubCategory::where([['user_id',Auth::user()->owner_id],['category_id',$request->id],['is_active',1]])->get();
     }
 
     public function store(Request $request)
@@ -62,14 +62,14 @@ class productController extends Controller
             'sub_category' => 'required',
             'name' => ['required','string','max:50',
                 Rule::unique('products')->where(function ($query) use ($request) {
-                    return $query->where('user_id', Auth::user()->id)
+                    return $query->where('user_id', Auth::user()->owner_id)
                                  ->where('category_id', $request->category)
                                  ->where('sub_category_id', $request->sub_category);
                 }),
             ],
             'code' => ['required','string','max:50',
                 Rule::unique('products')->where(function ($query) use ($request) {
-                    return $query->where('user_id', Auth::user()->id);
+                    return $query->where('user_id', Auth::user()->owner_id);
                 }),
             ],
             'hsn_code' => 'nullable|string|max:50',
@@ -124,7 +124,7 @@ class productController extends Controller
         //return $taxAmount;
 
         $product = Product::create([ 
-            'user_id' => Auth::user()->id,
+            'user_id' => Auth::user()->owner_id,
             'category_id' => $request->category,
             'sub_category_id' => $request->sub_category,
             'name' => Str::ucfirst($request->name),
@@ -155,7 +155,7 @@ class productController extends Controller
         }
 
         $stock = Stock::create([ 
-            'shop_id' => Auth::user()->id,
+            'shop_id' => Auth::user()->owner_id,
             'category_id' => $request->category,
             'sub_category_id' => $request->sub_category,
             'product_id' => $product->id,
@@ -170,7 +170,7 @@ class productController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Product Create','App/Models/Product','products',$product->id,'Insert',null,json_encode($request->all()),'Success','Product Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Created Successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Created Successfully',null, null,5);
 
         DB::commit();
 
@@ -180,7 +180,7 @@ class productController extends Controller
 
     public function edit(Request $request,$company,$id)
     {
-        $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
+        $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
         $product = Product::find($id);
         $taxes = Tax::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
         $metrics = Metric::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
@@ -195,14 +195,14 @@ class productController extends Controller
             'sub_category' => 'required',
             'name' => ['required','string','max:50',
                 Rule::unique('products')->where(function ($query) use ($request) {
-                    return $query->where('user_id', Auth::user()->id)
+                    return $query->where('user_id', Auth::user()->owner_id)
                                  ->where('category_id', $request->category_id)
                                  ->where('sub_category_id', $request->sub_category);
                 })->ignore($request->id), // ignore current product on update
             ],
             'code' => ['required','string','max:50',
                 Rule::unique('products')->where(function ($query) {
-                    return $query->where('user_id', Auth::user()->id);
+                    return $query->where('user_id', Auth::user()->owner_id);
                 })->ignore($request->id), // <-- ignore current record
             ],
             'hsn_code' => 'nullable|string|max:50',
@@ -239,7 +239,7 @@ class productController extends Controller
 
         $product = Product::find($request->id);
 
-        $stock = Stock::where([['shop_id', Auth::user()->id],['category_id', $product->category_id],['sub_category_id', $product->sub_category_id],['product_id', $request->id]])->first();
+        $stock = Stock::where([['shop_id', Auth::user()->owner_id],['category_id', $product->category_id],['sub_category_id', $product->sub_category_id],['product_id', $request->id]])->first();
 
         $tax = Tax::where('id',$request->tax)->first();
 
@@ -299,7 +299,7 @@ class productController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Product Update','App/Models/Product','products',$product->id,'Update',null, json_encode($request->all()),'Success','Product Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Updated Successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Updated Successfully',null, null,5);
 
         DB::commit();
         
@@ -323,7 +323,7 @@ class productController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Product Status Update','App/Models/Product','products',$request->id,'Update',null,null,'Success',$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $statusText,null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $statusText,null, null,5);
 
         return redirect()->back()->with('toast_success', $statusText);
     }
@@ -411,7 +411,7 @@ class productController extends Controller
         ]);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/BulkUploadLog', $bulk_upload->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bulk upload done for product',null, $logFile);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/BulkUploadLog', $bulk_upload->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bulk upload done for product',null, $logFile,5);
 
         // Return response
         if ($errorRecords > 0) {
@@ -425,7 +425,7 @@ class productController extends Controller
     public function download(Request $request)
     {
         $products = Product::with(['category', 'sub_category', 'metric', 'tax'])
-            ->where('user_id', Auth::user()->id)
+            ->where('user_id', Auth::user()->owner_id)
             ->when($request->product, function ($query) use ($request) {
                 $search = $request->product;
                 $query->where(function ($q) use ($search) {

@@ -97,7 +97,7 @@ class categoryController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Category Create','App/Models/Category','categories',$category->id,'Insert',null,json_encode($request->all()),'Success','Category Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category). ' category created successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category). ' category created successfully',null, null,1);
 
             return $this->successResponse($category, 200, 'Category created successfully');
         }
@@ -173,7 +173,7 @@ class categoryController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Category Update','App/Models/Category','categories',$category->id,'Update',null,json_encode($request->all()),'Success','Category Updated Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category_name).' category updated successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category_name).' category updated successfully',null, null,1);
 
             $category->image = $category->image ? asset('storage/' . $category->image) : asset('no-image-icon.svg');
 
@@ -199,7 +199,7 @@ class categoryController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Category Status Update','App/Models/Category','categories',$category->id,'Update',null,null,'Success',$category->name.' '.$statusText);
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, $category->name.' '.$statusText,null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, $category->name.' '.$statusText,null, null,1);
 
             return $this->successResponse("Success", 200, $statusText);
 

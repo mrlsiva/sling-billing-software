@@ -23,7 +23,7 @@ class userController extends Controller
     public function index(Request $request)
     {
         $genders = Gender::where('is_active',1)->get();
-        $users = Customer::where('user_id',Auth::user()->id)
+        $users = Customer::where('user_id',Auth::user()->owner_id)
         ->when(request('customer'), function ($query) {
             $search = request('customer');
             $query->where(function ($q) use ($search) {
@@ -42,7 +42,7 @@ class userController extends Controller
             'name' => 'required|string|max:50',
             'phone' => ['required','digits:10','different:alt_phone',
                 Rule::unique('customers', 'phone')->where(function ($query) {
-                    return $query->where('user_id', Auth::user()->id);
+                    return $query->where('user_id', Auth::user()->owner_id);
                 }),
             ],
             'alt_phone' => 'nullable|digits:10|different:phone',
@@ -59,7 +59,7 @@ class userController extends Controller
         DB::beginTransaction();
 
         $customer = Customer::create([ 
-            'user_id' => Auth::user()->id,
+            'user_id' => Auth::user()->owner_id,
             'name' => Str::ucfirst($request->name),
             'phone' => $request->phone,
             'alt_phone' => $request->alt_phone,
@@ -76,7 +76,7 @@ class userController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Customer Create','App/Models/Customer','customers',$customer->id,'Insert',null,$request,'Success','Customer Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->parent_id, null,'App/Models/Customer', $customer->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' created new customer '.Str::ucfirst($request->name),null, null);
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Customer', $customer->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' created new customer '.Str::ucfirst($request->name),null, null,12);
 
         return redirect()->back()->with('toast_success', 'Customer created successfully.');
     }
@@ -112,7 +112,7 @@ class userController extends Controller
     public function download(Request $request)
     {
         $users = Customer::with('gender')
-            ->where('user_id', Auth::user()->id)
+            ->where('user_id', Auth::user()->owner_id)
             ->when($request->customer, function ($query) use ($request) {
                 $search = $request->customer;
                 $query->where(function ($q) use ($search) {

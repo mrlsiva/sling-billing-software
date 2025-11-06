@@ -17,7 +17,7 @@ class financeController extends Controller
 
     public function index(Request $request)
     {
-        $finances = Finance::where('shop_id',Auth::user()->id)->when(request('finance'), function ($query) 
+        $finances = Finance::where('shop_id',Auth::user()->owner_id)->when(request('finance'), function ($query) 
         {
             $query->where('name', 'like', '%' . request('finance') . '%');
         })->orderBy('id','desc')->paginate(10);
@@ -30,7 +30,7 @@ class financeController extends Controller
         $request->validate([
             'name' => ['required','string',
                 Rule::unique('finances')->where(function ($query) {
-                    return $query->where('shop_id', Auth::id());
+                    return $query->where('shop_id', Auth::user()->owner_id);
                 }),
             ],
         ], 
@@ -42,7 +42,7 @@ class financeController extends Controller
         DB::beginTransaction();
 
         $finance = Finance::create([ 
-            'shop_id' => Auth::user()->id,
+            'shop_id' => Auth::user()->owner_id,
             'name' => $request->name,
             'is_active' => 1,
         ]);
@@ -53,7 +53,7 @@ class financeController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Finance Create','App/Models/Finance','finances',$finance->id,'Insert',null,json_encode($request->all()),'Success','Finance Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' finance created successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' finance created successfully',null, null,9);
 
         return redirect()->back()->with('toast_success', 'Finance created successfully.');
     }
@@ -75,7 +75,7 @@ class financeController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Finance Status Update','App/Models/Finance','metrics',$request->id,'Update',null,null,'Success',$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $finance->name.' '.$statusText,null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $finance->name.' '.$statusText,null, null,9);
 
         return redirect()->back()->with('toast_success', "Finance Status Changed");
     }
@@ -97,7 +97,7 @@ class financeController extends Controller
     {
         $request->validate([
             'finance' => ['required','string',
-                Rule::unique('finances','name')->where(fn ($query) => $query->where('shop_id', Auth::id()))->ignore($request->finance_id),
+                Rule::unique('finances','name')->where(fn ($query) => $query->where('shop_id', Auth::user()->owner_id))->ignore($request->finance_id),
             ],
         ],
         [
@@ -119,7 +119,7 @@ class financeController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Finance Update','App/Models/Finance','finances',$finance->id,'Update',null,$request,'Success','Finance Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->finance.' finance updated successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->finance.' finance updated successfully',null, null,9);
 
         return redirect()->back()->with('toast_success', 'Finance updated successfully.');
     }

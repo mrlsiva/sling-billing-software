@@ -99,7 +99,7 @@ class orderController extends Controller
         $this->addToLog($this->unique(),Auth::id(),'Refund','App/Models/Refund','refunds',$refund->id,'Insert',null,null,'Success','Refund done Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->parent_id, null,'App/Models/Refund', $refund->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' refunded order '.$refund->order->bill_id.' to customer '.$refund->order->customer->name,null, null);
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Refund', $refund->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' refunded order '.$refund->order->bill_id.' to customer '.$refund->order->customer->name,null, null,14);
 
         return redirect()->route('branch.order.index', request()->route('company'))->with('toast_success', 'Refund done successfully.');
     }

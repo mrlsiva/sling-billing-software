@@ -68,7 +68,7 @@ class taxController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Tax Create','App/Models/Tax','taxes',$tax->id,'Insert',null,json_encode($request->all()),'Success','Tax Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.'% tax created successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.'% tax created successfully',null, null,3);
 
             return $this->successResponse($tax, 200, 'Tax created successfully');
 
@@ -101,7 +101,7 @@ class taxController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Tax Status Update','App/Models/Tax','taxes',$tax->id,'Update',null,null,'Success',$tax->name.' '.$statusText);
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $tax->name.' '.$statusText,null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $tax->name.' '.$statusText,null, null,3);
 
             return $this->successResponse("Success", 200, $statusText);
 
@@ -148,7 +148,7 @@ class taxController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Tax Update','App/Models/Tax','taxes',$tax->id,'Update',null,$request,'Success','Tax Updated Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->tax.'% tax updated successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->tax.'% tax updated successfully',null, null,3);
 
             return $this->successResponse($tax, 200, 'Tax updated successfully');
         }

@@ -72,7 +72,7 @@ else
 
                 Route::get('/my_profile',[loginController::class, 'my_profile'])->name('my_profile');
 
-                Route::get('/notification',[notificationController::class, 'notification'])->name('notification');
+                Route::get('/notifications',[notificationController::class, 'notification'])->name('notification');
                 
                 Route::group(['middleware' => ['role:HO']], function () {
 

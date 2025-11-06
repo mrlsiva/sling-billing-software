@@ -311,7 +311,7 @@ class posController extends Controller
             $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null,14);
 
             DB::commit();
         
@@ -451,7 +451,7 @@ class posController extends Controller
             $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->parent_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null);
+            $this->notification(Auth::user()->parent_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null,14);
 
             DB::commit();
         
@@ -504,7 +504,7 @@ class posController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'POS Setting','App/Models/PosSetting','pos_settings',$pagination->id,'Update',null,json_encode($request->all()),'Success','POS Setting done Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/PosSetting', $pagination->id, null, json_encode($request->all()), now(), Auth::user()->id, Auth::user()->name.' updated POS setting',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/PosSetting', $pagination->id, null, json_encode($request->all()), now(), Auth::user()->id, Auth::user()->name.' updated POS setting',null, null,14);
 
             return $this->successResponse($pagination, 200, 'POS Setting done Successfully');
         }
@@ -536,7 +536,7 @@ class posController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'POS Setting','App/Models/PosSetting','pos_settings',$pagination->id,'Update',null,json_encode($request->all()),'Success','POS Setting done Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/PosSetting', $pagination->id, null, json_encode($request->all()), now(), Auth::user()->id, Auth::user()->name.' updated POS setting',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/PosSetting', $pagination->id, null, json_encode($request->all()), now(), Auth::user()->id, Auth::user()->name.' updated POS setting',null, null,14);
 
             return $this->successResponse($pagination, 200, 'POS Setting done Successfully');
 

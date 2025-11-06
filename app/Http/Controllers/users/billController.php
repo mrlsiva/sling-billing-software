@@ -67,14 +67,14 @@ class billController extends Controller
             $branch = User::where('id',$request->branch_id)->first();
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/BillSetup', $bill->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bill number set successfully for branch '. $branch->name,null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/BillSetup', $bill->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bill number set successfully for branch '. $branch->name,null, null,11);
         }
         else
         {
             $ho = User::where('id',Auth::user()->owner_id)->first();
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/BillSetup', $bill->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bill number set successfully for HO '. $ho->name,null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/BillSetup', $bill->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bill number set successfully for HO '. $ho->name,null, null,11);
         }
 
         DB::commit();
@@ -100,34 +100,10 @@ class billController extends Controller
             : 'Bank detail display disabled in bill.';
 
         // Log the action
-        $this->addToLog(
-            $this->unique(),
-            Auth::user()->id,
-            'Bank Detail Visibility Update',
-            'App/Models/UserDetail',
-            'user_details',
-            $user->id,
-            'Update',
-            null,
-            null,
-            'Success',
-            $statusText
-        );
+        $this->addToLog($this->unique(),Auth::user()->id,'Bank Detail Visibility Update','App/Models/UserDetail','user_details',$user->id,'Update',null,null,'Success',$statusText);
 
         // Notification to owner (optional)
-        $this->notification(
-            Auth::user()->owner_id,
-            null,
-            'App/Models/UserDetail',
-            $user->id,
-            null,
-            json_encode($request->all()),
-            now(),
-            Auth::user()->id,
-            $statusText,
-            null,
-            null
-        );
+        $this->notification(Auth::user()->owner_id,null,'App/Models/UserDetail',$user->id,null,json_encode($request->all()),now(),Auth::user()->id,$statusText,null,null,11);
 
         return redirect()->back()->with('toast_success', $statusText);
     }

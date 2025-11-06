@@ -110,7 +110,7 @@ class subCategoryController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Create','App/Models/SubCategory','sub_categories',$sub_category->id,'Insert',null, json_encode($request->all()),'Success','Sub Category Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category created successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category created successfully',null, null,2);
 
             return $this->successResponse($sub_category, 200, 'Sub Category created successfully');
         }
@@ -146,7 +146,7 @@ class subCategoryController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Status Update','App/Models/SubCategory','sub_categories',$sub_category->id,'Update',null,null,'Success',$statusText);
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, $sub_category->name.' '.$statusText,null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, $sub_category->name.' '.$statusText,null, null,2);
 
             return $this->successResponse("Success", 200, $statusText);
 
@@ -214,7 +214,7 @@ class subCategoryController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Update','App/Models/SubCategory','sub_categories',$sub_category->id,'Update',null,$request,'Success','Sub Category Updated Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category updated successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category updated successfully',null, null,2);
 
             $sub_category->image = $sub_category->image
                 ? asset('storage/' . $sub_category->image)

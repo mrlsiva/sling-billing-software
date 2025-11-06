@@ -20,7 +20,7 @@ class ledgerController extends Controller
     public function index(Request $request,$company,$id)
     {
         $vendor = Vendor::where('id',$id)->first();
-        $shop_payment_ids = ShopPayment::where('shop_id', Auth::user()->id)->pluck('payment_id')->toArray();
+        $shop_payment_ids = ShopPayment::where('shop_id', Auth::user()->owner_id)->pluck('payment_id')->toArray();
         $payment_methods = Payment::whereIn('id',$shop_payment_ids)->get();
 
         $query = PurchaseOrder::with('details')->where('vendor_id', $id)->orderBy('id', 'desc');

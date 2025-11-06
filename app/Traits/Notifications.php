@@ -7,7 +7,7 @@ use Request;
 trait Notifications
 
 {
-    public static function notification($shop_id,$branch_id,$model,$table_id,$old_value,$new_value,$send_on,$send_by,$message,$url,$bulk_upload_file)
+    public static function notification($shop_id,$branch_id,$model,$table_id,$old_value,$new_value,$send_on,$send_by,$message,$url,$bulk_upload_file,$notification_type)
 
     {
 
@@ -23,6 +23,7 @@ trait Notifications
     	$notification['message'] = $message;
     	$notification['url'] = $url;
     	$notification['bulk_upload_file'] = $bulk_upload_file;
+        $notification['notification_type_id'] = $notification_type;
 
     	Notification::create($notification);
 

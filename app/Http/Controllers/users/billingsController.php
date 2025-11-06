@@ -39,16 +39,16 @@ class billingsController extends Controller
     {
 
         $genders = Gender::where('is_active',1)->get();
-        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->id],['is_active', 1]])->pluck('payment_id')->toArray();
+        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->owner_id],['is_active', 1]])->pluck('payment_id')->toArray();
         $payments = Payment::whereIn('id',$shop_payment_ids)->get();
-        $finances = Finance::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
-        $categories = Stock::where([['shop_id',Auth::user()->id],['branch_id',null],['is_active',1]])->select('category_id')->get();
+        $finances = Finance::where([['shop_id',Auth::user()->owner_id],['is_active',1]])->get();
+        $categories = Stock::where([['shop_id',Auth::user()->owner_id],['branch_id',null],['is_active',1]])->select('category_id')->get();
         $categories = Category::whereIn('id',$categories)->get();
-        $staffs = Staff::where([['shop_id',Auth::user()->id],['branch_id',null],['is_active',1]])->get();
+        $staffs = Staff::where([['shop_id',Auth::user()->owner_id],['branch_id',null],['is_active',1]])->get();
 
         $pagination = 21;
 
-        $stocks = Stock::where([['shop_id',Auth::user()->id],['branch_id',null],['is_active',1]])
+        $stocks = Stock::where([['shop_id',Auth::user()->owner_id],['branch_id',null],['is_active',1]])
             ->when($request->category, function ($query, $category) {
                 $query->where('category_id', $category);
             })
@@ -83,7 +83,7 @@ class billingsController extends Controller
         $pagination = 21;
         
         $stocks = Stock::with(['product.category', 'product.sub_category'])
-            ->where([['shop_id',Auth::user()->id],['branch_id',null],['is_active',1]])
+            ->where([['shop_id',Auth::user()->owner_id],['branch_id',null],['is_active',1]])
             ->when($request->category, fn($q, $category) => $q->where('category_id', $category))
             ->when($request->sub_category, fn($q, $subCategory) => $q->where('sub_category_id', $subCategory))
             ->when($request->filter == 1, fn($q) => $q->where('quantity', '>', 0))
@@ -112,7 +112,7 @@ class billingsController extends Controller
     public function get_product_detail(Request $request)
     {
         return $products = Product::with(['tax','sub_category','category','stock' => function ($query) use ($request) {
-                $query->where('shop_id', Auth::user()->id)->where('branch_id', null);
+                $query->where('shop_id', Auth::user()->owner_id)->where('branch_id', null);
             },
         ])->where('id', $request->id)->first();
     }
@@ -139,7 +139,7 @@ class billingsController extends Controller
 
         DB::beginTransaction();
 
-        $user = User::where('id',Auth::user()->id)->first();
+        $user = User::where('id',Auth::user()->owner_id)->first();
         $billSetup = BillSetup::where([['shop_id', Auth::user()->id],['branch_id', null],['is_active',1]])->first();
 
         if (!$billSetup) {
@@ -153,7 +153,7 @@ class billingsController extends Controller
         $billPrefix = $billSetup->bill_number;
 
         // Get last order with this branch
-        $lastOrder = Order::where([['shop_id', Auth::user()->id],['branch_id', null]])->orderBy('id', 'desc')->first();
+        $lastOrder = Order::where([['shop_id', Auth::user()->owner_id],['branch_id', null]])->orderBy('id', 'desc')->first();
 
         $newBillNo = $billPrefix . '01'; // default start if no orders
 
@@ -172,20 +172,20 @@ class billingsController extends Controller
 
         $customerData = $request->input('customer');
         $customer = Customer::firstOrCreate(
-        [
-            'user_id' => $user->id, // include user_id in the unique key
-            'phone'   => $customerData['phone'],
-        ],
-        [
-            'branch_id' => null,
-            'alt_phone' => $customerData['alt_phone'] ?? null,
-            'name'      => $customerData['name'],
-            'address'   => $customerData['address'],
-            'pincode'   => $customerData['pincode'] ?? null,
-            'gender_id' => $customerData['gender'] ?? null,
-            'dob'       => $customerData['dob'] ?? null,
-        ]
-    );
+            [
+                'user_id' => $user->id, // include user_id in the unique key
+                'phone'   => $customerData['phone'],
+            ],
+            [
+                'branch_id' => null,
+                'alt_phone' => $customerData['alt_phone'] ?? null,
+                'name'      => $customerData['name'],
+                'address'   => $customerData['address'],
+                'pincode'   => $customerData['pincode'] ?? null,
+                'gender_id' => $customerData['gender'] ?? null,
+                'dob'       => $customerData['dob'] ?? null,
+            ]
+        );
 
 
         $cart = $request->input('cart', []);
@@ -271,7 +271,7 @@ class billingsController extends Controller
         $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null);
+        $this->notification(Auth::user()->id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.$user->name. ' placed one order for cutomer '.$customer->name,null, null,14);
 
         DB::commit();
         
@@ -285,24 +285,24 @@ class billingsController extends Controller
 
     public function get_bill(Request $request,$company,$id)
     {
-        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->id)->first();
+        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
-        $user_detail = UserDetail::where('user_id',Auth::id())->first();
+        $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();
 
         return view('bills.'.$user_detail->billType->blade,compact('user','order','order_details','order_payment_details'));
     }
 
     public function view_bill(Request $request,$company,$id)
     {
-        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->id)->first();
+        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
-        $user_detail = UserDetail::where('user_id',Auth::id())->first();
+        $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();
         return view('bills.view_bill',compact('user','order','order_details','order_payment_details'));
     }
     

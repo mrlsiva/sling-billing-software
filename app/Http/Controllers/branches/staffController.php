@@ -59,7 +59,7 @@ class staffController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Staff Create','App/Models/Staff','staffs',$staff->id,'Insert',null,$request,'Success','Staff Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' created new staff '.Str::ucfirst($request->name),null, null);
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' created new staff '.Str::ucfirst($request->name),null, null,13);
 
         return redirect()->back()->with('toast_success', 'Staff created successfully.');
     }
@@ -81,7 +81,7 @@ class staffController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Staff Status Update','App/Models/Staff','staffs',$request->id,'Update',null,null,'Success',$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, $staff->name .' '.$statusText .' in branch '.Auth::user()->name,null, null);
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, $staff->name .' '.$statusText .' in branch '.Auth::user()->name,null, null,13);
 
         return redirect()->back()->with('toast_success', "Staff Status Changed");
     }
@@ -120,7 +120,7 @@ class staffController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Staff Update','App/Models/Staff','staffs',$staff->id,'Update',null,$request,'Success','Staff Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' updated staff '.Str::ucfirst($request->name),null, null);
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' updated staff '.Str::ucfirst($request->name),null, null,13);
 
         return redirect()->back()->with('toast_success', 'Staff updated successfully.');
 

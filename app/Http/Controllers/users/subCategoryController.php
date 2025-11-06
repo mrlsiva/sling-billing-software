@@ -24,8 +24,8 @@ class subCategoryController extends Controller
 
     public function index(Request $request)
     {
-        $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
-        $sub_categories = SubCategory::where('user_id',Auth::user()->id)->when(request('name'), function ($query) {
+        $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
+        $sub_categories = SubCategory::where('user_id',Auth::user()->owner_id)->when(request('name'), function ($query) {
             $search = request('name');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%") // match subcategory name
@@ -42,7 +42,7 @@ class subCategoryController extends Controller
         $request->validate([
             'category' => 'required',
             'sub_category' => ['required','string','max:50',
-                Rule::unique('sub_categories', 'name')->where(fn($q) => $q->where('user_id', Auth::id())->where('category_id', $request->category)),
+                Rule::unique('sub_categories', 'name')->where(fn($q) => $q->where('user_id', Auth::user()->owner_id)->where('category_id', $request->category)),
             ],
             'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
         ], 
@@ -57,7 +57,7 @@ class subCategoryController extends Controller
         DB::beginTransaction();
 
         $sub_category = SubCategory::create([ 
-            'user_id' => Auth::user()->id,
+            'user_id' => Auth::user()->owner_id,
             'category_id' => $request->category,
             'name' => Str::ucfirst($request->sub_category),
             'is_active' => 1,
@@ -82,7 +82,7 @@ class subCategoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Create','App/Models/SubCategory','sub_categories',$sub_category->id,'Insert',null, json_encode($request->all()),'Success','Sub Category Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category created successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category created successfully',null, null,2);
 
         return redirect()->back()->with('toast_success', 'Sub Category created successfully.');
     }
@@ -106,7 +106,7 @@ class subCategoryController extends Controller
             'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'category_id' => 'required',
             'sub_category_name' => ['required','string','max:50',
-                Rule::unique('sub_categories', 'name')->where(fn($q) => $q->where('user_id', Auth::id())->where('category_id', $request->category_id))->ignore($request->sub_category_id),
+                Rule::unique('sub_categories', 'name')->where(fn($q) => $q->where('user_id', Auth::user()->owner_id)->where('category_id', $request->category_id))->ignore($request->sub_category_id),
             ], 
         ],
         [
@@ -144,7 +144,7 @@ class subCategoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Update','App/Models/SubCategory','sub_categories',$sub_category->id,'Update',null,$request,'Success','Sub Category Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category updated successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category updated successfully',null, null,2);
 
         return redirect()->back()->with('toast_success', 'Sub Category Updated Successfully.');
     }
@@ -166,7 +166,7 @@ class subCategoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Sub Category Status Update','App/Models/SubCategory','sub_categories',$request->id,'Update',null,null,'Success',$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, $sub_category->name.' '.$statusText,null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, $sub_category->name.' '.$statusText,null, null,2);
 
         return redirect()->back()->with('toast_success', "Sub Category Status Changed");
     }
@@ -249,7 +249,7 @@ class subCategoryController extends Controller
         ]);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/BulkUploadLog', $bulk_upload->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bulk upload done for sub category',null, $logFile);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/BulkUploadLog', $bulk_upload->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bulk upload done for sub category',null, $logFile,2);
 
         // Return response
         if ($errorRecords > 0) {
@@ -263,7 +263,7 @@ class subCategoryController extends Controller
     public function download(Request $request)
     {
         $sub_categories = SubCategory::with('category')
-            ->where('user_id', Auth::user()->id)
+            ->where('user_id', Auth::user()->owner_id)
             ->when($request->name, function ($query) use ($request) {
                 $search = $request->name;
                 $query->where(function ($q) use ($search) {

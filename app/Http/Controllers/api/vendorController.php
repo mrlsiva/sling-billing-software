@@ -84,7 +84,7 @@ class vendorController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Vendor Create','App/Models/Vendor','vendors',$vendor->id,'Insert',null,json_encode($request->all()),'Success','Vendor Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' vendor created successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' vendor created successfully',null, null,6);
 
             return $this->successResponse($vendor, 200, 'Vendor created successfully');
         }
@@ -118,7 +118,7 @@ class vendorController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Vendor Status Update','App/Models/Vendor','vendors',$vendor->id,'Update',null,null,'Success',$statusText);
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $request->id, null, $vendor->id, now(), Auth::user()->id, $vendor->name.' '.$statusText,null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $request->id, null, $vendor->id, now(), Auth::user()->id, $vendor->name.' '.$statusText,null, null,6);
 
             return $this->successResponse("Success", 200, $statusText);
         }
@@ -179,7 +179,7 @@ class vendorController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Vendor Update','App/Models/Vendor','vendors',$vendor->id,'Update',null,$request,'Success','Vendor Updated Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name. ' vendor updated successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name. ' vendor updated successfully',null, null,6);
 
             return $this->successResponse($vendor, 200, 'Vendor updated successfully');
         }

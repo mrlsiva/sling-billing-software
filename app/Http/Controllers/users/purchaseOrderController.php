@@ -29,7 +29,7 @@ class purchaseOrderController extends Controller
     public function index(Request $request)
     {
         $purchase_orders = PurchaseOrder::with('vendor')
-        ->where('shop_id', Auth::user()->id)
+        ->where('shop_id', Auth::user()->owner_id)
         ->when(request('vendor'), function ($query, $vendor) {
             $query->whereHas('vendor', function ($q) use ($vendor) {
                 $q->where('name', 'like', "%{$vendor}%");
@@ -42,17 +42,17 @@ class purchaseOrderController extends Controller
 
     public function create(Request $request)
     {
-        $vendors = Vendor::where('shop_id', Auth::user()->id)->get();
+        $vendors = Vendor::where('shop_id', Auth::user()->owner_id)->get();
         $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->parent_id],['is_active', 1]])->pluck('payment_id')->toArray();
         $payments = Payment::whereIn('id',$shop_payment_ids)->get();
-        $categories = Category::where([['user_id',Auth::user()->id],['is_active',1]])->get();
-        $taxes = Tax::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
+        $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
+        $taxes = Tax::where([['shop_id',Auth::user()->owner_id],['is_active',1]])->get();
         return view('users.purchase_orders.create',compact('vendors','payments','categories','taxes'));
     }
 
     public function get_product(Request $request)
     {
-        return $products = Product::where([['user_id',Auth::user()->id],['category_id',$request->category],['sub_category_id',$request->sub_category],['is_active',1]])->get();
+        return $products = Product::where([['user_id',Auth::user()->owner_id],['category_id',$request->category],['sub_category_id',$request->sub_category],['is_active',1]])->get();
     }
 
     public function get_product_detail(Request $request)
@@ -89,7 +89,7 @@ class purchaseOrderController extends Controller
         DB::beginTransaction();
 
         $purchase_order = PurchaseOrder::create([ 
-            'shop_id' => Auth::user()->id,
+            'shop_id' => Auth::user()->owner_id,
             'vendor_id' => $request->vendor,
             'payment_id' => $request->payment,
             'invoice_no' => $request->invoice,
@@ -112,7 +112,7 @@ class purchaseOrderController extends Controller
         $product = Product::where('id',$request->product)->first();
         $product->update(['quantity' => $product->quantity + $request->quantity]);
 
-        $stock = Stock::where([['shop_id',Auth::user()->id],['branch_id',null],['category_id',$request->category],['sub_category_id',$request->sub_category],['product_id',$request->product]])->first();
+        $stock = Stock::where([['shop_id',Auth::user()->owner_id],['branch_id',null],['category_id',$request->category],['sub_category_id',$request->sub_category],['product_id',$request->product]])->first();
 
         $stock->update(['quantity' => $stock->quantity + $request->quantity]);
 
@@ -120,7 +120,7 @@ class purchaseOrderController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Created','App/Models/PurchaseOrder','purchase_orders',$purchase_order->id,'Insert',null,$request,'Success','Purchase Order Created');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase_order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase_order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully',null, null,7);
 
         // --- Handle prepaid balance ---
         $vendor = Vendor::findOrFail($request->vendor);
@@ -207,7 +207,7 @@ class purchaseOrderController extends Controller
             );
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase->id, null, json_encode($request->all()), now(), Auth::user()->id, 'purchase order updated for product '.$purchase->product->name.' done successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase->id, null, json_encode($request->all()), now(), Auth::user()->id, 'purchase order updated for product '.$purchase->product->name.' done successfully',null, null,7);
 
             
             $paymentsForThis = VendorPaymentDetail::where('purchase_order_id', $purchase->id)->orderBy('id', 'desc')->get();
@@ -413,7 +413,7 @@ class purchaseOrderController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Refund','App/Models/PurchaseOrderRefund','purchase_order_refunds',$refund->id,'Insert',null,json_encode($request->all()),'Success','Purchase Order Refund');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrderRefund', $refund->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Purchase order return for product '.$purchase->product->name.' done successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrderRefund', $refund->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Purchase order return for product '.$purchase->product->name.' done successfully',null, null,7);
         
         DB::commit();
 

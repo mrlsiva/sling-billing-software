@@ -17,7 +17,7 @@ class vendorController extends Controller
 
     public function index(Request $request)
     {
-        $vendors = Vendor::where('shop_id', Auth::user()->id)
+        $vendors = Vendor::where('shop_id', Auth::user()->owner_id)
         ->when($request->vendor, function ($query, $vendor) {
             $query->where(function ($q) use ($vendor) {
                 $q->where('name', 'like', "%{$vendor}%")
@@ -37,7 +37,7 @@ class vendorController extends Controller
 
             'name' => ['required',
                 Rule::unique('vendors')->where(function ($query) use ($request) {
-                    return $query->where('shop_id', Auth::user()->id);
+                    return $query->where('shop_id', Auth::user()->owner_id);
                 }),
             ],
             'phone' => 'required|digits:10',
@@ -55,7 +55,7 @@ class vendorController extends Controller
         DB::beginTransaction();
 
         $vendor = Vendor::create([ 
-            'shop_id' => Auth::user()->id,
+            'shop_id' => Auth::user()->owner_id,
             'name' => $request->name,
             'phone' => $request->phone,
             'email' => $request->email,
@@ -73,7 +73,7 @@ class vendorController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Vendor Create','App/Models/Vendor','vendors',$vendor->id,'Insert',null,json_encode($request->all()),'Success','Vendor Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' vendor created successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' vendor created successfully',null, null,6);
 
         return redirect()->back()->with('toast_success', 'Vendor created successfully.');
     }
@@ -95,7 +95,7 @@ class vendorController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Vendor Status Update','App/Models/Vendor','vendors',$request->id,'Update',null,null,'Success',$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $vendor->name.' '.$statusText,null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $vendor->name.' '.$statusText,null, null,6);
 
         return redirect()->back()->with('toast_success', "Vendor Status Changed");
     }
@@ -107,7 +107,7 @@ class vendorController extends Controller
             'vendor_name' => [
                 'required',
                 Rule::unique('vendors','name')->where(function ($query) use ($request) {
-                    return $query->where('shop_id', Auth::user()->id);
+                    return $query->where('shop_id', Auth::user()->owner_id);
                 })->ignore($request->vendor_id), // <-- ignore current vendor ID
             ],
             'vendor_phone' => 'required|digits:10',
@@ -146,7 +146,7 @@ class vendorController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Vendor Update','App/Models/Vendor','vendors',$vendor->id,'Update',null,$request,'Success','Vendor Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->vendor_name. ' vendor updated successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->vendor_name. ' vendor updated successfully',null, null,6);
 
         return redirect()->back()->with('toast_success', 'Vendor updated successfully.');
 

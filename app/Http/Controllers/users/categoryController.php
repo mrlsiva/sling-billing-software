@@ -23,7 +23,7 @@ class categoryController extends Controller
 
     public function index(Request $request)
     {
-        $categories = Category::with(['sub_categories'])->where('user_id',Auth::user()->id)->when(request('name'), function ($query) {
+        $categories = Category::with(['sub_categories'])->where('user_id',Auth::user()->owner_id)->when(request('name'), function ($query) {
                 $query->where('name', 'like', '%' . request('name') . '%');
         })->orderBy('id','desc')->paginate(10);
         return view('users.categories.index',compact('categories'));
@@ -46,7 +46,7 @@ class categoryController extends Controller
         DB::beginTransaction();
 
         $category = Category::create([ 
-            'user_id' => Auth::user()->id,
+            'user_id' => Auth::user()->owner_id,
             'name' => Str::ucfirst($request->category),
             'is_active' => 1,
         ]);
@@ -70,7 +70,7 @@ class categoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Category Create','App/Models/Category','categories',$category->id,'Insert',null,json_encode($request->all()),'Success','Category Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category). ' category created successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category). ' category created successfully',null, null,1);
 
         return redirect()->back()->with('toast_success', 'Category created successfully.');
     }
@@ -93,7 +93,7 @@ class categoryController extends Controller
         $request->validate([
             'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'category_name' => ['required','string','max:50',
-                Rule::unique('categories', 'name')->where(fn($query) => $query->where('user_id', Auth::id()))->ignore($request->category_id),
+                Rule::unique('categories', 'name')->where(fn($query) => $query->where('user_id', Auth::user()->owner_id))->ignore($request->category_id),
             ],
 
             'category_id' => 'required',
@@ -131,7 +131,7 @@ class categoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Category Update','App/Models/Category','categories',$category->id,'Update',null,json_encode($request->all()),'Success','Category Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category_name).' category updated successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category_name).' category updated successfully',null, null,1);
 
         return redirect()->back()->with('toast_success', 'Category updated successfully.');
     }
@@ -153,7 +153,7 @@ class categoryController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Category Status Update','App/Models/Category','categories',$request->id,'Update',null,null,'Success',$category->name.' '.$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, $category->name.' '.$statusText,null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, $category->name.' '.$statusText,null, null,1);
 
         return redirect()->back()->with('toast_success', "Category Status Changed");
     }
@@ -236,7 +236,7 @@ class categoryController extends Controller
         ]);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/BulkUploadLog', $bulk_upload->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bulk upload done for category',null, $logFile);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/BulkUploadLog', $bulk_upload->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Bulk upload done for category',null, $logFile,1);
 
         if ($errorRecords > 0) {
             return redirect()->back()->with('error_alert', 'Some rows were skipped: ' . implode(' | ', $skipped));
@@ -251,7 +251,7 @@ class categoryController extends Controller
     public function download(Request $request)
     {
         $categories = Category::with('sub_categories')
-            ->where('user_id', Auth::user()->id)
+            ->where('user_id', Auth::user()->owner_id)
             ->when($request->name, function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->name . '%');
             })

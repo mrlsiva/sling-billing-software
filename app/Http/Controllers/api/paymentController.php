@@ -48,7 +48,7 @@ class paymentController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Payment method Update','App/Models/ShopPayment','shop_payments',$payment,'Update',null,null,'Success',$statusText);
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/ShopPayment', $request->id, null, $payment, now(), Auth::user()->id, $shop_payment->payment->name.' '.$statusText,null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/ShopPayment', $request->id, null, $payment, now(), Auth::user()->id, $shop_payment->payment->name.' '.$statusText,null, null,10);
 
             return $this->successResponse("Success", 200, $statusText);
         }

@@ -17,7 +17,7 @@ class taxController extends Controller
 
     public function index(Request $request)
     {
-        $taxes = Tax::where('shop_id',Auth::user()->id)->when(request('tax'), function ($query) 
+        $taxes = Tax::where('shop_id',Auth::user()->owner_id)->when(request('tax'), function ($query) 
         {
             $query->where('name', 'like', '%' . request('tax') . '%');
         })->orderBy('id','desc')->paginate(10);
@@ -30,7 +30,7 @@ class taxController extends Controller
         $request->validate([
             'name' => ['required','numeric',
                 Rule::unique('taxes')->where(function ($query) {
-                    return $query->where('shop_id', Auth::id());
+                    return $query->where('shop_id', Auth::user()->owner_id);
                 }),
             ],
         ], 
@@ -43,7 +43,7 @@ class taxController extends Controller
         DB::beginTransaction();
 
         $tax = Tax::create([ 
-            'shop_id' => Auth::user()->id,
+            'shop_id' => Auth::user()->owner_id,
             'name' => $request->name,
             'is_active' => 1,
         ]);
@@ -54,7 +54,7 @@ class taxController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Tax Create','App/Models/Tax','taxes',$tax->id,'Insert',null,json_encode($request->all()),'Success','Tax Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.'% tax created successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.'% tax created successfully',null, null,3);
 
         return redirect()->back()->with('toast_success', 'Tax created successfully.');
     }
@@ -76,7 +76,7 @@ class taxController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Tax Status Update','App/Models/Tax','taxes',$request->id,'Update',null,null,'Success',$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $tax->name.'% '.$statusText,null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $tax->name.'% '.$statusText,null, null,3);
 
         return redirect()->back()->with('toast_success', "Tax Status Changed");
     }
@@ -98,7 +98,7 @@ class taxController extends Controller
     {
         $request->validate([
             'tax' => ['required','numeric',
-                Rule::unique('taxes','name')->where(fn ($query) => $query->where('shop_id', Auth::id()))->ignore($request->tax_id),
+                Rule::unique('taxes','name')->where(fn ($query) => $query->where('shop_id', Auth::user()->owner_id))->ignore($request->tax_id),
             ],
         ],
         [
@@ -121,7 +121,7 @@ class taxController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Tax Update','App/Models/Tax','taxes',$tax->id,'Update',null,$request,'Success','Tax Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->tax.'% tax updated successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->tax.'% tax updated successfully',null, null,3);
 
         return redirect()->back()->with('toast_success', 'Tax updated successfully.');
     }

@@ -20,9 +20,9 @@ class orderReportsController extends Controller
     public function order(Request $request,$company,$branch)
     {
 
-        $branches = User::where([['parent_id',Auth::user()->id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
+        $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
 
-        $query = Order::where('shop_id', Auth::user()->id);
+        $query = Order::where('shop_id', Auth::user()->owner_id);
 
         // If a specific branch is selected
         if ($branch != 0) {
@@ -45,7 +45,7 @@ class orderReportsController extends Controller
 
     public function download_excel(Request $request, $company, $branch)
     {
-        $query = Order::where('shop_id', Auth::user()->id);
+        $query = Order::where('shop_id', Auth::user()->owner_id);
 
         if ($branch != 0) {
             $query->where('branch_id', $branch);
@@ -66,7 +66,7 @@ class orderReportsController extends Controller
 
     public function download_pdf(Request $request, $company, $branch)
     {
-        $query = Order::where('shop_id', Auth::user()->id);
+        $query = Order::where('shop_id', Auth::user()->owner_id);
 
         if ($branch != 0) {
             $query->where('branch_id', $branch);

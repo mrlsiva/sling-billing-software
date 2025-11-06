@@ -83,7 +83,7 @@ class staffController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Staff Create','App/Models/Staff','staffs',$staff->id,'Insert',null,$request,'Success','Staff Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Shop '.Auth::user()->name. ' created new staff '.Str::ucfirst($request->name),null, null);
+            $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Shop '.Auth::user()->name. ' created new staff '.Str::ucfirst($request->name),null, null,13);
 
             return $this->successResponse($staff, 200, 'Successfully created staff');
         }
@@ -106,7 +106,7 @@ class staffController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Staff Create','App/Models/Staff','staffs',$staff->id,'Insert',null,$request,'Success','Staff Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' created new staff '.Str::ucfirst($request->name),null, null);
+            $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' created new staff '.Str::ucfirst($request->name),null, null,13);
 
             return $this->successResponse($staff, 200, 'Successfully created staff');
         }
@@ -146,7 +146,7 @@ class staffController extends Controller
                 $this->addToLog($this->unique(),Auth::user()->id,'Staff Status Update','App/Models/Staff','staffs',$staff->id,'Update',null,null,'Success',$statusText);
 
                 //Notifiction
-                $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, $staff->id, now(), Auth::user()->id, $staff->name .' '.$statusText .' in HO '.Auth::user()->name,null, null);
+                $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, $staff->id, now(), Auth::user()->id, $staff->name .' '.$statusText .' in HO '.Auth::user()->name,null, null,13);
             }
         }
 
@@ -168,7 +168,7 @@ class staffController extends Controller
                 $this->addToLog($this->unique(),Auth::user()->id,'Staff Status Update','App/Models/Staff','staffs',$staff->id,'Update',null,null,'Success',$statusText);
 
                 //Notifiction
-                $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, $staff->id, now(), Auth::user()->id, $staff->name .' '.$statusText .' in branch '.Auth::user()->name,null, null);
+                $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, $staff->id, now(), Auth::user()->id, $staff->name .' '.$statusText .' in branch '.Auth::user()->name,null, null,13);
             }
 
         }
@@ -218,13 +218,13 @@ class staffController extends Controller
         if(Auth::user()->role_id == 3)
         {
             //Notification
-            $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' updated staff '.Str::ucfirst($request->name),null, null);
+            $this->notification(Auth::user()->parent_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' updated staff '.Str::ucfirst($request->name),null, null,13);
         }
 
         if(Auth::user()->role_id == 2)
         {
             //Notification
-            $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.Auth::user()->name. ' updated staff '.Str::ucfirst($request->name),null, null);
+            $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.Auth::user()->name. ' updated staff '.Str::ucfirst($request->name),null, null,13);
         }
 
         return $this->successResponse($staff, 200, 'Successfully updated staff');

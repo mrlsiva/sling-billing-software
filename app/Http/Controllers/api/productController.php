@@ -188,7 +188,7 @@ class productController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Product Create','App/Models/Product','products',$product->id,'Insert',null,json_encode($request->all()),'Success','Product Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Created Successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Created Successfully',null, null,5);
 
             DB::commit();
 
@@ -216,7 +216,7 @@ class productController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Product Status Update','App/Models/Product','products',$product->id,'Update',null,null,'Success',$statusText);
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $request->id, null, $product->id, now(), Auth::user()->id, $statusText,null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $request->id, null, $product->id, now(), Auth::user()->id, $statusText,null, null,5);
 
             return $this->successResponse("Success", 200, $statusText);
         }
@@ -373,7 +373,7 @@ class productController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Product Update','App/Models/Product','products',$product->id,'Update',null, json_encode($request->all()),'Success','Product Updated Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Updated Successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Updated Successfully',null, null,5);
 
             DB::commit();
 

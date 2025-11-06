@@ -67,7 +67,7 @@ class financeController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Finance Create','App/Models/Finance','finances',$finance->id,'Insert',null,json_encode($request->all()),'Success','Finance Created Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' finance created successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' finance created successfully',null, null,9);
 
             return $this->successResponse($finance, 200, 'Finance created successfully');
         }
@@ -102,7 +102,7 @@ class financeController extends Controller
                 $this->addToLog($this->unique(),Auth::user()->id,'Finance Status Update','App/Models/Finance','finances',$finance->id,'Update',null,null,'Success',$finance->name.' '.$statusText);
 
                 //Notifiction
-                $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $finance->name.' '.$statusText,null, null);
+                $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $finance->name.' '.$statusText,null, null,9);
 
                 return $this->successResponse("Success", 200, $statusText);
             }
@@ -148,7 +148,7 @@ class financeController extends Controller
             $this->addToLog($this->unique(),Auth::user()->id,'Finance Update','App/Models/Finance','finances',$finance->id,'Update',null,$request,'Success','Finance Updated Successfully');
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->finance.' finance updated successfully',null, null);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->finance.' finance updated successfully',null, null,9);
 
             return $this->successResponse($finance, 200, 'Finance updated successfully');
 

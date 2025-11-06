@@ -17,7 +17,7 @@ class metricController extends Controller
     
     public function index(Request $request)
     {
-        $metrics = Metric::where('shop_id',Auth::user()->id)->when(request('metric'), function ($query) 
+        $metrics = Metric::where('shop_id',Auth::user()->owner_id)->when(request('metric'), function ($query) 
         {
             $query->where('name', 'like', '%' . request('metric') . '%');
         })->orderBy('id','desc')->paginate(10);
@@ -30,7 +30,7 @@ class metricController extends Controller
         $request->validate([
             'name' => ['required','string',
                 Rule::unique('metrics')->where(function ($query) {
-                    return $query->where('shop_id', Auth::id());
+                    return $query->where('shop_id', Auth::user()->owner_id);
                 }),
             ],
         ], 
@@ -42,7 +42,7 @@ class metricController extends Controller
         DB::beginTransaction();
 
         $metric = Metric::create([ 
-            'shop_id' => Auth::user()->id,
+            'shop_id' => Auth::user()->owner_id,
             'name' => $request->name,
             'is_active' => 1,
         ]);
@@ -53,7 +53,7 @@ class metricController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Metric Create','App/Models/Metric','metrics',$metric->id,'Insert',null, json_encode($request->all()),'Success','Metric Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' metric created successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' metric created successfully',null, null,4);
 
         return redirect()->back()->with('toast_success', 'Metric created successfully.');
     }
@@ -75,7 +75,7 @@ class metricController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Metric Status Update','App/Models/Metric','metrics',$request->id,'Update',null,null,'Success',$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $metric->name.' '.$statusText,null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $metric->name.' '.$statusText,null, null,4);
 
         return redirect()->back()->with('toast_success', "Metric Status Changed");
     }
@@ -97,7 +97,7 @@ class metricController extends Controller
     {
         $request->validate([
             'metric' => ['required','string',
-                Rule::unique('metrics','name')->where(fn ($query) => $query->where('shop_id', Auth::id()))->ignore($request->metric_id),
+                Rule::unique('metrics','name')->where(fn ($query) => $query->where('shop_id', Auth::user()->owner_id))->ignore($request->metric_id),
             ],
         ],
         [
@@ -119,7 +119,7 @@ class metricController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Metric Update','App/Models/Metric','metrics',$metric->id,'Update',null,$request,'Success','Metric Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->metric.' metric updated successfully',null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->metric.' metric updated successfully',null, null,4);
 
         return redirect()->back()->with('toast_success', 'Metric updated successfully.');
     }

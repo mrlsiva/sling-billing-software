@@ -19,7 +19,7 @@ class staffsController extends Controller
 
     public function index(Request $request)
     {
-        $staffs = Staff::where([['shop_id', Auth::user()->id],['branch_id',null]])
+        $staffs = Staff::where([['shop_id', Auth::user()->owner_id],['branch_id',null]])
         ->when($request->name, function ($query, $name) {
             $query->where('name', 'like', "%{$name}%");
         })->paginate(10);
@@ -33,7 +33,7 @@ class staffsController extends Controller
 
             'name' => ['required',
                 Rule::unique('staffs')->where(function ($query) use ($request) {
-                    return $query->where('shop_id', Auth::user()->id);
+                    return $query->where('shop_id', Auth::user()->owner_id);
                 }),
             ],
             'phone' => 'nullable|numeric|digits:10',
@@ -59,7 +59,7 @@ class staffsController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Staff Create','App/Models/Staff','staffs',$staff->id,'Insert',null,$request,'Success','Staff Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Shop '.Auth::user()->name. ' created new staff '.Str::ucfirst($request->name),null, null);
+        $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Shop '.Auth::user()->name. ' created new staff '.Str::ucfirst($request->name),null, null,13);
 
         return redirect()->back()->with('toast_success', 'Staff created successfully.');
     }
@@ -81,7 +81,7 @@ class staffsController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Staff Status Update','App/Models/Staff','staffs',$request->id,'Update',null,null,'Success',$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, $staff->name .' '.$statusText .' in HO '.Auth::user()->name,null, null);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, $staff->name .' '.$statusText .' in HO '.Auth::user()->name,null, null,13);
 
         return redirect()->back()->with('toast_success', "Staff Status Changed");
     }
@@ -94,7 +94,7 @@ class staffsController extends Controller
                 'required',
                 Rule::unique('staffs', 'name') // DB column is `name`
                     ->where(function ($query) use ($request) {
-                        return $query->where('shop_id', Auth::user()->id);
+                        return $query->where('shop_id', Auth::user()->owner_id);
                     })
                     ->ignore($request->staff_id), // ignore current staff
             ],
@@ -120,7 +120,7 @@ class staffsController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Staff Update','App/Models/Staff','staffs',$staff->id,'Update',null,$request,'Success','Staff Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.Auth::user()->name. ' updated staff '.Str::ucfirst($request->name),null, null);
+        $this->notification(Auth::user()->id, null,'App/Models/Staff', $staff->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.Auth::user()->name. ' updated staff '.Str::ucfirst($request->name),null, null,13);
 
         return redirect()->back()->with('toast_success', 'Staff updated successfully.');
 
