@@ -50,8 +50,8 @@
                                                     <div>
                                                         <div class="notification-title">
                                                             <span class="fw-semibold">{{ $notification->message ?? 'New Notification' }}</span>
-                                                            @if($notification->url)
-                                                                <a href="{{ $notification->url }}" class="text-primary ms-2">View</a>
+                                                            @if($notification->bulk_upload_file)
+                                                                <a href="{{ asset('storage/' . $notification->bulk_upload_file) }}" target="_blank" class="text-primary ms-2">View</a>
                                                             @endif
                                                         </div>
                                                         <div class="notification-meta text-muted small">
