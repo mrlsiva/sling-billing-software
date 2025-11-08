@@ -11,6 +11,7 @@ use App\Models\VendorPaymentDetail;
 use App\Models\PurchaseOrderDetail;
 use App\Models\PurchaseOrderRefund;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
 use App\Models\ShopPayment;
 use App\Models\Category;
 use App\Models\Payment;
@@ -64,108 +65,146 @@ class purchaseOrderController extends Controller
     {
         $request->validate([
             'vendor' => 'required',
-            'category' => 'required',
-            'sub_category' => 'required',
-            'product' => 'required',
-            'unit' => 'required',
-            'quantity' => 'required',
-            'price_per_unit' => 'required',
-            'net_cost' => 'required',
-            'gross_cost' => 'required',
+            'invoice_date' => 'required|date',
+            'products' => 'required|array|min:1',
+            'products.*.category' => 'required',
+            'products.*.sub_category' => 'required',
+            'products.*.product' => 'required',
+            'products.*.unit' => 'required',
+            'products.*.quantity' => 'required|numeric|min:1',
+            'products.*.price_per_unit' => 'required|numeric|min:0.01',
+            'products.*.net_cost' => 'required|numeric',
+            'products.*.gross_cost' => 'required|numeric',
         ], 
         [
             'vendor.required' => 'Vendor is required.',
-            'category.required' => 'Category is required.',
-            'sub_category.required' => 'Sub Category is required.',
-            'product.required' => 'Product is required.',
-            'unit.required' => 'Unit is required.',
-            'quantity.required' => 'Quantity is required.',
-            'price_per_unit.required' => 'Price Per Unit is required.',
-            'net_cost.required' => 'Net Cost is required.',
-            'gross_cost.required' => 'Gross Cost is required.',
+            'invoice_date.required' => 'Invoice date is required.',
+            'products.required' => 'At least one product is required.',
+            'products.min' => 'At least one product is required.',
+            'products.*.category.required' => 'Category is required for all products.',
+            'products.*.sub_category.required' => 'Sub Category is required for all products.',
+            'products.*.product.required' => 'Product is required for all products.',
+            'products.*.unit.required' => 'Unit is required for all products.',
+            'products.*.quantity.required' => 'Quantity is required for all products.',
+            'products.*.price_per_unit.required' => 'Price Per Unit is required for all products.',
+            'products.*.net_cost.required' => 'Net Cost is required for all products.',
+            'products.*.gross_cost.required' => 'Gross Cost is required for all products.',
         ]);
-
 
         DB::beginTransaction();
 
-        $purchase_order = PurchaseOrder::create([ 
-            'shop_id' => Auth::user()->owner_id,
-            'vendor_id' => $request->vendor,
-            'payment_id' => $request->payment,
-            'invoice_no' => $request->invoice,
-            'invoice_date' => $request->invoice_date,
-            'due_date' => $request->due_date,
-            'vendor_id' => $request->vendor,
-            'category_id' => $request->category,
-            'sub_category_id' => $request->sub_category,
-            'product_id' => $request->product,
-            'imei' => $request->imei,
-            'metric_id' => $request->unit,
-            'quantity' => $request->quantity,
-            'price_per_unit' => $request->price_per_unit,
-            'tax' => $request->tax ?: 0,
-            'discount' => $request->discount,
-            'net_cost' => $request->net_cost,
-            'gross_cost' => $request->gross_cost,
-        ]);
+        try {
+            // Filter out empty products (where category is not selected)
+            $validProducts = collect($request->products)->filter(function($product) {
+                return !empty($product['category']) && !empty($product['sub_category']) && !empty($product['product']);
+            })->toArray();
 
-        $product = Product::where('id',$request->product)->first();
-        $product->update(['quantity' => $product->quantity + $request->quantity]);
+            // Debug: Log the received products data
+            \Log::info('Valid products data:', $validProducts);
+            
+            // Calculate total amount from valid products
+            $totalAmount = collect($validProducts)->sum('gross_cost');
 
-        $stock = Stock::where([['shop_id',Auth::user()->owner_id],['branch_id',null],['category_id',$request->category],['sub_category_id',$request->sub_category],['product_id',$request->product]])->first();
-
-        $stock->update(['quantity' => $stock->quantity + $request->quantity]);
-
-        //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Created','App/Models/PurchaseOrder','purchase_orders',$purchase_order->id,'Insert',null,$request,'Success','Purchase Order Created');
-
-        //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase_order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully',null, null,7);
-
-        // --- Handle prepaid balance ---
-        $vendor = Vendor::findOrFail($request->vendor);
-        $prepaid = $vendor->prepaid_amount ?? 0;
-        $grossCost = $request->gross_cost;
-
-        if ($prepaid > 0) {
-            $allocatable = 0;
-            $comment = '';
-            $status  = 0;
-
-            if ($prepaid >= $grossCost) {
-                // Full payment from prepaid
-                $allocatable = $grossCost;
-                $vendor->update(['prepaid_amount' => $prepaid - $grossCost]);
-                $comment = 'Fully paid using prepaid balance';
-                $status  = 1;
-            } else {
-                // Partial payment from prepaid
-                $allocatable = $prepaid;
-                $vendor->update(['prepaid_amount' => 0]);
-                $comment = 'Partially paid using prepaid balance';
-                $status  = 2;
-            }
-
-            // Record the payment detail
-            VendorPaymentDetail::create([
-                'vendor_payment_id' => null,
-                'purchase_order_id' => $purchase_order->id,
-                'payment_id'        => 1,
-                'amount'            => $allocatable,
-                'paid_on'           => now(),
-                'comment'           => $comment,
+            // Create the main purchase order
+            $purchase_order = PurchaseOrder::create([ 
+                'shop_id' => Auth::user()->owner_id,
+                'vendor_id' => $request->vendor,
+                'payment_id' => $request->payment,
+                'invoice_no' => $request->invoice,
+                'invoice_date' => $request->invoice_date,
+                'due_date' => $request->due_date,
+                'total_amount' => $totalAmount,
             ]);
 
-            // Update purchase order status
-            $purchase_order->update(['status' => $status]);
+            // Create purchase order items
+            foreach ($validProducts as $productData) {
+                PurchaseOrderItem::create([
+                    'purchase_order_id' => $purchase_order->id,
+                    'category_id' => $productData['category'],
+                    'sub_category_id' => $productData['sub_category'],
+                    'product_id' => $productData['product'],
+                    'imei' => $productData['imei'] ?? null,
+                    'metric_id' => $productData['unit'],
+                    'quantity' => $productData['quantity'],
+                    'price_per_unit' => $productData['price_per_unit'],
+                    'tax' => $productData['tax'] ?? 0,
+                    'discount' => $productData['discount'] ?? 0,
+                    'net_cost' => $productData['net_cost'],
+                    'gross_cost' => $productData['gross_cost'],
+                ]);
 
-        }
+                // Update product quantity
+                $product = Product::find($productData['product']);
+                if ($product) {
+                    $product->update(['quantity' => $product->quantity + $productData['quantity']]);
 
+                    // Update stock
+                    $stock = Stock::where([
+                        ['shop_id', Auth::user()->owner_id],
+                        ['branch_id', null],
+                        ['category_id', $productData['category']],
+                        ['sub_category_id', $productData['sub_category']],
+                        ['product_id', $productData['product']]
+                    ])->first();
 
-        DB::commit();
+                    if ($stock) {
+                        $stock->update(['quantity' => $stock->quantity + $productData['quantity']]);
+                    }
+                }
+            }
 
-        return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])->with('toast_success', 'Purchase order created successfully.');
+            //Log
+            $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Created','App/Models/PurchaseOrder','purchase_orders',$purchase_order->id,'Insert',null,$request,'Success','Purchase Order Created');
+
+            //Notification
+            $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase_order->id, null, json_encode($validProducts), now(), Auth::user()->id, 'Purchase order created with '.count($validProducts).' items successfully',null, null,7);
+
+            // --- Handle prepaid balance ---
+            $vendor = Vendor::findOrFail($request->vendor);
+            $prepaid = $vendor->prepaid_amount ?? 0;
+            $grossCost = $totalAmount;
+
+            if ($prepaid > 0) {
+                $allocatable = 0;
+                $comment = '';
+                $status  = 0;
+
+                if ($prepaid >= $grossCost) {
+                    // Full payment from prepaid
+                    $allocatable = $grossCost;
+                    $vendor->update(['prepaid_amount' => $prepaid - $grossCost]);
+                    $comment = 'Fully paid using prepaid balance';
+                    $status  = 1;
+                } else {
+                    // Partial payment from prepaid
+                    $allocatable = $prepaid;
+                    $vendor->update(['prepaid_amount' => 0]);
+                    $comment = 'Partially paid using prepaid balance';
+                    $status  = 2;
+                }
+
+                // Record the payment detail
+                VendorPaymentDetail::create([
+                    'vendor_payment_id' => null,
+                    'purchase_order_id' => $purchase_order->id,
+                    'payment_id'        => 1,
+                    'amount'            => $allocatable,
+                    'paid_on'           => now(),
+                    'comment'           => $comment,
+                ]);
+
+                // Update purchase order status
+                $purchase_order->update(['status' => $status]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])->with('toast_success', 'Purchase order created successfully with '.count($validProducts).' items.');
         
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('toast_error', 'Error creating purchase order: ' . $e->getMessage());
+        }
     }
 
     public function update(Request $request)

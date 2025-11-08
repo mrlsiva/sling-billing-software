@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PurchaseOrder extends Model
 {
     protected $fillable = [
-        'shop_id','vendor_id','payment_id','invoice_no','invoice_date','due_date','category_id','sub_category_id','product_id','imei','metric_id','quantity','price_per_unit','tax','discount','net_cost','gross_cost','status','is_refunded'
+        'shop_id','vendor_id','payment_id','invoice_no','invoice_date','due_date','total_amount','status','is_refunded'
     ];
 
     public function vendor()
@@ -20,6 +20,23 @@ class PurchaseOrder extends Model
         return $this->belongsTo('App\Models\Payment');
     }
 
+    public function items()
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    public function details()
+    {
+        return $this->hasMany(PurchaseOrderDetail::class);
+    }
+
+    // Get total amount from all items
+    public function getTotalAmountAttribute()
+    {
+        return $this->items()->sum('gross_cost');
+    }
+
+    // Legacy support - for backward compatibility with existing data
     public function category()
     {
         return $this->belongsTo('App\Models\Category');
@@ -39,11 +56,4 @@ class PurchaseOrder extends Model
     {
         return $this->belongsTo('App\Models\Metric');
     }
-
-    public function details()
-    {
-        return $this->hasMany(PurchaseOrderDetail::class);
-    }
-
-
 }
