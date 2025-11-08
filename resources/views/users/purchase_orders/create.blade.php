@@ -183,14 +183,9 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
-                    <div class="mb-3">
-                        <label class="form-label">IMEI/Serial</label>
-                        <input type="text" name="products[0][imei]" class="form-control" placeholder="Enter IMEI/Serial (optional)">
-                    </div>
-                </div>
+                
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Quantity <span class="metric-display"></span> <span class="text-danger">*</span></label>
                         <input type="number" name="products[0][quantity]" class="form-control quantity-input" placeholder="Qty" min="1" step="1" required>
@@ -224,17 +219,28 @@
                     </div>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Net Cost</label>
                         <input type="number" name="products[0][net_cost]" class="form-control net-cost-input" readonly>
                     </div>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Gross Cost</label>
                         <input type="number" name="products[0][gross_cost]" class="form-control gross-cost-input" readonly>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="checkbox" class="form-check-input me-2 enable-imei-checkbox" id="enableImei[0]">
+                            <label class="form-check-label" for="enableImei[0]">Enable IMEI Numbers</label>
+                        </div>
+                        <div class="imei-container row" style="display: none;">
+                            <!-- IMEI inputs will be generated here based on quantity -->
+                        </div>
                     </div>
                 </div>
             </div>

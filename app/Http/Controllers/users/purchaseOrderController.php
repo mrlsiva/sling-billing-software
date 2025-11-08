@@ -118,12 +118,29 @@ class purchaseOrderController extends Controller
 
             // Create purchase order items
             foreach ($validProducts as $productData) {
+                // Handle IMEI data - can be array or bulk text
+                $imeiData = null;
+                if (isset($productData['imei']) && is_array($productData['imei'])) {
+                    // Filter out empty values and join with commas
+                    $imeiArray = array_filter($productData['imei'], function($value) {
+                        return !empty(trim($value));
+                    });
+                    $imeiData = implode(',', $imeiArray);
+                } elseif (isset($productData['imei_bulk']) && !empty($productData['imei_bulk'])) {
+                    // Handle bulk IMEI input - normalize separators
+                    $imeiData = preg_replace('/[\r\n,]+/', ',', trim($productData['imei_bulk']));
+                    $imeiData = trim($imeiData, ','); // Remove leading/trailing commas
+                } elseif (isset($productData['imei']) && is_string($productData['imei'])) {
+                    // Handle single IMEI string
+                    $imeiData = trim($productData['imei']);
+                }
+
                 PurchaseOrderItem::create([
                     'purchase_order_id' => $purchase_order->id,
                     'category_id' => $productData['category'],
                     'sub_category_id' => $productData['sub_category'],
                     'product_id' => $productData['product'],
-                    'imei' => $productData['imei'] ?? null,
+                    'imei' => $imeiData,
                     'metric_id' => $productData['unit'],
                     'quantity' => $productData['quantity'],
                     'price_per_unit' => $productData['price_per_unit'],

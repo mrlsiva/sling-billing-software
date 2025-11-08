@@ -19,11 +19,22 @@ jQuery(document).ready(function () {
         newRow.find('.product-number').text(rowIndex + 1);
 
         // Update all form field names with current index
-        newRow.find('select, input').each(function () {
+        newRow.find('select, input, label').each(function () {
             const name = $(this).attr('name');
+            const id = $(this).attr('id');
+            const forAttr = $(this).attr('for');
+
             if (name) {
                 const newName = name.replace('[0]', '[' + rowIndex + ']');
                 $(this).attr('name', newName);
+            }
+            if (id) {
+                const newId = id.replace('[0]', '[' + rowIndex + ']');
+                $(this).attr('id', newId);
+            }
+            if (forAttr) {
+                const newFor = forAttr.replace('[0]', '[' + rowIndex + ']');
+                $(this).attr('for', newFor);
             }
         });
 
@@ -109,8 +120,52 @@ jQuery(document).ready(function () {
             }
         });
 
+        // IMEI Checkbox event
+        row.find('.enable-imei-checkbox').on('change', function () {
+            const isChecked = $(this).is(':checked');
+            const imeiContainer = row.find('.imei-container');
+
+            if (isChecked) {
+                imeiContainer.show();
+                generateIMEIInputs(row);
+            } else {
+                imeiContainer.hide().empty();
+            }
+        });
+
+        // Quantity change event - Update IMEI inputs if checkbox is checked
+        row.find('.quantity-input').on('input', function () {
+            const quantity = parseInt($(this).val()) || 0;
+
+            // Check if quantity exceeds 60
+            if (quantity > 60) {
+                alert('Please enter quantity below 60 at a time. For larger quantities, please create multiple purchase orders.');
+                $(this).val(''); // Clear the quantity field
+
+                // Clear cost calculations
+                row.find('.net-cost-input').val('');
+                row.find('.gross-cost-input').val('');
+
+                // Clear IMEI inputs if checkbox is checked
+                const imeiCheckbox = row.find('.enable-imei-checkbox');
+                if (imeiCheckbox.is(':checked')) {
+                    row.find('.imei-container').empty();
+                }
+
+                updateTotalSummary();
+                return;
+            }
+
+            // Update IMEI inputs if checkbox is checked and quantity is valid
+            const imeiCheckbox = row.find('.enable-imei-checkbox');
+            if (imeiCheckbox.is(':checked')) {
+                generateIMEIInputs(row);
+            }
+            calculateRowCosts(row);
+        });
+
         // Calculation events
-        row.find('.quantity-input, .price-input, .tax-input, .discount-input').on('input', function () {
+        row.find('.price-input, .tax-input, .discount-input').on('input', function () {
             calculateRowCosts(row);
         });
 
@@ -121,6 +176,55 @@ jQuery(document).ready(function () {
             updateRemoveButtons();
             updateTotalSummary();
         });
+    }
+
+    // Function to generate IMEI input fields based on quantity
+    function generateIMEIInputs(row) {
+        const quantity = parseInt(row.find('.quantity-input').val()) || 0;
+        const imeiContainer = row.find('.imei-container');
+        const rowIndex = row.attr('data-row-index');
+
+        // Clear existing IMEI inputs
+        imeiContainer.empty();
+
+        if (quantity > 0) {
+            if (quantity <= 60) {
+                // Create individual IMEI inputs for reasonable quantities
+                for (let i = 1; i <= quantity; i++) {
+                    const imeiInput = $(`
+                        <div class="col-md-3">
+                        <div class="input-group mb-2">
+                            <span class="input-group-text">#${i}</span>
+                            <input type="text" 
+                                   name="products[${rowIndex}][imei][]" 
+                                   class="form-control imei-input" 
+                                   placeholder="IMEI/Serial #${i}"
+                                   pattern="[0-9A-Za-z-]+"
+                                   title="Enter valid IMEI/Serial number">
+                        </div>
+                        </div>
+                    `);
+                    imeiContainer.append(imeiInput);
+                }
+            } else {
+                // Show error alert for quantities above 60
+                alert('Please enter quantity below 60 at a time. For larger quantities, please create multiple purchase orders.');
+
+                // Reset quantity to empty and uncheck IMEI checkbox
+                row.find('.quantity-input').val('');
+                row.find('.enable-imei-checkbox').prop('checked', false);
+                imeiContainer.hide().empty();
+
+                // Clear cost calculations
+                row.find('.net-cost-input').val('');
+                row.find('.gross-cost-input').val('');
+                updateTotalSummary();
+
+                return; // Exit the function
+            }
+
+            return; // Exit the function
+        }
     }
 
     // Function to calculate costs for a specific row
