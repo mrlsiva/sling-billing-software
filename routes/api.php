@@ -90,6 +90,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/vendors/{vendor}/status', 'App\Http\Controllers\api\vendorController@status');
 	Route::post('/vendors/update', 'App\Http\Controllers\api\vendorController@update');
 
+	//Notification
+	Route::get('notifications/{type?}', 'App\Http\Controllers\api\notificationController@notification');
+
 
 	//General
 	Route::get('genders', 'App\Http\Controllers\api\generalController@gender');

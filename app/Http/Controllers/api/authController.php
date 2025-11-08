@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 use App\Traits\ResponseHelper;
@@ -52,6 +53,13 @@ class authController extends Controller
             else
             {
                 $user->auth_token = $user->createToken('authToken')->plainTextToken;
+
+                if($user->role_id == 2)
+                {
+                    $user->branch = User::where([['parent_id',$user->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
+                }
+
+
 
                 return $this->successResponse($user, 200, 'Successfully Logged in');
             }

@@ -91,11 +91,11 @@ class orderController extends Controller
         return $this->successResponse($orders, 200, 'Successfully returned all orders.');
     }
 
-    public function view(Request $request, Order $order)
+    public function view(Request $request, $order)
     {
-        //$order = Order::where('id',$id)->first();
+        $order = Order::with('shop','branch','customer','billedBy')->where('id',$order)->first();
         $order_details = OrderDetail::where('order_id',$order->id)->get();
-        $order_payment_details = OrderPaymentDetail::where('order_id',$order->id)->get();
+        $order_payment_details = OrderPaymentDetail::with('payment','finance')->where('order_id',$order->id)->get();
 
         $data = [
 

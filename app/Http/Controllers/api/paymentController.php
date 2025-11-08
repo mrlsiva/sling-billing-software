@@ -22,7 +22,7 @@ class paymentController extends Controller
     {
         if(Auth::user()->role_id == 2)
         {
-            $shop_payments = ShopPayment::where('shop_id',Auth::user()->owner_id)->get();
+            $shop_payments = ShopPayment::with('payment')->where('shop_id',Auth::user()->owner_id)->get();
 
             return $this->successResponse($shop_payments, 200, 'Successfully returned all payments');
         }
