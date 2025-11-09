@@ -2,6 +2,7 @@
 
 @section('title')
 <title>{{ config('app.name')}} | Home</title>
+<link rel="stylesheet" href="{{asset('assets/css/landing-shop.css')}}">
 @endsection
 
 @section('body')
