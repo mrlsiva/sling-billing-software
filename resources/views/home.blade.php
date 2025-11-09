@@ -352,8 +352,13 @@
               <input type="tel" id="alternateMobile" name="alternateMobile" placeholder="Enter alternate mobile number">
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
+          
+          <div class="form-row address-logo-row">
+            <div class="form-group address-group">
+              <label for="address">Address</label>
+              <textarea id="address" name="address" placeholder="Enter your shop address" rows="5"></textarea>
+            </div>
+            <div class="form-group logo-group">
               <label for="shopLogo">Upload Shop Logo *</label>
               <div class="file-upload">
                 <input type="file" id="shopLogo" name="shopLogo" accept="image/*" required>
@@ -364,10 +369,6 @@
                   <span>Choose file to upload</span>
                 </div>
               </div>
-            </div>
-            <div class="form-group full-width">
-              <label for="address">Address</label>
-              <textarea id="address" name="address" placeholder="Enter your shop address" rows="3"></textarea>
             </div>
           </div>
    

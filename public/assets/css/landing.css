@@ -1307,7 +1307,7 @@ body {
 }
 
 .modal-header {
-    padding: var(--p-md);
+    padding: var(--p-lg) var(--p-xl);
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
@@ -1341,7 +1341,7 @@ body {
 }
 
 .modal-body {
-    padding: var(--p-md);
+    padding: var(--p-lg) var(--p-xl);
 }
 
 .shop-form {
@@ -1358,6 +1358,42 @@ body {
 
 .form-row .form-group.full-width {
     grid-column: 1 / -1;
+}
+
+/* Address and Logo Row Specific Layout */
+.address-logo-row {
+    grid-template-columns: 2fr 1fr;
+    align-items: stretch;
+}
+
+.address-group {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-group {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.address-group textarea {
+    min-height: 140px;
+    height: 140px;
+    resize: vertical;
+    flex: 1;
+}
+
+.logo-group .file-upload {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-group .file-upload-placeholder {
+    height: 140px;
+    flex: 1;
 }
 
 .form-group {
@@ -1493,6 +1529,15 @@ body {
     .form-row {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
+    }
+
+    .address-logo-row {
+        grid-template-columns: 1fr;
+    }
+
+    .address-group,
+    .logo-group {
+        grid-column: 1;
     }
 
     .form-actions {
