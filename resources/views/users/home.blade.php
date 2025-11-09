@@ -19,7 +19,7 @@
 
     <div class="container text-center my-5">
       <h1>Welcome to</h1>
-    <h2 class="display-4 fw-bold typing-loop" id="typingText">
+    <h2 class="fw-bold typing-loop" id="typingText">
         {{ $user->name }} 
     </h2>
 
