@@ -44,7 +44,7 @@ class purchaseOrderController extends Controller
     public function create(Request $request)
     {
         $vendors = Vendor::where('shop_id', Auth::user()->owner_id)->get();
-        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->parent_id],['is_active', 1]])->pluck('payment_id')->toArray();
+        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->owner_id],['is_active', 1]])->pluck('payment_id')->toArray();
         $payments = Payment::whereIn('id',$shop_payment_ids)->get();
         $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
         $taxes = Tax::where([['shop_id',Auth::user()->owner_id],['is_active',1]])->get();
@@ -103,18 +103,18 @@ class purchaseOrderController extends Controller
             \Log::info('Valid products data:', $validProducts);
             
             // Calculate total amount from valid products
-            $totalAmount = collect($validProducts)->sum('gross_cost');
+            // $totalAmount = collect($validProducts)->sum('gross_cost');
 
-            // Create the main purchase order
-            $purchase_order = PurchaseOrder::create([ 
-                'shop_id' => Auth::user()->owner_id,
-                'vendor_id' => $request->vendor,
-                'payment_id' => $request->payment,
-                'invoice_no' => $request->invoice,
-                'invoice_date' => $request->invoice_date,
-                'due_date' => $request->due_date,
-                'total_amount' => $totalAmount,
-            ]);
+            // // Create the main purchase order
+            // $purchase_order = PurchaseOrder::create([ 
+            //     'shop_id' => Auth::user()->owner_id,
+            //     'vendor_id' => $request->vendor,
+            //     'payment_id' => $request->payment,
+            //     'invoice_no' => $request->invoice,
+            //     'invoice_date' => $request->invoice_date,
+            //     'due_date' => $request->due_date,
+            //     'total_amount' => $totalAmount,
+            // ]);
 
             // Create purchase order items
             foreach ($validProducts as $productData) {
@@ -135,8 +135,7 @@ class purchaseOrderController extends Controller
                     $imeiData = trim($productData['imei']);
                 }
 
-                PurchaseOrderItem::create([
-                    'purchase_order_id' => $purchase_order->id,
+                PurchaseOrder::create([
                     'category_id' => $productData['category'],
                     'sub_category_id' => $productData['sub_category'],
                     'product_id' => $productData['product'],
