@@ -43,7 +43,7 @@ class purchaseOrderController extends Controller
     public function create(Request $request)
     {
         $vendors = Vendor::where('shop_id', Auth::user()->owner_id)->get();
-        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->parent_id],['is_active', 1]])->pluck('payment_id')->toArray();
+        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->owner_id],['is_active', 1]])->pluck('payment_id')->toArray();
         $payments = Payment::whereIn('id',$shop_payment_ids)->get();
         $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
         $taxes = Tax::where([['shop_id',Auth::user()->owner_id],['is_active',1]])->get();
@@ -61,112 +61,145 @@ class purchaseOrderController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'vendor' => 'required',
-            'category' => 'required',
-            'sub_category' => 'required',
-            'product' => 'required',
-            'unit' => 'required',
-            'quantity' => 'required',
-            'price_per_unit' => 'required',
-            'net_cost' => 'required',
-            'gross_cost' => 'required',
-        ], 
-        [
-            'vendor.required' => 'Vendor is required.',
-            'category.required' => 'Category is required.',
-            'sub_category.required' => 'Sub Category is required.',
-            'product.required' => 'Product is required.',
-            'unit.required' => 'Unit is required.',
-            'quantity.required' => 'Quantity is required.',
-            'price_per_unit.required' => 'Price Per Unit is required.',
-            'net_cost.required' => 'Net Cost is required.',
-            'gross_cost.required' => 'Gross Cost is required.',
-        ]);
+{
+    $request->validate([
+        'vendor' => 'required',
+        'invoice_date' => 'required|date',
+        'products' => 'required|array|min:1',
+        'products.*.category' => 'required',
+        'products.*.sub_category' => 'required',
+        'products.*.product' => 'required',
+        'products.*.unit' => 'required',
+        'products.*.quantity' => 'required|numeric|min:1',
+        'products.*.price_per_unit' => 'required|numeric|min:0.01',
+        'products.*.net_cost' => 'required|numeric',
+        'products.*.gross_cost' => 'required|numeric',
+    ], [
+        'vendor.required' => 'Vendor is required.',
+        'invoice_date.required' => 'Invoice date is required.',
+        'products.required' => 'At least one product is required.',
+        'products.min' => 'At least one product is required.',
+        'products.*.category.required' => 'Category is required for all products.',
+        'products.*.sub_category.required' => 'Sub Category is required for all products.',
+        'products.*.product.required' => 'Product is required for all products.',
+        'products.*.unit.required' => 'Unit is required for all products.',
+        'products.*.quantity.required' => 'Quantity is required for all products.',
+        'products.*.price_per_unit.required' => 'Price Per Unit is required for all products.',
+        'products.*.net_cost.required' => 'Net Cost is required for all products.',
+        'products.*.gross_cost.required' => 'Gross Cost is required for all products.',
+    ]);
 
+    DB::beginTransaction();
 
-        DB::beginTransaction();
+    try {
+        $vendor = Vendor::findOrFail($request->vendor);
+        $totalGross = 0;
 
-        $purchase_order = PurchaseOrder::create([ 
-            'shop_id' => Auth::user()->owner_id,
-            'vendor_id' => $request->vendor,
-            'payment_id' => $request->payment,
-            'invoice_no' => $request->invoice,
-            'invoice_date' => $request->invoice_date,
-            'due_date' => $request->due_date,
-            'vendor_id' => $request->vendor,
-            'category_id' => $request->category,
-            'sub_category_id' => $request->sub_category,
-            'product_id' => $request->product,
-            'imei' => $request->imei,
-            'metric_id' => $request->unit,
-            'quantity' => $request->quantity,
-            'price_per_unit' => $request->price_per_unit,
-            'tax' => $request->tax ?: 0,
-            'discount' => $request->discount,
-            'net_cost' => $request->net_cost,
-            'gross_cost' => $request->gross_cost,
-        ]);
+        foreach ($request->products as $item) {
+            return $item;
+            $purchaseOrder = PurchaseOrder::create([
+                'shop_id'        => Auth::user()->owner_id,
+                'vendor_id'      => $request->vendor,
+                'payment_id'     => $request->payment,
+                'invoice_no'     => $request->invoice,
+                'invoice_date'   => $request->invoice_date,
+                'due_date'       => $request->due_date,
+                'category_id'    => $item['category'],
+                'sub_category_id'=> $item['sub_category'],
+                'product_id'     => $item['product'],
+                'metric_id'      => $item['unit'],
+                'quantity'       => $item['quantity'],
+                'price_per_unit' => $item['price_per_unit'],
+                'tax'            => $item['tax'] ?? 0,
+                'discount'       => $item['discount'] ?? 0,
+                'net_cost'       => $item['net_cost'],
+                'gross_cost'     => $item['gross_cost'],
+                'status'         => 0, // pending
+            ]);
 
-        $product = Product::where('id',$request->product)->first();
-        $product->update(['quantity' => $product->quantity + $request->quantity]);
+            // Update Product quantity
+            $product = Product::find($item['product']);
+            $product->increment('quantity', $item['quantity']);
 
-        $stock = Stock::where([['shop_id',Auth::user()->owner_id],['branch_id',null],['category_id',$request->category],['sub_category_id',$request->sub_category],['product_id',$request->product]])->first();
+            // Update Stock for Shop
+            $stock = Stock::firstOrCreate(
+                [
+                    'shop_id'        => Auth::user()->owner_id,
+                    'branch_id'      => null,
+                    'category_id'    => $item['category'],
+                    'sub_category_id'=> $item['sub_category'],
+                    'product_id'     => $item['product']
+                ],
+                ['quantity' => 0]
+            );
 
-        $stock->update(['quantity' => $stock->quantity + $request->quantity]);
+            $stock->increment('quantity', $item['quantity']);
 
-        //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Purchase Order Created','App/Models/PurchaseOrder','purchase_orders',$purchase_order->id,'Insert',null,$request,'Success','Purchase Order Created');
+            // Handle IMEI Numbers
+            if (!empty($item['imei'])) {
+                $imeiNumbers = array_filter(explode(',', $item['imei']));
+                foreach ($imeiNumbers as $imei) {
+                    ProductImeiNumber::create([
+                        'purchase_order_id' => $purchaseOrder->id,
+                        'product_id'        => $item['product'],
+                        'name'              => trim($imei),
+                        'is_sold'           => 0,
+                    ]);
+                }
+            }
 
-        //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase_order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully',null, null,7);
+            $totalGross += $item['gross_cost'];
+
+            // Log and Notification per product row
+            $this->addToLog($this->unique(), Auth::user()->id, 'Purchase Order Created', 'App/Models/PurchaseOrder', 'purchase_orders', $purchaseOrder->id, 'Insert', null, json_encode($item), 'Success', 'Purchase Order Created');
+            $this->notification(Auth::user()->owner_id, null, 'App/Models/PurchaseOrder', $purchaseOrder->id, null, json_encode($item), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully', null, null, 7);
+        }
 
         // --- Handle prepaid balance ---
-        $vendor = Vendor::findOrFail($request->vendor);
         $prepaid = $vendor->prepaid_amount ?? 0;
-        $grossCost = $request->gross_cost;
 
         if ($prepaid > 0) {
             $allocatable = 0;
             $comment = '';
-            $status  = 0;
+            $status = 0;
 
-            if ($prepaid >= $grossCost) {
-                // Full payment from prepaid
-                $allocatable = $grossCost;
-                $vendor->update(['prepaid_amount' => $prepaid - $grossCost]);
+            if ($prepaid >= $totalGross) {
+                $allocatable = $totalGross;
+                $vendor->update(['prepaid_amount' => $prepaid - $totalGross]);
                 $comment = 'Fully paid using prepaid balance';
-                $status  = 1;
+                $status = 1;
             } else {
-                // Partial payment from prepaid
                 $allocatable = $prepaid;
                 $vendor->update(['prepaid_amount' => 0]);
                 $comment = 'Partially paid using prepaid balance';
-                $status  = 2;
+                $status = 2;
             }
 
-            // Record the payment detail
             VendorPaymentDetail::create([
                 'vendor_payment_id' => null,
-                'purchase_order_id' => $purchase_order->id,
+                'purchase_order_id' => $purchaseOrder->id, // last created order
                 'payment_id'        => 1,
                 'amount'            => $allocatable,
                 'paid_on'           => now(),
                 'comment'           => $comment,
             ]);
 
-            // Update purchase order status
-            $purchase_order->update(['status' => $status]);
-
+            // Update status for all orders in this invoice
+            PurchaseOrder::where('invoice_no', $request->invoice)
+                ->update(['status' => $status]);
         }
-
 
         DB::commit();
 
-        return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])->with('toast_success', 'Purchase order created successfully.');
-        
+        return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])
+            ->with('toast_success', 'Purchase order created successfully.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('toast_error', 'Error creating purchase order: '.$e->getMessage());
     }
+}
+
 
     public function update(Request $request)
     {

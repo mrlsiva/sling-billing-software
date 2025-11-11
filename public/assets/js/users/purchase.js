@@ -1,165 +1,177 @@
 jQuery(document).ready(function () {
-    jQuery('select[name="category"]').on('change', function () {
-        var category = jQuery(this).val();
-        if (category) {
-            jQuery.ajax({
-                url: '../../products/get_sub_category',
-                type: 'GET',
-                dataType: 'json',
-                data: { id: category },
-                success: function (data) {
-                    console.log(data);
+    let rowIndex = 0;
+    addProductRow(); // default first row
 
-                    jQuery('select[name="sub_category"]').empty();
-                    $('select[name="sub_category"]').append('<option value="">' + "Select" + '</option>');
-                    jQuery.each(data, function (key, value) {
-                        console.log(value.name)
-                        $('select[name="sub_category"]').append('<option value="' + value.id + '">' + value.name + '</option>');
-                    });
-
-                }
-            });
-        }
+    $('#addProductRow').click(function () {
+        addProductRow();
     });
-});
 
-jQuery(document).ready(function () {
-    jQuery('select[name="sub_category"]').on('change', function () {
-        var sub_category = jQuery(this).val();
-        var category = jQuery('#category').val();
-        jQuery.ajax({
-            url: 'get_product',
-            type: 'GET',
-            dataType: 'json',
-            data: { category: category, sub_category: sub_category },
-            success: function (data) {
-                console.log(data);
+    function addProductRow() {
+        const template = $('#productRowTemplate').html();
+        const newRow = $(template).clone();
 
-                jQuery('select[name="product"]').empty();
-                $('select[name="product"]').append('<option value="">' + "Select" + '</option>');
-                jQuery.each(data, function (key, value) {
-                    console.log(value.name)
-                    $('select[name="product"]').append('<option value="' + value.id + '">' + value.name + '</option>');
+        newRow.attr('data-row-index', rowIndex);
+        newRow.find('.product-number').text(rowIndex + 1);
+
+        // Update input names and ids
+        newRow.find('select, input, label').each(function () {
+            const name = $(this).attr('name');
+            const id = $(this).attr('id');
+            const forAttr = $(this).attr('for');
+            if (name) $(this).attr('name', name.replace('[0]', '[' + rowIndex + ']'));
+            if (id) $(this).attr('id', id.replace('[0]', '[' + rowIndex + ']'));
+            if (forAttr) $(this).attr('for', forAttr.replace('[0]', '[' + rowIndex + ']'));
+        });
+
+        $('#productsContainer').append(newRow);
+
+        // Default values
+        newRow.find('.quantity-input').val(1);
+        newRow.find('.tax-input').val('0');
+        newRow.find('.net-cost-input').val('');
+        newRow.find('.gross-cost-input').val('');
+
+        bindRowEvents(newRow);
+        calculateRowCosts(newRow);
+        rowIndex++;
+        updateRemoveButtons();
+    }
+
+    function bindRowEvents(row) {
+        row.find('.category-select').on('change', function () {
+            const category = $(this).val();
+            const subCategorySelect = row.find('.sub-category-select');
+            const productSelect = row.find('.product-select');
+            subCategorySelect.empty().append('<option value=""> Select </option>');
+            productSelect.empty().append('<option value=""> Select </option>');
+            if (category) {
+                $.ajax({
+                    url: '../../products/get_sub_category',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { id: category },
+                    success: function (data) {
+                        $.each(data, function (key, value) {
+                            subCategorySelect.append('<option value="' + value.id + '">' + value.name + '</option>');
+                        });
+                    }
                 });
-
             }
         });
-    });
-});
 
-jQuery(document).ready(function ()
-{
-	jQuery('select[name="product"]').on('change',function(){
-		var product = jQuery(this).val();
-			jQuery.ajax({
-				url : 'get_product_detail',
-				type: 'GET',
-				dataType: 'json',
-				data: { product: product },
-				success:function(data)
-				{
-					console.log(data);
-					document.getElementById("unit").value = data.metric.id;
-					// show metric name next to label
-                	jQuery("#metric_name").text("(" + data.metric.name + ")");
-                }
-			});
-	});
-});
+        row.find('.sub-category-select').on('change', function () {
+            const subCategory = $(this).val();
+            const category = row.find('.category-select').val();
+            const productSelect = row.find('.product-select');
+            productSelect.empty().append('<option value=""> Select </option>');
+            if (category && subCategory) {
+                $.ajax({
+                    url: 'get_product',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { category: category, sub_category: subCategory },
+                    success: function (data) {
+                        $.each(data, function (key, value) {
+                            productSelect.append('<option value="' + value.id + '">' + value.name + '</option>');
+                        });
+                    }
+                });
+            }
+        });
 
-const invoiceDate = document.getElementById("invoice_date");
-const dueDate = document.getElementById("due_date");
+        row.find('.product-select').on('change', function () {
+            const product = $(this).val();
+            const unitInput = row.find('.unit-input');
+            const metricDisplay = row.find('.metric-display');
+            if (product) {
+                $.ajax({
+                    url: 'get_product_detail',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { product: product },
+                    success: function (data) {
+                        unitInput.val(data.metric.id);
+                        metricDisplay.text("(" + data.metric.name + ")");
+                        if (data.price) {
+                            row.find('.price-input').val(parseFloat(data.price).toFixed(2));
+                        }
+                        row.find('.quantity-input').val(1);
+                        const firstNonZeroTax = row.find('.tax-input option').not('[value="0"]').first().val() || "0";
+                        row.find('.tax-input').val(firstNonZeroTax);
+                        calculateRowCosts(row);
+                    }
+                });
+            }
+        });
 
-invoiceDate.addEventListener("change", function () {
-    dueDate.min = this.value; // block earlier dates
-    if (dueDate.value < this.value) {
-        dueDate.value = this.value; // auto-correct if invalid
+        row.find('.quantity-input, .price-input, .tax-input, .discount-input').on('input', function () {
+            calculateRowCosts(row);
+        });
+
+        row.find('.remove-product-row').on('click', function () {
+            row.remove();
+            updateProductNumbers();
+            updateRemoveButtons();
+            updateTotalSummary();
+        });
+    }
+
+    function calculateRowCosts(row) {
+        const quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+        const price = parseFloat(row.find('.price-input').val()) || 0;
+        const tax = parseFloat(row.find('.tax-input').val()) || 0;
+        const discount = parseFloat(row.find('.discount-input').val()) || 0;
+        let netCost = quantity * price;
+        let grossCost = netCost * (1 + tax / 100) - discount;
+        if (grossCost < 0) grossCost = 0;
+        row.find('.net-cost-input').val(netCost.toFixed(2));
+        row.find('.gross-cost-input').val(grossCost.toFixed(2));
+        updateTotalSummary();
+    }
+
+    function updateTotalSummary() {
+        let totalNet = 0, totalTax = 0, totalDiscount = 0, grandTotal = 0;
+        $('.product-row').each(function () {
+            const row = $(this);
+            const quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+            const price = parseFloat(row.find('.price-input').val()) || 0;
+            const tax = parseFloat(row.find('.tax-input').val()) || 0;
+            const discount = parseFloat(row.find('.discount-input').val()) || 0;
+            const netCost = quantity * price;
+            totalNet += netCost;
+            totalTax += (netCost * tax / 100);
+            totalDiscount += discount;
+            grandTotal += (netCost * (1 + tax / 100) - discount);
+        });
+        $('#totalNetCost').text(totalNet.toFixed(2));
+        $('#totalTax').text(totalTax.toFixed(2));
+        $('#totalDiscount').text(totalDiscount.toFixed(2));
+        $('#grandTotal').text(grandTotal.toFixed(2));
+    }
+
+    function updateProductNumbers() {
+        $('.product-row').each(function (i) {
+            $(this).find('.product-number').text(i + 1);
+        });
+    }
+
+    function updateRemoveButtons() {
+        const count = $('.product-row').length;
+        $('.remove-product-row').prop('disabled', count <= 1);
+    }
+
+    // Ensure due date >= invoice date
+    const invoiceDate = document.getElementById("invoice_date");
+    const dueDate = document.getElementById("due_date");
+    if (invoiceDate && dueDate) {
+        invoiceDate.addEventListener("change", function () {
+            dueDate.min = this.value;
+            if (dueDate.value < this.value) {
+                dueDate.value = this.value;
+            }
+        });
     }
 });
-
-
-function calculateCosts() {
-    let qtyInput = document.getElementById("quantity");
-    let priceInput = document.getElementById("price_per_unit");
-    let taxInput = document.getElementById("tax");
-    let discountInput = document.getElementById("discount");
-
-    let netInput = document.getElementById("net_cost");
-    let grossInput = document.getElementById("gross_cost");
-
-    let quantity = parseFloat(qtyInput.value);
-    let price = parseFloat(priceInput.value);
-    let tax = taxInput.value === "" ? 0 : parseFloat(taxInput.value);
-    let discount = discountInput.value === "" ? 0 : parseFloat(discountInput.value);
-
-    // Reset error messages
-    document.getElementById("quantity_error")?.classList.add("d-none");
-    document.getElementById("price_error")?.classList.add("d-none");
-    document.getElementById("tax_error")?.classList.add("d-none");
-
-    let valid = true;
-
-    // ✅ Quantity validation
-    if (quantity <= 0 || isNaN(quantity)) {
-        qtyInput.value = "";
-        document.getElementById("quantity_error")?.classList.remove("d-none");
-        valid = false;
-    }
-
-    // ✅ Price validation
-    if (price <= 0 || isNaN(price)) {
-        priceInput.value = "";
-        document.getElementById("price_error")?.classList.remove("d-none");
-        valid = false;
-    }
-
-    // ✅ Tax validation
-    if (tax < 0 || isNaN(tax)) {
-        taxInput.value = "";
-        document.getElementById("tax_error")?.classList.remove("d-none");
-        tax = 0;
-    }
-
-    // ✅ Discount validation (cannot be negative)
-    if (discount < 0 || isNaN(discount)) {
-        discountInput.value = "";
-        discount = 0;
-    }
-
-    // Stop if qty or price invalid
-    if (!valid) {
-        netInput.value = "";
-        grossInput.value = "";
-        return;
-    }
-
-    // ✅ Calculation
-    let netCost = quantity * price;
-    let grossCost = 0;
-    if(tax != 0)
-    {
-        grossCost = netCost * (1 + (tax / 100));
-        //console.log(grossCost);
-    }
-    else
-    {
-        grossCost = netCost;
-    }
-
-    // Apply discount (absolute amount, not %)
-    grossCost = grossCost - discount;
-    if (grossCost < 0) grossCost = 0; // prevent negative total
-
-    netInput.value = netCost.toFixed(2);
-    grossInput.value = grossCost.toFixed(2);
-}
-
-// ✅ Attach listeners
-["quantity", "price_per_unit", "tax", "discount"].forEach(id => {
-    document.getElementById(id).addEventListener("input", calculateCosts);
-});
-
-
 
 function purchase_detail(id) {
     $.ajax({
@@ -178,7 +190,3 @@ function purchase_detail(id) {
         }
     });
 }
-
-
-
-
