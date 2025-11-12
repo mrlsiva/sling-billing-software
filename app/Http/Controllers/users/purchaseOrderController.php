@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\VendorPaymentDetail;
 use App\Models\PurchaseOrderDetail;
 use App\Models\PurchaseOrderRefund;
+use App\Models\ProductImeiNumber;
 use App\Models\PurchaseOrder;
 use App\Models\ShopPayment;
 use App\Models\Category;
@@ -61,144 +62,149 @@ class purchaseOrderController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'vendor' => 'required',
-        'invoice_date' => 'required|date',
-        'products' => 'required|array|min:1',
-        'products.*.category' => 'required',
-        'products.*.sub_category' => 'required',
-        'products.*.product' => 'required',
-        'products.*.unit' => 'required',
-        'products.*.quantity' => 'required|numeric|min:1',
-        'products.*.price_per_unit' => 'required|numeric|min:0.01',
-        'products.*.net_cost' => 'required|numeric',
-        'products.*.gross_cost' => 'required|numeric',
-    ], [
-        'vendor.required' => 'Vendor is required.',
-        'invoice_date.required' => 'Invoice date is required.',
-        'products.required' => 'At least one product is required.',
-        'products.min' => 'At least one product is required.',
-        'products.*.category.required' => 'Category is required for all products.',
-        'products.*.sub_category.required' => 'Sub Category is required for all products.',
-        'products.*.product.required' => 'Product is required for all products.',
-        'products.*.unit.required' => 'Unit is required for all products.',
-        'products.*.quantity.required' => 'Quantity is required for all products.',
-        'products.*.price_per_unit.required' => 'Price Per Unit is required for all products.',
-        'products.*.net_cost.required' => 'Net Cost is required for all products.',
-        'products.*.gross_cost.required' => 'Gross Cost is required for all products.',
-    ]);
+    {
+        $request->validate([
+            'vendor' => 'required',
+            'invoice_date' => 'required|date',
+            'products' => 'required|array|min:1',
+            'products.*.category' => 'required',
+            'products.*.sub_category' => 'required',
+            'products.*.product' => 'required',
+            'products.*.unit' => 'required',
+            'products.*.quantity' => 'required|numeric|min:1',
+            'products.*.price_per_unit' => 'required|numeric|min:0.01',
+            'products.*.net_cost' => 'required|numeric',
+            'products.*.gross_cost' => 'required|numeric',
+        ], [
+            'vendor.required' => 'Vendor is required.',
+            'invoice_date.required' => 'Invoice date is required.',
+            'products.required' => 'At least one product is required.',
+            'products.min' => 'At least one product is required.',
+            'products.*.category.required' => 'Category is required for all products.',
+            'products.*.sub_category.required' => 'Sub Category is required for all products.',
+            'products.*.product.required' => 'Product is required for all products.',
+            'products.*.unit.required' => 'Unit is required for all products.',
+            'products.*.quantity.required' => 'Quantity is required for all products.',
+            'products.*.price_per_unit.required' => 'Price Per Unit is required for all products.',
+            'products.*.net_cost.required' => 'Net Cost is required for all products.',
+            'products.*.gross_cost.required' => 'Gross Cost is required for all products.',
+        ]);
 
-    DB::beginTransaction();
+        DB::beginTransaction();
 
-    try {
-        $vendor = Vendor::findOrFail($request->vendor);
-        $totalGross = 0;
+        try {
+            $vendor = Vendor::findOrFail($request->vendor);
+            $totalGross = 0;
 
-        foreach ($request->products as $item) {
-            return $item;
-            $purchaseOrder = PurchaseOrder::create([
-                'shop_id'        => Auth::user()->owner_id,
-                'vendor_id'      => $request->vendor,
-                'payment_id'     => $request->payment,
-                'invoice_no'     => $request->invoice,
-                'invoice_date'   => $request->invoice_date,
-                'due_date'       => $request->due_date,
-                'category_id'    => $item['category'],
-                'sub_category_id'=> $item['sub_category'],
-                'product_id'     => $item['product'],
-                'metric_id'      => $item['unit'],
-                'quantity'       => $item['quantity'],
-                'price_per_unit' => $item['price_per_unit'],
-                'tax'            => $item['tax'] ?? 0,
-                'discount'       => $item['discount'] ?? 0,
-                'net_cost'       => $item['net_cost'],
-                'gross_cost'     => $item['gross_cost'],
-                'status'         => 0, // pending
-            ]);
-
-            // Update Product quantity
-            $product = Product::find($item['product']);
-            $product->increment('quantity', $item['quantity']);
-
-            // Update Stock for Shop
-            $stock = Stock::firstOrCreate(
-                [
+            foreach ($request->products as $item) {
+                //return $item;
+                $purchaseOrder = PurchaseOrder::create([
                     'shop_id'        => Auth::user()->owner_id,
-                    'branch_id'      => null,
+                    'vendor_id'      => $request->vendor,
+                    'payment_id'     => $request->payment,
+                    'invoice_no'     => $request->invoice,
+                    'invoice_date'   => $request->invoice_date,
+                    'due_date'       => $request->due_date,
                     'category_id'    => $item['category'],
                     'sub_category_id'=> $item['sub_category'],
-                    'product_id'     => $item['product']
-                ],
-                ['quantity' => 0]
-            );
+                    'product_id'     => $item['product'],
+                    'metric_id'      => $item['unit'],
+                    'quantity'       => $item['quantity'],
+                    'price_per_unit' => $item['price_per_unit'],
+                    'tax'            => $item['tax'] ?? 0,
+                    'discount'       => $item['discount'] ?? 0,
+                    'net_cost'       => $item['net_cost'],
+                    'gross_cost'     => $item['gross_cost'],
+                    'status'         => 0, // pending
+                ]);
 
-            $stock->increment('quantity', $item['quantity']);
+                // Update Product quantity
+                $product = Product::find($item['product']);
+                $product->increment('quantity', $item['quantity']);
 
-            // Handle IMEI Numbers
-            if (!empty($item['imei'])) {
-                $imeiNumbers = array_filter(explode(',', $item['imei']));
-                foreach ($imeiNumbers as $imei) {
-                    ProductImeiNumber::create([
-                        'purchase_order_id' => $purchaseOrder->id,
-                        'product_id'        => $item['product'],
-                        'name'              => trim($imei),
-                        'is_sold'           => 0,
-                    ]);
+                // Update Stock for Shop
+                $stock = Stock::firstOrCreate(
+                    [
+                        'shop_id'        => Auth::user()->owner_id,
+                        'branch_id'      => null,
+                        'category_id'    => $item['category'],
+                        'sub_category_id'=> $item['sub_category'],
+                        'product_id'     => $item['product']
+                    ],
+                    ['quantity' => 0]
+                );
+
+                $stock->increment('quantity', $item['quantity']);
+
+                // Handle IMEI Numbers
+                if (!empty($item['imei'])) {
+                    // Normalize IMEI input: accept both array and comma-separated string
+                    $imeiList = is_array($item['imei']) ? $item['imei'] : explode(',', $item['imei']);
+
+                    $imeiNumbers = array_filter(array_map('trim', $imeiList));
+
+                    foreach ($imeiNumbers as $imei) {
+                        ProductImeiNumber::create([
+                            'purchase_order_id' => $purchaseOrder->id,
+                            'product_id'        => $item['product'],
+                            'name'              => $imei,
+                            'is_sold'           => 0,
+                        ]);
+                    }
                 }
+
+
+                $totalGross += $item['gross_cost'];
+
+                // Log and Notification per product row
+                $this->addToLog($this->unique(), Auth::user()->id, 'Purchase Order Created', 'App/Models/PurchaseOrder', 'purchase_orders', $purchaseOrder->id, 'Insert', null, json_encode($item), 'Success', 'Purchase Order Created');
+                $this->notification(Auth::user()->owner_id, null, 'App/Models/PurchaseOrder', $purchaseOrder->id, null, json_encode($item), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully', null, null, 7);
             }
 
-            $totalGross += $item['gross_cost'];
+            // --- Handle prepaid balance ---
+            $prepaid = $vendor->prepaid_amount ?? 0;
 
-            // Log and Notification per product row
-            $this->addToLog($this->unique(), Auth::user()->id, 'Purchase Order Created', 'App/Models/PurchaseOrder', 'purchase_orders', $purchaseOrder->id, 'Insert', null, json_encode($item), 'Success', 'Purchase Order Created');
-            $this->notification(Auth::user()->owner_id, null, 'App/Models/PurchaseOrder', $purchaseOrder->id, null, json_encode($item), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully', null, null, 7);
-        }
+            if ($prepaid > 0) {
+                $allocatable = 0;
+                $comment = '';
+                $status = 0;
 
-        // --- Handle prepaid balance ---
-        $prepaid = $vendor->prepaid_amount ?? 0;
+                if ($prepaid >= $totalGross) {
+                    $allocatable = $totalGross;
+                    $vendor->update(['prepaid_amount' => $prepaid - $totalGross]);
+                    $comment = 'Fully paid using prepaid balance';
+                    $status = 1;
+                } else {
+                    $allocatable = $prepaid;
+                    $vendor->update(['prepaid_amount' => 0]);
+                    $comment = 'Partially paid using prepaid balance';
+                    $status = 2;
+                }
 
-        if ($prepaid > 0) {
-            $allocatable = 0;
-            $comment = '';
-            $status = 0;
+                VendorPaymentDetail::create([
+                    'vendor_payment_id' => null,
+                    'purchase_order_id' => $purchaseOrder->id, // last created order
+                    'payment_id'        => 1,
+                    'amount'            => $allocatable,
+                    'paid_on'           => now(),
+                    'comment'           => $comment,
+                ]);
 
-            if ($prepaid >= $totalGross) {
-                $allocatable = $totalGross;
-                $vendor->update(['prepaid_amount' => $prepaid - $totalGross]);
-                $comment = 'Fully paid using prepaid balance';
-                $status = 1;
-            } else {
-                $allocatable = $prepaid;
-                $vendor->update(['prepaid_amount' => 0]);
-                $comment = 'Partially paid using prepaid balance';
-                $status = 2;
+                // Update status for all orders in this invoice
+                PurchaseOrder::where('invoice_no', $request->invoice)
+                    ->update(['status' => $status]);
             }
 
-            VendorPaymentDetail::create([
-                'vendor_payment_id' => null,
-                'purchase_order_id' => $purchaseOrder->id, // last created order
-                'payment_id'        => 1,
-                'amount'            => $allocatable,
-                'paid_on'           => now(),
-                'comment'           => $comment,
-            ]);
+            DB::commit();
 
-            // Update status for all orders in this invoice
-            PurchaseOrder::where('invoice_no', $request->invoice)
-                ->update(['status' => $status]);
+            return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])
+                ->with('toast_success', 'Purchase order created successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('toast_error', 'Error creating purchase order: '.$e->getMessage());
         }
-
-        DB::commit();
-
-        return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])
-            ->with('toast_success', 'Purchase order created successfully.');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('toast_error', 'Error creating purchase order: '.$e->getMessage());
     }
-}
 
 
     public function update(Request $request)

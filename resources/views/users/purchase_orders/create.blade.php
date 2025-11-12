@@ -30,7 +30,7 @@
                             <h5 class="text-primary">Purchase Order Details</h5>
                         </div>
                         
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label text-muted">Vendor <span class="text-danger">*</span></label>
                                 <select class="form-control" name="vendor" id="vendor" required="">
@@ -42,28 +42,28 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Invoice No</label>
                                 <input type="text" name="invoice" id="invoice" value="{{old('invoice')}}" class="form-control" placeholder="Enter Invoice No">
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Invoice Date <span class="text-danger">*</span></label>
                                 <input type="date" name="invoice_date" id="invoice_date" value="{{old('invoice_date')}}" class="form-control" required="">
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Due Date</label>
                                 <input type="date" name="due_date" id="due_date" value="{{old('due_date')}}" class="form-control">
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label">Payment Method</label>
                                 <select class="form-control" name="payment" id="payment">
@@ -73,7 +73,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- Products Section -->
@@ -226,6 +226,19 @@
                     <input type="number" name="products[0][gross_cost]" class="form-control gross-cost-input" readonly>
                 </div>
             </div>
+
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <input type="checkbox" class="form-check-input me-2 enable-imei-checkbox" id="enableImei[0]">
+                        <label class="form-check-label" for="enableImei[0]">Enable IMEI Numbers</label>
+                    </div>
+                    <div class="imei-container row" style="display: none;">
+                        <!-- IMEI inputs will be generated here based on quantity -->
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
