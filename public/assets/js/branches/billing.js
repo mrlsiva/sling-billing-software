@@ -1154,7 +1154,8 @@ function openImeiModal(productId) {
         '234567890123456',
         '345678901234567',
         '456789012345678',
-        '567890123456789'
+        '567890123456789',
+        '999999999999999'
     ];
 
     $('#imeiModalProductId').val(productId);
@@ -1166,15 +1167,20 @@ function openImeiModal(productId) {
 
     let imeiHtml = `
         <div class="mb-3">
-            <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="selectAllImei()">Select All</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllImei()">Clear All</button>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="ri-search-line"></i>
+                </span>
+                <input type="text" class="form-control" id="imeiSearchBox" placeholder="Search IMEI numbers..." onkeyup="filterImeiList()">
+            </div>
         </div>
+        <div id="imeiCheckboxContainer">
     `;
 
     imeiNumbers.forEach((imei, index) => {
         const isChecked = currentImeis.includes(imei) ? 'checked' : '';
         imeiHtml += `
-            <div class="form-check mb-2">
+            <div class="form-check mb-2 imei-item" data-imei="${imei}">
                 <input class="form-check-input imei-checkbox" type="checkbox" name="selectedImei" value="${imei}" id="imei_${index}" ${isChecked}>
                 <label class="form-check-label" for="imei_${index}">
                     ${imei}
@@ -1183,11 +1189,11 @@ function openImeiModal(productId) {
         `;
     });
 
+    imeiHtml += '</div>';
+
     $('#imeiList').html(imeiHtml);
     $('#imeiModal').modal('show');
-}
-
-function selectImei() {
+} function selectImei() {
     const selectedImeis = [];
     $('input[name="selectedImei"]:checked').each(function () {
         selectedImeis.push($(this).val());
@@ -1214,13 +1220,42 @@ function selectImei() {
     showToast('success', `${selectedImeis.length} IMEI(s) selected successfully`);
 }
 
-// Helper functions for select all/clear all
-function selectAllImei() {
-    $('.imei-checkbox').prop('checked', true);
+// Helper functions for IMEI management
+function filterImeiList() {
+    const searchTerm = $('#imeiSearchBox').val().trim();
+
+    if (searchTerm === '') {
+        $('.imei-item').show();
+        return;
+    }
+
+    // Check if search term contains only numbers
+    const isNumericSearch = /^\d+$/.test(searchTerm);
+
+    $('.imei-item').each(function () {
+        const imeiNumber = $(this).attr('data-imei');
+        let shouldShow = false;
+
+        if (isNumericSearch) {
+            // For numeric search, check if IMEI contains the sequence of numbers
+            shouldShow = imeiNumber.includes(searchTerm);
+        } else {
+            // For text search, do case-insensitive matching
+            shouldShow = imeiNumber.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+
+        if (shouldShow) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
 }
 
 function clearAllImei() {
     $('.imei-checkbox').prop('checked', false);
+    $('#imeiSearchBox').val('');
+    $('.imei-item').show();
 }
 
 // Show toast notification
@@ -1266,6 +1301,7 @@ $(document).ready(function () {
                         <input type="hidden" id="imeiModalProductId" value="">
                     </div>
                     <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" onclick="clearAllImei()">Clear All</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-primary" onclick="selectImei()">Select IMEIs</button>
                     </div>
