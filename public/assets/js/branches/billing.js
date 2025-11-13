@@ -132,7 +132,7 @@ $(document).ready(function () {
         loadProducts(currentPage);
     });
 
-    jQuery('input[name="product"]').on('input', function() {
+    jQuery('input[name="product"]').on('input', function () {
         currentPage = 1;
         loadProducts(currentPage);
     });
@@ -152,8 +152,7 @@ $(document).ready(function () {
 // Add product to cart or increase quantity
 function add_to_cart(element) {
     var system_id = $(element).data("system_id");
-    if(!system_id)
-    {
+    if (!system_id) {
         system_id = element;
     }
 
@@ -215,8 +214,12 @@ function add_to_cart(element) {
                         <div class="d-flex align-items-center justify-content-between px-1">
                             <div>
                                 <p class="text-dark fw-semibold fs-16 mb-0">₹${data.price} <span class="fs-10">(${data.tax.name}%)</span></p>
+                                <p class="fs-10 text-muted mb-0 imei-selected" style="display: none;">IMEI: <span class="selected-imei"></span></p>
                             </div>
                             <div class="d-flex align-content-center gap-1">
+                                <a href="#!" class="btn btn-soft-info avatar-xs rounded d-flex align-items-center justify-content-center imei-btn" onclick="openImeiModal(${data.id})">
+                                    <i class="ri-barcode-line align-middle fs-12"></i>
+                                </a>
                                 <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center remove-item">
                                     <i class="ri-delete-bin-5-line align-middle fs-12"></i>
                                 </a>
@@ -548,7 +551,7 @@ $(document).ready(function () {
         let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
-            $("#cash_amount").val(payable-received);
+            $("#cash_amount").val(payable - received);
         } else {
             $("#cash_amount").val(""); // clear if unchecked
         }
@@ -573,7 +576,7 @@ $(document).ready(function () {
         let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
-            $("#card_amount").val(payable-received);
+            $("#card_amount").val(payable - received);
         } else {
             $("#card_amount").val(""); // clear if unchecked
         }
@@ -598,7 +601,7 @@ $(document).ready(function () {
         let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
-            $("#finance_amount").val(payable-received);
+            $("#finance_amount").val(payable - received);
         } else {
             $("#finance_amount").val(""); // clear if unchecked
         }
@@ -623,7 +626,7 @@ $(document).ready(function () {
         let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
-            $("#exchange_amount").val(payable-received);
+            $("#exchange_amount").val(payable - received);
         } else {
             $("#exchange_amount").val(""); // clear if unchecked
         }
@@ -648,7 +651,7 @@ $(document).ready(function () {
         let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
-            $("#cheque_amount").val(payable-received);
+            $("#cheque_amount").val(payable - received);
         } else {
             $("#cheque_amount").val(""); // clear if unchecked
         }
@@ -673,7 +676,7 @@ $(document).ready(function () {
         let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
-            $("#credit_amount").val(payable-received);
+            $("#credit_amount").val(payable - received);
         } else {
             $("#credit_amount").val(""); // clear if unchecked
         }
@@ -698,7 +701,7 @@ $(document).ready(function () {
         let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
 
         if ($(this).is(":checked")) {
-            $("#upi_amount").val(payable-received);
+            $("#upi_amount").val(payable - received);
         } else {
             $("#upi_amount").val(""); // clear if unchecked
         }
@@ -716,8 +719,7 @@ function appendPaymentRow(method, amount, extraData = {}) {
     console.log(received);
     console.log(amount);
     console.log("Total after adding:", received + amt);
-    if ((received + amt) > payable) 
-    {
+    if ((received + amt) > payable) {
         alert("Received amount cant be greater than payable amount.");
         return;
     }
@@ -1043,12 +1045,14 @@ function submit() {
         let qty = parseInt($(this).find('.qty-input').val());
         let price = parseFloat($(this).data('price'));
         let tax_amount = parseFloat($(this).data('tax_amount'));
+        let imeis = $(this).attr('data-imei') ? $(this).attr('data-imei').split(',') : [];
 
         cartData.push({
             product_id: $(this).data('product-id'),
             qty: qty,
             price: price,
-            tax_amount: tax_amount
+            tax_amount: tax_amount,
+            imeis: imeis
         });
     });
 
@@ -1097,13 +1101,11 @@ function submit() {
         success: function (data) {
             console.log("Order stored:", data);
 
-            if(data.status == 'success')
-            {
+            if (data.status == 'success') {
                 window.open(data.order_id + '/get_bill', '_blank');
                 location.reload();
             }
-            else
-            {
+            else {
                 alert(data.message);
             }
 
@@ -1118,7 +1120,7 @@ function submit() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     let input = document.getElementById("scanner-input");
 
     // Keep focus on hidden field only if user isn't typing somewhere else
@@ -1128,7 +1130,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    input.addEventListener("change", function() {
+    input.addEventListener("change", function () {
         let productId = this.value.trim();
 
         if (productId) {
@@ -1142,6 +1144,140 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Initial focus
     refocus();
+});
+
+// IMEI selection functionality
+function openImeiModal(productId) {
+    // Sample IMEI numbers (in production this would come from the server)
+    const imeiNumbers = [
+        '123456789012345',
+        '234567890123456',
+        '345678901234567',
+        '456789012345678',
+        '567890123456789'
+    ];
+
+    $('#imeiModalProductId').val(productId);
+    $('#imeiModalTitle').text('Select IMEI Numbers for Product #' + productId);
+
+    // Get currently selected IMEIs for this product
+    const cartItem = $(`[data-product-id="${productId}"]`);
+    const currentImeis = cartItem.attr('data-imei') ? cartItem.attr('data-imei').split(',') : [];
+
+    let imeiHtml = `
+        <div class="mb-3">
+            <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="selectAllImei()">Select All</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllImei()">Clear All</button>
+        </div>
+    `;
+
+    imeiNumbers.forEach((imei, index) => {
+        const isChecked = currentImeis.includes(imei) ? 'checked' : '';
+        imeiHtml += `
+            <div class="form-check mb-2">
+                <input class="form-check-input imei-checkbox" type="checkbox" name="selectedImei" value="${imei}" id="imei_${index}" ${isChecked}>
+                <label class="form-check-label" for="imei_${index}">
+                    ${imei}
+                </label>
+            </div>
+        `;
+    });
+
+    $('#imeiList').html(imeiHtml);
+    $('#imeiModal').modal('show');
+}
+
+function selectImei() {
+    const selectedImeis = [];
+    $('input[name="selectedImei"]:checked').each(function () {
+        selectedImeis.push($(this).val());
+    });
+
+    const productId = $('#imeiModalProductId').val();
+
+    if (selectedImeis.length === 0) {
+        showToast('error', 'Please select at least one IMEI number');
+        return;
+    }
+
+    // Find the cart item and update it with selected IMEIs
+    const cartItem = $(`[data-product-id="${productId}"]`);
+    const imeiText = selectedImeis.length > 1 ?
+        `${selectedImeis.length} IMEIs selected` :
+        `IMEI: ${selectedImeis[0]}`;
+
+    cartItem.find('.selected-imei').text(imeiText);
+    cartItem.find('.imei-selected').show();
+    cartItem.attr('data-imei', selectedImeis.join(','));
+
+    $('#imeiModal').modal('hide');
+    showToast('success', `${selectedImeis.length} IMEI(s) selected successfully`);
+}
+
+// Helper functions for select all/clear all
+function selectAllImei() {
+    $('.imei-checkbox').prop('checked', true);
+}
+
+function clearAllImei() {
+    $('.imei-checkbox').prop('checked', false);
+}
+
+// Show toast notification
+function showToast(type, message) {
+    const toastHtml = `
+        <div class="toast align-items-center text-white border-0 ${type === 'success' ? 'bg-success' : 'bg-danger'}" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+
+    $('body').append(toastHtml);
+    $('.toast').toast('show');
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        $('.toast').remove();
+    }, 3000);
+}
+
+// Add this HTML for the IMEI modal at the end of the page
+$(document).ready(function () {
+    const imeiModalHtml = `
+        <!-- IMEI Selection Modal -->
+        <div class="modal fade" id="imeiModal" tabindex="-1" aria-labelledby="imeiModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="imeiModalTitle">Select IMEI Numbers</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Available IMEI Numbers:</label>
+                            <div id="imeiList">
+                                <!-- IMEI checkboxes will be populated here -->
+                            </div>
+                        </div>
+                        <input type="hidden" id="imeiModalProductId" value="">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="selectImei()">Select IMEIs</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Append the modal to body if it doesn't exist
+    if ($('#imeiModal').length === 0) {
+        $('body').append(imeiModalHtml);
+    }
 });
 
 
