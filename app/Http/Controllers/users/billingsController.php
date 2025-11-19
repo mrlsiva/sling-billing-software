@@ -19,6 +19,7 @@ use App\Models\Finance;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPaymentDetail;
+use App\Models\ProductImeiNumber;
 use App\Models\ShopPayment;
 use App\Models\PosSetting;
 use Illuminate\Support\Str;
@@ -241,11 +242,38 @@ class billingsController extends Controller
                 'tax_percent'   => $product->tax->name,
                 'discount_type' => $product->discount_type,
                 'discount'      => $product->discount,
+                'imei'          => isset($item['imeis']) ? implode(',', $item['imeis']) : null,
             ]);
 
             $stock = Stock::where([['shop_id',$user->id],['branch_id',null],['product_id',$item['product_id']]])->first();
 
-            $stock->update(['quantity' => $stock->quantity - $item['qty'] ]);
+            // Reduce Quantity
+            $stock->quantity = $stock->quantity - $item['qty'];
+
+            // Remove sold IMEI numbers from stock
+            if (!empty($item['imeis'])) {
+
+                // Convert comma-separated IMEI string to array
+                $existingImeis = !empty($stock->imei) ? explode(',', $stock->imei) : [];
+
+                // Remove sold IMEIs
+                $remainingImeis = array_values(array_diff($existingImeis, $item['imeis']));
+
+                // Convert back to comma-separated string
+                $stock->imei = implode(',', $remainingImeis);
+            }
+
+
+            $stock->save();
+
+            if (!empty($item['imeis'])) {
+                ProductImeiNumber::where('product_id', $item['product_id'])
+                    ->whereIn('name', $item['imeis'])
+                    ->update(['is_sold' => 1]);
+            }
+
+
+            //$stock->update(['quantity' => $stock->quantity - $item['qty'] ]);
 
         }
 
@@ -304,6 +332,16 @@ class billingsController extends Controller
 
         $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();
         return view('bills.view_bill',compact('user','order','order_details','order_payment_details'));
+    }
+
+    public function get_imei_product(Request $request)
+    {
+        $stock = Stock::where([
+            ['product_id', $request->product],
+            ['shop_id', Auth::user()->owner_id]])->first();
+
+
+        return explode(',', $stock->imei);
     }
     
 }

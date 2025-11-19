@@ -320,11 +320,33 @@ class billingController extends Controller
                 'imei'          => isset($item['imeis']) ? implode(',', $item['imeis']) : null,
             ]);
 
-            $stock = Stock::where([['shop_id',$user->parent_id],['branch_id',Auth::user()->id],['product_id',$item['product_id']]])->first();
+            // Fetch stock
+            $stock = Stock::where([
+                ['shop_id',$user->parent_id],
+                ['branch_id',Auth::user()->id],
+                ['product_id',$item['product_id']]
+            ])->first();
 
-            $stock->update(['quantity' => $stock->quantity - $item['qty'] ]);
+            // Reduce Quantity
+            $stock->quantity = $stock->quantity - $item['qty'];
 
-             if (!empty($item['imeis'])) {
+            // Remove sold IMEI numbers from stock
+            if (!empty($item['imeis'])) {
+
+                // Convert comma-separated IMEI string to array
+                $existingImeis = !empty($stock->imei) ? explode(',', $stock->imei) : [];
+
+                // Remove sold IMEIs
+                $remainingImeis = array_values(array_diff($existingImeis, $item['imeis']));
+
+                // Convert back to comma-separated string
+                $stock->imei = implode(',', $remainingImeis);
+            }
+
+
+            $stock->save();
+
+            if (!empty($item['imeis'])) {
                 ProductImeiNumber::where('product_id', $item['product_id'])
                     ->whereIn('name', $item['imeis'])
                     ->update(['is_sold' => 1]);

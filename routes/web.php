@@ -201,6 +201,7 @@ else
                             Route::post('/store',[billingsController::class, 'store'])->name('store');
                             Route::get('/{id}/get_bill',[billingsController::class, 'get_bill'])->name('get_bill');
                             Route::get('/{id}/view_bill',[billingsController::class, 'view_bill'])->name('view_bill');
+                            Route::get('/get_imei_product',[billingsController::class, 'get_imei_product'])->name('get_imei_product');
                         });
                     });
 
