@@ -8,6 +8,10 @@
 
     @php
         $user = App\Models\User::where('slug_name',request()->segment(1))->first();
+        if(!$user)
+        {
+            $user = App\Models\User::where('slug_name',admin)->first();
+        }
     @endphp
 
 	<meta name="viewport" content="width=device-width, initial-scale=1" />

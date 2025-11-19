@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call(GenderSeeder::class);
         $this->call(PaymentSeeder::class);
         $this->call(PrinterTypeSeeder::class);
+        $this->call(NotificationTypeSeeder::class);
         //$this->call(FinanceSeeder::class);
         //$this->call(MetricSeeder::class);
         //$this->call(TaxSeeder::class);

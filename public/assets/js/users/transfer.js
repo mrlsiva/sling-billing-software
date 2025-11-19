@@ -55,38 +55,92 @@ jQuery(document).ready(function ()
 	});
 });
 
-jQuery(document).ready(function ()
-{
-	jQuery('select[name="product"]').on('change',function(){
-		var product = jQuery(this).val();
-		if(product)
-		{
-			jQuery.ajax({
-				url : 'transfer/get_product_detail',
-				type: 'GET',
-				dataType: 'json',
-				data: { product: product},
-				success:function(data)
-				{
-					console.log(data);
-					document.getElementById("unit").value = data.metric.name;
-					document.getElementById("available").value = data.quantity;	
-					if(data.quantity == 0)
-					{
-						$('#transfer').prop('disabled', true).attr('data-bs-original-title', 'You can’t transfer a product with 0 quantity.').tooltip('dispose').tooltip('show');
+jQuery(document).ready(function () {
 
-					}	
-					else
-					{
-						$('#transfer').prop('disabled', false).attr('data-bs-original-title', 'Click to transfer this product').tooltip('dispose').tooltip();
+    jQuery('select[name="product"]').on('change', function () {
 
-					}		
-					
-				}
-			});
-		}
-	});
+        var product = jQuery(this).val();
+
+        if (product) {
+
+            jQuery.ajax({
+                url: 'transfer/get_product_detail',
+                type: 'GET',
+                dataType: 'json',
+                data: { product: product },
+
+                success: function (data) {
+
+                    $("#unit").val(data.product.product.metric.name);
+                    $("#available").val(data.quantity);
+
+                    if (data.quantity == 0) {
+                        $('#transfer').prop('disabled', true)
+                            .attr('data-bs-original-title', 'You can’t transfer a product with 0 quantity.')
+                            .tooltip('dispose').tooltip('show');
+                    } else {
+                        $('#transfer').prop('disabled', false)
+                            .attr('data-bs-original-title', 'Click to transfer this product')
+                            .tooltip('dispose').tooltip();
+                    }
+
+                    // IMEI CHECKBOXES INLINE
+                    $("#imei_list").html("");
+
+                    if (data.imeis && data.imeis.length > 0) {
+
+                        $("#imei_section").show();
+
+                        data.imeis.forEach(function (imei, index) {
+
+                            $("#imei_list").append(`
+                                <div class="form-check" style="min-width:120px;">
+                                    <input type="checkbox"
+                                           class="form-check-input imei-checkbox"
+                                           name="imeis[]"
+                                           value="${imei}"
+                                           id="imei_${index}">
+                                    <label for="imei_${index}" class="form-check-label">
+                                        ${imei}
+                                    </label>
+                                </div>
+                            `);
+
+                        });
+
+                    } else {
+                        $("#imei_section").hide();
+                    }
+                }
+            });
+        }
+    });
+
+    // Limit IMEI selection by quantity
+    $(document).on('change', '.imei-checkbox', function () {
+        let allowed = parseInt($("#quantity").val());
+        let selected = $(".imei-checkbox:checked").length;
+
+        if (allowed && selected > allowed) {
+            $(this).prop('checked', false);
+            alert("You can select only " + allowed + " IMEIs.");
+        }
+    });
+
+    // Handle quantity changes
+    $("#quantity").on('input', function () {
+        let allowed = parseInt($(this).val());
+        let selected = $(".imei-checkbox:checked").length;
+
+        if (allowed < selected) {
+            alert("Quantity reduced! Removing extra selected IMEIs.");
+            $(".imei-checkbox:checked").slice(allowed).prop('checked', false);
+        }
+    });
+
 });
+
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('transfer_submit');

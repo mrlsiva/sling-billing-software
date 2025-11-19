@@ -26,6 +26,7 @@ use App\Models\UserDetail;
 use App\Models\User;
 use App\Models\Staff;
 use App\Models\BillSetup;
+use App\Models\ProductImeiNumber;
 use App\Traits\Log;
 use Carbon\Carbon;
 use Session;
@@ -85,6 +86,19 @@ class billingController extends Controller
     {
         return $sub_categories = SubCategory::where([['category_id',$request->id],['is_active',1]])->get();
     }
+
+    public function get_imei_product(Request $request)
+    {
+        $stock = Stock::where([
+            ['product_id', $request->product],
+            ['shop_id', Auth::user()->parent_id],
+            ['branch_id', Auth::user()->id]
+        ])->first();
+
+
+        return explode(',', $stock->imei);
+    }
+
 
     public function get_product(Request $request)
     {
@@ -303,11 +317,18 @@ class billingController extends Controller
                 'tax_percent'   => $product->tax->name,
                 'discount_type' => $product->discount_type,
                 'discount'      => $product->discount,
+                'imei'          => isset($item['imeis']) ? implode(',', $item['imeis']) : null,
             ]);
 
             $stock = Stock::where([['shop_id',$user->parent_id],['branch_id',Auth::user()->id],['product_id',$item['product_id']]])->first();
 
             $stock->update(['quantity' => $stock->quantity - $item['qty'] ]);
+
+             if (!empty($item['imeis'])) {
+                ProductImeiNumber::where('product_id', $item['product_id'])
+                    ->whereIn('name', $item['imeis'])
+                    ->update(['is_sold' => 1]);
+            }
 
         }
 

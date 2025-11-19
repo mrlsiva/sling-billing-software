@@ -366,6 +366,7 @@ else
                                     Route::post('/store',[billingController::class, 'store'])->name('store');
                                     Route::get('/{id}/get_bill',[billingController::class, 'get_bill'])->name('get_bill');
                                     Route::get('/{id}/view_bill',[billingController::class, 'view_bill'])->name('view_bill');
+                                    Route::get('/get_imei_product',[billingController::class, 'get_imei_product'])->name('get_imei_product');
                                 });
                             });
 

@@ -179,6 +179,8 @@ function add_to_cart(element) {
             dataType: 'json',
             data: { id: system_id },
             success: function (data) {
+                console.log(data);
+                let hasImei = data.stock.imei && data.stock.imei.trim() !== "";
                 var maxQty = parseInt(data.stock.quantity);
 
                 if (maxQty <= 0) {
@@ -217,9 +219,12 @@ function add_to_cart(element) {
                                 <p class="fs-10 text-muted mb-0 imei-selected" style="display: none;">IMEI: <span class="selected-imei"></span></p>
                             </div>
                             <div class="d-flex align-content-center gap-1">
-                                <a href="#!" class="btn btn-soft-info avatar-xs rounded d-flex align-items-center justify-content-center imei-btn" onclick="openImeiModal(${data.id})">
-                                    <i class="ri-barcode-line align-middle fs-12"></i>
-                                </a>
+                                ${hasImei ? `
+                                    <a href="#!" class="btn btn-soft-info avatar-xs rounded d-flex align-items-center justify-content-center imei-btn" onclick="openImeiModal(${data.id})">
+                                        <i class="ri-barcode-line align-middle fs-12"></i>
+                                    </a>` : ``
+                                }
+
                                 <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center remove-item">
                                     <i class="ri-delete-bin-5-line align-middle fs-12"></i>
                                 </a>
@@ -1148,66 +1153,84 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // IMEI selection functionality
 function openImeiModal(productId) {
-    // Sample IMEI numbers (in production this would come from the server)
-    const imeiNumbers = [
-        '123456789012345',
-        '234567890123456',
-        '345678901234567',
-        '456789012345678',
-        '567890123456789',
-        '999999999999999'
-    ];
-
     $('#imeiModalProductId').val(productId);
     $('#imeiModalTitle').text('Select IMEI Numbers for Product #' + productId);
 
     // Get currently selected IMEIs for this product
     const cartItem = $(`[data-product-id="${productId}"]`);
-    const currentImeis = cartItem.attr('data-imei') ? cartItem.attr('data-imei').split(',') : [];
+    const currentImeis = cartItem.attr('data-imei') 
+        ? cartItem.attr('data-imei').split(',') 
+        : [];
 
-    let imeiHtml = `
-        <div class="mb-3">
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="ri-search-line"></i>
-                </span>
-                <input type="text" class="form-control" id="imeiSearchBox" placeholder="Search IMEI numbers..." onkeyup="filterImeiList()">
-            </div>
-        </div>
-        <div id="imeiCheckboxContainer">
-    `;
+    console.log(productId);
 
-    imeiNumbers.forEach((imei, index) => {
-        const isChecked = currentImeis.includes(imei) ? 'checked' : '';
-        imeiHtml += `
-            <div class="form-check mb-2 imei-item" data-imei="${imei}">
-                <input class="form-check-input imei-checkbox" type="checkbox" name="selectedImei" value="${imei}" id="imei_${index}" ${isChecked}>
-                <label class="form-check-label" for="imei_${index}">
-                    ${imei}
-                </label>
-            </div>
-        `;
+    $.ajax({
+        url: 'get_imei_product',
+        type: 'GET',
+        dataType: 'json',
+        data: { product: productId },
+        success: function (imeiNumbers) {
+            console.log(imeiNumbers);
+            let imeiHtml = `
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="ri-search-line"></i>
+                        </span>
+                        <input type="text" class="form-control" id="imeiSearchBox" placeholder="Search IMEI numbers..." onkeyup="filterImeiList()">
+                    </div>
+                </div>
+                <div id="imeiCheckboxContainer" class="row">
+            `;
+
+            imeiNumbers.forEach((imei, index) => {
+                const isChecked = currentImeis.includes(imei) ? 'checked' : '';
+                imeiHtml += `
+                    <div class="col-md-4 mb-2 imei-item" data-imei="${imei}">
+                        <div class="form-check">
+                            <input class="form-check-input imei-checkbox" 
+                                   type="checkbox" 
+                                   name="selectedImei"   <-- ADD THIS
+                                   value="${imei}" 
+                                   id="imei_${index}" 
+                                   ${isChecked}>
+                            <label class="form-check-label" for="imei_${index}">
+                                ${imei}
+                            </label>
+                        </div>
+                    </div>
+                `;
+
+            });
+
+            imeiHtml += '</div>';
+
+            $('#imeiList').html(imeiHtml);
+            $('#imeiModal').modal('show');
+        }
     });
-
-    imeiHtml += '</div>';
-
-    $('#imeiList').html(imeiHtml);
-    $('#imeiModal').modal('show');
-} function selectImei() {
+}
+ 
+function selectImei() {
     const selectedImeis = [];
     $('input[name="selectedImei"]:checked').each(function () {
         selectedImeis.push($(this).val());
     });
 
     const productId = $('#imeiModalProductId').val();
+    const cartItem = $(`[data-product-id="${productId}"]`);
+    const qty = parseInt(cartItem.find('.qty-input').val()) || 1;
 
     if (selectedImeis.length === 0) {
         showToast('error', 'Please select at least one IMEI number');
         return;
     }
 
-    // Find the cart item and update it with selected IMEIs
-    const cartItem = $(`[data-product-id="${productId}"]`);
+    if (selectedImeis.length > qty) {
+        showToast('error', `Quantity = ${qty}. You selected ${selectedImeis.length} IMEIs!`);
+        return;
+    }
+
     const imeiText = selectedImeis.length > 1 ?
         `${selectedImeis.length} IMEIs selected` :
         `IMEI: ${selectedImeis[0]}`;

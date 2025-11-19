@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('product_imei_numbers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_order_id');
-            $table->foreignId('product_id');
+            $table->foreignId('purchase_order_id')->constrained('purchase_orders')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade'); 
             $table->string('name')->nullable();
-            $table->boolean('is_sold')->default(false);
+            $table->integer('is_sold')->default(false);
             $table->timestamps();
+
         });
     }
 

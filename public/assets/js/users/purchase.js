@@ -100,6 +100,7 @@ jQuery(document).ready(function () {
             const product = $(this).val();
             const unitInput = row.find('.unit-input');
             const metricDisplay = row.find('.metric-display');
+            const taxInput = row.find('.tax-input');
 
             if (product) {
                 $.ajax({
@@ -108,6 +109,7 @@ jQuery(document).ready(function () {
                     dataType: 'json',
                     data: { product: product },
                     success: function (data) {
+                        console.log(data);
                         unitInput.val(data.metric.id);
                         metricDisplay.text("(" + data.metric.name + ")");
 
@@ -116,8 +118,13 @@ jQuery(document).ready(function () {
                             row.find('.price-input').val(parseFloat(data.price).toFixed(2));
                         }
                         row.find('.quantity-input').val(1);
-                        const firstNonZeroTax = row.find('.tax-input option').not('[value="0"]').first().val() || "0";
-                        row.find('.tax-input').val(firstNonZeroTax);
+                        
+                        if (data.tax_id) {
+                            taxInput.val(data.tax_id).change();
+                        } else {
+                            taxInput.val("0"); 
+                        }
+
                         calculateRowCosts(row);
                     }
                 });

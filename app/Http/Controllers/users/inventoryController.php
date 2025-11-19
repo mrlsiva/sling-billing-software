@@ -114,7 +114,18 @@ class inventoryController extends Controller
 
     public function get_product_detail(Request $request)
     {
-        return $product = Product::with('metric')->where('id',$request->product)->first();
+        $product = Stock::with('product.metric')->where([['shop_id', Auth::user()->owner_id],['product_id', $request->product]])->first();
+
+        $imeis = explode(',', $product->imei);
+
+        return response()->json([
+            'product' => $product,
+            'quantity' => $product->quantity,
+            'imeis' => $imeis
+        ]);
+
+
+        //return $product = Product::with('metric')->where('id',$request->product)->first();
     }
 
     public function store(Request $request)
@@ -132,6 +143,9 @@ class inventoryController extends Controller
             'quantity.numeric'      => 'Quantity must be a number.',
             'quantity.min'          => 'Quantity cannot be negative.',
         ]);
+
+        // IMEIs selected by user
+        $selectedImeis = $request->imeis ?? [];
 
         $product = Product::findOrFail($request->product);
 
@@ -152,6 +166,16 @@ class inventoryController extends Controller
 
         if ($branchStock) 
         {
+            $branchImeis = [];
+
+            // If branch already has IMEIs, append
+            if ($branchStock && $branchStock->imei) {
+                $branchImeis = explode(',', $branchStock->imei);
+            }
+
+            // Merge existing + new IMEIs
+            $updatedBranchImeis = array_merge($branchImeis, $selectedImeis);
+
             $branchStock->update([
                 'shop_id'        => Auth::user()->owner_id,
                 'branch_id'      => $request->branch,
@@ -160,6 +184,7 @@ class inventoryController extends Controller
                 'product_id'     => $request->product,
                 'quantity'       => $branchStock->quantity + $request->quantity,
                 'is_active'      => 1,
+                'imei' => implode(',', $updatedBranchImeis)
             ]);
 
             //Log
@@ -175,6 +200,7 @@ class inventoryController extends Controller
                 'product_id'     => $request->product,
                 'quantity'       => $request->quantity,
                 'is_active'      => 1,
+                'imei' => implode(',', $selectedImeis)
             ]);
 
             //Log
@@ -184,10 +210,21 @@ class inventoryController extends Controller
         // Deduct from main shop stock
         $mainStock = Stock::where([['shop_id', Auth::user()->owner_id],['branch_id', null],['product_id', $request->product]])->first();
 
+        
         if ($mainStock) 
         {
+            $mainImeis = [];
+
+            if ($mainStock && $mainStock->imei) {
+                $mainImeis = explode(',', $mainStock->imei);
+            }
+
+            // Remove transferred IMEIs from main shop IMEI list
+            $remainingImeis = array_diff($mainImeis, $selectedImeis);
+
             $mainStock->update([
-                'quantity' => $mainStock->quantity - $request->quantity
+                'quantity' => $mainStock->quantity - $request->quantity,
+                'imei' => implode(',', $remainingImeis)
             ]);
         }
 

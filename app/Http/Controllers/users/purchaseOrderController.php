@@ -90,6 +90,28 @@ class purchaseOrderController extends Controller
             'products.*.gross_cost.required' => 'Gross Cost is required for all products.',
         ]);
 
+        // Validate unique IMEI numbers across all products
+        $allImeis = [];
+
+        foreach ($request->products as $index => $item) {
+
+            if (!empty($item['imei'])) {
+                $imeiList = is_array($item['imei']) ? $item['imei'] : explode(',', $item['imei']);
+
+                foreach ($imeiList as $imei) {
+                    $imei = trim($imei);
+
+                    if (in_array($imei, $allImeis)) {
+                        return back()->withErrors([
+                            "products.$index.imei" => "IMEI number $imei is duplicated across products."
+                        ])->withInput();
+                    }
+
+                    $allImeis[] = $imei;
+                }
+            }
+        }
+
         DB::beginTransaction();
 
         try {
@@ -98,6 +120,13 @@ class purchaseOrderController extends Controller
 
             foreach ($request->products as $item) {
                 //return $item;
+
+                if (!empty($item['imei'])) {
+                    $imeiList = is_array($item['imei']) ? $item['imei'] : explode(',', $item['imei']);
+                } else {
+                    $imeiList = [];
+                }
+
                 $purchaseOrder = PurchaseOrder::create([
                     'shop_id'        => Auth::user()->owner_id,
                     'vendor_id'      => $request->vendor,
@@ -115,6 +144,7 @@ class purchaseOrderController extends Controller
                     'discount'       => $item['discount'] ?? 0,
                     'net_cost'       => $item['net_cost'],
                     'gross_cost'     => $item['gross_cost'],
+                    'imei'           => !empty($imeiList) ? implode(',', $imeiList) : null,
                     'status'         => 0, // pending
                 ]);
 
@@ -129,7 +159,8 @@ class purchaseOrderController extends Controller
                         'branch_id'      => null,
                         'category_id'    => $item['category'],
                         'sub_category_id'=> $item['sub_category'],
-                        'product_id'     => $item['product']
+                        'product_id'     => $item['product'],
+                        'imei'           => !empty($imeiList) ? implode(',', $imeiList) : null,
                     ],
                     ['quantity' => 0]
                 );
