@@ -5,6 +5,7 @@ namespace App\Http\Controllers\branches;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderPaymentDetail;
+use App\Models\ProductImeiNumber;
 use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\RefundDetail;
@@ -75,6 +76,10 @@ class orderController extends Controller
             if ($qty !== null && $qty > 0) {
                 $detail = OrderDetail::find($orderDetailId);
 
+                $selectedImeis = $request->imeis[$detail->id] ?? [];
+                $imeiString    = implode(',', $selectedImeis);
+                $qty           = $request->quantity[$detail->id];
+
                 RefundDetail::create([
                     'refund_id'   => $refund->id,
                     'product_id'  => $detail->product_id,
@@ -82,11 +87,29 @@ class orderController extends Controller
                     'quantity'    => $qty,
                     'price'       => $detail->price,
                     'tax_amount'  => $detail->tax_amount,
+                    'imei'        => $imeiString,
                 ]);
 
-                $stock = Stock::where([['shop_id',Auth::user()->parent_id],['branch_id',Auth::user()->id],['product_id',$detail->product_id]])->first();
 
-                $stock->update(['quantity' => $stock->quantity + $qty]);
+                $stock = Stock::where([
+                    ['shop_id', Auth::user()->parent_id],
+                    ['branch_id', Auth::user()->id],
+                    ['product_id', $detail->product_id]
+                ])->first();
+
+                $existingImeis = !empty($stock->imei) ? explode(',', $stock->imei) : [];
+
+                $newImeiList = array_merge($existingImeis, $selectedImeis);
+
+                $stock->update([
+                    'quantity'      => $stock->quantity + $qty,
+                    'imei'          => implode(',', $newImeiList),
+                ]);
+
+
+                ProductImeiNumber::whereIn('name', $selectedImeis)
+                ->where('product_id', $detail->product_id)
+                ->update(['is_sold' => 0]); 
 
             }
         }

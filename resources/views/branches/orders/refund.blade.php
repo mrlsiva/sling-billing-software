@@ -57,22 +57,61 @@
 								</thead>
 								<tbody>
 						            @foreach($order_details as $order_detail)
-						            <tr>
-						            	<td>
-						            		<input type="checkbox" class="form-check-input" id="product_select_{{$order_detail->id}}" value="{{$order_detail->id}}" name="orders_details[]">
-						            	</td>
-						                <td>{{ $loop->iteration }}</td>
-						                <td>{{$order_detail->name}}</td>
-						                <td>{{$order_detail->quantity}}</td>
-						                <td>₹ {{ $order_detail->price - $order_detail->tax_amount }}</td>
-						                <td>₹ {{$order_detail->tax_amount}}</td>
-						                <td>₹ {{$order_detail->price * $order_detail->quantity}}</td>
-						                <td>
-						                	<input type="number" name="quantity[{{ $order_detail->id }}]" class="form-control refund-qty" placeholder="Enter refund quantity" max="{{ $order_detail->quantity }}" data-max="{{ $order_detail->quantity }}" data-price = "{{$order_detail->price}}" data-checkbox="product_select_{{$order_detail->id}}">
-	        								<small class="text-danger error-msg d-none"></small>
-						                </td>
-						            </tr>
-						            @endforeach
+
+										@php
+										    // convert comma separated imei numbers into array
+										    $imeis = explode(',', $order_detail->imei);
+										@endphp
+
+										<tr>
+										    <td>
+										        <input type="checkbox"
+										               class="form-check-input"
+										               id="product_select_{{$order_detail->id}}"
+										               value="{{$order_detail->id}}"
+										               name="orders_details[]">
+										    </td>
+
+										    <td>{{ $loop->iteration }}</td>
+										    <td>{{ $order_detail->name }}</td>
+										    <td>{{ $order_detail->quantity }}</td>
+										    <td>₹ {{ $order_detail->price - $order_detail->tax_amount }}</td>
+										    <td>₹ {{ $order_detail->tax_amount }}</td>
+										    <td>₹ {{ $order_detail->price * $order_detail->quantity }}</td>
+
+										    <td>
+										        <!-- Refund Quantity Input -->
+										        <input type="number"
+										               name="quantity[{{ $order_detail->id }}]"
+										               class="form-control refund-qty"
+										               placeholder="Enter refund quantity"
+										               max="{{ $order_detail->quantity }}"
+										               data-id="{{ $order_detail->id }}"
+										               data-price="{{ $order_detail->price }}"
+										               data-checkbox="product_select_{{$order_detail->id}}">
+
+										        <small class="text-danger error-msg d-none"></small>
+
+										        <!-- IMEI CHECKBOXES -->
+										        <div class="imei-box mt-2">
+										            <label><strong>Select IMEIs</strong></label><br>
+
+										            @foreach($imeis as $imei)
+										                <label class="d-block">
+										                    <input type="checkbox"
+										                           class="imei-checkbox imei-{{ $order_detail->id }}"
+										                           data-id="{{ $order_detail->id }}"
+										                           name="imeis[{{ $order_detail->id }}][]"
+										                           value="{{ trim($imei) }}">
+										                    {{ trim($imei) }}
+										                </label>
+										            @endforeach
+										        </div>
+										    </td>
+										</tr>
+
+										@endforeach
+
 						        </tbody>
 							</table>
 						</div>
@@ -257,6 +296,37 @@
 	            errorMsg.classList.add("d-none"); // hide if valid
 	        }
 	    });
+	});
+</script>
+
+<script type="text/javascript">
+	// When refund qty changes → uncheck if invalid
+	$(document).on("input", ".refund-qty", function () {
+
+	    let id = $(this).data("id");
+	    let qty = parseInt($(this).val()) || 0;
+	    let maxQty = parseInt($(this).attr("max"));
+
+	    // invalid or zero qty → uncheck all imei
+	    if (qty < 1 || qty > maxQty) {
+	        $(".imei-" + id).prop("checked", false);
+	    }
+	});
+
+	// Restrict IMEI selection based on refund qty
+	$(document).on("change", ".imei-checkbox", function () {
+
+	    let id = $(this).data("id");
+
+	    // READ refund quantity properly
+	    let refundQty = parseInt($(".refund-qty[data-id='" + id + "']").val()) || 0;
+
+	    let selected = $(".imei-" + id + ":checked").length;
+
+	    if (selected > refundQty) {
+	        alert("You can select only " + refundQty + " IMEIs.");
+	        $(this).prop("checked", false);
+	    }
 	});
 </script>
 
