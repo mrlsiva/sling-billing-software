@@ -138,6 +138,7 @@ class productController extends Controller
             'discount_type' => $request->discount_type,
             'discount' => $request->discount,
             'quantity' => $request->quantity,
+            'is_size_differentiation_available' => $request->has('is_size_differentiation_available') ? 1 : 0,
             'is_active' => 1,
         ]);
 
@@ -266,7 +267,9 @@ class productController extends Controller
             'discount_type' => $request->discount_type,
             'discount' => $request->discount,
             'quantity' => $request->quantity,
+            'is_size_differentiation_available' => $request->has('is_size_differentiation_available') ? 1 : 0,
         ]);
+
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');

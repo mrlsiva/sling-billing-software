@@ -26,6 +26,7 @@ use App\Http\Controllers\users\generalController;
 use App\Http\Controllers\users\staffsController;
 use App\Http\Controllers\users\orderReportsController;
 use App\Http\Controllers\users\billingsController;
+use App\Http\Controllers\users\sizeController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -291,6 +292,16 @@ else
                             Route::prefix('general')->group(function () {
                                 Route::name('general.')->group(function () {
                                     Route::get('/index',[generalController::class, 'index'])->name('index');
+                                });
+                            });
+
+                            Route::prefix('sizes')->group(function () {
+                                Route::name('size.')->group(function () {
+                                    Route::get('/index',[sizeController::class, 'index'])->name('index');
+                                    Route::post('/store',[sizeController::class, 'store'])->name('store');
+                                    Route::post('/status',[sizeController::class, 'status'])->name('status');
+                                    Route::get('/edit',[sizeController::class, 'edit'])->name('edit');
+                                    Route::post('/update',[sizeController::class, 'update'])->name('update');
                                 });
                             });
 

@@ -35,6 +35,7 @@ class NotificationTypeSeeder extends Seeder
             ['name' => 'Staff', 'order_by' => 13],
             ['name' => 'Order', 'order_by' => 14],
             ['name' => 'Report', 'order_by' => 15],
+            ['name' => 'Size', 'order_by' => 16],
         ];
 
         foreach ($notification_types as $data) {

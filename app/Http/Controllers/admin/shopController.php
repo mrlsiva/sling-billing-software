@@ -196,6 +196,7 @@ class shopController extends Controller
             'bill_type' => $request->bill_type,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
             'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
+            'is_size_differentiation_available' => $request->has('is_size_differentiation_available') ? 1 : 0,
         ]);
 
         //Log
@@ -429,6 +430,7 @@ class shopController extends Controller
             'plan_end' => $nextPaymentDate,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
             'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
+            'is_size_differentiation_available' => $request->has('is_size_differentiation_available') ? 1 : 0,
         ]);
 
         //Log
