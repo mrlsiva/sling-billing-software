@@ -152,20 +152,41 @@ class purchaseOrderController extends Controller
                 $product = Product::find($item['product']);
                 $product->increment('quantity', $item['quantity']);
 
-                // Update Stock for Shop
-                $stock = Stock::firstOrCreate(
-                    [
+                // Check if stock already exists
+                $stock = Stock::where([
+                    'shop_id'        => Auth::user()->owner_id,
+                    'branch_id'      => null,
+                    'category_id'    => $item['category'],
+                    'sub_category_id'=> $item['sub_category'],
+                    'product_id'     => $item['product'],
+                ])->first();
+
+                if ($stock) {
+                    // Merge IMEI numbers
+                    $existingImeis = !empty($stock->imei)
+                        ? explode(',', $stock->imei)
+                        : [];
+
+                    $mergedImeis = array_unique(array_merge($existingImeis, $imeiList));
+
+                    // Update existing stock
+                    $stock->update([
+                        'quantity' => $stock->quantity + $item['quantity'],
+                        'imei'     => !empty($mergedImeis) ? implode(',', $mergedImeis) : null,
+                    ]);
+
+                } else {
+                    // Create new stock
+                    Stock::create([
                         'shop_id'        => Auth::user()->owner_id,
                         'branch_id'      => null,
                         'category_id'    => $item['category'],
                         'sub_category_id'=> $item['sub_category'],
                         'product_id'     => $item['product'],
+                        'quantity'       => $item['quantity'],
                         'imei'           => !empty($imeiList) ? implode(',', $imeiList) : null,
-                    ],
-                    ['quantity' => 0]
-                );
-
-                $stock->increment('quantity', $item['quantity']);
+                    ]);
+                }
 
                 // Handle IMEI Numbers
                 if (!empty($item['imei'])) {
