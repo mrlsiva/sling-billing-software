@@ -18,6 +18,8 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Metric;
 use App\Models\Stock;
+use App\Models\Colour;
+use App\Models\Size;
 use App\Traits\common;
 use App\Traits\Log;
 use App\Models\Tax;
@@ -45,8 +47,10 @@ class productController extends Controller
         $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
         $taxes = Tax::where([['shop_id',Auth::user()->owner_id],['is_active',1]])->get();
         $metrics = Metric::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
+        $sizes = Size::where('shop_id', Auth::user()->owner_id)->where('is_active', 1)->get();
+        $colours = Colour::where('shop_id', Auth::user()->owner_id)->where('is_active', 1)->get();
 
-        return view('users.products.create',compact('categories','taxes','metrics'));
+        return view('users.products.create',compact('categories','taxes','metrics','sizes','colours'));
     }
 
     public function get_sub_category(Request $request)
@@ -79,6 +83,13 @@ class productController extends Controller
             'discount_type' => 'nullable|required_with:discount',
             'discount' => 'nullable|required_with:discount_type|numeric|min:0',
             'quantity' => 'numeric|min:0',
+
+             // ⭐ Conditional validation
+            'sizes'   => 'required_if:is_size_differentiation_available,1|array',
+            'sizes.*' => 'required_if:is_size_differentiation_available,1',
+
+            'colours'   => 'required_if:is_colour_differentiation_available,1|array',
+            'colours.*' => 'required_if:is_colour_differentiation_available,1',
         ], 
         [
             'image.mimes' => 'Image must be a JPG, JPEG, PNG, or GIF file.',
@@ -99,8 +110,12 @@ class productController extends Controller
             'discount.min' => 'Discount cannot be negative.',
             'quantity.numeric' => 'Quantity must be a number.',
             'quantity.min' => 'Quantity cannot be negative.',
-        ]);
 
+            // ⭐ Custom error messages
+            'sizes.required_if' => 'Please select at least one size.',
+            'colours.required_if' => 'Please select at least one colour.',
+        ]);
+        return 'gh';
 
         DB::beginTransaction();
         $tax = Tax::where('id',$request->tax)->first();
@@ -139,8 +154,13 @@ class productController extends Controller
             'discount' => $request->discount,
             'quantity' => $request->quantity,
             'is_size_differentiation_available' => $request->has('is_size_differentiation_available') ? 1 : 0,
+            'is_colour_differentiation_available' => $request->has('is_colour_differentiation_available') ? 1 : 0,
             'is_active' => 1,
         ]);
+
+        $product->size_id = $request->sizes ? implode(',', $request->sizes) : null;
+        $product->colour_id = $request->colours ? implode(',', $request->colours) : null;
+        $product->save();
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -268,6 +288,7 @@ class productController extends Controller
             'discount' => $request->discount,
             'quantity' => $request->quantity,
             'is_size_differentiation_available' => $request->has('is_size_differentiation_available') ? 1 : 0,
+            'is_colour_differentiation_available' => $request->has('is_colour_differentiation_available') ? 1 : 0,
         ]);
 
 

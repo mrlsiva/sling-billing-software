@@ -18,7 +18,7 @@ class sizeController extends Controller
 
     public function index(Request $request)
     {
-        $sizes = Size::where('shop_id',Auth::user()->owner_id)->when(request('metric'), function ($query) 
+        $sizes = Size::where('shop_id',Auth::user()->owner_id)->when(request('size'), function ($query) 
         {
             $query->where('name', 'like', '%' . request('size') . '%');
         })->orderBy('id','desc')->paginate(10);

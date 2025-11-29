@@ -140,15 +140,84 @@
                                 </div>
                             </div>
 
+                            @php
+                                $user_detail = \App\Models\UserDetail::where('user_id', Auth::user()->owner_id)->first();
+                            @endphp
+
+                            @if($user_detail->is_size_differentiation_available == 1)
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <div class="form-check form-switch mt-5">
-                                        <input class="form-check-input" type="checkbox" id="is_size_differentiation_available" name="is_size_differentiation_available">
+                                        <input class="form-check-input" type="checkbox"
+                                               id="is_size_differentiation_available"
+                                               name="is_size_differentiation_available"
+                                               value="1">
                                         <label class="form-check-label" for="is_size_differentiation_available">Is Size Differentiation Available</label>
                                         <span class="text-danger">*</span>
                                     </div>
                                 </div>
                             </div>
+                            @endif
+
+                            @if($user_detail->is_colour_differentiation_available == 1)
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mt-5">
+                                        <input class="form-check-input" type="checkbox"
+                                               id="is_colour_differentiation_available"
+                                               name="is_colour_differentiation_available"
+                                               value="1">
+                                        <label class="form-check-label" for="is_colour_differentiation_available">Is Colour Differentiation Available</label>
+                                        <span class="text-danger">*</span>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
+                            <div class="col-md-12" id="sizes-section" style="display:none;">
+                                <label class="mt-3"><strong>Select Sizes</strong></label>
+                                <div class="row">
+
+                                    @foreach($sizes as $size)
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input size-checkbox"
+                                                       type="checkbox"
+                                                       name="sizes[]"
+                                                       value="{{ $size->id }}"
+                                                       id="size_{{ $size->id }}">
+
+                                                <label class="form-check-label" for="size_{{ $size->id }}">
+                                                    {{ $size->name }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-12" id="colours-section" style="display:none;">
+                                <label class="mt-3"><strong>Select Colours</strong></label>
+                                <div class="row">
+                                    @foreach($colours as $colour)
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input colour-checkbox"
+                                                       type="checkbox"
+                                                       name="colours[]"
+                                                       value="{{ $colour->id }}"
+                                                       id="colour_{{ $colour->id }}">
+
+                                                <label class="form-check-label" for="colour_{{ $colour->id }}">
+                                                    {{ $colour->name }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
 
                             <input type="hidden" name="quantity" id="quantity" value="0">
 

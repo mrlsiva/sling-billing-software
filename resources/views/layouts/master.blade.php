@@ -254,12 +254,23 @@
                                     <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/bill/index') ? 'active' : '' }}" href="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => 0])}}">Bill </a>
                                     </li>
-                                    @if(Auth::user()->user_detail->is_size_differentiation_available == 1)
 
+                                    @php
+                                        $user_detail = \App\Models\UserDetail::where('user_id', Auth::user()->owner_id)->first();
+                                    @endphp
+
+                                    @if($user_detail->is_size_differentiation_available == 1)
                                     <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/sizes/index') ? 'active' : '' }}" href="{{route('setting.size.index', ['company' => request()->route('company')])}}">Size</a>
                                     </li>
                                     @endif
+
+                                    @if($user_detail->is_colour_differentiation_available == 1)
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/colours/index') ? 'active' : '' }}" href="{{route('setting.colour.index', ['company' => request()->route('company')])}}">Colour</a>
+                                    </li>
+                                    @endif
+
                                     <!-- <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/general/index') ? 'active' : '' }}" href="{{route('setting.general.index', ['company' => request()->route('company')])}}">General Settings</a>
                                     </li> -->

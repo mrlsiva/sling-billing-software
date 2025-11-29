@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 class Product extends Model
 {
     protected $fillable = [
-        'user_id','name','category_id','sub_category_id','code','description','hsn_code','price','quantity','tax_id','metric_id','discount_type','discount','image','is_active','tax_amount','is_bulk_upload','run_id','is_size_differentiation_available'
+        'user_id','name','category_id','sub_category_id','code','description','hsn_code','price','quantity','tax_id','metric_id','discount_type','discount','image','is_active','tax_amount','is_bulk_upload','run_id','is_size_differentiation_available','is_colour_differentiation_available','size_id','colour_id'
     ];
 
     public function sub_category()

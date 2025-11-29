@@ -27,6 +27,7 @@ use App\Http\Controllers\users\staffsController;
 use App\Http\Controllers\users\orderReportsController;
 use App\Http\Controllers\users\billingsController;
 use App\Http\Controllers\users\sizeController;
+use App\Http\Controllers\users\colourController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -302,6 +303,16 @@ else
                                     Route::post('/status',[sizeController::class, 'status'])->name('status');
                                     Route::get('/edit',[sizeController::class, 'edit'])->name('edit');
                                     Route::post('/update',[sizeController::class, 'update'])->name('update');
+                                });
+                            });
+
+                            Route::prefix('colours')->group(function () {
+                                Route::name('colour.')->group(function () {
+                                    Route::get('/index',[colourController::class, 'index'])->name('index');
+                                    Route::post('/store',[colourController::class, 'store'])->name('store');
+                                    Route::post('/status',[colourController::class, 'status'])->name('status');
+                                    Route::get('/edit',[colourController::class, 'edit'])->name('edit');
+                                    Route::post('/update',[colourController::class, 'update'])->name('update');
                                 });
                             });
 

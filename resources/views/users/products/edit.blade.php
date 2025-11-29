@@ -155,6 +155,11 @@
                                 </div>
                             </div>
 
+                            @php
+                                $user_detail = \App\Models\UserDetail::where('user_id', Auth::user()->owner_id)->first();
+                            @endphp
+
+                            @if($user_detail->is_size_differentiation_available == 1)
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <div class="form-check form-switch mt-5">
@@ -164,6 +169,19 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
+
+                            @if($user_detail->is_colour_differentiation_available == 1)
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mt-5">
+                                        <input class="form-check-input" type="checkbox" id="is_colour_differentiation_available" name="is_colour_differentiation_available" {{ $product->is_colour_differentiation_available == 1 ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="is_colour_differentiation_available">Is Colour Differentiation Available</label>
+                                        <span class="text-danger">*</span>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
 
                             <input type="hidden" name="quantity" id="quantity" value="{{$product->quantity}}" >
 

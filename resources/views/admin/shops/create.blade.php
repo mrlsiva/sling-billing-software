@@ -202,6 +202,16 @@
                                 </div>
                             </div>
 
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mt-5">
+                                        <input class="form-check-input" type="checkbox" id="is_colour_differentiation_available" name="is_colour_differentiation_available">
+                                        <label class="form-check-label" for="is_colour_differentiation_available">Is Colour Differentiation Available</label>
+                                        <span class="text-danger">*</span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

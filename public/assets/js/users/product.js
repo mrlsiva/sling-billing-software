@@ -282,3 +282,60 @@ document.addEventListener("DOMContentLoaded", function () {
     searchInput.addEventListener("input", toggleClear);
 });
 
+
+
+$(function() {
+  var $toggle = $('#is_size_differentiation_available');
+  if ($toggle.length === 0) {
+    $toggle = $('input[name="is_size_differentiation_available"]'); // fallback
+  }
+  var $sizes = $('#sizes-section');
+
+  if ($toggle.length === 0) {
+    console.error('Checkbox not found.');
+    return;
+  }
+  if ($sizes.length === 0) {
+    console.error('Sizes section not found.');
+    return;
+  }
+
+  function update() {
+    if ($toggle.is(':checked')) {
+      $sizes.show();
+    } else {
+      $sizes.hide();
+      $('.size-checkbox').prop('checked', false);
+    }
+  }
+
+  // init and bind
+  update();
+  $toggle.on('change', update);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Colour checkbox toggle
+    const colourToggle = document.getElementById('is_colour_differentiation_available');
+    const coloursSection = document.getElementById('colours-section');
+
+    if (colourToggle && coloursSection) {
+
+        function updateColours() {
+            if (colourToggle.checked) {
+                coloursSection.style.display = 'block';
+            } else {
+                coloursSection.style.display = 'none';
+                document.querySelectorAll('.colour-checkbox').forEach(cb => cb.checked = false);
+            }
+        }
+
+        updateColours(); // initialize on load
+        colourToggle.addEventListener('change', updateColours);
+    }
+});
+
+
+
+
