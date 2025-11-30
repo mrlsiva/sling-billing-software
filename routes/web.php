@@ -155,6 +155,7 @@ else
                                     Route::get('/create',[purchaseOrderController::class, 'create'])->name('create');
                                     Route::get('/get_product',[purchaseOrderController::class, 'get_product'])->name('get_product');
                                     Route::get('/get_product_detail',[purchaseOrderController::class, 'get_product_detail'])->name('get_product_detail');
+                                    Route::get('/get_stock_variations', [purchaseOrderController::class, 'get_stock_variations']);
                                     Route::post('/store',[purchaseOrderController::class, 'store'])->name('store');
                                     Route::post('/update',[purchaseOrderController::class, 'update'])->name('update');
                                     Route::get('/{id}/get_detail',[purchaseOrderController::class, 'get_detail'])->name('get_detail');

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->unsignedBigInteger('size_id')->nullable();
-            $table->unsignedBigInteger('colour_id')->nullable();
+            $table->string('size_id')->after('is_colour_differentiation_available')->nullable();
+            $table->string('colour_id')->after('size_id')->nullable();
         });
     }
 

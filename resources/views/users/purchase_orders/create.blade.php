@@ -227,6 +227,8 @@
                 </div>
             </div>
 
+            <div class="variation-container mt-2 mb-3"></div>
+
             <div class="col-md-12">
                 <div class="mb-3">
                     <div class="d-flex align-items-center mb-2">

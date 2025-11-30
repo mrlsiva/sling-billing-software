@@ -284,39 +284,49 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-$(function() {
-  var $toggle = $('#is_size_differentiation_available');
-  if ($toggle.length === 0) {
-    $toggle = $('input[name="is_size_differentiation_available"]'); // fallback
-  }
-  var $sizes = $('#sizes-section');
-
-  if ($toggle.length === 0) {
-    console.error('Checkbox not found.');
-    return;
-  }
-  if ($sizes.length === 0) {
-    console.error('Sizes section not found.');
-    return;
-  }
-
-  function update() {
-    if ($toggle.is(':checked')) {
-      $sizes.show();
-    } else {
-      $sizes.hide();
-      $('.size-checkbox').prop('checked', false);
-    }
-  }
-
-  // init and bind
-  update();
-  $toggle.on('change', update);
-});
-
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Colour checkbox toggle
+    // -----------------------------
+    // Detect EDIT Page
+    // -----------------------------
+    function isEditPage() {
+        const sizeChecked = document.querySelector('.size-checkbox:checked');
+        const colourChecked = document.querySelector('.colour-checkbox:checked');
+        return !!(sizeChecked || colourChecked);
+    }
+
+    const EDIT = isEditPage();
+
+
+    // -----------------------------
+    // SIZE TOGGLE
+    // -----------------------------
+    const sizeToggle = document.getElementById('is_size_differentiation_available');
+    const sizesSection = document.getElementById('sizes-section');
+
+    if (sizeToggle && sizesSection) {
+
+        function updateSizes() {
+            if (sizeToggle.checked) {
+                sizesSection.style.display = 'block';
+            } else {
+                sizesSection.style.display = 'none';
+
+                // ❌ Only uncheck on CREATE page
+                if (!EDIT) {
+                    document.querySelectorAll('.size-checkbox').forEach(cb => cb.checked = false);
+                }
+            }
+        }
+
+        updateSizes();
+        sizeToggle.addEventListener('change', updateSizes);
+    }
+
+
+    // -----------------------------
+    // COLOUR TOGGLE
+    // -----------------------------
     const colourToggle = document.getElementById('is_colour_differentiation_available');
     const coloursSection = document.getElementById('colours-section');
 
@@ -327,14 +337,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 coloursSection.style.display = 'block';
             } else {
                 coloursSection.style.display = 'none';
-                document.querySelectorAll('.colour-checkbox').forEach(cb => cb.checked = false);
+
+                // ❌ Only uncheck on CREATE page
+                if (!EDIT) {
+                    document.querySelectorAll('.colour-checkbox').forEach(cb => cb.checked = false);
+                }
             }
         }
 
-        updateColours(); // initialize on load
+        updateColours();
         colourToggle.addEventListener('change', updateColours);
     }
 });
+
 
 
 

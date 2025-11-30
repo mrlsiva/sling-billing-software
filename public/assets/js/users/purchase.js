@@ -57,6 +57,8 @@ jQuery(document).ready(function () {
             subCategorySelect.empty().append('<option value=""> Select </option>');
             productSelect.empty().append('<option value=""> Select </option>');
 
+            clearVariations(row); // NEW → Remove variations
+
             if (category) {
                 $.ajax({
                     url: '../../products/get_sub_category',
@@ -80,6 +82,8 @@ jQuery(document).ready(function () {
 
             productSelect.empty().append('<option value=""> Select </option>');
 
+            clearVariations(row); // NEW → Remove variations
+
             if (category && subCategory) {
                 $.ajax({
                     url: 'get_product',
@@ -97,39 +101,104 @@ jQuery(document).ready(function () {
 
         // Product change event
         row.find('.product-select').on('change', function () {
+
             const product = $(this).val();
+
             const unitInput = row.find('.unit-input');
             const metricDisplay = row.find('.metric-display');
             const taxInput = row.find('.tax-input');
 
             if (product) {
+
+                // ===============================
+                // First API: Fetch Product Detail
+                // ===============================
                 $.ajax({
                     url: 'get_product_detail',
                     type: 'GET',
                     dataType: 'json',
                     data: { product: product },
+
                     success: function (data) {
                         console.log(data);
                         unitInput.val(data.metric.id);
                         metricDisplay.text("(" + data.metric.name + ")");
 
-                        // Auto-fill price and tax if available
                         if (data.price) {
                             row.find('.price-input').val(parseFloat(data.price).toFixed(2));
                         }
+
                         row.find('.quantity-input').val(1);
-                        
+
                         if (data.tax_id) {
                             taxInput.val(data.tax_id).change();
                         } else {
-                            taxInput.val("0"); 
+                            taxInput.val("0");
                         }
 
                         calculateRowCosts(row);
                     }
                 });
+
+                // ==============================================
+                // Second API: Fetch Stocks + Stock Variations
+                // ==============================================
+                // inside your row.find('.product-select').on('change', ...) success callback
+                // Fetch stock variations
+                $.ajax({
+                    url: 'get_stock_variations',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { product_id: product },
+
+                    success: function (response) {
+                        let container = row.find('.variation-container');
+                        container.html("");
+
+                        // if no size and no colour → DO NOT SHOW variation rows
+                        if (response.variations.length === 0 ||
+                            response.variations.every(v => !v.size && !v.colour)) {
+
+                            container.hide();
+                            return;
+                        }
+
+                        container.show();
+
+                        response.variations.forEach((v, index) => {
+
+                            container.append(`
+                                <div class="row border p-2 mb-2 variation-row">
+
+                                    <div class="col-md-3">
+                                        <label>Size</label>
+                                        <input type="text" value="${v.size ? v.size.name : '-'}" class="form-control" readonly>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>Colour</label>
+                                        <input type="text" value="${v.colour ? v.colour.name : '-'}" class="form-control" readonly>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>Qty</label>
+                                        <input type="number" value="0" class="form-control variation-qty">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>Price</label>
+                                        <input type="number" value="0" class="form-control variation-price">
+                                    </div>
+
+                                </div>
+                            `);
+                        });
+                    }
+                });
+
             }
         });
+
 
         // IMEI Checkbox event
         row.find('.enable-imei-checkbox').on('change', function () {
@@ -276,7 +345,7 @@ jQuery(document).ready(function () {
 
     // Form validation before submit
     $('#purchaseOrderCreate').on('submit', function (e) {
-        let isValid = true;
+
         let errorMessages = [];
 
         const vendor = $('#vendor').val();
@@ -285,25 +354,61 @@ jQuery(document).ready(function () {
         if (!vendor) errorMessages.push('Vendor is required.');
         if (!invoiceDateVal) errorMessages.push('Invoice Date is required.');
 
-        $('.product-row').each(function (index) {
+        $('.product-row').each(function (i) {
+
             const row = $(this);
+            const index = i + 1;
+
             const category = row.find('.category-select').val();
             const subCategory = row.find('.sub-category-select').val();
             const product = row.find('.product-select').val();
             const quantity = parseFloat(row.find('.quantity-input').val());
-            const price = parseFloat(row.find('.price-input').val());
+            const price = parseFloat(row.find('.price-input').val()); // net cost
 
+            // Basic validation
             if (category) {
-                if (!subCategory) errorMessages.push(`Product #${index + 1}: Sub Category is required.`);
-                if (!product) errorMessages.push(`Product #${index + 1}: Product is required.`);
-                if (!quantity || quantity <= 0) errorMessages.push(`Product #${index + 1}: Valid quantity is required.`);
-                if (!price || price <= 0) errorMessages.push(`Product #${index + 1}: Valid price is required.`);
+                if (!subCategory) errorMessages.push(`Product #${index}: Sub Category is required.`);
+                if (!product) errorMessages.push(`Product #${index}: Product is required.`);
+                if (!quantity || quantity <= 0) errorMessages.push(`Product #${index}: Quantity is required.`);
+                if (!price || price <= 0) errorMessages.push(`Product #${index}: Net cost is required.`);
             }
+
+            // -------------------------------
+            // VARIATION VALIDATION
+            // -------------------------------
+            let variationRows = row.find('.variation-row');
+
+            if (variationRows.length > 0) {
+
+                let totalQty = 0;
+                let totalPrice = 0;
+
+                variationRows.each(function () {
+                    const vQty = parseFloat($(this).find('.variation-qty').val()) || 0;
+                    const vPrice = parseFloat($(this).find('.variation-price').val()) || 0;
+
+                    totalQty += vQty;
+                    totalPrice += vPrice;
+                });
+
+                if (totalQty !== quantity) {
+                    errorMessages.push(
+                        `Product #${index}: Sum of variation Qty (${totalQty}) must match main Qty (${quantity}).`
+                    );
+                }
+
+                if (totalPrice !== price) {
+                    errorMessages.push(
+                        `Product #${index}: Sum of variation Price (${totalPrice}) must match Net Cost (${price}).`
+                    );
+                }
+            }
+
         });
 
         if (errorMessages.length > 0) {
             e.preventDefault();
-            alert(errorMessages.join('\n'));
+            alert(errorMessages.join("\n"));
         }
     });
 });
@@ -323,3 +428,12 @@ function purchase_detail(id) {
         }
     });
 }
+
+// CLEAR VARIATIONS FUNCTION
+function clearVariations(row) {
+    row.find('.variation-container').html(''); // remove all variation rows
+    row.find('.price-input').prop('readonly', false);
+    row.find('.quantity-input').prop('readonly', false);
+}
+
+

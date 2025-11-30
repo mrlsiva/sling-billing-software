@@ -13,6 +13,7 @@ use App\Models\PurchaseOrderRefund;
 use App\Models\ProductImeiNumber;
 use App\Models\PurchaseOrder;
 use App\Models\ShopPayment;
+use App\Models\StockVariation;
 use App\Models\Category;
 use App\Models\Payment;
 use App\Models\Product;
@@ -61,8 +62,33 @@ class purchaseOrderController extends Controller
         return $product = Product::with('metric')->where('id',$request->product)->first();
     }
 
+    public function get_stock_variations(Request $request)
+    {
+        $stock = Stock::where('product_id', $request->product_id)
+            ->where('shop_id', auth()->user()->owner_id)
+            ->whereNull('branch_id')
+            ->first();
+
+        if (!$stock) {
+            return response()->json([
+                'stock_id' => null,
+                'variations' => []
+            ]);
+        }
+
+        $variations = StockVariation::with(['size', 'colour'])
+            ->where('stock_id', $stock->id)
+            ->get();
+
+        return response()->json([
+            'stock_id'   => $stock->id,
+            'variations' => $variations
+        ]);
+    }
+
     public function store(Request $request)
     {
+        return "Working...";
         $request->validate([
             'vendor' => 'required',
             'invoice_date' => 'required|date',
@@ -442,8 +468,7 @@ class purchaseOrderController extends Controller
 
     public function get_detail($company,$id)
     {
-        $purchase = PurchaseOrder::with(['vendor', 'category', 'sub_category', 'product', 'metric']) // if relationships exist
-                    ->findOrFail($id);
+        $purchase = PurchaseOrder::with(['vendor', 'category', 'sub_category', 'product', 'metric'])->findOrFail($id);
 
         return view('users.purchase_orders.detail', compact('purchase'));
     }

@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductExport;
 use App\Imports\ProductImport;
 use Illuminate\Validation\Rule;
+use App\Models\StockVariation;
 use App\Traits\Notifications;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -115,7 +116,6 @@ class productController extends Controller
             'sizes.required_if' => 'Please select at least one size.',
             'colours.required_if' => 'Please select at least one colour.',
         ]);
-        return 'gh';
 
         DB::beginTransaction();
         $tax = Tax::where('id',$request->tax)->first();
@@ -184,6 +184,72 @@ class productController extends Controller
             'is_active' => 1,
         ]);
 
+        // ---------------------------------------------
+        // CREATE STOCK VARIATIONS FOR SIZE/COLOUR
+        // ---------------------------------------------
+
+        $sizes   = $request->sizes ?? [];
+        $colours = $request->colours ?? [];
+        $basePrice = $request->price;
+
+        // CASE 1: Only sizes available
+        if ($request->is_size_differentiation_available && !$request->is_colour_differentiation_available) {
+
+            foreach ($sizes as $sizeId) {
+                StockVariation::create([
+                    'stock_id'   => $stock->id,
+                    'product_id' => $product->id,
+                    'size_id'    => $sizeId,
+                    'quantity'   => 0,
+                    'price'      => 0,
+                ]);
+            }
+        }
+
+        // CASE 2: Only colours available
+        elseif (!$request->is_size_differentiation_available && $request->is_colour_differentiation_available) {
+
+            foreach ($colours as $colourId) {
+                StockVariation::create([
+                    'stock_id'   => $stock->id,
+                    'product_id' => $product->id,
+                    'colour_id'  => $colourId,
+                    'quantity'   => 0,
+                    'price'      => 0,
+                ]);
+            }
+        }
+
+        // CASE 3: BOTH size & colour differentiation available
+        elseif ($request->is_size_differentiation_available && $request->is_colour_differentiation_available) {
+
+            foreach ($sizes as $sizeId) {
+                foreach ($colours as $colourId) {
+
+                    // Create combination: S-Red, S-Pink, M-Red, M-Pink ...
+                    StockVariation::create([
+                        'stock_id'   => $stock->id,
+                        'product_id' => $product->id,
+                        'size_id'    => $sizeId,
+                        'colour_id'  => $colourId,
+                        'quantity'   => 0,
+                        'price'      => 0,
+                    ]);
+                }
+            }
+        }
+
+        elseif (!$request->is_size_differentiation_available && !$request->is_colour_differentiation_available) {
+
+            StockVariation::create([
+                'stock_id'   => $stock->id,
+                'product_id' => $product->id,
+                'quantity'   => 0,
+                'price'      => 0,
+            ]);
+        }
+
+
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Stock Added','App/Models/Stock','stocks',$stock->id,'Insert',null,json_encode($request->all()),'Success','Stock Added for this product');
 
@@ -203,13 +269,21 @@ class productController extends Controller
     {
         $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
         $product = Product::find($id);
+
+        // Convert comma separated values to array
+        $product->selected_sizes = $product->size_id ? explode(',', $product->size_id) : [];
+        $product->selected_colours = $product->colour_id ? explode(',', $product->colour_id) : [];
+
         $taxes = Tax::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
         $metrics = Metric::where([['shop_id',Auth::user()->id],['is_active',1]])->get();
-        return view('users.products.edit',compact('product','categories','taxes','metrics'));
+        $sizes = Size::where('shop_id', Auth::user()->owner_id)->where('is_active', 1)->get();
+        $colours = Colour::where('shop_id', Auth::user()->owner_id)->where('is_active', 1)->get();
+        return view('users.products.edit',compact('product','categories','taxes','metrics','sizes','colours'));
     }
 
     public function update(Request $request)
     {
+        //return $request;
         $request->validate([
             'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // up to 2MB
             'category_id' => 'required',
@@ -287,8 +361,10 @@ class productController extends Controller
             'discount_type' => $request->discount_type,
             'discount' => $request->discount,
             'quantity' => $request->quantity,
-            'is_size_differentiation_available' => $request->has('is_size_differentiation_available') ? 1 : 0,
-            'is_colour_differentiation_available' => $request->has('is_colour_differentiation_available') ? 1 : 0,
+            'is_size_differentiation_available' => $request->input('is_size_differentiation_available') == 1 ? 1 : 0,
+            'is_colour_differentiation_available' => $request->input('is_colour_differentiation_available') == 1 ? 1 : 0,
+            'size_id' => $request->sizes ? implode(',', $request->sizes) : null,
+            'colour_id' => $request->colours ? implode(',', $request->colours) : null,
         ]);
 
 
@@ -314,6 +390,114 @@ class productController extends Controller
             'sub_category_id' => $request->sub_category,
             'quantity' => $request->quantity,
         ]);
+
+        // ---------------------------------------------------------
+        // UPDATE STOCK VARIATIONS → Add only new combinations
+        // ---------------------------------------------------------
+        $basePrice = $request->price;
+
+        $sizes   = $request->sizes ?? [];
+        $colours = $request->colours ?? [];
+
+        $existing = StockVariation::where('stock_id', $stock->id)
+            ->pluck('id', 'size_id', 'colour_id');
+
+        // CASE 1: only size differentiation
+        if ($request->is_size_differentiation_available && !$request->is_colour_differentiation_available) {
+
+            foreach ($sizes as $sizeId) {
+
+                $exists = StockVariation::where([
+                    ['stock_id', $stock->id],
+                    ['product_id', $product->id],
+                    ['size_id', $sizeId],
+                    ['colour_id', null],
+                ])->exists();
+
+                if (!$exists) {
+                    StockVariation::create([
+                        'stock_id'   => $stock->id,
+                        'product_id' => $product->id,
+                        'size_id'    => $sizeId,
+                        'colour_id'  => null,
+                        'quantity'   => 0,
+                        'price'      => 0,
+                    ]);
+                }
+            }
+        }
+
+        // CASE 2: only colour differentiation
+        elseif (!$request->is_size_differentiation_available && $request->is_colour_differentiation_available) {
+
+            foreach ($colours as $colourId) {
+
+                $exists = StockVariation::where([
+                    ['stock_id', $stock->id],
+                    ['product_id', $product->id],
+                    ['size_id', null],
+                    ['colour_id', $colourId],
+                ])->exists();
+
+                if (!$exists) {
+                    StockVariation::create([
+                        'stock_id'   => $stock->id,
+                        'product_id' => $product->id,
+                        'colour_id'  => $colourId,
+                        'quantity'   => 0,
+                        'price'      => 0,
+                    ]);
+                }
+            }
+        }
+
+        // CASE 3: BOTH size and colour differentiation
+        elseif ($request->is_size_differentiation_available && $request->is_colour_differentiation_available) {
+
+            foreach ($sizes as $sizeId) {
+                foreach ($colours as $colourId) {
+
+                    $exists = StockVariation::where([
+                        ['stock_id', $stock->id],
+                        ['product_id', $product->id],
+                        ['size_id', $sizeId],
+                        ['colour_id', $colourId],
+                    ])->exists();
+
+                    if (!$exists) {
+                        StockVariation::create([
+                            'stock_id'   => $stock->id,
+                            'product_id' => $product->id,
+                            'size_id'    => $sizeId,
+                            'colour_id'  => $colourId,
+                            'quantity'   => 0,
+                            'price'      => 0,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // CASE 4: Neither size nor color available → ensure only one entry exists
+        elseif (!$request->is_size_differentiation_available && !$request->is_colour_differentiation_available) {
+
+            $exists = StockVariation::where([
+                ['stock_id', $stock->id],
+                ['product_id', $product->id],
+                ['size_id', null],
+                ['colour_id', null],
+            ])->exists();
+
+            if (!$exists) {
+                StockVariation::create([
+                    'stock_id'   => $stock->id,
+                    'product_id' => $product->id,
+                    'quantity'   => 0,
+                    'price'      => 0,
+                ]);
+            }
+        }
+
 
 
         //Log

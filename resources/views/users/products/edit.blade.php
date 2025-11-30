@@ -160,28 +160,134 @@
                             @endphp
 
                             @if($user_detail->is_size_differentiation_available == 1)
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <div class="form-check form-switch mt-5">
-                                        <input class="form-check-input" type="checkbox" id="is_size_differentiation_available" name="is_size_differentiation_available" {{ $product->is_size_differentiation_available == 1 ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_size_differentiation_available">Is Size Differentiation Available</label>
-                                        <span class="text-danger">*</span>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch mt-5">
+                                            
+                                            <!-- VISIBLE but disabled (read-only) -->
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   id="is_size_differentiation_available"
+                                                   {{ $product->is_size_differentiation_available == 1 ? 'checked' : '' }}
+                                                   disabled>
+
+                                            <!-- HIDDEN field actually submitted -->
+                                            <input type="hidden"
+                                                   name="is_size_differentiation_available"
+                                                   value="{{ $product->is_size_differentiation_available }}">
+
+                                            <label class="form-check-label" for="is_size_differentiation_available">
+                                                Is Size Differentiation Available
+                                            </label>
+                                            <span class="text-danger">*</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             @endif
 
+
                             @if($user_detail->is_colour_differentiation_available == 1)
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <div class="form-check form-switch mt-5">
-                                        <input class="form-check-input" type="checkbox" id="is_colour_differentiation_available" name="is_colour_differentiation_available" {{ $product->is_colour_differentiation_available == 1 ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_colour_differentiation_available">Is Colour Differentiation Available</label>
-                                        <span class="text-danger">*</span>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch mt-5">
+
+                                            <!-- VISIBLE but disabled -->
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   id="is_colour_differentiation_available"
+                                                   {{ $product->is_colour_differentiation_available == 1 ? 'checked' : '' }}
+                                                   disabled>
+
+                                            <!-- HIDDEN field actually submitted -->
+                                            <input type="hidden"
+                                                   name="is_colour_differentiation_available"
+                                                   value="{{ $product->is_colour_differentiation_available }}">
+
+                                            <label class="form-check-label" for="is_colour_differentiation_available">
+                                                Is Colour Differentiation Available
+                                            </label>
+                                            <span class="text-danger">*</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             @endif
+
+
+                            <div class="col-md-12" id="sizes-section" style="{{ $product->is_size_differentiation_available ? '' : 'display:none;' }}">
+                                <label class="mt-3"><strong>Select Sizes</strong></label>
+                                <div class="row">
+
+                                    @foreach($sizes as $size)
+                                        @php
+                                            $checked = in_array($size->id, $product->selected_sizes);
+                                        @endphp
+
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+
+                                                <input class="form-check-input size-checkbox"
+                                                       type="checkbox"
+                                                       name="sizes[]"
+                                                       value="{{ $size->id }}"
+                                                       id="size_{{ $size->id }}"
+                                                       {{ $checked ? 'checked' : '' }}
+                                                       {{ $checked ? 'disabled' : '' }}>
+
+                                                <label class="form-check-label" for="size_{{ $size->id }}">
+                                                    {{ $size->name }}
+                                                </label>
+
+                                                {{-- Hidden input so disabled values get submitted --}}
+                                                @if($checked)
+                                                    <input type="hidden" name="sizes[]" value="{{ $size->id }}">
+                                                @endif
+
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-12" id="colours-section" style="{{ $product->is_colour_differentiation_available ? '' : 'display:none;' }}">
+                                <label class="mt-3"><strong>Select Colours</strong></label>
+                                <div class="row">
+
+                                    @foreach($colours as $colour)
+                                        @php
+                                            $checked = in_array($colour->id, $product->selected_colours);
+                                        @endphp
+
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+
+                                                <input class="form-check-input colour-checkbox"
+                                                       type="checkbox"
+                                                       name="colours[]"
+                                                       value="{{ $colour->id }}"
+                                                       id="colour_{{ $colour->id }}"
+                                                       {{ $checked ? 'checked' : '' }}
+                                                       {{ $checked ? 'disabled' : '' }}>
+
+                                                <label class="form-check-label" for="colour_{{ $colour->id }}">
+                                                    {{ $colour->name }}
+                                                </label>
+
+                                                {{-- Hidden input to submit disabled values --}}
+                                                @if($checked)
+                                                    <input type="hidden" name="colours[]" value="{{ $colour->id }}">
+                                                @endif
+
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                </div>
+                            </div>
+
+
+
+
 
                             <input type="hidden" name="quantity" id="quantity" value="{{$product->quantity}}" >
 
