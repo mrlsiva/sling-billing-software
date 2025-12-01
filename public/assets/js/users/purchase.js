@@ -155,7 +155,6 @@ jQuery(document).ready(function () {
                         let container = row.find('.variation-container');
                         container.html("");
 
-                        // if no size and no colour → DO NOT SHOW variation rows
                         if (response.variations.length === 0 ||
                             response.variations.every(v => !v.size && !v.colour)) {
 
@@ -170,32 +169,44 @@ jQuery(document).ready(function () {
                             container.append(`
                                 <div class="row border p-2 mb-2 variation-row">
 
+                                    <input type="hidden" name="variation[${index}][stock_id]" 
+                                   value="${response.stock_id}">
+
+                                    <input type="hidden" name="variation[${index}][size_id]" 
+                                        value="${v.size ? v.size.id : ''}">
+                                    <input type="hidden" name="variation[${index}][colour_id]" 
+                                        value="${v.colour ? v.colour.id : ''}">
+
                                     <div class="col-md-3">
                                         <label>Size</label>
-                                        <input type="text" value="${v.size ? v.size.name : '-'}" class="form-control" readonly>
+                                        <input type="text" value="${v.size ? v.size.name : '-'}" 
+                                               class="form-control" readonly>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label>Colour</label>
-                                        <input type="text" value="${v.colour ? v.colour.name : '-'}" class="form-control" readonly>
+                                        <input type="text" value="${v.colour ? v.colour.name : '-'}" 
+                                               class="form-control" readonly>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label>Qty</label>
-                                        <input type="number" value="0" class="form-control variation-qty">
+                                        <input type="number" name="variation[${index}][qty]" 
+                                               class="form-control variation-qty" value="0">
                                     </div>
 
                                     <div class="col-md-3">
                                         <label>Price</label>
-                                        <input type="number" value="0" class="form-control variation-price">
+                                        <input type="number" name="variation[${index}][price]" 
+                                               class="form-control variation-price" value="0">
                                     </div>
 
                                 </div>
                             `);
                         });
                     }
-                });
 
+                });
             }
         });
 
@@ -362,8 +373,9 @@ jQuery(document).ready(function () {
             const category = row.find('.category-select').val();
             const subCategory = row.find('.sub-category-select').val();
             const product = row.find('.product-select').val();
+
             const quantity = parseFloat(row.find('.quantity-input').val());
-            const price = parseFloat(row.find('.price-input').val()); // net cost
+            const price = parseFloat(row.find('.net-cost-input').val());  // net cost
 
             // Basic validation
             if (category) {
@@ -378,39 +390,44 @@ jQuery(document).ready(function () {
             // -------------------------------
             let variationRows = row.find('.variation-row');
 
+            // Only validate when variations exist
             if (variationRows.length > 0) {
 
                 let totalQty = 0;
                 let totalPrice = 0;
 
                 variationRows.each(function () {
-                    const vQty = parseFloat($(this).find('.variation-qty').val()) || 0;
-                    const vPrice = parseFloat($(this).find('.variation-price').val()) || 0;
+        const vQty = parseFloat($(this).find('.variation-qty').val()) || 0;
+        const vPrice = parseFloat($(this).find('.variation-price').val()) || 0;
 
-                    totalQty += vQty;
-                    totalPrice += vPrice;
-                });
+        totalQty += vQty;
+        totalPrice += vPrice;
+    });
 
-                if (totalQty !== quantity) {
-                    errorMessages.push(
-                        `Product #${index}: Sum of variation Qty (${totalQty}) must match main Qty (${quantity}).`
-                    );
-                }
 
-                if (totalPrice !== price) {
-                    errorMessages.push(
-                        `Product #${index}: Sum of variation Price (${totalPrice}) must match Net Cost (${price}).`
-                    );
-                }
+            // MUST MATCH MAIN QUANTITY
+            if (totalQty !== quantity) {
+                errorMessages.push(
+                    `Product #${index}: Sum of variation Qty (${totalQty}) must match main Qty (${quantity}).`
+                );
             }
 
-        });
-
-        if (errorMessages.length > 0) {
-            e.preventDefault();
-            alert(errorMessages.join("\n"));
+            // NEW: Price comparison should match NET COST (not sum)
+            if (totalPrice !== price) {
+                errorMessages.push(
+                    `Product #${index}: Sum of variation Price (${totalPrice}) must match Net Cost (${price}).`
+                );
+            }
         }
+
     });
+
+    if (errorMessages.length > 0) {
+        e.preventDefault();
+        alert(errorMessages.join("\n"));
+    }
+});
+
 });
 
 // Load purchase details in modal

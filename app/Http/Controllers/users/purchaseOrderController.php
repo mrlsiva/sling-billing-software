@@ -88,7 +88,7 @@ class purchaseOrderController extends Controller
 
     public function store(Request $request)
     {
-        return "Working...";
+        //return $request;
         $request->validate([
             'vendor' => 'required',
             'invoice_date' => 'required|date',
@@ -213,6 +213,7 @@ class purchaseOrderController extends Controller
                         'imei'           => !empty($imeiList) ? implode(',', $imeiList) : null,
                     ]);
                 }
+                
 
                 // Handle IMEI Numbers
                 if (!empty($item['imei'])) {
@@ -228,6 +229,61 @@ class purchaseOrderController extends Controller
                             'name'              => $imei,
                             'is_sold'           => 0,
                         ]);
+                    }
+                }
+
+                $productId  = $item['product'];
+                $quantity   = (float)$item['quantity'];
+                $netCost    = (float)$item['net_cost'];
+
+                $stock = Stock::where('product_id', $productId)
+                ->where('shop_id', auth()->user()->owner_id)
+                ->whereNull('branch_id')
+                ->first();
+
+                if (!empty($request->variation)) 
+                {
+
+                    foreach ($request->variation as $var) {
+
+                        $stockId   = $var['stock_id'];
+                        $sizeId    = $var['size_id'] ?? null;
+                        $colourId  = $var['colour_id'] ?? null;
+                        $qty       = (int) $var['qty'];
+                        $price     = (float) $var['price'];
+
+                        // FIND VARIATION
+                        $variation = StockVariation::where('stock_id', $stockId)
+                            ->where('size_id', $sizeId)
+                            ->where('colour_id', $colourId)
+                            ->first();
+
+            
+
+                        // UPDATE (ADD new quantity)
+                        $variation->update([
+                            'quantity' => $variation->quantity + $qty,
+                            'price'    => $price,   // overwrite or keep? you said "update", so set new price
+                        ]);
+
+                    }
+
+                }
+                else
+                {
+                    // find default variation without size and colour
+                    $defaultVariation = StockVariation::where('stock_id', $stock->id)
+                        ->where('product_id', $productId)
+                        ->whereNull('size_id')
+                        ->whereNull('colour_id')
+                        ->first();
+
+                    if ($defaultVariation) {
+
+                        // ADD QUANTITY & PRICE
+                        $defaultVariation->quantity += $quantity;
+                        $defaultVariation->price    += $netCost;
+                        $defaultVariation->save();
                     }
                 }
 
