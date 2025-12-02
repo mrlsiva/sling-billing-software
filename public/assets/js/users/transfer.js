@@ -71,6 +71,9 @@ jQuery(document).ready(function () {
 
                 success: function (data) {
 
+                    console.log(data);
+                    console.log(data.imeis.length);
+
                     $("#unit").val(data.product.product.metric.name);
                     $("#available").val(data.quantity);
 
@@ -84,28 +87,40 @@ jQuery(document).ready(function () {
                             .tooltip('dispose').tooltip();
                     }
 
+                    $("#variations_section").html("");
+
+                    data.variations.forEach(function (v) {
+                        $("#variations_section").append(`
+                            <div class="row mb-2 p-2 border rounded">
+                                <div class="col-md-5"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
+                                <div class="col-md-7">
+                                    <input type="number" class="form-control variation-qty"
+                                        max="${v.quantity}" min="0" name="variation_qty[${v.id}]"
+                                        placeholder="Available: ${v.quantity}">
+                                </div>
+                            </div>
+                        `);
+                    });
+
+
                     // IMEI CHECKBOXES INLINE
                     $("#imei_list").html("");
 
-                    if (data.imeis && data.imeis.length > 0) {
+                    let validImeis = data.imeis.filter(i => i && i.trim() !== "");
 
+                    if (validImeis.length > 0) {
                         $("#imei_section").show();
 
-                        data.imeis.forEach(function (imei, index) {
+                        $("#imei_list").html("");
 
+                        validImeis.forEach(function (imei, index) {
                             $("#imei_list").append(`
                                 <div class="form-check" style="min-width:120px;">
-                                    <input type="checkbox"
-                                           class="form-check-input imei-checkbox"
-                                           name="imeis[]"
-                                           value="${imei}"
-                                           id="imei_${index}">
-                                    <label for="imei_${index}" class="form-check-label">
-                                        ${imei}
-                                    </label>
+                                    <input type="checkbox" class="form-check-input imei-checkbox"
+                                           name="imeis[]" value="${imei}" id="imei_${index}">
+                                    <label for="imei_${index}" class="form-check-label">${imei}</label>
                                 </div>
                             `);
-
                         });
 
                     } else {
@@ -175,3 +190,30 @@ document.addEventListener("DOMContentLoaded", function () {
     // Run on typing
     searchInput.addEventListener("input", toggleClear);
 });
+
+// When any variation qty changes
+$(document).on("input", ".variation-qty", function () {
+
+    let max = parseInt($(this).attr("data-max"));
+    let val = parseInt($(this).val());
+
+    // 1️⃣ Prevent higher than allowed
+    if (val > max) {
+        $(this).val(max);
+        val = max;
+    }
+
+    // 2️⃣ Update total quantity
+    updateMainQuantity();
+});
+
+function updateMainQuantity() {
+    let total = 0;
+
+    $(".variation-qty").each(function () {
+        let val = parseInt($(this).val()) || 0;
+        total += val;
+    });
+
+    $("#quantity").val(total);
+}

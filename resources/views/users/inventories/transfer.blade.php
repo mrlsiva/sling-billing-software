@@ -15,6 +15,17 @@
 					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#productTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Product Transfer</a>
 				</div>
 
+				@if ($errors->any())
+			        <div class="alert alert-danger">
+			            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+			            <ul>
+			                @foreach ($errors->all() as $error)
+			                <li>{{ $error }}</li>
+			                @endforeach
+			            </ul>
+			        </div>
+			    @endif
+
 				<form method="get" action="{{route('inventory.transfer', ['company' => request()->route('company')])}}">
 				    <div class="row mb-3 p-3">
 				    	<div class="col-md-6">
@@ -177,7 +188,7 @@
 	                        <div class="col-md-12">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Enter Quantity</label>
-	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1">
+	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1" readonly="">
 	                            </div>
 	                        </div>
 	                    </div>
@@ -192,6 +203,7 @@
 						    </div>
 						</div>
 
+						<div id="variations_section"></div>
 
 	                </div>
 	                <div class="modal-footer">
@@ -205,5 +217,5 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/users/transfer.js?v1')}}"></script>
+<script src="{{asset('assets/js/users/transfer.js?v2')}}"></script>
 @endsection

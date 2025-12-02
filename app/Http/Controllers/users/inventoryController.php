@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Traits\Notifications;
 use App\Models\ProductHistory;
+use App\Models\StockVariation;
 use App\Models\SubCategory;
 use App\Models\Category;
 use App\Models\Product;
@@ -116,12 +117,23 @@ class inventoryController extends Controller
     {
         $product = Stock::with('product.metric')->where([['shop_id', Auth::user()->owner_id],['product_id', $request->product]])->first();
 
-        $imeis = explode(',', $product->imei);
+        $imeis = [];
+
+        if (!empty($product->imei)) {
+            $imeis = array_filter(explode(',', $product->imei), function ($i) {
+                return trim($i) !== "";
+            });
+        }
+
+        $variations = StockVariation::with(['size','colour'])
+        ->where('stock_id', $product->id)
+        ->get();
 
         return response()->json([
-            'product' => $product,
-            'quantity' => $product->quantity,
-            'imeis' => $imeis
+            'product'     => $product,
+            'quantity'    => $product->quantity,
+            'imeis'       => $imeis,
+            'variations'  => $variations,
         ]);
 
 
@@ -130,12 +142,16 @@ class inventoryController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
+            'branch'      => 'required',
             'category'      => 'required',
             'sub_category'  => 'required',
             'product'       => 'required',
             'quantity'      => 'required|numeric|min:0',
-        ], [
+        ], 
+        [
+            'branch.required'       => 'Branch is required.',
             'category.required'     => 'Category is required.',
             'sub_category.required' => 'Sub Category is required.',
             'product.required'      => 'Product is required.',
@@ -244,6 +260,38 @@ class inventoryController extends Controller
             'transfer_on'    => now(),
             'transfer_by'    => Auth::user()->id,
         ]);
+
+        foreach ($request->variation_qty as $variationId => $qty) 
+        {
+            if ($qty > 0) {
+
+                $mainV = StockVariation::find($variationId);
+
+                // Find if variation already exists for this branch
+                $branchV = StockVariation::where([
+                    ['stock_id', $branchStock->id],
+                    ['size_id', $mainV->size_id],
+                    ['colour_id', $mainV->colour_id],
+                    ['product_id', $request->product],
+                ])->first();
+
+                if ($branchV) {
+                    $branchV->update([
+                        'quantity' => $branchV->quantity + $qty
+                    ]);
+                } else {
+                    StockVariation::create([
+                        'stock_id'  => $branchStock->id,
+                        'product_id'=> $request->product,
+                        'size_id'   => $mainV->size_id,
+                        'colour_id' => $mainV->colour_id,
+                        'quantity'  => $qty,
+                        'price'     => $mainV->price
+                    ]);
+                }
+            }
+        }
+
 
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Product Transfer','App/Models/ProductHistory','product_histories',$transfer->id,'Create',null,$request,'Success','Product Transfered Successfully');
