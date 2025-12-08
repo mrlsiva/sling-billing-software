@@ -4,6 +4,7 @@ namespace App\Http\Controllers\branches;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\StockVariation;
 use App\Models\ProductHistory;
 use App\Traits\Notifications;
 use Illuminate\Http\Request;
@@ -95,9 +96,26 @@ class stockController extends Controller
 
     public function get_product_detail(Request $request)
     {
-        return $product = Stock::with('product.metric')->where([['shop_id', Auth::user()->parent_id],['branch_id', Auth::user()->id],['product_id', $request->product]])->first();
+        $product = Stock::with('product.metric')->where([['shop_id', Auth::user()->parent_id],['branch_id', Auth::user()->id],['product_id', $request->product]])->first();
 
-        //return $product = Product::with('metric')->where('id',$request->product)->first();
+        $imeis = [];
+
+        if (!empty($product->imei)) {
+            $imeis = array_filter(explode(',', $product->imei), function ($i) {
+                return trim($i) !== "";
+            });
+        }
+
+        $variations = StockVariation::with(['size','colour'])
+            ->where('stock_id', $product->id)
+            ->get();
+
+        return response()->json([
+            'product'     => $product,
+            'quantity'    => $product->quantity,
+            'imeis'       => $imeis,
+            'variations'  => $variations,
+        ]);
     }
 
     public function store(Request $request)
@@ -116,71 +134,131 @@ class stockController extends Controller
             'quantity.min'          => 'Quantity cannot be negative.',
         ]);
 
-        if($request->transfer_to == 1)
+        // If transfer to branch
+        if ($request->transfer_to == 1) 
         {
             $request->validate([
-                'branch'  => 'required',
-            ], 
-            [
+                'branch' => 'required',
+            ], [
                 'branch.required' => 'Branch is required.',
             ]);
         }
+
+        // Selected IMEIs
+        $selectedImeis = $request->imeis ?? [];
 
         $product = Product::findOrFail($request->product);
 
         if ($product->quantity == 0) 
         {
-            return redirect()->back()->with('toast_error', 'You cant transfer a product with 0 quantity.');
+            return back()->with('toast_error', 'You cant transfer a product with 0 quantity.');
         }
 
         if ($product->quantity < $request->quantity) 
         {
-            return redirect()->back()->with('toast_error', 'Quantity can’t be greater than stock.');
+            return back()->with('toast_error', 'Quantity can’t be greater than stock.');
         }
 
         DB::beginTransaction();
 
-        if($request->transfer_to == 2)
-        {
-            // Update or create branch stock
-            $hoStock = Stock::where([['shop_id', Auth::user()->parent_id],['branch_id', null],['product_id', $request->product]])->first();
 
-            if ($hoStock) 
-            {
-                $hoStock->update([
-                    'shop_id'        => Auth::user()->parent_id,
-                    'branch_id'      => null,
-                    'category_id'    => $request->category,
-                    'sub_category_id'=> $request->sub_category,
-                    'product_id'     => $request->product,
-                    'quantity'       => $hoStock->quantity + $request->quantity,
-                    'is_active'      => 1,
-                ]);
+        /* ============================================================
+        CASE: Branch → HO (transfer_to = 2)
+        ============================================================ */
+        if ($request->transfer_to == 2) {
 
+            /** ================ FIND OR CREATE HO STOCK ================== **/
+            $hoStock = Stock::where([
+                ['shop_id', Auth::user()->parent_id],
+                ['branch_id', null],
+                ['product_id', $request->product]
+            ])->first();
 
-                //Log
-                $this->addToLog($this->unique(),Auth::user()->id,'Stock Updated','App/Models/Stock','stocks',$hoStock->id,'Update',null,$request,'Success','Stock Updated for this product');
-            } 
+            $hoImeis = $hoStock && $hoStock->imei ? explode(',', $hoStock->imei) : [];
 
-            // Deduct from main shop stock
-            $mainStock = Stock::where([['shop_id', Auth::user()->parent_id],['branch_id', Auth::user()->id],['product_id', $request->product]])->first();
+            
+            // Append transferred IMEI to existing HO
+            $updatedHoImeis = array_merge($hoImeis, $selectedImeis);
 
-            if ($mainStock) 
-            {
+            $hoStock->update([
+                'quantity' => $hoStock->quantity + $request->quantity,
+                'imei'     => implode(',', $updatedHoImeis)
+            ]);
+
+            /** ================ REDUCE BRANCH (main) STOCK ================== **/
+            $mainStock = Stock::where([
+                ['shop_id', Auth::user()->parent_id],
+                ['branch_id', Auth::user()->id],
+                ['product_id', $request->product]
+            ])->first();
+
+            if ($mainStock) {
+                $mainImeis = $mainStock->imei ? explode(',', $mainStock->imei) : [];
+
+                // Remove IMEIs transferred back to HO
+                $remainingImeis = array_diff($mainImeis, $selectedImeis);
+
                 $mainStock->update([
-                    'quantity' => $mainStock->quantity - $request->quantity
+                    'quantity' => $mainStock->quantity - $request->quantity,
+                    'imei'     => implode(',', $remainingImeis)
                 ]);
             }
 
-            // Update product table stock
+            // Product table quantity update
             Product::where('id', $request->product)->update(['quantity' => $product->quantity + $request->quantity]);
 
-            //Log
-            $this->addToLog($this->unique(),Auth::user()->id,'Quantity Updated','App/Models/Poduct','products',$product->id,'Update',null,$request,'Success','Quantity Updated for this product');
+            /** ================ VARIATION TRANSFER: Branch(Main) -> HO ================== **/
+            // Make sure request->variation_qty exists and is an array
+            if (!empty($request->variation_qty) && is_array($request->variation_qty)) {
+                foreach ($request->variation_qty as $variationId => $qty) {
+                    $qty = (int) $qty;
+                    if ($qty > 0) {
+
+                        // Main variation (from branch/main stock)
+                        $mainV = StockVariation::find($variationId);
+                        if (! $mainV) {
+                            // skip if invalid id (or optionally log)
+                            continue;
+                        }
+
+                        // Find matching variation record under HO stock
+                        $hoV = StockVariation::where([
+                            ['stock_id', $hoStock->id],
+                            ['size_id', $mainV->size_id],
+                            ['colour_id', $mainV->colour_id],
+                            ['product_id', $request->product],
+                        ])->first();
+
+                        if ($hoV) {
+                            // Increase HO variation
+                            $hoV->update([
+                                'quantity' => $hoV->quantity + $qty
+                            ]);
+                        } else {
+                            // Create HO variation
+                            StockVariation::create([
+                                'stock_id'  => $hoStock->id,
+                                'product_id'=> $request->product,
+                                'size_id'   => $mainV->size_id,
+                                'colour_id' => $mainV->colour_id,
+                                'quantity'  => $qty,
+                                'price'     => $mainV->price
+                            ]);
+                        }
+
+                        // Reduce quantity from main variation
+                        // Guard against negative values
+                        $newMainQty = max(0, $mainV->quantity - $qty);
+                        $mainV->update([
+                            'quantity' => $newMainQty
+                        ]);
+                    }
+                }
+            }
 
             $transfer = ProductHistory::create([
-                'from'           => Auth::user()->id,
-                'to'             => Auth::user()->parent_id,
+                'from' => Auth::user()->id,
+                'to'   => Auth::user()->parent_id,
                 'category_id'    => $request->category,
                 'sub_category_id'=> $request->sub_category,
                 'product_id'     => $request->product,
@@ -189,32 +267,42 @@ class stockController extends Controller
                 'transfer_by'    => Auth::user()->id,
             ]);
 
-            //Log
-            $this->addToLog($this->unique(),Auth::user()->id,'Product Transfer','App/Models/ProductHistory','product_histories',$transfer->id,'Create',null,$request,'Success','Product Transfered Successfully');
+            // Logs
+            $this->addToLog($this->unique(),Auth::user()->id,'Product Transfer','App/Models/ProductHistory',
+                'product_histories',$transfer->id,'Create',null,$request,'Success',
+                'Product Transfered Successfully');
 
-            //Notification
-            $this->notification(Auth::user()->owner_id, null,'App/Models/ProductHistory', $transfer->id, null, json_encode($request->all()), now(), Auth::user()->id, $transfer->product->name.' has been successfully transfered to HO '.$transfer->transfer_to->name,null, null,8);
+            // Notification
+            $this->notification(Auth::user()->owner_id, null,'App/Models/ProductHistory',
+                $transfer->id, null, json_encode($request->all()), now(),
+                Auth::user()->id, $transfer->product->name.' has been successfully transfered to HO '.$transfer->transfer_to->name,
+                null, null, 8
+            );
         }
-        else
-        {
-        
-            // Update or create branch stock
-            $branchStock = Stock::where([['shop_id', Auth::user()->parent_id],['branch_id', $request->branch],['product_id', $request->product]])->first();
+
+
+        /* ============================================================
+        CASE 2: Branch → Other BRANCH (transfer_to = 1)
+        ============================================================ */
+        else {
+
+            /** ================= Other BRANCH STOCK UPDATE ================== **/
+            $branchStock = Stock::where([
+                ['shop_id', Auth::user()->parent_id],
+                ['branch_id', $request->branch],
+                ['product_id', $request->product]
+            ])->first();
+
+            $branchImeis = $branchStock && $branchStock->imei ? explode(',', $branchStock->imei) : [];
+
+            $updatedBranchImeis = array_merge($branchImeis, $selectedImeis);
 
             if ($branchStock) 
             {
                 $branchStock->update([
-                    'shop_id'        => Auth::user()->parent_id,
-                    'branch_id'      => $request->branch,
-                    'category_id'    => $request->category,
-                    'sub_category_id'=> $request->sub_category,
-                    'product_id'     => $request->product,
-                    'quantity'       => $branchStock->quantity + $request->quantity,
-                    'is_active'      => 1,
+                    'quantity' => $branchStock->quantity + $request->quantity,
+                    'imei'     => implode(',', $updatedBranchImeis)
                 ]);
-
-                //Log
-                $this->addToLog($this->unique(),Auth::user()->id,'Stock Updated','App/Models/Stock','stocks',$branchStock->id,'Update',null,$request,'Success','Stock Updated for this product');
             } 
             else 
             {
@@ -226,21 +314,74 @@ class stockController extends Controller
                     'product_id'     => $request->product,
                     'quantity'       => $request->quantity,
                     'is_active'      => 1,
+                    'imei'           => implode(',', $selectedImeis)
                 ]);
-
-                //Log
-                $this->addToLog($this->unique(),Auth::user()->id,'Stock Added','App/Models/Stock','stocks',$branchStock->id,'Insert',null,$request,'Success','Stock Added for this product');
             }
 
-            // Deduct from main shop stock
-            $mainStock = Stock::where([['shop_id', Auth::user()->parent_id],['branch_id', Auth::user()->id],['product_id', $request->product]])->first();
+            /** ================= Branch STOCK REDUCE ================== **/
+            $mainStock = Stock::where([
+                ['shop_id', Auth::user()->parent_id],
+                ['branch_id', Auth::user()->id],
+                ['product_id', $request->product]
+            ])->first();
 
-            if ($mainStock) 
-            {
+            if ($mainStock) {
+                $mainImeis = $mainStock->imei ? explode(',', $mainStock->imei) : [];
+
+                $remainingImeis = array_diff($mainImeis, $selectedImeis);
+
                 $mainStock->update([
-                    'quantity' => $mainStock->quantity - $request->quantity
+                    'quantity' => $mainStock->quantity - $request->quantity,
+                    'imei'     => implode(',', $remainingImeis)
                 ]);
             }
+
+            // Product stock deduct
+            Product::where('id', $request->product)->update(['quantity' => $product->quantity - $request->quantity]);
+
+            /** ================= VARIATION TRANSFER ================== **/
+            foreach ($request->variation_qty as $variationId => $qty) 
+            {
+                if ($qty > 0) {
+
+                    $mainV = StockVariation::find($variationId);
+
+                    // Find if variation already exists for this branch
+                    $branchV = StockVariation::where([
+                        ['stock_id', $branchStock->id],
+                        ['size_id', $mainV->size_id],
+                        ['colour_id', $mainV->colour_id],
+                        ['product_id', $request->product],
+                    ])->first();
+
+                    if ($branchV) {
+                        $branchV->update([
+                            'quantity' => $branchV->quantity + $qty
+                        ]);
+
+                        // 🔥 FIX: Reduce variation quantity from main stock
+                        $mainV->update([
+                            'quantity' => $mainV->quantity - $qty
+                        ]);
+                    
+                    } else {
+                        StockVariation::create([
+                            'stock_id'  => $branchStock->id,
+                            'product_id'=> $request->product,
+                            'size_id'   => $mainV->size_id,
+                            'colour_id' => $mainV->colour_id,
+                            'quantity'  => $qty,
+                            'price'     => $mainV->price
+                        ]);
+                    }
+
+                    // 🔥 FIX: Reduce variation quantity from main stock
+                    $mainV->update([
+                        'quantity' => $mainV->quantity - $qty
+                    ]);
+                }
+            }
+
 
             $transfer = ProductHistory::create([
                 'from'           => Auth::user()->id,
@@ -253,19 +394,23 @@ class stockController extends Controller
                 'transfer_by'    => Auth::user()->id,
             ]);
 
-            //Log
-            $this->addToLog($this->unique(),Auth::user()->id,'Product Transfer','App/Models/ProductHistory','product_histories',$transfer->id,'Create',null,$request,'Success','Product Transfered Successfully');
+            // Notifications
+            $this->notification(Auth::user()->owner_id, null,'App/Models/ProductHistory',
+                $transfer->id, null, json_encode($request->all()), now(),
+                Auth::user()->id, $transfer->product->name.' has been successfully transfered to branch '.$transfer->transfer_to->name,
+                null, null, 8);
 
-            //Notification
-            $this->notification(Auth::user()->owner_id, null,'App/Models/ProductHistory', $transfer->id, null, json_encode($request->all()), now(), Auth::user()->id, $transfer->product->name.' has been successfully transfered to branch '.$transfer->transfer_to->name,null, null,8);
-
-            //Notification
-            $this->notification(null, $request->branch,'App/Models/ProductHistory', $transfer->id, null, json_encode($request->all()), now(), Auth::user()->id, $transfer->product->name.' has been successfully transfered to your branch '.$transfer->transfer_to->name,null, null,8);
+            $this->notification(null, $request->branch,'App/Models/ProductHistory',
+                $transfer->id, null, json_encode($request->all()), now(),
+                Auth::user()->id, $transfer->product->name.' has been successfully transfered to your branch '.$transfer->transfer_to->name,
+                null, null, 8);
         }
 
         DB::commit();
 
         return redirect()->back()->with('toast_success', 'Product transferred successfully.');
     }
+
+    
 
 }

@@ -124,6 +124,8 @@
                 <th>Items</th>
                 <th class="right">Rate</th>
                 <th class="right">Qty</th>
+                <th class="right">Size-Colour</th>
+                <th class="right">IMEI</th>
                 <th class="right">Discount</th>
                 <th class="right">Amount</th>
             </tr>
@@ -139,6 +141,21 @@
                 </td>
                 <td class="right"> {{ number_format($order_detail->price,2) }}</td>
                 <td class="right">{{$order_detail->quantity}}</td>
+                <td class="right">
+                    @php
+                        $sizeName   = $order_detail->size_id   ? $order_detail->size->name   : null;
+                        $colorName  = $order_detail->colour_id ? $order_detail->colour->name : null;
+                    @endphp
+
+                    {{ $sizeName && $colorName ? "$sizeName - $colorName" : ($sizeName ?: ($colorName ?: '-')) }}
+                </td>
+                <td class="right">
+                    @if($order_detail->imei != null)
+                        {{$order_detail->imei}}
+                    @else
+                        -
+                    @endif
+                </td>
                 @if($order_detail->discount_type == 1)
                     <td class="right">{{$order_detail->discount}}</td>
                 @elseif($order_detail->discount_type == 2)

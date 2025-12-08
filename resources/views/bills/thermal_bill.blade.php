@@ -75,6 +75,8 @@
             <tr>
                 <th>Item</th>
                 <th class="right">Qty</th>
+                <th class="right">Size-Colour</th>
+                <th class="right">IMEI</th>
                 <th class="right">Price</th>
                 <th class="right">Tax</th>
                 <th class="right">Total</th>
@@ -85,6 +87,21 @@
             <tr>
                 <td>{{$order_detail->name}}</td>
                 <td class="right">{{$order_detail->quantity}}</td>
+                <td class="right">
+                    @php
+                        $sizeName   = $order_detail->size_id   ? $order_detail->size->name   : null;
+                        $colorName  = $order_detail->colour_id ? $order_detail->colour->name : null;
+                    @endphp
+
+                    {{ $sizeName && $colorName ? "$sizeName - $colorName" : ($sizeName ?: ($colorName ?: '-')) }}
+                </td>
+                <td class="right">
+                    @if($order_detail->imei != null)
+                        {{$order_detail->imei}}
+                    @else
+                        -
+                    @endif
+                </td>
                 <td class="right">₹ {{ $order_detail->price - $order_detail->tax_amount }}</td>
                 <td class="right">₹ {{$order_detail->tax_amount}}</td>
                 <td class="right">₹ {{$order_detail->price * $order_detail->quantity}}</td>

@@ -324,6 +324,15 @@
                             </a>
                         </li>
 
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('branch.stock_transfer.transfer', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-stock-fill"></i>
+                                </span>
+                                <span class="nav-text"> Stock Transfer </span>
+                            </a>
+                        </li>
+
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/branches/orders/*') ? 'active' : '' }}">
                             <a class="menu-link" href="{{route('branch.order.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">

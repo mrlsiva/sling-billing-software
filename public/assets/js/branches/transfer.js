@@ -55,38 +55,141 @@ jQuery(document).ready(function ()
 	});
 });
 
-jQuery(document).ready(function ()
-{
-	jQuery('select[name="product"]').on('change',function(){
-		var product = jQuery(this).val();
-		if(product)
-		{
-			jQuery.ajax({
-				url : 'get_product_detail',
-				type: 'GET',
-				dataType: 'json',
-				data: { product: product},
-				success:function(data)
-				{
-					console.log(data);
-					document.getElementById("unit").value = data.product.metric.name;
-					document.getElementById("available").value = data.quantity;	
-					if(data.quantity == 0)
-					{
-						$('#transfer').prop('disabled', true).attr('data-bs-original-title', 'You can’t transfer a product with 0 quantity.').tooltip('dispose').tooltip('show');
+/* ============================
+   PRODUCT → PRODUCT DETAILS
+============================ */
+jQuery(document).ready(function () {
 
-					}	
-					else
-					{
-						$('#transfer').prop('disabled', false).attr('data-bs-original-title', 'Click to transfer this product').tooltip('dispose').tooltip();
+    jQuery('select[name="product"]').on('change', function () {
 
-					}		
-					
-				}
-			});
-		}
-	});
+        var product = jQuery(this).val();
+
+        if (product) {
+
+            jQuery.ajax({
+                url: 'get_product_detail',
+                type: 'GET',
+                dataType: 'json',
+                data: { product: product },
+
+                success: function (data) {
+
+                    $("#unit").val(data.product.product.metric.name);
+                    $("#available").val(data.quantity);
+
+                    // ENABLE / DISABLE TRANSFER BUTTON
+                    if (data.quantity == 0) {
+                        $('#transfer').prop('disabled', true)
+                            .attr('data-bs-original-title', 'You can’t transfer a product with 0 quantity.')
+                            .tooltip('dispose').tooltip('show');
+
+                    } else {
+                        $('#transfer').prop('disabled', false)
+                            .attr('data-bs-original-title', 'Click to transfer this product')
+                            .tooltip('dispose').tooltip();
+                    }
+
+                    /* ============================
+                       VARIATION LIST UI
+                    ============================ */
+                    $("#variations_section").html("");
+
+                    data.variations.forEach(function (v) {
+                        $("#variations_section").append(`
+                            <div class="row mb-2 p-2 border rounded">
+                                <div class="col-md-5"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
+                                <div class="col-md-7">
+                                    <input type="number" class="form-control variation-qty"
+                                        data-max="${v.quantity}"
+                                        max="${v.quantity}" min="0"
+                                        name="variation_qty[${v.id}]"
+                                        placeholder="Available: ${v.quantity}">
+                                </div>
+                            </div>
+                        `);
+                    });
+
+                    /* ============================
+                       IMEI LIST
+                    ============================ */
+                    $("#imei_list").html("");
+
+                    let validImeis = data.imeis.filter(i => i && i.trim() !== "");
+
+                    if (validImeis.length > 0) {
+                        $("#imei_section").show();
+
+                        validImeis.forEach(function (imei, index) {
+                            $("#imei_list").append(`
+                                <div class="form-check" style="min-width:120px;">
+                                    <input type="checkbox" class="form-check-input imei-checkbox"
+                                           name="imeis[]" value="${imei}" id="imei_${index}">
+                                    <label for="imei_${index}" class="form-check-label">${imei}</label>
+                                </div>
+                            `);
+                        });
+
+                    } else {
+                        $("#imei_section").hide();
+                    }
+
+                }
+            });
+        }
+    });
+
+
+    /* ============================
+       IMEI VALIDATION
+    ============================ */
+
+    $(document).on('change', '.imei-checkbox', function () {
+        let allowed = parseInt($("#quantity").val());
+        let selected = $(".imei-checkbox:checked").length;
+
+        if (allowed && selected > allowed) {
+            $(this).prop('checked', false);
+            alert("You can select only " + allowed + " IMEIs.");
+        }
+    });
+
+    $("#quantity").on('input', function () {
+
+        let allowed = parseInt($(this).val());
+        let selected = $(".imei-checkbox:checked").length;
+
+        if (allowed < selected) {
+            alert("Quantity reduced! Removing extra selected IMEIs.");
+            $(".imei-checkbox:checked").slice(allowed).prop('checked', false);
+        }
+    });
 });
+
+
+/* ============================
+   VARIATION TOTAL → QUANTITY
+============================ */
+$(document).on("input", ".variation-qty", function () {
+
+    let max = parseInt($(this).attr("data-max"));
+    let val = parseInt($(this).val());
+
+    if (val > max) {
+        $(this).val(max);
+        val = max;
+    }
+
+    updateMainQuantity();
+});
+
+function updateMainQuantity() {
+    let total = 0;
+    $(".variation-qty").each(function () {
+        total += parseInt($(this).val()) || 0;
+    });
+
+    $("#quantity").val(total);
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('transfer_submit');

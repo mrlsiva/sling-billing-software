@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPaymentDetail;
 use App\Models\User;
+use App\Models\UserDetail;
 use App\Traits\Log;
 use DB;
 
@@ -75,7 +76,10 @@ class posController extends Controller
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
-        return view('bills.bill',compact('user','order','order_details','order_payment_details'));
+
+        $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+        
+        return view('bills.'.$user_detail->billType->blade,compact('user','order','order_details','order_payment_details'));
     }
 
     public function view_bill(Request $request,$company,$id)

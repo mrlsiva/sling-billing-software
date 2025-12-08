@@ -137,6 +137,8 @@
                 <th style="width:5%;">S.No</th>
                 <th style="width:34%;">Description</th>
                 <th style="width:6%;">Qty</th>
+                <th style="width:6%;">Size-Colour</th>
+                <th style="width:6%;">IMEI</th>
                 <th style="width:9%;">Rate</th>
                 <th style="width:9%;">Taxable</th>
                 <th style="width:7%;">CGST%</th>
@@ -153,6 +155,21 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{$order_detail->name}}</td>
                 <td>{{$order_detail->quantity}}</td>
+                <td>
+                    @php
+                        $sizeName   = $order_detail->size_id   ? $order_detail->size->name   : null;
+                        $colorName  = $order_detail->colour_id ? $order_detail->colour->name : null;
+                    @endphp
+
+                    {{ $sizeName && $colorName ? "$sizeName - $colorName" : ($sizeName ?: ($colorName ?: '-')) }}
+                </td>
+                <td>
+                    @if($order_detail->imei != null)
+                        {{$order_detail->imei}}
+                    @else
+                        -
+                    @endif
+                </td>
                 <td>₹ {{ $order_detail->price - $order_detail->tax_amount }}</td>
                 <td>₹ {{$order_detail->tax_amount}}</td>
                 <td>₹ {{ number_format((float)($order_detail->tax_percent / 2), 2) }}</td>

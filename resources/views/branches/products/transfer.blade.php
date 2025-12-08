@@ -215,6 +215,20 @@
 	                        </div>
 	                    </div>
 	                </div>
+
+	                <div class="row mt-3" id="imei_section" style="display:none;">
+						    <div class="col-md-12">
+						        <label class="form-label text-muted">Select IMEI Numbers</label>
+
+						        <div id="imei_list"
+						             class="border rounded p-2 d-flex flex-wrap gap-3"
+						             style="max-height:250px; overflow-y:auto;">
+						        </div>
+						    </div>
+						</div>
+
+						<div id="variations_section"></div>
+						
 	                <div class="modal-footer">
 	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	                    <button type="submit" id="transfer" class="btn btn-primary">Transfer</button>

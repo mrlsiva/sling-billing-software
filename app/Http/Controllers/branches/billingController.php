@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Gender;
 use App\Models\Stock;
+use App\Models\StockVariation;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Finance;
@@ -143,11 +144,76 @@ class billingController extends Controller
 
     public function get_product_detail(Request $request)
     {
-        return $products = Product::with(['tax','sub_category','category','stock' => function ($query) use ($request) {
-                $query->where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id);
+        $product = Product::with([
+            'tax',
+            'sub_category',
+            'category',
+            'stock' => function ($query) {
+                $query->where('shop_id', Auth::user()->parent_id)
+                      ->where('branch_id', Auth::user()->id);
             },
-        ])->where('id', $request->id)->first();
+            'stock.variations.size',    // load size name
+            'stock.variations.colour'   // load colour name
+        ])
+        ->where('id', $request->id)
+        ->first();
+
+        return response()->json([
+            'id'            => $product->id,
+            'name'          => $product->name,
+            'price'         => $product->price,
+            'tax_amount'    => $product->tax_amount,
+            'tax'           => $product->tax,
+            'category'      => $product->category,
+            'sub_category'  => $product->sub_category,
+            'stock'         => $product->stock,
+            'variations'    => $product->stock ? $product->stock->variations->map(function ($v) {
+                return [
+                    'id'          => $v->id,
+                    'size_name'   => optional($v->size)->name,
+                    'colour_name' => optional($v->colour)->name,
+                    'quantity'    => $v->quantity,
+                    'price'       => $v->price,
+                ];
+            }) : []
+        ]);
     }
+
+    public function get_variation_detail(Request $request)
+    {
+        $variation = StockVariation::with(['size', 'colour', 'stock.product.tax'])
+            ->where('id', $request->id)
+            ->first();
+
+        if (!$variation) {
+            return response()->json(['error' => 'Variation not found'], 404);
+        }
+
+        $product = $variation->stock->product;
+
+        $basePrice = (float) $product->price;
+        $taxPercent = (float) ($product->tax->percentage ?? 0);
+        $taxAmount = ($basePrice * $taxPercent) / 100;
+        $finalPrice = $basePrice + $taxAmount;
+
+        return response()->json([
+            'id'            => $variation->id,
+            'product_id'    => $variation->product_id,
+            'product_name'  => $product->name,
+            'size_name'     => $variation->size->name ?? '',
+            'colour_name'   => $variation->colour->name ?? '',
+            'quantity'      => $variation->quantity,
+
+            // MANDATORY FOR JS
+            'base_price'    => $basePrice,
+            'price'         => $finalPrice,
+            'tax_amount'    => $taxAmount,
+            'tax'           => $taxPercent
+        ]);
+    }
+
+
+
 
     public function suggestPhone(Request $request)
     {
@@ -212,44 +278,39 @@ class billingController extends Controller
 
     public function store(Request $request)
     {
-
         DB::beginTransaction();
 
-        $user = User::where('id',Auth::user()->id)->first();
-        $billSetup = BillSetup::where([['branch_id',Auth::user()->id],['is_active',1]])->first();
+        $user = User::where('id', Auth::user()->id)->first();
+        $billSetup = BillSetup::where([['branch_id', Auth::user()->id], ['is_active', 1]])->first();
 
         if (!$billSetup) {
             return response()->json([
-                'status'   => 'failure',
-                'message'  => 'No active bill setup found for this branch.'
+                'status'  => 'failure',
+                'message' => 'No active bill setup found for this branch.'
             ]);
         }
 
-        // Active bill prefix
+        // Bill number logic -------------------------
         $billPrefix = $billSetup->bill_number;
-
-        // Get last order with this branch
         $lastOrder = Order::where('branch_id', Auth::user()->id)->orderBy('id', 'desc')->first();
 
-        $newBillNo = $billPrefix . '01'; // default start if no orders
+        $newBillNo = $billPrefix . '01';
 
         if ($lastOrder && $lastOrder->bill_id) {
             $lastBillNo = $lastOrder->bill_id;
 
             if (Str::startsWith($lastBillNo, $billPrefix)) {
-                // continue sequence
                 $lastNumber = (int) Str::replaceFirst($billPrefix, '', $lastBillNo);
                 $newBillNo = $billPrefix . str_pad($lastNumber + 1, 2, '0', STR_PAD_LEFT);
-            } else {
-                // reset sequence for new prefix
-                $newBillNo = $billPrefix . '01';
             }
         }
 
-        $customerData = $request->input('customer');
+        // Customer Creation -------------------------
+        $customerData = $request->customer;
+
         $customer = Customer::firstOrCreate(
             [
-                'user_id' => $user->parent_id,     // include user_id for composite uniqueness
+                'user_id' => $user->parent_id,
                 'phone'   => $customerData['phone'],
             ],
             [
@@ -263,48 +324,50 @@ class billingController extends Controller
             ]
         );
 
+        // Bill Amount ------------------------
+        $cart = $request->cart ?? [];
 
-        $cart = $request->input('cart', []);
-        $billAmount = collect($cart)->sum(function ($item) {
-            return ($item['qty'] * $item['price']);
-        });
+        $billAmount = collect($cart)->sum(fn($item) =>
+            ($item['qty'] * $item['price'])
+        );
 
-        // ✅ Calculate total product discount
+        // Product discount -------------------
         $totalProductDiscount = collect($cart)->sum(function ($item) {
             $product = Product::find($item['product_id']);
-            if (!$product) {
-                return 0;
-            }
+            if (!$product) return 0;
 
-            // Calculate per-item discount
             if ($product->discount_type == 1) {
-                // Flat discount per unit
-                $discount = $product->discount * $item['qty'];
-            } elseif ($product->discount_type == 2) {
-                // Percentage discount
-                $discount = (($product->discount / 100) * $item['price']) * $item['qty'];
-            } else {
-                $discount = 0;
+                return $product->discount * $item['qty'];
             }
-
-            return $discount;
+            elseif ($product->discount_type == 2) {
+                return (($product->discount / 100) * $item['price']) * $item['qty'];
+            }
+            return 0;
         });
 
         $order = Order::create([
-            'shop_id'                   => $user->parent_id,
-            'branch_id'                 => Auth::user()->id,
-            'bill_id'                   => $newBillNo,
-            'billed_by'                 => $request->billed_by,
-            'customer_id'               => $customer->id,
-            'total_product_discount'    => $totalProductDiscount,
-            'bill_amount'               => $billAmount,
-            'billed_on'                 => Carbon::now(),
+            'shop_id'                => $user->parent_id,
+            'branch_id'              => Auth::user()->id,
+            'bill_id'                => $newBillNo,
+            'billed_by'              => $request->billed_by,
+            'customer_id'            => $customer->id,
+            'total_product_discount' => $totalProductDiscount,
+            'bill_amount'            => $billAmount,
+            'billed_on'              => now(),
         ]);
 
-
+        // ---------------------------------------
+        // Order Details + Variation Save
+        // ---------------------------------------
         foreach ($cart as $item) {
 
-            $product = Product::where('id',$item['product_id'])->first();
+            $product = Product::find($item['product_id']);
+            $variation = null;
+
+            // 👉 CHANGE: Fetch variation if exists
+            if (!empty($item['variation_id'])) {
+                $variation = StockVariation::find($item['variation_id']);
+            }
 
             OrderDetail::create([
                 'order_id'      => $order->id,
@@ -317,47 +380,53 @@ class billingController extends Controller
                 'tax_percent'   => $product->tax->name,
                 'discount_type' => $product->discount_type,
                 'discount'      => $product->discount,
-                'imei'          => isset($item['imeis']) ? implode(',', $item['imeis']) : null,
+                'imei'          => !empty($item['imeis']) ? implode(',', $item['imeis']) : null,
+
+                // 👉 CHANGE: Store variation SIZE + COLOUR as comma-separated values
+                'size_id'       => $variation ? $variation->size_id : null,
+                'colour_id'     => $variation ? $variation->colour_id : null,
             ]);
 
-            // Fetch stock
+            // Fetch main stock ------------------
             $stock = Stock::where([
-                ['shop_id',$user->parent_id],
-                ['branch_id',Auth::user()->id],
-                ['product_id',$item['product_id']]
+                ['shop_id', $user->parent_id],
+                ['branch_id', Auth::user()->id],
+                ['product_id', $item['product_id']]
             ])->first();
 
-            // Reduce Quantity
-            $stock->quantity = $stock->quantity - $item['qty'];
+            // ---------------------------------------
+            // 👉 CHANGE: Variation stock reduce
+            // ---------------------------------------
+            if ($variation) {
 
-            // Remove sold IMEI numbers from stock
+                // reduce variation quantity
+                $variation->quantity -= $item['qty'];
+                $variation->save();
+            }
+
+            // reduce main stock quantity
+            $stock->quantity -= $item['qty'];
+
+            // IMEI remove
             if (!empty($item['imeis'])) {
-
-                // Convert comma-separated IMEI string to array
                 $existingImeis = !empty($stock->imei) ? explode(',', $stock->imei) : [];
-
-                // Remove sold IMEIs
                 $remainingImeis = array_values(array_diff($existingImeis, $item['imeis']));
-
-                // Convert back to comma-separated string
                 $stock->imei = implode(',', $remainingImeis);
             }
 
-
             $stock->save();
 
+            // IMEI marking sold
             if (!empty($item['imeis'])) {
                 ProductImeiNumber::where('product_id', $item['product_id'])
                     ->whereIn('name', $item['imeis'])
                     ->update(['is_sold' => 1]);
             }
-
         }
 
-        $payments = $request->input('payments', []);
-        foreach ($payments as $payment) {
-
-            $payment_id = Payment::where('name',$payment['method'])->first()->id;
+        // Payments --------------------------
+        foreach ($request->payments ?? [] as $payment) {
+            $payment_id = Payment::where('name', $payment['method'])->first()->id;
             $extra = $payment['extra'] ?? [];
 
             OrderPaymentDetail::create([
@@ -370,23 +439,33 @@ class billingController extends Controller
             ]);
         }
 
-        
+        // Logs & Notification --------------
+        $this->addToLog($this->unique(), Auth::id(), 'Order', 'App/Models/Order', 'orders', $order->id, 'Insert', null, null, 'Success', 'Order Created Successfully');
 
-        //Log
-        $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
-
-        //Notifiction
-        $this->notification(Auth::user()->parent_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null,14);
+        $this->notification(
+            Auth::user()->parent_id,
+            null,
+            'App/Models/Order',
+            $order->id,
+            null,
+            json_encode($request->all()),
+            now(),
+            Auth::user()->id,
+            'Branch ' . Auth::user()->name . ' placed one order for customer ' . $customer->name,
+            null,
+            null,
+            14
+        );
 
         DB::commit();
-        
+
         return response()->json([
             'status'   => 'success',
             'message'  => 'Order saved successfully',
             'order_id' => $order->id
         ]);
-
     }
+
 
     public function get_bill(Request $request,$company,$id)
     {
