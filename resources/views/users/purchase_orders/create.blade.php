@@ -21,7 +21,7 @@
             @csrf
             <div class="card">
                 <div class="card-header pb-0">
-                    <h4 class="card-title">Purchase Order - Multiple Items</h4>
+                    <h4 class="card-title">Purchase Order</h4>
                 </div>
                 <div class="card-body">
                     <!-- Purchase Order Header Information -->
@@ -81,15 +81,22 @@
                         <div class="col-md-12">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="text-primary">Products</h5>
-                                <button type="button" class="btn btn-success btn-sm" id="addProductRow">
-                                    <i class="ri-add-line"></i> Add Product
-                                </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Product Items Container -->
                     <div id="productsContainer"></div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-success btn-sm" id="addProductRow">
+                                    <i class="ri-add-line"></i> Add Product
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Purchase Order Summary -->
                     <div class="row mt-4 border-top pt-3">

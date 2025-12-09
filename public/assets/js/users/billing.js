@@ -162,99 +162,109 @@ function add_to_cart(element) {
         data: { id: system_id },
         success: function (data) {
 
-            // -----------------------------  
-            // IF PRODUCT HAS VARIATIONS  
-            // -----------------------------
-            if (data.variations && data.variations.length > 0) {
+            console.log(data);
 
-                let modalBody = '';
-
-                data.variations.forEach(function (v) {
-                    modalBody += `
-                        <tr>
-                            <td>${v.size_name ?? '-'}</td>
-                            <td>${v.colour_name ?? '-'}</td>
-                            <td>₹${v.price}</td>
-                            <td>${v.quantity}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary"
-                                    onclick="addVariationToCart(${data.id}, ${v.id})">
-                                    Add
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                $("#variationModalBody").html(modalBody);
-                $("#variationModal").modal("show");
-                return;
+            if(data.stock.quantity == 0)
+            {
+                alert('No stock for this product');  
             }
+            else
+            {
 
-            // -----------------------------  
-            // NO VARIATIONS → DEFAULT LOGIC  
-            // -----------------------------
+                // -----------------------------  
+                // IF PRODUCT HAS VARIATIONS  
+                // -----------------------------
+                if (data.variations && data.variations.length > 0) {
 
-            var $existingItem = $('#cart_item').find('[data-product-id="' + system_id + '"]');
+                    let modalBody = '';
 
-            if ($existingItem.length) {
-                var $qtyInput = $existingItem.find('.qty-input');
-                var currentQty = parseInt($qtyInput.val());
-                var maxQty = parseInt($existingItem.data('stock-qty'));
+                    data.variations.forEach(function (v) {
+                        modalBody += `
+                            <tr>
+                                <td>${v.size_name ?? '-'}</td>
+                                <td>${v.colour_name ?? '-'}</td>
+                                <td>₹${v.price}</td>
+                                <td>${v.quantity}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary"
+                                        onclick="addVariationToCart(${data.id}, ${v.id})">
+                                        Add
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
 
-                if (currentQty < maxQty) {
-                    $qtyInput.val(currentQty + 1);
-                    updateCartSummary();
-                } else {
-                    alert("Cannot add more. Stock limit reached (" + maxQty + ").");
+                    $("#variationModalBody").html(modalBody);
+                    $("#variationModal").modal("show");
+                    return;
                 }
-                return;
-            }
 
-            let hasImei = data.stock.imei && data.stock.imei.trim() !== "";
-            var maxQty = parseInt(data.stock.quantity);
+                // -----------------------------  
+                // NO VARIATIONS → DEFAULT LOGIC  
+                // -----------------------------
 
-            $("#cart_item").append(`
-                <div class="border border-light mt-3 p-2 rounded" 
-                    data-product-id="${data.id}" 
-                    data-price="${data.price}"
-                    data-tax_amount="${data.tax_amount}" 
-                    data-tax-id="${data.tax_id}" 
-                    data-stock-qty="${maxQty}">
+                var $existingItem = $('#cart_item').find('[data-product-id="' + system_id + '"]');
 
-                    <div class="d-flex flex-wrap align-items-center gap-3">
-                        <div>
-                            <a class="text-dark fs-12 fw-bold">${data.name}</a>
-                            <p class="fs-10 my-1">${data.category.name} - ${data.sub_category.name}</p>
+                if ($existingItem.length) {
+                    var $qtyInput = $existingItem.find('.qty-input');
+                    var currentQty = parseInt($qtyInput.val());
+                    var maxQty = parseInt($existingItem.data('stock-qty'));
+
+                    if (currentQty < maxQty) {
+                        $qtyInput.val(currentQty + 1);
+                        updateCartSummary();
+                    } else {
+                        alert("Cannot add more. Stock limit reached (" + maxQty + ").");
+                    }
+                    return;
+                }
+
+                let hasImei = data.stock.imei && data.stock.imei.trim() !== "";
+                var maxQty = parseInt(data.stock.quantity);
+
+                $("#cart_item").append(`
+                    <div class="border border-light mt-3 p-2 rounded" 
+                        data-product-id="${data.id}" 
+                        data-price="${data.price}"
+                        data-tax_amount="${data.tax_amount}" 
+                        data-tax-id="${data.tax_id}" 
+                        data-stock-qty="${maxQty}">
+
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <div>
+                                <a class="text-dark fs-12 fw-bold">${data.name}</a>
+                                <p class="fs-10 my-1">${data.category.name} - ${data.sub_category.name}</p>
+                            </div>
+                            <div class="ms-lg-auto">
+                                <div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
+                                    <button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
+                                    <input type="number" class="qty-input text-dark text-center border-0 bg-body-secondary rounded h-100" value="1" min="0" max="${maxQty}" readonly>
+                                    <button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100" data-system_id="${data.id}">+</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="ms-lg-auto">
-                            <div class="input-step border bg-body-secondary p-1 mt-1 rounded d-inline-flex overflow-visible">
-                                <button type="button" class="minus bg-light text-dark border-0 rounded fs-20 lh-1 h-100">-</button>
-                                <input type="number" class="qty-input text-dark text-center border-0 bg-body-secondary rounded h-100" value="1" min="0" max="${maxQty}" readonly>
-                                <button type="button" class="plus bg-light text-dark border-0 rounded fs-20 lh-1 h-100" data-system_id="${data.id}">+</button>
+
+                        <div class="d-flex align-items-center justify-content-between px-1">
+                            <div>
+                                <p class="text-dark fw-semibold fs-16 mb-0">₹${data.price} <span class="fs-10">(${data.tax.name}%)</span></p>
+                            </div>
+                            <div class="d-flex align-content-center gap-1">
+                                ${hasImei ?
+                                    `<a href="#!" class="btn btn-soft-info avatar-xs rounded d-flex align-items-center justify-content-center imei-btn" onclick="openImeiModal(${data.id})">
+                                        <i class="ri-barcode-line align-middle fs-12"></i>
+                                    </a>` : ``}
+
+                                <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center remove-item">
+                                    <i class="ri-delete-bin-5-line align-middle fs-12"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
+                `);
 
-                    <div class="d-flex align-items-center justify-content-between px-1">
-                        <div>
-                            <p class="text-dark fw-semibold fs-16 mb-0">₹${data.price} <span class="fs-10">(${data.tax.name}%)</span></p>
-                        </div>
-                        <div class="d-flex align-content-center gap-1">
-                            ${hasImei ?
-                                `<a href="#!" class="btn btn-soft-info avatar-xs rounded d-flex align-items-center justify-content-center imei-btn" onclick="openImeiModal(${data.id})">
-                                    <i class="ri-barcode-line align-middle fs-12"></i>
-                                </a>` : ``}
-
-                            <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center remove-item">
-                                <i class="ri-delete-bin-5-line align-middle fs-12"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            `);
-
-            updateCartSummary();
+                updateCartSummary();
+            }
         }
     });
 }
