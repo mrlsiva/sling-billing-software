@@ -727,6 +727,34 @@
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="variationModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Select Variation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>Size</th>
+                            <th>Color</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Add</th>
+                        </tr>
+                    </thead>
+                    <tbody id="variationModalBody"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')

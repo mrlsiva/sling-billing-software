@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Gender;
 use App\Models\Stock;
+use App\Models\StockVariation;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Finance;
@@ -109,13 +110,74 @@ class billingsController extends Controller
         return view('users.billing', compact('stocks'));
     }
 
-
     public function get_product_detail(Request $request)
     {
-        return $products = Product::with(['tax','sub_category','category','stock' => function ($query) use ($request) {
-                $query->where('shop_id', Auth::user()->owner_id)->where('branch_id', null);
+        $product = Product::with([
+            'tax',
+            'sub_category',
+            'category',
+            'stock' => function ($query) {
+                $query->where('shop_id', Auth::user()->owner_id)
+                      ->where('branch_id', null);
             },
-        ])->where('id', $request->id)->first();
+            'stock.variations.size',    // load size name
+            'stock.variations.colour'   // load colour name
+        ])
+        ->where('id', $request->id)
+        ->first();
+
+        return response()->json([
+            'id'            => $product->id,
+            'name'          => $product->name,
+            'price'         => $product->price,
+            'tax_amount'    => $product->tax_amount,
+            'tax'           => $product->tax,
+            'category'      => $product->category,
+            'sub_category'  => $product->sub_category,
+            'stock'         => $product->stock,
+            'variations'    => $product->stock ? $product->stock->variations->map(function ($v) {
+                return [
+                    'id'          => $v->id,
+                    'size_name'   => optional($v->size)->name,
+                    'colour_name' => optional($v->colour)->name,
+                    'quantity'    => $v->quantity,
+                    'price'       => $v->price,
+                ];
+            }) : []
+        ]);
+    }
+
+    public function get_variation_detail(Request $request)
+    {
+        $variation = StockVariation::with(['size', 'colour', 'stock.product.tax'])
+            ->where('id', $request->id)
+            ->first();
+
+        if (!$variation) {
+            return response()->json(['error' => 'Variation not found'], 404);
+        }
+
+        $product = $variation->stock->product;
+
+        $basePrice = (float) $product->price;
+        $taxPercent = (float) ($product->tax->percentage ?? 0);
+        $taxAmount = ($basePrice * $taxPercent) / 100;
+        $finalPrice = $basePrice + $taxAmount;
+
+        return response()->json([
+            'id'            => $variation->id,
+            'product_id'    => $variation->product_id,
+            'product_name'  => $product->name,
+            'size_name'     => $variation->size->name ?? '',
+            'colour_name'   => $variation->colour->name ?? '',
+            'quantity'      => $variation->quantity,
+
+            // MANDATORY FOR JS
+            'base_price'    => $basePrice,
+            'price'         => $finalPrice,
+            'tax_amount'    => $taxAmount,
+            'tax'           => $taxPercent
+        ]);
     }
 
     public function suggestPhone(Request $request)
@@ -134,6 +196,7 @@ class billingsController extends Controller
     {
         return $customer = Customer::with('gender')->where('phone', $request->phone)->where('user_id', Auth::user()->id)->first();
     }
+
 
     public function store(Request $request)
     {
@@ -230,6 +293,7 @@ class billingsController extends Controller
         foreach ($cart as $item) {
 
             $product = Product::where('id',$item['product_id'])->first();
+            $variation = !empty($item['variation_id'])? StockVariation::find($item['variation_id']) : null;
 
             OrderDetail::create([
                 'order_id'      => $order->id,
@@ -243,9 +307,18 @@ class billingsController extends Controller
                 'discount_type' => $product->discount_type,
                 'discount'      => $product->discount,
                 'imei'          => isset($item['imeis']) ? implode(',', $item['imeis']) : null,
+                // Variation support
+                'size_id'       => $variation?->size_id,
+                'colour_id'     => $variation?->colour_id,
             ]);
 
             $stock = Stock::where([['shop_id',$user->id],['branch_id',null],['product_id',$item['product_id']]])->first();
+
+            // Reduce variation stock FIRST
+            if ($variation) {
+                $variation->quantity -= $item['qty'];
+                $variation->save();
+            }
 
             // Reduce Quantity
             $stock->quantity = $stock->quantity - $item['qty'];
