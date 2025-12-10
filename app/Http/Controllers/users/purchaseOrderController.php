@@ -122,10 +122,17 @@ class purchaseOrderController extends Controller
         foreach ($request->products as $index => $item) {
 
             if (!empty($item['imei'])) {
+
                 $imeiList = is_array($item['imei']) ? $item['imei'] : explode(',', $item['imei']);
 
                 foreach ($imeiList as $imei) {
+
                     $imei = trim($imei);
+
+                    // ❗ Skip empty IMEI values
+                    if ($imei === '' || $imei === null) {
+                        continue;
+                    }
 
                     if (in_array($imei, $allImeis)) {
                         return back()->withErrors([
@@ -137,6 +144,7 @@ class purchaseOrderController extends Controller
                 }
             }
         }
+
 
         DB::beginTransaction();
 
