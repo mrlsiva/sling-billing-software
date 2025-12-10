@@ -88,7 +88,6 @@ class purchaseOrderController extends Controller
 
     public function store(Request $request)
     {
-        //return $request;
         $request->validate([
             'vendor' => 'required',
             'invoice_date' => 'required|date',

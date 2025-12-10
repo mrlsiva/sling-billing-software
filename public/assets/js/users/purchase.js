@@ -1,24 +1,279 @@
 jQuery(document).ready(function () {
+
     let rowIndex = 0;
 
-    // Initialize with one product row
-    addProductRow();
+    // If server provided old products (blade will inject `window._OLD_PRODUCTS = ...`), restore them
+    const oldProducts = window._OLD_PRODUCTS || null;
 
-    // Add Product Row Button Click
-    $('#addProductRow').click(function () {
+    // Initialize
+    if (oldProducts && Array.isArray(oldProducts) && oldProducts.length > 0) {
+        // create rows for old products
+        oldProducts.forEach((p, idx) => {
+            addProductRow(p);
+        });
+    } else {
+        addProductRow();
+    }
+
+    // Add product row button
+    $('#addProductRow').on('click', function () {
         addProductRow();
     });
 
-    // Function to add a new product row
-    function addProductRow() {
+    // Delegated event handlers (works for dynamic rows)
+    const container = $('#productsContainer');
+
+    // CATEGORY -> fetch subcategories
+    container.on('change', '.category-select', function () {
+        const row = $(this).closest('.product-row');
+        const category = $(this).val();
+        const sub = row.find('.sub-category-select');
+        const prod = row.find('.product-select');
+
+        sub.html('<option value=""> Select </option>');
+        prod.html('<option value=""> Select </option>');
+        clearVariations(row);
+
+        if (!category) return;
+
+        $.getJSON('../../products/get_sub_category', { id: category })
+            .done(function (data) {
+                data.forEach(v => sub.append(`<option value="${v.id}">${v.name}</option>`));
+            })
+            .fail(function (xhr) { console.error('get_sub_category failed', xhr); });
+    });
+
+    // SUBCATEGORY -> fetch products
+    container.on('change', '.sub-category-select', function () {
+        const row = $(this).closest('.product-row');
+        const subCategory = $(this).val();
+        const category = row.find('.category-select').val();
+        const prod = row.find('.product-select');
+
+        prod.html('<option value=""> Select </option>');
+        clearVariations(row);
+
+        if (!category || !subCategory) return;
+
+        $.getJSON('get_product', { category: category, sub_category: subCategory })
+            .done(function (data) {
+                data.forEach(v => prod.append(`<option value="${v.id}">${v.name}</option>`));
+            })
+            .fail(function (xhr) { console.error('get_product failed', xhr); });
+    });
+
+    // PRODUCT -> fetch details + variations
+    container.on('change', '.product-select', function () {
+        const row = $(this).closest('.product-row');
+        const product = $(this).val();
+
+        const qtyInput = findQtyInput(row);
+        const unitInput = row.find('.unit-input');
+        const metricDisplay = row.find('.metric-display');
+        const taxInput = row.find('.tax-input');
+        const variationContainer = row.find('.variation-container');
+
+        clearVariations(row);
+
+        if (!product) return;
+
+        // product details
+        $.getJSON('get_product_detail', { product: product })
+            .done(function (data) {
+                console.log('product_detail', data);
+                if (data.metric) unitInput.val(data.metric.id);
+                if (data.metric && data.metric.name) metricDisplay.text("(" + data.metric.name + ")");
+                if (data.price) row.find('.price-input').val(parseFloat(data.price).toFixed(2));
+                qtyInput.val(1);
+                if (data.tax_id) taxInput.val(data.tax_id).change(); else taxInput.val('0');
+                calculateRowCosts(row);
+            })
+            .fail(function (xhr) { console.error('get_product_detail failed', xhr); });
+
+        // variations
+        $.getJSON('get_stock_variations', { product_id: product })
+            .done(function (response) {
+                console.log('stock_variations', response);
+                variationContainer.html('');
+
+                if (!response || !Array.isArray(response.variations) || response.variations.length === 0) {
+                    // no variations -> quantity editable
+                    variationContainer.hide();
+                    qtyInput.removeAttr('readonly');
+                    return;
+                }
+
+                // check if all variation entries have no size & no colour
+                const allEmpty = response.variations.every(v => !v.size && !v.colour);
+                if (allEmpty) {
+                    variationContainer.hide();
+                    qtyInput.removeAttr('readonly');
+                    return;
+                }
+
+                // variations exist -> make quantity readonly
+                variationContainer.show();
+                qtyInput.attr('readonly', 'readonly');
+
+                response.variations.forEach((v, idx) => {
+                    const sizeName = v.size ? v.size.name : '-';
+                    const colourName = v.colour ? v.colour.name : '-';
+
+                    // create inputs with names containing row index so Laravel receives structured input
+                    const rowIdx = row.attr('data-row-index');
+                    const html = `
+                        <div class="row border p-2 mb-2 variation-row">
+                            <input type="hidden" name="products[${rowIdx}][variation][${idx}][stock_id]" value="${response.stock_id}">
+                            <input type="hidden" name="products[${rowIdx}][variation][${idx}][size_id]" value="${v.size ? v.size.id : ''}">
+                            <input type="hidden" name="products[${rowIdx}][variation][${idx}][colour_id]" value="${v.colour ? v.colour.id : ''}">
+
+                            <div class="col-md-3">
+                                <label>Size</label>
+                                <input type="text" class="form-control" readonly value="${sizeName}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Colour</label>
+                                <input type="text" class="form-control" readonly value="${colourName}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Qty</label>
+                                <input type="number" step="1" min="0" class="form-control variation-qty" name="products[${rowIdx}][variation][${idx}][qty]" value="0">
+                            </div>
+
+                            
+                        </div>
+                    `;
+                    variationContainer.append(html);
+                });
+
+                // when variations change -> consolidate sum into quantity input
+                // handled by delegated handlers below
+            })
+            .fail(function (xhr) { console.error('get_stock_variations failed', xhr); });
+    });
+
+    // DELEGATED: when variation qty or price changes -> recalc and consolidate
+    container.on('input', '.variation-qty, .variation-price', function () {
+        const row = $(this).closest('.product-row');
+
+        // Consolidate variation qtys into main quantity
+        const totalQty = sumVariationQty(row);
+        const qtyInput = findQtyInput(row);
+
+        // Update main qty (keep as integer)
+        qtyInput.val(totalQty);
+
+        // Recalculate: we keep variation prices independent, but you already validate sums on submit
+        calculateRowCosts(row);
+    });
+
+    // Delegated: when main quantity changed by user (only possible when no variations or when we allow edits)
+    container.on('input', '.quantity-input', function () {
+        const row = $(this).closest('.product-row');
+        const qty = parseInt($(this).val()) || 0;
+        const variationRows = row.find('.variation-row');
+
+        // enforce limit
+        if (qty > 60) {
+            alert('Please enter quantity below 60 at a time. For larger quantities, create multiple purchase orders.');
+            $(this).val('');
+            row.find('.imei-container').empty();
+            return calculateRowCosts(row);
+        }
+
+        // If there are variation rows, propagate the main qty (distribute proportionally by current shares or equally)
+        if (variationRows.length > 0) {
+            // If all variation qtys are zero, distribute equally; else scale proportionally
+            let currentTotal = sumVariationQty(row);
+            if (currentTotal === 0) {
+                // distribute equally
+                const count = variationRows.length;
+                const base = Math.floor(qty / count);
+                let remainder = qty - base * count;
+                variationRows.each(function () {
+                    const $v = $(this);
+                    let assign = base + (remainder > 0 ? 1 : 0);
+                    $v.find('.variation-qty').val(assign);
+                    remainder--;
+                });
+            } else {
+                // scale proportionally
+                variationRows.each(function () {
+                    const $v = $(this);
+                    const cur = parseFloat($v.find('.variation-qty').val()) || 0;
+                    const proportion = currentTotal === 0 ? 0 : (cur / currentTotal);
+                    const newQty = Math.round(proportion * qty);
+                    $v.find('.variation-qty').val(newQty);
+                });
+                // small correction: ensure sum matches desired qty
+                let newSum = sumVariationQty(row);
+                let diff = qty - newSum;
+                // add diff to first variation
+                if (diff !== 0) {
+                    const first = variationRows.first();
+                    const curFirst = parseInt(first.find('.variation-qty').val()) || 0;
+                    first.find('.variation-qty').val(Math.max(0, curFirst + diff));
+                }
+            }
+        }
+
+        // IMEI regeneration if checked
+        if (row.find('.enable-imei-checkbox').is(':checked')) {
+            generateIMEIInputs(row);
+        }
+
+        calculateRowCosts(row);
+    });
+
+    // IMEI checkbox delegated
+    container.on('change', '.enable-imei-checkbox', function () {
+        const row = $(this).closest('.product-row');
+        const checked = $(this).is(':checked');
+        const ic = row.find('.imei-container');
+        if (checked) {
+            ic.show();
+            generateIMEIInputs(row);
+        } else {
+            ic.hide().empty();
+        }
+    });
+
+    // Price/tax/discount delegated recalculation
+    container.on('input', '.price-input, .tax-input, .discount-input', function () {
+        const row = $(this).closest('.product-row');
+        calculateRowCosts(row);
+    });
+
+    // Remove row
+    container.on('click', '.remove-product-row', function () {
+        $(this).closest('.product-row').remove();
+        updateProductNumbers();
+        updateRemoveButtons();
+        updateTotalSummary();
+    });
+
+    // Form submit validation (existing logic preserved; can be extended)
+    $('#purchaseOrderCreate').on('submit', function (e) {
+        // you can keep your existing validation logic here
+        // Example: ensure variations sum matches main qty, ensure net cost > 0 etc.
+        // nothing changed here; we trust server-side to still validate
+    });
+
+    // -----------------------
+    // Helper functions
+    // -----------------------
+    function addProductRow(oldData = null) {
         const template = $('#productRowTemplate').html();
         const newRow = $(template).clone();
 
-        // Update row index and form names
+        // set real row index before replacing names
         newRow.attr('data-row-index', rowIndex);
+        newRow.addClass('product-row');
         newRow.find('.product-number').text(rowIndex + 1);
 
-        // Update all form field names with current index
+        // Replace names/ids/for text [0] -> [rowIndex]
         newRow.find('select, input, label').each(function () {
             const name = $(this).attr('name');
             const id = $(this).attr('id');
@@ -29,428 +284,152 @@ jQuery(document).ready(function () {
             if (forAttr) $(this).attr('for', forAttr.replace('[0]', '[' + rowIndex + ']'));
         });
 
-        // Default values
+        // Defaults
         newRow.find('.quantity-input').val(1);
         newRow.find('.tax-input').val('0');
         newRow.find('.net-cost-input').val('');
         newRow.find('.gross-cost-input').val('');
 
-        // Append to container
         $('#productsContainer').append(newRow);
 
-        // Bind events for this row
-        bindRowEvents(newRow);
-        calculateRowCosts(newRow);
+        // If oldData is provided, populate values (we trigger change events to load dependent data)
+        if (oldData) {
+            try {
+                if (oldData.category) {
+                    newRow.find('.category-select').val(oldData.category).trigger('change');
+                }
+                // small delays to allow AJAX to populate subcategory/product
+                setTimeout(() => {
+                    if (oldData.sub_category) newRow.find('.sub-category-select').val(oldData.sub_category).trigger('change');
+                }, 300);
+                setTimeout(() => {
+                    if (oldData.product) newRow.find('.product-select').val(oldData.product).trigger('change');
+                }, 700);
+
+                if (oldData.quantity) newRow.find('.quantity-input').val(oldData.quantity);
+                if (oldData.price_per_unit) newRow.find('.price-input').val(oldData.price_per_unit);
+                if (oldData.discount) newRow.find('.discount-input').val(oldData.discount);
+                if (oldData.tax) newRow.find('.tax-input').val(oldData.tax);
+
+                // IMEIs
+                if (oldData.imei && Array.isArray(oldData.imei) && oldData.imei.length > 0) {
+                    newRow.find('.enable-imei-checkbox').prop('checked', true);
+                    generateIMEIInputs(newRow);
+                    // fill values after IMEI inputs generated
+                    setTimeout(() => {
+                        newRow.find('.imei-input').each(function (i) {
+                            if (oldData.imei[i]) $(this).val(oldData.imei[i]);
+                        });
+                    }, 300);
+                }
+            } catch (err) {
+                console.warn('oldData populate failed', err);
+            }
+        }
 
         rowIndex++;
         updateRemoveButtons();
     }
 
-    // Function to bind events to a product row
-    function bindRowEvents(row) {
-        // Category change event
-        row.find('.category-select').on('change', function () {
-            const category = $(this).val();
-            const subCategorySelect = row.find('.sub-category-select');
-            const productSelect = row.find('.product-select');
-
-            subCategorySelect.empty().append('<option value=""> Select </option>');
-            productSelect.empty().append('<option value=""> Select </option>');
-
-            clearVariations(row); // NEW → Remove variations
-
-            if (category) {
-                $.ajax({
-                    url: '../../products/get_sub_category',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: { id: category },
-                    success: function (data) {
-                        $.each(data, function (key, value) {
-                            subCategorySelect.append('<option value="' + value.id + '">' + value.name + '</option>');
-                        });
-                    }
-                });
-            }
-        });
-
-        // Sub Category change event
-        row.find('.sub-category-select').on('change', function () {
-            const subCategory = $(this).val();
-            const category = row.find('.category-select').val();
-            const productSelect = row.find('.product-select');
-
-            productSelect.empty().append('<option value=""> Select </option>');
-
-            clearVariations(row); // NEW → Remove variations
-
-            if (category && subCategory) {
-                $.ajax({
-                    url: 'get_product',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: { category: category, sub_category: subCategory },
-                    success: function (data) {
-                        $.each(data, function (key, value) {
-                            productSelect.append('<option value="' + value.id + '">' + value.name + '</option>');
-                        });
-                    }
-                });
-            }
-        });
-
-        // Product change event
-        row.find('.product-select').on('change', function () {
-
-            const product = $(this).val();
-
-            const unitInput = row.find('.unit-input');
-            const metricDisplay = row.find('.metric-display');
-            const taxInput = row.find('.tax-input');
-
-            if (product) {
-
-                // ===============================
-                // First API: Fetch Product Detail
-                // ===============================
-                $.ajax({
-                    url: 'get_product_detail',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: { product: product },
-
-                    success: function (data) {
-                        console.log(data);
-                        unitInput.val(data.metric.id);
-                        metricDisplay.text("(" + data.metric.name + ")");
-
-                        if (data.price) {
-                            row.find('.price-input').val(parseFloat(data.price).toFixed(2));
-                        }
-
-                        row.find('.quantity-input').val(1);
-
-                        if (data.tax_id) {
-                            taxInput.val(data.tax_id).change();
-                        } else {
-                            taxInput.val("0");
-                        }
-
-                        calculateRowCosts(row);
-                    }
-                });
-
-                // ==============================================
-                // Second API: Fetch Stocks + Stock Variations
-                // ==============================================
-                // inside your row.find('.product-select').on('change', ...) success callback
-                // Fetch stock variations
-                $.ajax({
-                    url: 'get_stock_variations',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: { product_id: product },
-
-                    success: function (response) {
-                        let container = row.find('.variation-container');
-                        container.html("");
-
-                        if (response.variations.length === 0 ||
-                            response.variations.every(v => !v.size && !v.colour)) {
-
-                            container.hide();
-                            return;
-                        }
-
-                        container.show();
-
-                        response.variations.forEach((v, index) => {
-
-                            container.append(`
-                                <div class="row border p-2 mb-2 variation-row">
-
-                                    <input type="hidden" name="variation[${index}][stock_id]" 
-                                   value="${response.stock_id}">
-
-                                    <input type="hidden" name="variation[${index}][size_id]" 
-                                        value="${v.size ? v.size.id : ''}">
-                                    <input type="hidden" name="variation[${index}][colour_id]" 
-                                        value="${v.colour ? v.colour.id : ''}">
-
-                                    <div class="col-md-3">
-                                        <label>Size</label>
-                                        <input type="text" value="${v.size ? v.size.name : '-'}" 
-                                               class="form-control" readonly>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label>Colour</label>
-                                        <input type="text" value="${v.colour ? v.colour.name : '-'}" 
-                                               class="form-control" readonly>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label>Qty</label>
-                                        <input type="number" name="variation[${index}][qty]" 
-                                               class="form-control variation-qty" value="0">
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label>Price</label>
-                                        <input type="number" name="variation[${index}][price]" 
-                                               class="form-control variation-price" value="0">
-                                    </div>
-
-                                </div>
-                            `);
-                        });
-                    }
-
-                });
-            }
-        });
-
-
-        // IMEI Checkbox event
-        row.find('.enable-imei-checkbox').on('change', function () {
-            const isChecked = $(this).is(':checked');
-            const imeiContainer = row.find('.imei-container');
-            if (isChecked) {
-                imeiContainer.show();
-                generateIMEIInputs(row);
-            } else {
-                imeiContainer.hide().empty();
-            }
-        });
-
-        // Quantity, price, tax, discount change → recalc
-        row.find('.quantity-input, .price-input, .tax-input, .discount-input').on('input', function () {
-            const quantity = parseInt(row.find('.quantity-input').val()) || 0;
-
-            // Restrict quantity to 60
-            if (quantity > 60) {
-                alert('Please enter quantity below 60 at a time. For larger quantities, please create multiple purchase orders.');
-                row.find('.quantity-input').val('');
-                row.find('.net-cost-input').val('');
-                row.find('.gross-cost-input').val('');
-                row.find('.imei-container').empty();
-                updateTotalSummary();
-                return;
-            }
-
-            // Regenerate IMEI inputs if checkbox is checked
-            const imeiCheckbox = row.find('.enable-imei-checkbox');
-            if (imeiCheckbox.is(':checked')) {
-                generateIMEIInputs(row);
-            }
-
-            calculateRowCosts(row);
-        });
-
-        // Remove row event
-        row.find('.remove-product-row').on('click', function () {
-            row.remove();
-            updateProductNumbers();
-            updateRemoveButtons();
-            updateTotalSummary();
-        });
+    // find quantity input inside row reliably
+    function findQtyInput(row) {
+        // prefer class; fallback to name-based selector
+        let el = row.find('.quantity-input');
+        if (el.length) return el;
+        return row.find('input[name^="products"][name$="[quantity]"]');
     }
 
-    // Function to generate IMEI input fields based on quantity
+    // sum variation qtys in a row
+    function sumVariationQty(row) {
+        let total = 0;
+        row.find('.variation-qty').each(function () {
+            total += parseInt($(this).val()) || 0;
+        });
+        return total;
+    }
+
+    // generate IMEI inputs based on current qty
     function generateIMEIInputs(row) {
-        const quantity = parseInt(row.find('.quantity-input').val()) || 0;
-        const imeiContainer = row.find('.imei-container');
-        const rowIndex = row.attr('data-row-index');
+        const qty = parseInt(findQtyInput(row).val()) || 0;
+        const container = row.find('.imei-container');
+        const rowIdx = row.attr('data-row-index');
 
-        imeiContainer.empty();
+        container.html('');
+        if (qty <= 0) return;
 
-        if (quantity > 0 && quantity <= 60) {
-            for (let i = 1; i <= quantity; i++) {
-                const imeiInput = $(`
-                    <div class="col-md-3">
-                        <div class="input-group mb-2">
-                            <span class="input-group-text">#${i}</span>
-                            <input type="text" 
-                                   name="products[${rowIndex}][imei][]" 
-                                   class="form-control imei-input" 
-                                   placeholder="IMEI/Serial #${i}"
-                                   pattern="[0-9A-Za-z-]+"
-                                   title="Enter valid IMEI/Serial number">
-                        </div>
+        if (qty > 60) {
+            alert('Max 60 IMEIs allowed');
+            return;
+        }
+
+        for (let i = 1; i <= qty; i++) {
+            container.append(`
+                <div class="col-md-3">
+                    <div class="input-group mb-2">
+                        <span class="input-group-text">#${i}</span>
+                        <input type="text" name="products[${rowIdx}][imei][]" class="form-control imei-input" placeholder="IMEI/Serial #${i}">
                     </div>
-                `);
-                imeiContainer.append(imeiInput);
-            }
+                </div>
+            `);
         }
     }
 
-    // Function to calculate costs for a specific row
+    // clear variations
+    function clearVariations(row) {
+        row.find('.variation-container').html('').hide();
+        // ensure quantity editable by default
+        findQtyInput(row).removeAttr('readonly');
+    }
+
+    // calculate for a row
     function calculateRowCosts(row) {
-        const quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+        const qty = parseFloat(findQtyInput(row).val()) || 0;
         const price = parseFloat(row.find('.price-input').val()) || 0;
         const tax = parseFloat(row.find('.tax-input').val()) || 0;
         const discount = parseFloat(row.find('.discount-input').val()) || 0;
 
-        let netCost = quantity * price;
-        let grossCost = netCost * (1 + tax / 100) - discount;
-        if (grossCost < 0) grossCost = 0;
+        let net = qty * price;
+        let gross = net + (net * tax / 100) - discount;
+        if (!isFinite(net)) net = 0;
+        if (!isFinite(gross)) gross = 0;
 
-        if (quantity && price) {
-            row.find('.net-cost-input').val(netCost.toFixed(2));
-            row.find('.gross-cost-input').val(grossCost.toFixed(2));
-        } else {
-            row.find('.net-cost-input, .gross-cost-input').val('');
-        }
-
+        row.find('.net-cost-input').val(net ? net.toFixed(2) : '');
+        row.find('.gross-cost-input').val(gross ? gross.toFixed(2) : '');
         updateTotalSummary();
     }
 
-    // Function to update total summary
+    // update totals
     function updateTotalSummary() {
-        let totalNet = 0, totalTax = 0, totalDiscount = 0, grandTotal = 0;
-
+        let totalNet = 0, totalTax = 0, totalDiscount = 0, grand = 0;
         $('.product-row').each(function () {
             const row = $(this);
-            const quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+            const qty = parseFloat(findQtyInput(row).val()) || 0;
             const price = parseFloat(row.find('.price-input').val()) || 0;
             const tax = parseFloat(row.find('.tax-input').val()) || 0;
             const discount = parseFloat(row.find('.discount-input').val()) || 0;
-            const netCost = quantity * price;
 
-            totalNet += netCost;
-            totalTax += (netCost * tax / 100);
+            const net = qty * price;
+            const taxAmount = net * tax / 100;
+
+            totalNet += net;
+            totalTax += taxAmount;
             totalDiscount += discount;
-            grandTotal += (netCost * (1 + tax / 100) - discount);
+            grand += (net + taxAmount - discount);
         });
 
         $('#totalNetCost').text(totalNet.toFixed(2));
         $('#totalTax').text(totalTax.toFixed(2));
         $('#totalDiscount').text(totalDiscount.toFixed(2));
-        $('#grandTotal').text(grandTotal.toFixed(2));
+        $('#grandTotal').text(grand.toFixed(2));
     }
 
-    // Function to update product numbers
     function updateProductNumbers() {
         $('.product-row').each(function (i) {
             $(this).find('.product-number').text(i + 1);
         });
     }
 
-    // Function to update remove buttons
     function updateRemoveButtons() {
-        const count = $('.product-row').length;
-        $('.remove-product-row').prop('disabled', count <= 1);
-    }
-
-    // Form date validation
-    const invoiceDate = document.getElementById("invoice_date");
-    const dueDate = document.getElementById("due_date");
-    if (invoiceDate && dueDate) {
-        invoiceDate.addEventListener("change", function () {
-            dueDate.min = this.value;
-            if (dueDate.value < this.value) {
-                dueDate.value = this.value;
-            }
-        });
-    }
-
-    // Form validation before submit
-    $('#purchaseOrderCreate').on('submit', function (e) {
-
-        let errorMessages = [];
-
-        const vendor = $('#vendor').val();
-        const invoiceDateVal = $('#invoice_date').val();
-
-        if (!vendor) errorMessages.push('Vendor is required.');
-        if (!invoiceDateVal) errorMessages.push('Invoice Date is required.');
-
-        $('.product-row').each(function (i) {
-
-            const row = $(this);
-            const index = i + 1;
-
-            const category = row.find('.category-select').val();
-            const subCategory = row.find('.sub-category-select').val();
-            const product = row.find('.product-select').val();
-
-            const quantity = parseFloat(row.find('.quantity-input').val());
-            const price = parseFloat(row.find('.net-cost-input').val());  // net cost
-
-            // Basic validation
-            if (category) {
-                if (!subCategory) errorMessages.push(`Product #${index}: Sub Category is required.`);
-                if (!product) errorMessages.push(`Product #${index}: Product is required.`);
-                if (!quantity || quantity <= 0) errorMessages.push(`Product #${index}: Quantity is required.`);
-                if (!price || price <= 0) errorMessages.push(`Product #${index}: Net cost is required.`);
-            }
-
-            // -------------------------------
-            // VARIATION VALIDATION
-            // -------------------------------
-            let variationRows = row.find('.variation-row');
-
-            // Only validate when variations exist
-            if (variationRows.length > 0) {
-
-                let totalQty = 0;
-                let totalPrice = 0;
-
-                variationRows.each(function () {
-        const vQty = parseFloat($(this).find('.variation-qty').val()) || 0;
-        const vPrice = parseFloat($(this).find('.variation-price').val()) || 0;
-
-        totalQty += vQty;
-        totalPrice += vPrice;
-    });
-
-
-            // MUST MATCH MAIN QUANTITY
-            if (totalQty !== quantity) {
-                errorMessages.push(
-                    `Product #${index}: Sum of variation Qty (${totalQty}) must match main Qty (${quantity}).`
-                );
-            }
-
-            // NEW: Price comparison should match NET COST (not sum)
-            if (totalPrice !== price) {
-                errorMessages.push(
-                    `Product #${index}: Sum of variation Price (${totalPrice}) must match Net Cost (${price}).`
-                );
-            }
-        }
-
-    });
-
-    if (errorMessages.length > 0) {
-        e.preventDefault();
-        alert(errorMessages.join("\n"));
+        $('.remove-product-row').prop('disabled', $('.product-row').length <= 1);
     }
 });
-
-});
-
-// Load purchase details in modal
-function purchase_detail(id) {
-    $.ajax({
-        url: id + "/get_detail",
-        type: "GET",
-        success: function (html) {
-            $("#purchaseDetail .modal-body").html(html);
-            $("#purchaseDetail").modal("show");
-        },
-        error: function (xhr) {
-            alert("Failed to load details");
-            console.error(xhr.responseText);
-        }
-    });
-}
-
-// CLEAR VARIATIONS FUNCTION
-function clearVariations(row) {
-    row.find('.variation-container').html(''); // remove all variation rows
-    row.find('.price-input').prop('readonly', false);
-    row.find('.quantity-input').prop('readonly', false);
-}
-
-
