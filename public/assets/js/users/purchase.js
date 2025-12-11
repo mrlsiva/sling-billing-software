@@ -127,17 +127,17 @@ jQuery(document).ready(function () {
                             <input type="hidden" name="products[${rowIdx}][variation][${idx}][size_id]" value="${v.size ? v.size.id : ''}">
                             <input type="hidden" name="products[${rowIdx}][variation][${idx}][colour_id]" value="${v.colour ? v.colour.id : ''}">
 
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label>Size</label>
                                 <input type="text" class="form-control" readonly value="${sizeName}">
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label>Colour</label>
                                 <input type="text" class="form-control" readonly value="${colourName}">
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label>Qty</label>
                                 <input type="number" step="1" min="0" class="form-control variation-qty" name="products[${rowIdx}][variation][${idx}][qty]" value="0">
                             </div>
