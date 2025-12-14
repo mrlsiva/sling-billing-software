@@ -42,6 +42,7 @@
 									<th>Slug Name</th>
 									<th>User Name</th>
 									<th>Mobile Number</th>
+									<th>Created By</th>
 									<th>Status</th>
 									<th>Action</th>
 								</tr>
@@ -56,6 +57,13 @@
 										<td>{{$shop->slug_name}}</td>
 										<td>{{$shop->user_name}}</td>
 										<td>{{$shop->phone}}</td>
+										<td>
+											@if ($shop->created_by == $shop->id)
+										    	<span class="badge badge-soft-warning text-warnig">Self Registered</span>
+										    @else
+										    	<span class="badge bg-soft-primary text-primary">Admin</span>
+										    @endif
+										</td>
 										<td>
 										    @php
 										        $today = now()->format('Y-m-d');

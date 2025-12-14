@@ -337,19 +337,28 @@
         <span class="close" onclick="closeShopDetailsModal()">&times;</span>
       </div>
       <div class="modal-body">
-        <form id="shopDetailsForm" class="shop-form">
+        <form class="row" action="{{route('register')}}" method="post" enctype="multipart/form-data" id="shopCreate">
+          @csrf
+
+          <!-- Hidden fields -->
+          <input type="hidden" name="password" value="Password@1234">
+          <input type="hidden" name="password_confirmation" value="Password@1234">
+          <input type="hidden" name="bill_type" value="1">
+          <input type="hidden" name="payment_method" value="1">
+
+
           <div class="form-row">
             <div class="form-group">
-              <label for="shopName">Shop Name *</label>
-              <input type="text" id="shopName" name="shopName" placeholder="Enter your shop name" required>
+              <label for="name">Shop Name *</label>
+              <input type="text" id="name" name="name" placeholder="Enter your shop name" required>
             </div>
             <div class="form-group">
-              <label for="mobileNumber">Mobile Number *</label>
-              <input type="tel" id="mobileNumber" name="mobileNumber" placeholder="Enter mobile number" required>
+              <label for="phone">Mobile Number *</label>
+              <input type="tel" id="phone" name="phone" placeholder="Enter mobile number" required>
             </div>
             <div class="form-group">
-              <label for="alternateMobile">Alternate Mobile Number</label>
-              <input type="tel" id="alternateMobile" name="alternateMobile" placeholder="Enter alternate mobile number">
+              <label for="phone1">Alternate Mobile Number</label>
+              <input type="tel" id="phone1" name="phone1" placeholder="Enter alternate mobile number">
             </div>
           </div>
           
@@ -361,7 +370,7 @@
             <div class="form-group logo-group">
               <label for="shopLogo">Upload Shop Logo *</label>
               <div class="file-upload">
-                <input type="file" id="shopLogo" name="shopLogo" accept="image/*" required>
+                <input type="file" id="shopLogo" name="logo" accept="image/*" required>
                 <div class="file-upload-placeholder">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
@@ -375,22 +384,12 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="shopEmail">Email</label>
-              <input type="email" id="shopEmail" name="shopEmail" placeholder="Enter email address">
+              <label for="email">Email *</label>
+              <input type="email" id="email" name="email" placeholder="Enter email address" required="">
             </div>
             <div class="form-group">
-              <label for="gstin">Company GSTin</label>
-              <input type="text" id="gstin" name="gstin" placeholder="Enter GST number">
-            </div>
-            <div class="form-group">
-              <label for="payment">Choose Payment</label>
-              <select id="payment" name="payment">
-                <option value="">Select payment method</option>
-                <option value="monthly">Monthly Subscription</option>
-                <option value="quarterly">Quarterly Subscription</option>
-                <option value="yearly">Yearly Subscription</option>
-                <option value="one-time">One-time Payment</option>
-              </select>
+              <label for="gst">Company GSTin</label>
+              <input type="text" id="gst" name="gst" placeholder="Enter GST number">
             </div>
           </div>
           <div class="form-actions">
@@ -435,25 +434,6 @@
       if (fileName) {
         placeholder.textContent = fileName;
       }
-    });
-
-    // Handle form submission
-    document.getElementById('shopDetailsForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Collect form data
-      const formData = new FormData(this);
-      
-      // You can add your form submission logic here
-      console.log('Shop details submitted:', Object.fromEntries(formData));
-      
-      // Show success message or redirect
-      alert('Thank you! Your shop details have been submitted successfully.');
-      closeShopDetailsModal();
-      
-      // Reset form
-      this.reset();
-      document.querySelector('.file-upload-placeholder span').textContent = 'Choose file to upload';
     });
   </script>
 @endsection

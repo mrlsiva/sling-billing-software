@@ -156,7 +156,7 @@ class branchController extends Controller
         ]);
 
         $user->update([
-            'created_by' => $user->id
+            'created_by' => Auth::user()->id
         ]);
 
         if ($request->hasFile('logo')) {

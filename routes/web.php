@@ -52,6 +52,8 @@ Route::get('/', function () {
     return view('home');
 });
 
+Route::post('/register',[homeController::class, 'register'])->name('register');
+
 if (request()->segment(1) === 'admin') 
 {
     require __DIR__.'/admin.php';
