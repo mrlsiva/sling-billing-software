@@ -207,7 +207,7 @@
                     <select class="form-control tax-input" name="products[0][tax]">
                         <option value="0"> No Tax </option>
                         @foreach($taxes as $tax)
-                            <option value="{{$tax->id}}"> {{$tax->name}}% </option>
+                            <option value="{{$tax->name}}"> {{$tax->name}}% </option>
                         @endforeach
                     </select>
                 </div>

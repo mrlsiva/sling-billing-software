@@ -85,7 +85,7 @@ jQuery(document).ready(function () {
                 if (data.metric && data.metric.name) metricDisplay.text("(" + data.metric.name + ")");
                 if (data.price) row.find('.price-input').val(parseFloat(data.price).toFixed(2));
                 qtyInput.val(1);
-                if (data.tax_id) taxInput.val(data.tax_id).change(); else taxInput.val('0');
+                if (data.tax.name) taxInput.val(data.tax.name).change(); else taxInput.val('0');
                 calculateRowCosts(row);
             })
             .fail(function (xhr) { console.error('get_product_detail failed', xhr); });
@@ -408,6 +408,7 @@ jQuery(document).ready(function () {
             const tax = parseFloat(row.find('.tax-input').val()) || 0;
             const discount = parseFloat(row.find('.discount-input').val()) || 0;
 
+            console.log(tax);
             const net = qty * price;
             const taxAmount = net * tax / 100;
 
