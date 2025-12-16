@@ -743,7 +743,6 @@
                         <tr>
                             <th>Size</th>
                             <th>Color</th>
-                            <th>Price</th>
                             <th>Stock</th>
                             <th>Add</th>
                         </tr>

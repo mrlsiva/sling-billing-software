@@ -183,7 +183,6 @@ function add_to_cart(element) {
                             <tr>
                                 <td>${v.size_name ?? '-'}</td>
                                 <td>${v.colour_name ?? '-'}</td>
-                                <td>₹${v.price}</td>
                                 <td>${v.quantity}</td>
                                 <td>
                                     <button class="btn btn-sm btn-primary"
@@ -277,10 +276,16 @@ function addVariationToCart(productId, variationId) {
         data: { id: variationId },
         success: function (v) {
 
+            if(v.quantity == 0 )
+            {
+                alert("Stock limit reached!");
+                return;
+            }
             $("#variationModal").modal("hide");
 
             // Prevent duplicate variation in cart
             var existing = $('#cart_item').find('[data-variation-id="' + variationId + '"]');
+            
             if (existing.length) {
                 var input = existing.find(".qty-input");
                 var current = parseInt(input.val());
@@ -294,6 +299,8 @@ function addVariationToCart(productId, variationId) {
                 }
                 return;
             }
+
+            
 
             $("#cart_item").append(`
                 <div class="border border-light mt-3 p-2 rounded" 
@@ -350,11 +357,13 @@ function updateCartSummary() {
         var qty = parseInt($(this).find('.qty-input').val());
         var price = parseFloat($(this).data('price'));        // total price WITH tax (per item)
         var tax_amount = parseFloat($(this).data('tax_amount')); // tax portion (per item)
-
+        console.log(tax_amount);
         totalItems += qty;
         subTotal += (price - tax_amount) * qty;  // only base price part
         totalTax += tax_amount * qty;           // tax part
     });
+
+    console.log(totalTax);
 
     var totalAmount = subTotal + totalTax; // OR just sum(price * qty)
 

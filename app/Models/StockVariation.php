@@ -10,6 +10,11 @@ class StockVariation extends Model
         'stock_id','product_id','size_id','colour_id','quantity','price'
     ];
 
+    public function product()
+    {
+        return $this->belongsTo('App\Models\Product','product_id');
+    }
+
 
     public function stock()
     {

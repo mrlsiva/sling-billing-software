@@ -248,51 +248,71 @@ class purchaseOrderController extends Controller
                 ->whereNull('branch_id')
                 ->first();
 
-                if (!empty($request->variation)) 
+                if (!empty($item['variation']) && is_array($item['variation'])) 
                 {
 
-                    foreach ($request->variation as $var) {
+                    foreach ($item['variation'] as $var) {
 
-                        $stockId   = $var['stock_id'];
-                        $sizeId    = $var['size_id'] ?? null;
-                        $colourId  = $var['colour_id'] ?? null;
-                        $qty       = (int) $var['qty'];
-                        $price     = (float) $var['price'];
+                        $stockId  = $var['stock_id'];
+                        $sizeId   = $var['size_id'] ?? null;
+                        $colourId = $var['colour_id'] ?? null;
+                        $qty      = (int) ($var['qty'] ?? 0);
 
-                        // FIND VARIATION
+                        if ($qty <= 0) {
+                            continue;
+                        }
+
+                        // FIND VARIATION (null-safe)
                         $variation = StockVariation::where('stock_id', $stockId)
-                            ->where('size_id', $sizeId)
-                            ->where('colour_id', $colourId)
+                            ->where('product_id', $productId)
+                            ->where(function ($q) use ($sizeId) {
+                                $sizeId === null ? $q->whereNull('size_id') : $q->where('size_id', $sizeId);
+                            })
+                            ->where(function ($q) use ($colourId) {
+                                $colourId === null ? $q->whereNull('colour_id') : $q->where('colour_id', $colourId);
+                            })
+                            ->lockForUpdate()
                             ->first();
 
-            
+                        if (!$variation) {
+                            // Optional: create variation if missing
+                            $variation = StockVariation::create([
+                                'stock_id'   => $stockId,
+                                'product_id' => $productId,
+                                'size_id'    => $sizeId,
+                                'colour_id'  => $colourId,
+                                'quantity'   => 0,
+                                'price'      => $product->price,
+                            ]);
+                        }
 
-                        // UPDATE (ADD new quantity)
+                        // UPDATE QUANTITY
                         $variation->update([
                             'quantity' => $variation->quantity + $qty,
-                            'price'    => $price,   // overwrite or keep? you said "update", so set new price
+                            'price'    => $product->price,
                         ]);
-
                     }
 
-                }
-                else
+                } 
+                else 
                 {
-                    // find default variation without size and colour
+
+                    // DEFAULT VARIATION (no size / no colour)
                     $defaultVariation = StockVariation::where('stock_id', $stock->id)
                         ->where('product_id', $productId)
                         ->whereNull('size_id')
                         ->whereNull('colour_id')
+                        ->lockForUpdate()
                         ->first();
 
                     if ($defaultVariation) {
-
-                        // ADD QUANTITY & PRICE
-                        $defaultVariation->quantity += $quantity;
-                        $defaultVariation->price    += $netCost;
-                        $defaultVariation->save();
+                        $defaultVariation->update([
+                            'quantity' => $defaultVariation->quantity + $quantity,
+                            'price'    => $product->price,
+                        ]);
                     }
                 }
+
 
 
                 $totalGross += $item['gross_cost'];

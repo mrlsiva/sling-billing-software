@@ -227,6 +227,15 @@ jQuery(document).ready(function () {
         calculateRowCosts(row);
     });
 
+    container.on('input', '.variation-qty', function () {
+        const row = $(this).closest('.product-row');
+
+        // IMEI regeneration if checked
+        if (row.find('.enable-imei-checkbox').is(':checked')) {
+            generateIMEIInputs(row);
+        }
+    });
+
     // IMEI checkbox delegated
     container.on('change', '.enable-imei-checkbox', function () {
         const row = $(this).closest('.product-row');
@@ -433,4 +442,20 @@ jQuery(document).ready(function () {
     function updateRemoveButtons() {
         $('.remove-product-row').prop('disabled', $('.product-row').length <= 1);
     }
+
+    window.purchase_detail = function (id) {
+    $.ajax({
+        url: id + "/get_detail",
+        type: "GET",
+        success: function (html) {
+            $("#purchaseDetail .modal-body").html(html);
+            $("#purchaseDetail").modal("show");
+        },
+        error: function (xhr) {
+            alert("Failed to load details");
+            console.error(xhr.responseText);
+        }
+    });
+};
+
 });

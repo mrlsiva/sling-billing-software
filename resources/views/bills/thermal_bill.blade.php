@@ -75,7 +75,6 @@
             <tr>
                 <th>Item</th>
                 <th class="right">Qty</th>
-                <th class="right">Size-Colour</th>
                 <th class="right">IMEI</th>
                 <th class="right">Price</th>
                 <th class="right">Tax</th>
@@ -85,16 +84,16 @@
         <tbody>
         	@foreach($order_details as $order_detail)
             <tr>
-                <td>{{$order_detail->name}}</td>
-                <td class="right">{{$order_detail->quantity}}</td>
-                <td class="right">
+                <td>
                     @php
                         $sizeName   = $order_detail->size_id   ? $order_detail->size->name   : null;
                         $colorName  = $order_detail->colour_id ? $order_detail->colour->name : null;
                     @endphp
 
-                    {{ $sizeName && $colorName ? "$sizeName - $colorName" : ($sizeName ?: ($colorName ?: '-')) }}
+                    {{ $order_detail->name }}
+                    {{ ($sizeName || $colorName) ? '(' . trim(($sizeName ?? '') . ' - ' . ($colorName ?? ''), ' - ') . ')' : '' }}
                 </td>
+                <td class="right">{{$order_detail->quantity}}</td>
                 <td class="right">
                     @if($order_detail->imei != null)
                         {{$order_detail->imei}}
