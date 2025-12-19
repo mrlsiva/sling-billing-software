@@ -179,6 +179,6 @@ class homeController extends Controller
 
         DB::commit();
 
-        return redirect()->back()->with('toast_success', 'Registered successfully. Please check your email for further details.');
+        return redirect()->back()->with('success_alert', 'Registered successfully. Please check your email for further details.');
     }
 }

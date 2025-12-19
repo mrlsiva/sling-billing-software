@@ -90,16 +90,20 @@ jQuery(document).ready(function () {
                     $("#variations_section").html("");
 
                     data.variations.forEach(function (v) {
-                        $("#variations_section").append(`
-                            <div class="row mb-2 p-2 border rounded">
-                                <div class="col-md-5"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
-                                <div class="col-md-7">
-                                    <input type="number" class="form-control variation-qty"
-                                        max="${v.quantity}" min="0" name="variation_qty[${v.id}]"
-                                        placeholder="Available: ${v.quantity}">
+
+                        if (v.quantity > 0) {
+                            $("#variations_section").append(`
+                                <div class="row mb-2 p-2 border rounded">
+                                    <div class="col-md-3"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
+                                    <div class="col-md-3"><strong>Colour:</strong> ${v.colour?.name ?? "-"}</div>
+                                    <div class="col-md-6">
+                                        <input type="number" class="form-control variation-qty"
+                                            max="${v.quantity}" min="0" name="variation_qty[${v.id}]"
+                                            placeholder="Available: ${v.quantity}">
+                                    </div>
                                 </div>
-                            </div>
-                        `);
+                            `);
+                        }
                     });
 
 

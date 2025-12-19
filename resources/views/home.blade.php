@@ -82,6 +82,23 @@
     <!-- Payment Success -->
     <div class="payment-success">✓</div>
 
+    @if ($errors->any())
+      <div class="alert alert-danger">
+        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+        <ul>
+          @foreach ($errors->all() as $error)
+          <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
+    @if(session('success_alert'))
+      <div class="alert alert-success">
+        <strong>Success! </strong>{{ session('success_alert') }}<br>
+      </div>
+    @endif
+
     <div class="hero-container">
       <div class="hero-content">
         <div class="hero-subtitle">
