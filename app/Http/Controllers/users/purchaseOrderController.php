@@ -31,16 +31,26 @@ class purchaseOrderController extends Controller
     public function index(Request $request)
     {
         $purchase_orders = PurchaseOrder::with('vendor')
-        ->where('shop_id', Auth::user()->owner_id)
-        ->when(request('vendor'), function ($query, $vendor) {
-            $query->whereHas('vendor', function ($q) use ($vendor) {
-                $q->where('name', 'like', "%{$vendor}%");
-            });
-        })
-        ->orderBy('id', 'desc')
-        ->paginate(10);
-        return view('users.purchase_orders.index',compact('purchase_orders'));
+            ->where('shop_id', Auth::user()->owner_id)
+            ->whereIn('id', function ($sub) {
+                $sub->selectRaw('MAX(id)')
+                    ->from('purchase_orders')
+                    ->where('shop_id', Auth::user()->owner_id)
+                    ->groupBy('invoice_no');
+            })
+            ->when(request('vendor'), function ($query, $vendor) {
+                $query->whereHas('vendor', function ($q) use ($vendor) {
+                    $q->where('name', 'like', "%{$vendor}%");
+                });
+            })
+            ->orderBy('id', 'desc')
+            ->paginate(10);
+
+        return view('users.purchase_orders.index', compact('purchase_orders'));
     }
+
+
+
 
     public function create(Request $request)
     {
@@ -551,10 +561,19 @@ class purchaseOrderController extends Controller
 
     public function get_detail($company,$id)
     {
-        $purchase = PurchaseOrder::with(['vendor', 'category', 'sub_category', 'product', 'metric'])->findOrFail($id);
+        $purchase_orders = PurchaseOrder::with([
+                'vendor',
+                'category',
+                'sub_category',
+                'product',
+                'metric'
+            ])
+            ->where('invoice_no', $id)
+            ->get(); // 👈 or ->first() if single invoice
 
-        return view('users.purchase_orders.detail', compact('purchase'));
+        return view('users.purchase_orders.detail', compact('purchase_orders'));
     }
+
 
     public function refund(Request $request)
     {

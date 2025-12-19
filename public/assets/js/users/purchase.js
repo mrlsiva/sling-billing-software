@@ -442,8 +442,12 @@ jQuery(document).ready(function () {
     function updateRemoveButtons() {
         $('.remove-product-row').prop('disabled', $('.product-row').length <= 1);
     }
+    
+    $(document).on('click', '.view-detail', function (e) {
+    e.preventDefault();
 
-    window.purchase_detail = function (id) {
+    let id = $(this).data('id');
+
     $.ajax({
         url: id + "/get_detail",
         type: "GET",
@@ -456,6 +460,9 @@ jQuery(document).ready(function () {
             console.error(xhr.responseText);
         }
     });
-};
+});
+
+
+
 
 });

@@ -38,10 +38,9 @@
 								<tr>
 									<th>S.No</th>
 									<th>Vendor</th>
-									<th>Category</th>
-									<th>Product</th>
-									<th>Quantity</th>
-									<th>Price (₹)</th>
+									<th>Invoice No</th>
+									<th>Invoice Date</th>
+									<th>Due Date</th>
 									<th>Action</th>
 								</tr>
 							</thead>
@@ -52,15 +51,16 @@
 											{{ ($purchase_orders->currentPage() - 1) * $purchase_orders->perPage() + $loop->iteration }}
 										</td>
 										<td>{{$purchase_order->vendor->name}}</td>
-										<td>{{$purchase_order->category->name}} - {{$purchase_order->sub_category->name}}</td>
-										<td>{{$purchase_order->product->name}}</td>
-										<td>{{$purchase_order->quantity}} ({{$purchase_order->metric->name}})</td>
-										<td>{{$purchase_order->gross_cost}}</td>
+										<td>{{$purchase_order->invoice_no}}</td>
+										<td>{{ \Carbon\Carbon::parse($purchase_order->invoice_date)->format('d M Y') }}</td>
+										<td>{{ \Carbon\Carbon::parse($purchase_order->due_date)->format('d M Y') }}</td>
 										<td>
-										    <a href="#!" onclick="purchase_detail({{ $purchase_order->id }})" class="link-dark">
+										    <a href="#!" class="link-dark view-detail"
+										       data-id="{{ $purchase_order->invoice_no }}">
 										        <i class="ri-eye-line align-middle fs-20" title="View Order"></i>
 										    </a>
 										</td>
+
 
 									</tr>
 									@endforeach
