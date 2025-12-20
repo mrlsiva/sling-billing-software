@@ -132,6 +132,7 @@ class productController extends Controller
         {            
             $taxRate   = (float) $tax->name;
             $taxAmount   = round($price / (1 + ($taxRate / 100)),2);
+            $taxAmount   = $request->price - $taxAmount;
             //$taxAmount = $price * ((float) $tax->name / 100); 
             //$finalPrice = $price + $taxAmount; // if you want price including tax
         }
@@ -342,9 +343,16 @@ class productController extends Controller
 
         $taxAmount = 0; // default, in case tax = 0
 
-        if ($tax && preg_match('/(\d+)%/', $tax->name, $matches)) {
-            $taxRate = (int) $matches[1]; // extract number part e.g. "18" from "GST 18%"
-            $taxAmount = $price * $taxRate / 100;
+        // if ($tax && preg_match('/(\d+)%/', $tax->name, $matches)) {
+        //     $taxRate = (int) $matches[1]; // extract number part e.g. "18" from "GST 18%"
+        //     $taxAmount = $price * $taxRate / 100;
+        // }
+
+        if ($tax && $tax->name != 0)
+        {            
+            $taxRate   = (float) $tax->name;
+            $taxAmount   = round($price / (1 + ($taxRate / 100)),2);
+            $taxAmount   = $request->price - $taxAmount;
         }
 
         $product->update([ 

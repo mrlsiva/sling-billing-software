@@ -72,6 +72,15 @@ class inventoryController extends Controller
         return view('users.inventories.stock',compact('stocks','branches','categories'));
     }
 
+    public function get_stock_variation($company, Stock $stock)
+    {
+        $variations = StockVariation::with(['size', 'colour'])
+            ->where('stock_id', $stock->id)
+            ->get();
+
+        return view('users.inventories.variation', compact('stock', 'variations'));
+    }
+
     public function transfer(Request $request)
     {
         $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();

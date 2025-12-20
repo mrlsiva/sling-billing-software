@@ -176,8 +176,13 @@ else
                                 Route::name('stock')->group(function () {
 
                                     Route::get('/{shop}/{branch}',[inventoryController::class, 'stock']);
+
                                 });
                             });
+
+                            Route::get('/{stock}/get_stock_variation',[inventoryController::class, 'get_stock_variation'])->name('.get_stock_variation');
+
+
 
                             Route::prefix('transfer')->group(function () {
                                 Route::name('transfer')->group(function () {
@@ -365,6 +370,7 @@ else
                                 Route::name('product.')->group(function () {
 
                                     Route::get('/index',[stockController::class, 'index'])->name('index');
+                                    Route::get('/{stock}/get_stock_variation',[stockController::class, 'get_stock_variation'])->name('.get_stock_variation');
                                     Route::get('/{product}/qrcode',[stockController::class, 'qrcode'])->name('qrcode');
                                     Route::get('/{id}/barcode',[stockController::class, 'barcode'])->name('barcode');
                                 });

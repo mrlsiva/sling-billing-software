@@ -41,6 +41,15 @@ class stockController extends Controller
         return view('branches.products.index',compact('stocks'));
     }
 
+    public function get_stock_variation($company, Stock $stock)
+    {
+        $variations = StockVariation::with(['size', 'colour'])
+            ->where('stock_id', $stock->id)
+            ->get();
+
+        return view('branches.products.variation', compact('stock', 'variations'));
+    }
+
     public function qrcode(Request $request,$company,Product $product)
     {
         //$product = Product::where('id',$id)->first();

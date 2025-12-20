@@ -189,26 +189,33 @@ class billingController extends Controller
             return response()->json(['error' => 'Variation not found'], 404);
         }
 
-        $product = $variation->stock->product;
+        $product = $variation->product;
 
-        $basePrice = (float) $product->price;
-        $taxPercent = (float) ($product->tax->percentage ?? 0);
-        $taxAmount = ($basePrice * $taxPercent) / 100;
-        $finalPrice = $basePrice + $taxAmount;
+        $product = Product::with([
+            'stock' => function ($query) {
+                $query->where('shop_id', Auth::user()->parent_id)
+                      ->where('branch_id', Auth::user()->id);
+            },
+        ])
+        ->where('id', $variation->product->id)
+        ->first();
 
         return response()->json([
             'id'            => $variation->id,
             'product_id'    => $variation->product_id,
             'product_name'  => $product->name,
+            'category'      => $product->category->name,
+            'sub_category'  => $product->sub_category->name,
+            'stock'         => $product->stock,
             'size_name'     => $variation->size->name ?? '',
             'colour_name'   => $variation->colour->name ?? '',
             'quantity'      => $variation->quantity,
 
             // MANDATORY FOR JS
-            'base_price'    => $basePrice,
-            'price'         => $finalPrice,
-            'tax_amount'    => $taxAmount,
-            'tax'           => $taxPercent
+            'base_price'    => (float) $product->price,
+            'price'         => (float) $product->price,
+            'tax_amount'    => (float) $product->tax_amount,
+            'tax'           => $product->tax->name
         ]);
     }
 

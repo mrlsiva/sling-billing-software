@@ -137,7 +137,6 @@
                 <th style="width:5%;">S.No</th>
                 <th style="width:34%;">Description</th>
                 <th style="width:6%;">Qty</th>
-                <th style="width:6%;">IMEI</th>
                 <th style="width:9%;">Rate</th>
                 <th style="width:9%;">Taxable</th>
                 <th style="width:7%;">CGST%</th>
@@ -153,28 +152,27 @@
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>
-                     @php
-                        $sizeName   = $order_detail->size_id   ? $order_detail->size->name   : null;
-                        $colorName  = $order_detail->colour_id ? $order_detail->colour->name : null;
+                    @php
+                        $sizeName  = $order_detail->size_id   ? $order_detail->size->name   : null;
+                        $colorName = $order_detail->colour_id ? $order_detail->colour->name : null;
+
+                        $variationText = ($sizeName || $colorName)
+                            ? '(' . trim(($sizeName ?? '') . ' - ' . ($colorName ?? ''), ' - ') . ')'
+                            : '';
+
+                        $imeiText = $order_detail->imei ?? ' ';
                     @endphp
 
-                    {{ $order_detail->name }}
-                    {{ ($sizeName || $colorName) ? '(' . trim(($sizeName ?? '') . ' - ' . ($colorName ?? ''), ' - ') . ')' : '' }}
-
+                    {{ $order_detail->name }} {{ $variationText }}
+                    <br>
+                    <small class="text-muted">IMEI: {{ $imeiText }}</small>
                 </td>
                 <td>{{$order_detail->quantity}}</td>
-                <td>
-                    @if($order_detail->imei != null)
-                        {{$order_detail->imei}}
-                    @else
-                        -
-                    @endif
-                </td>
                 <td>₹ {{ $order_detail->price - $order_detail->tax_amount }}</td>
                 <td>₹ {{$order_detail->tax_amount}}</td>
-                <td>₹ {{ number_format((float)($order_detail->tax_percent / 2), 2) }}</td>
+                <td>{{ number_format((float)($order_detail->tax_percent / 2), 2) }} %</td>
                 <td>₹ {{ number_format((float)($order_detail->tax_amount / 2), 2) }}</td>
-                <td>₹ {{ number_format((float)($order_detail->tax_percent / 2), 2) }}</td>
+                <td>{{ number_format((float)($order_detail->tax_percent / 2), 2) }} %</td>
                 <td>₹ {{ number_format((float)($order_detail->tax_amount / 2), 2) }}</td>
                 <td>₹ {{$order_detail->price * $order_detail->quantity}}</td>
             </tr>

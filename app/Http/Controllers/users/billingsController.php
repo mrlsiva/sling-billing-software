@@ -159,12 +159,24 @@ class billingsController extends Controller
 
         $product = $variation->product;
 
+        $product = Product::with([
+            'stock' => function ($query) {
+                $query->where('shop_id', Auth::user()->owner_id)
+                      ->where('branch_id', null);
+            },
+        ])
+        ->where('id', $variation->product->id)
+        ->first();
+
        
 
         return response()->json([
             'id'            => $variation->id,
             'product_id'    => $variation->product_id,
             'product_name'  => $product->name,
+            'category'      => $product->category->name,
+            'sub_category'  => $product->sub_category->name,
+            'stock'         => $product->stock,
             'size_name'     => $variation->size->name ?? '',
             'colour_name'   => $variation->colour->name ?? '',
             'quantity'      => $variation->quantity,

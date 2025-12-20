@@ -44,6 +44,7 @@
 									<th>Price (₹)</th>
 									<th>Stock</th>
 									<th>Total Price (₹)</th>
+									<th>Variation</th>
 									<th>Action</th>
 								</tr>
 							</thead>
@@ -66,6 +67,22 @@
 										<td>{{$stock->product->price}}</td>
 										<td>{{$stock->quantity}}</td>
 										<td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
+
+										@php
+                                            $variation = \App\Models\StockVariation::where('stock_id', $stock->id)->first();
+                                        @endphp
+
+                                        @if($variation && ($variation->size_id !== null || $variation->colour_id !== null))
+	                                        <td>
+	                                            <a href="#!" class="text-dark view-variations" data-stock-id="{{ $stock->id }}" title="View Variations">
+	                                                <i class="ri-eye-line fs-18"></i>
+	                                            </a>
+	                                        </td>
+                                        @else
+                                        	<td>
+                                            	-
+                                            </td>
+                                        @endif
 										<td>
 											@php
 												$user_detail = App\Models\UserDetail::where('user_id',Auth::user()->id)->first();
@@ -119,6 +136,22 @@
 
 @endsection
 
+@section('modal')
+<div class="modal fade" id="stockVariationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Stock Variations</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- ajax content -->
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
 @section('script')
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function () {
@@ -140,4 +173,25 @@
         searchInput.addEventListener("input", toggleClear);
     });
 </script>
+
+<script>
+    $(document).on('click', '.view-variations', function (e) {
+        e.preventDefault();
+
+        let stockId = $(this).data('stock-id');
+
+        $.ajax({
+            url: stockId + "/get_stock_variation",
+            type: "GET",
+            success: function (html) {
+                $('#stockVariationModal .modal-body').html(html);
+                $('#stockVariationModal').modal('show');
+            },
+            error: function () {
+                alert('Failed to load stock variations');
+            }
+        });
+    });
+</script>
+
 @endsection
