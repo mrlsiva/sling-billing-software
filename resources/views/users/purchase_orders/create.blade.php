@@ -44,8 +44,8 @@
 
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label class="form-label">Invoice No</label>
-                                <input type="text" name="invoice" id="invoice" value="{{old('invoice')}}" class="form-control" placeholder="Enter Invoice No">
+                                <label class="form-label">Invoice No <span class="text-danger">*</span></label>
+                                <input type="text" name="invoice" id="invoice" value="{{old('invoice')}}" class="form-control" placeholder="Enter Invoice No" required="">
                             </div>
                         </div>
 

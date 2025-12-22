@@ -100,6 +100,14 @@ class purchaseOrderController extends Controller
     {
         $request->validate([
             'vendor' => 'required',
+             'invoice' => [
+                'required',
+                Rule::unique('purchase_orders', 'invoice_no')
+                    ->where(function ($query) use ($request) {
+                        return $query->where('vendor_id', $request->vendor)
+                                     ->where('shop_id', Auth::user()->owner_id);
+                    }),
+            ],
             'invoice_date' => 'required|date',
             'products' => 'required|array|min:1',
             'products.*.category' => 'required',
