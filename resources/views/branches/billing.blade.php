@@ -672,6 +672,13 @@
 						</div>
 					</div>
 
+					<div class="col-md-12">
+						<div class="mb-3">
+							<label for="discount" class="form-label">Discount</label>
+							<input type="number" name="discount" id="discount" value="{{old('discount')}}" class="form-control" placeholder="Discount Amount" min="1">
+						</div>
+					</div>
+
 					<h5 class="fw-semibold my-3">Payment info</h5>
 					<div class="table-responsive">
 						<table class="table table-bordered bg-light-subtle">

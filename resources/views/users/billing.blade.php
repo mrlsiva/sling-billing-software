@@ -227,9 +227,16 @@
 									<tr>
 										<td>
 											<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-danger">
+												Discount : </p>
+										</td>
+										<td class="text-end text-success fw-semibold" id="order_discount">₹0.00</td>
+									</tr>
+									<tr>
+										<td>
+											<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-danger">
 												Payable Amount : </p>
 										</td>
-										<td class="text-end text-success fw-semibold" id="amount">$0.00</td>
+										<td class="text-end text-success fw-semibold" id="amount">₹0.00</td>
 									</tr>
 								</tbody>
 							</table>
@@ -590,6 +597,14 @@
 									class="ri-bank-line"></i> Add</button>
 						</div>
 					</div>
+
+					<div class="col-md-12">
+						<div class="mb-3">
+							<label for="discount" class="form-label">Discount</label>
+							<input type="number" name="discount" id="discount" value="{{old('discount')}}" class="form-control" placeholder="Discount Amount" min="1">
+						</div>
+					</div>
+
 
 					<h5 class="fw-semibold my-3">Payment info</h5>
 					<div class="table-responsive">

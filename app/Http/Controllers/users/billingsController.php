@@ -293,6 +293,7 @@ class billingsController extends Controller
             'bill_id'                   => $newBillNo,
             'billed_by'                 => $request->billed_by,
             'customer_id'               => $customer->id,
+            'order_discount'            => $request->discount,
             'total_product_discount'    => $totalProductDiscount,
             'bill_amount'               => $billAmount,
             'billed_on'                 => Carbon::now(),

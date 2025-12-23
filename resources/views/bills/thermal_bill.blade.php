@@ -161,10 +161,24 @@
 	            <td class="bold">Total Tax</td>
 	            <td class="right">₹ {{ number_format($order_details->sum(fn($d) => (float)$d->tax_amount * (int)$d->quantity),2)}}</td>
 	        </tr>
-	        <tr>
-	            <td class="bold">Total</td>
-	            <td class="right">₹ {{number_format($order->bill_amount,2)}}</td>
-	        </tr>
+
+            @if($order->order_discount != null)
+            <tr>
+                <td colspan="5"><strong>Discount:</strong></td>
+                <td colspan="5">₹ {{number_format($order->order_discount,2)}}</td>
+            </tr>
+            <tr>
+                <td colspan="5"><strong>Total</strong></td>
+                <td colspan="5">₹ {{number_format($order->bill_amount - $order->order_discount,2)}}</td>
+            </tr>
+            @else
+            <tr>
+                <td class="bold">Total</td>
+                <td class="right">₹ {{number_format($order->bill_amount,2)}}</td>
+            </tr>
+            @endif
+            
+	        
 	    @endif
     </table>
 

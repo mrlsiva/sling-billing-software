@@ -352,6 +352,24 @@ function remove_from_cart(element) {
     updateCartSummary();
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+
+    let discountInput = document.getElementById('discount');
+
+    discountInput.addEventListener('input', function () {
+
+        let discount = parseFloat(this.value) || 0;
+        let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
+
+        if (discount > payable) {
+            discount = payable;
+            this.value = payable;
+        }
+
+        updateCartSummary();
+    });
+});
+
 // Update totals, tax, and amount
 function updateCartSummary() {
     var totalItems = 0;
@@ -368,7 +386,12 @@ function updateCartSummary() {
         totalTax += tax_amount * qty;           // tax part
     });
 
+    var discount = $('#discount').val()  || 0;
+
+    console.log(discount);
+
     var totalAmount = subTotal + totalTax; // OR just sum(price * qty)
+    totalAmount = totalAmount - discount;
 
     $('#total_item').text(totalItems + ' (Items)');
     $('#sub_total').text('₹' + subTotal.toFixed(2));
@@ -1109,6 +1132,7 @@ function submit() {
     let dob = $("#dob").val();
     let gst = $("#gst").val();
     let billed_by = $("#billed_by").val();
+    let discount = parseFloat($('#discount').val()) || 0;
 
     // --- Customer validation ---
     if (!/^[0-9]{10}$/.test(phone)) {
@@ -1214,7 +1238,8 @@ function submit() {
             cart: cartData,
             payments: paymentData,
             customer: customer,
-            billed_by: billed_by
+            billed_by: billed_by,
+            discount: discount
         },
         success: function (data) {
             console.log("Order stored:", data);
