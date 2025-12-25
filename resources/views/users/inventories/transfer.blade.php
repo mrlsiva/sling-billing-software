@@ -12,7 +12,16 @@
 					<div>
 						<p class="card-title">Product Transfer</p>
 					</div>
-					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#productTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Product Transfer</a>
+					<div>
+						<a class="btn btn-outline-primary btn-sm fw-semibold"
+   data-bs-toggle="modal"
+   data-bs-target="#bulkTransfer"
+   href="javascript:void(0);">
+    <i class="ri-file-excel-2-line me-2"></i> Bulk Transfer
+</a>
+
+						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#productTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Product Transfer</a>
+					</div>
 				</div>
 
 				@if ($errors->any())
@@ -204,6 +213,58 @@
 						</div>
 
 						<div id="variations_section"></div>
+
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+	                    <button type="submit" id="transfer" class="btn btn-primary">Transfer</button>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+	</div>
+
+	<div class="modal fade" id="bulkTransfer" tabindex="-1" aria-labelledby="bulkTransferLabel" aria-hidden="true">
+	    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="bulkTransferLabel">Bulk Transfer</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	            </div>
+	            <form class="row" action="{{route('inventory.transfer.bulk', ['company' => request()->route('company')])}}" method="post" id="transfer_submit">
+	                @csrf
+	                <div class="modal-body">
+
+	                    <div class="row">
+	                        <div class="col-md-12">
+	                            <div class="mb-3">
+	                                <label for="choices-single-groups" class="form-label text-muted">Select Branch</label>
+	                                <select class="form-control" data-choices name="branch" id="branch">
+	                                    <option value=""> Select </option>
+	                                    @foreach($branches as $branch)
+	                                    <option value="{{$branch->id}}">{{$branch->user_name}}</option>
+	                                    @endforeach
+	                                </select>
+	                            </div>
+	                        </div>
+	                    </div>
+
+	                    <div class="row">
+		                    <div class="col-md-12 d-flex justify-content-end">
+		                    	<a href="{{ asset('assets/templates/category.xlsx') }}" download="Category_Template.xlsx">Download Template</a>
+		                    </div>
+		                </div>
+
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="name" class="form-label">Upload File</label>
+	                                <div class="input-group">
+	                                    <input type="file" name="file" id="file" class="form-control" accept=".xlsx">
+	                                </div>
+		                        </div>
+		                    </div>
+	                   </div>
 
 	                </div>
 	                <div class="modal-footer">

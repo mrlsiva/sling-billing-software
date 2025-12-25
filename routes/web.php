@@ -192,6 +192,7 @@ else
                                     Route::get('/get_product',[inventoryController::class, 'get_product'])->name('get_product');
                                     Route::get('/get_product_detail',[inventoryController::class, 'get_product_detail'])->name('.get_product_detail');
                                     Route::post('/store',[inventoryController::class, 'store'])->name('.store');
+                                    Route::post('/bulk',[inventoryController::class, 'bulk'])->name('.bulk');
 
                                 });
                             });

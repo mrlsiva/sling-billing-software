@@ -5,6 +5,7 @@
 @endsection
 
 @section('body')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="row">
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -17,7 +18,7 @@
         </div>
     @endif
     <div class="col-xl-12 col-md-12">
-        <form class="row" action="{{ route('vendor.purchase_order.store', ['company' => request()->route('company')]) }}" method="post" enctype="multipart/form-data" id="purchaseOrderCreate">
+        <form class="row" method="post" enctype="multipart/form-data" id="purchaseOrderCreate">
             @csrf
             <div class="card">
                 <div class="card-header pb-0">
@@ -132,7 +133,7 @@
             <div class="p-3 mb-3 rounded">
                 <div class="row justify-content-end g-2">
                     <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary w-100"><i class="ri-save-line"></i> Create Purchase Order</button>
+                        <button type="submit" id="poSubmitBtn" class="btn btn-primary w-100"><i class="ri-save-line"></i> Create Purchase Order</button>
                     </div>
                     <div class="col-md-2">
                         <a href="{{ route('vendor.purchase_order.index', ['company' => request()->route('company')]) }}" class="btn btn-outline-secondary w-100"><i class="ri-close-circle-line"></i> Cancel</a>

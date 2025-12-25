@@ -69,7 +69,7 @@ class purchaseOrderController extends Controller
 
     public function get_product_detail(Request $request)
     {
-        return $product = Product::with('metric')->where('id',$request->product)->first();
+        return $product = Product::with('metric','tax')->where('id',$request->product)->first();
     }
 
     public function get_stock_variations(Request $request)
@@ -98,6 +98,7 @@ class purchaseOrderController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'vendor' => 'required',
              'invoice' => [
@@ -152,9 +153,15 @@ class purchaseOrderController extends Controller
                     }
 
                     if (in_array($imei, $allImeis)) {
-                        return back()->withErrors([
-                            "products.$index.imei" => "IMEI number $imei is duplicated across products."
-                        ])->withInput();
+
+                        // return back()->withErrors([
+                        //     "products.$index.imei" => "IMEI number $imei is duplicated across products."
+                        // ])->withInput();
+                        
+                        return response()->json([
+                            'status'   => false,
+                            'message'  => "IMEI number $imei is duplicated across products."
+                        ]);
                     }
 
                     $allImeis[] = $imei;
@@ -376,8 +383,13 @@ class purchaseOrderController extends Controller
 
             DB::commit();
 
-            return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])
-                ->with('toast_success', 'Purchase order created successfully.');
+            return response()->json([
+                'status'   => true,
+                'message'  => 'Purchase Order created successfully',
+                'redirect' => route('vendor.purchase_order.index', ['company' => request()->route('company')])
+            ]);
+
+            //return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])->with('toast_success', 'Purchase order created successfully.');
 
         } catch (\Exception $e) {
             DB::rollBack();
