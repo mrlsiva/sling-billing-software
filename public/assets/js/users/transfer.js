@@ -221,3 +221,15 @@ function updateMainQuantity() {
 
     $("#quantity").val(total);
 }
+
+// Enforce selection limit
+$(document).on('change', '.imei-checkbox', function () {
+    let maxQty = parseInt($('#quantity').val()) || 0;
+    let checkedCount = $('.imei-checkbox:checked').length;
+
+    if (checkedCount > maxQty) {
+        this.checked = false;
+        alert('You can select only ' + maxQty + ' IMEI(s).');
+        return false;
+    }
+});

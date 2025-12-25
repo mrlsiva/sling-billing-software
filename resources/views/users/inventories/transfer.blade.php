@@ -13,12 +13,9 @@
 						<p class="card-title">Product Transfer</p>
 					</div>
 					<div>
-						<a class="btn btn-outline-primary btn-sm fw-semibold"
-   data-bs-toggle="modal"
-   data-bs-target="#bulkTransfer"
-   href="javascript:void(0);">
-    <i class="ri-file-excel-2-line me-2"></i> Bulk Transfer
-</a>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#bulkTransfer" href="javascript:void(0);">
+    						<i class="ri-file-excel-2-line me-2"></i> Bulk Transfer
+						</a>
 
 						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#productTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Product Transfer</a>
 					</div>
@@ -251,7 +248,7 @@
 
 	                    <div class="row">
 		                    <div class="col-md-12 d-flex justify-content-end">
-		                    	<a href="{{ asset('assets/templates/category.xlsx') }}" download="Category_Template.xlsx">Download Template</a>
+		                    	<a href="{{ asset('assets/templates/bulk_transfer.xlsx') }}" download="Bulk_Transfer.xlsx">Download Template</a>
 		                    </div>
 		                </div>
 
