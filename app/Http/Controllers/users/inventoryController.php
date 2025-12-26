@@ -4,6 +4,9 @@ namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Imports\ProductTransferImport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProductTransferErrorExport;
 use Illuminate\Http\Request;
 use App\Traits\Notifications;
 use App\Models\ProductHistory;
@@ -315,5 +318,51 @@ class inventoryController extends Controller
 
         return redirect()->back()->with('toast_success', 'Product transferred successfully.');
     }
+
+
+    public function bulk(Request $request)
+    {
+        $request->validate([
+            'branch' => 'required',
+            'file'   => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+            $import = new ProductTransferImport(auth()->user()->owner_id);
+
+            Excel::import($import, $request->file('file'));
+
+            if ($import->hasErrors()) {
+
+                DB::rollBack();
+
+                return Excel::download(
+                    new ProductTransferErrorExport($import->errors),
+                    'bulk_transfer_errors.xlsx'
+                );
+            }
+
+            /*
+             |--------------------------------------------------------------------------
+             | PLACE YOUR ACTUAL TRANSFER LOGIC HERE
+             |--------------------------------------------------------------------------
+             | (reuse your working bulk transfer code)
+             */
+
+            DB::commit();
+
+            return back()->with('toast_success', 'Bulk transfer completed successfully.');
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()->with('toast_success', $e->getMessage());
+        }
+    }
+
 
 }

@@ -228,7 +228,8 @@
 	                <h5 class="modal-title" id="bulkTransferLabel">Bulk Transfer</h5>
 	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	            </div>
-	            <form class="row" action="{{route('inventory.transfer.bulk', ['company' => request()->route('company')])}}" method="post" id="transfer_submit">
+	            <form class="row" action="{{ route('inventory.transfer.bulk', ['company' => request()->route('company')]) }}" method="post" enctype="multipart/form-data" id="transfer_submit">
+
 	                @csrf
 	                <div class="modal-body">
 
