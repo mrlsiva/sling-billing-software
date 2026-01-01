@@ -224,6 +224,15 @@
                             </a>
                         </li>
 
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/excel/history/*') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{route('excel.history', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-history-line"></i>
+                                </span>
+                                <span class="nav-text"> Bulk Upload History </span>
+                            </a>
+                        </li>
+
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/settings/*') ? 'active' : '' }}">
                             <a class="menu-link menu-arrow" href="#sidebarSetting" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSetting">
                                 <span class="nav-icon">

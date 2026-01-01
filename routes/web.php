@@ -24,6 +24,7 @@ use App\Http\Controllers\users\paymentController;
 use App\Http\Controllers\users\billController;
 use App\Http\Controllers\users\generalController;
 use App\Http\Controllers\users\staffsController;
+use App\Http\Controllers\users\excelController;
 use App\Http\Controllers\users\orderReportsController;
 use App\Http\Controllers\users\billingsController;
 use App\Http\Controllers\users\sizeController;
@@ -340,6 +341,12 @@ else
                                     Route::get('/{branch}/download/excel',[orderReportsController::class, 'download_excel'])->name('.download_excel');
                                 });
                             });
+                        });
+                    });
+
+                    Route::prefix('excel')->group(function () {
+                        Route::name('excel.')->group(function () {
+                            Route::get('/history',[excelController::class, 'history'])->name('history');
                         });
                     });
 

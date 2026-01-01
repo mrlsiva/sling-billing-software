@@ -4,14 +4,17 @@ namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Imports\ProductTransferImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductTransferErrorExport;
+use App\Models\BulkUploadLog;
 use Illuminate\Http\Request;
 use App\Traits\Notifications;
 use App\Models\ProductHistory;
 use App\Models\StockVariation;
 use App\Models\SubCategory;
+use Illuminate\Support\Str;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Stock;
@@ -324,45 +327,262 @@ class inventoryController extends Controller
     {
         $request->validate([
             'branch' => 'required',
-            'file'   => 'required|file|mimes:xlsx,xls',
+            'file'   => 'required|file|mimes:xlsx,xls|max:10000',
         ]);
+
+        // Generate unique run_id
+        do {
+            $run_id = rand(100000, 999999);
+        } while (BulkUploadLog::where('run_id', $run_id)->exists());
 
         DB::beginTransaction();
 
         try {
 
             $import = new ProductTransferImport(auth()->user()->owner_id);
-
             Excel::import($import, $request->file('file'));
 
-            if ($import->hasErrors()) {
+            // Error handling
+            $errors = $import->errors ?? [];
+            $errorRecords = count($errors);
+
+            if ($errorRecords > 0) {
 
                 DB::rollBack();
 
-                return Excel::download(
-                    new ProductTransferErrorExport($import->errors),
-                    'bulk_transfer_errors.xlsx'
+                // Directory
+                $directory = "bulk_uploads/product_transfer/{$run_id}";
+                Storage::disk('public')->makeDirectory($directory);
+
+                // Save uploaded Excel
+                $uploadedFile = $request->file('file');
+                $originalName = $uploadedFile->getClientOriginalName();
+                $excelPath    = $uploadedFile->storeAs($directory, $originalName, 'public');
+
+                // Build log
+                $logContent  = "======================\n";
+                $logContent .= "Bulk Product Transfer Report\n";
+                $logContent .= "Uploaded On: " . now() . "\n";
+                $logContent .= "Run ID: {$run_id}\n";
+                $logContent .= "Uploaded File: {$originalName}\n";
+                $logContent .= "Error Records: {$errorRecords}\n";
+                $logContent .= "Error Details:\n";
+
+                foreach ($errors as $error) {
+                    $logContent .= "- Row {$error['row']}: {$error['error']}\n";
+                }
+
+
+                $logContent .= "======================\n\n";
+
+                $logFile = "{$directory}/log.txt";
+                Storage::disk('public')->put($logFile, $logContent);
+
+                // Save log record
+                $bulk_upload = BulkUploadLog::create([
+                    'user_id'            => auth()->id(),
+                    'run_id'             => $run_id,
+                    'run_on'             => now(),
+                    'module'             => 'Product Transfer',
+                    'total_record'       => $import->getRowCount(),
+                    'successfull_record' => 0,
+                    'error_record'       => $errorRecords,
+                    'excel'              => $excelPath,
+                    'log'                => $logFile,
+                ]);
+
+                // Notification
+                $this->notification(
+                    Auth::user()->owner_id,
+                    null,
+                    'App/Models/BulkUploadLog',
+                    $bulk_upload->id,
+                    null,
+                    json_encode($request->all()),
+                    now(),
+                    Auth::user()->id,
+                    'Bulk product transfer failed',
+                    null,
+                    $logFile,
+                    1
                 );
+
+                return back()->with('toast_success', 'Failed to import excel.');
+
+                // return Excel::download(
+                //     new ProductTransferErrorExport($errors),
+                //     'bulk_transfer_errors.xlsx'
+                // );
             }
 
             /*
              |--------------------------------------------------------------------------
-             | PLACE YOUR ACTUAL TRANSFER LOGIC HERE
+             | ACTUAL TRANSFER LOGIC HERE
              |--------------------------------------------------------------------------
-             | (reuse your working bulk transfer code)
              */
 
+            // AFTER validation success
+            foreach ($import->validRows as $row) {
+
+                $this->transferProduct([
+                    'branch_id'       => $request->branch,
+                    'category_id'     => $row['category_id'],
+                    'sub_category_id' => $row['sub_category_id'],
+                    'product_id'      => $row['product_id'],
+                    'quantity'        => $row['quantity'],
+                    'imeis'           => $row['imeis'],
+                ]);
+            }
+
+
             DB::commit();
+
+            // Counts
+            $totalRecords      = $import->getRowCount();
+            $successfulRecords = $totalRecords;
+
+            // Directory
+            $directory = "bulk_uploads/product_transfer/{$run_id}";
+            Storage::disk('public')->makeDirectory($directory);
+
+            // Save uploaded Excel
+            $uploadedFile = $request->file('file');
+            $originalName = $uploadedFile->getClientOriginalName();
+            $excelPath    = $uploadedFile->storeAs($directory, $originalName, 'public');
+
+            // Log file
+            $logContent  = "======================\n";
+            $logContent .= "Bulk Product Transfer Report\n";
+            $logContent .= "Uploaded On: " . now() . "\n";
+            $logContent .= "Run ID: {$run_id}\n";
+            $logContent .= "Uploaded File: {$originalName}\n";
+            $logContent .= "Total Records: {$totalRecords}\n";
+            $logContent .= "Successful Records: {$successfulRecords}\n";
+            $logContent .= "Error Records: 0\n";
+            $logContent .= "======================\n\n";
+
+            $logFile = "{$directory}/log.txt";
+            Storage::disk('public')->put($logFile, $logContent);
+
+            // Save DB log
+            $bulk_upload = BulkUploadLog::create([
+                'user_id'            => auth()->id(),
+                'run_id'             => $run_id,
+                'run_on'             => now(),
+                'module'             => 'Product Transfer',
+                'total_record'       => $totalRecords,
+                'successfull_record' => $successfulRecords,
+                'error_record'       => 0,
+                'excel'              => $excelPath,
+                'log'                => $logFile,
+            ]);
+
+            // Notification
+            $this->notification(
+                Auth::user()->owner_id,
+                null,
+                'App/Models/BulkUploadLog',
+                $bulk_upload->id,
+                null,
+                json_encode($request->all()),
+                now(),
+                Auth::user()->id,
+                'Bulk product transfer completed successfully',
+                null,
+                $logFile,
+                1
+            );
 
             return back()->with('toast_success', 'Bulk transfer completed successfully.');
 
         } catch (\Exception $e) {
 
             DB::rollBack();
-
-            return back()->with('toast_success', $e->getMessage());
+            return back()->with('toast_error', $e->getMessage());
         }
     }
+
+    private function transferProduct(array $data)
+    {
+        $selectedImeis = $data['imeis'] ?? [];
+
+        $product = Product::findOrFail($data['product_id']);
+
+        if ($product->quantity == 0) {
+            throw new \Exception('You cant transfer a product with 0 quantity.');
+        }
+
+        if ($product->quantity < $data['quantity']) {
+            throw new \Exception('Quantity can’t be greater than stock.');
+        }
+
+        // Branch stock
+        $branchStock = Stock::where([
+            ['branch_id', $data['branch_id']],
+            ['product_id', $data['product_id']]
+        ])->first();
+
+        if ($branchStock) {
+
+            $branchImeis = $branchStock->imei
+                ? explode(',', $branchStock->imei)
+                : [];
+
+            $branchStock->update([
+                'quantity' => $branchStock->quantity + $data['quantity'],
+                'imei'     => implode(',', array_merge($branchImeis, $selectedImeis)),
+            ]);
+
+        } else {
+
+            $branchStock = Stock::create([
+                'shop_id'        => Auth::user()->owner_id,
+                'branch_id'      => $data['branch_id'],
+                'category_id'    => $data['category_id'],
+                'sub_category_id'=> $data['sub_category_id'],
+                'product_id'     => $data['product_id'],
+                'quantity'       => $data['quantity'],
+                'is_active'      => 1,
+                'imei'           => implode(',', $selectedImeis),
+            ]);
+        }
+
+        // Deduct from main stock
+        $mainStock = Stock::where([
+            ['shop_id', Auth::user()->owner_id],
+            ['branch_id', null],
+            ['product_id', $data['product_id']]
+        ])->first();
+
+        if ($mainStock) {
+
+            $mainImeis = $mainStock->imei
+                ? explode(',', $mainStock->imei)
+                : [];
+
+            $mainStock->update([
+                'quantity' => $mainStock->quantity - $data['quantity'],
+                'imei'     => implode(',', array_diff($mainImeis, $selectedImeis)),
+            ]);
+        }
+
+        // Update product quantity
+        $product->decrement('quantity', $data['quantity']);
+
+        // History
+        ProductHistory::create([
+            'from'            => Auth::user()->id,
+            'to'              => $data['branch_id'],
+            'category_id'     => $data['category_id'],
+            'sub_category_id' => $data['sub_category_id'],
+            'product_id'      => $data['product_id'],
+            'quantity'        => $data['quantity'],
+            'transfer_on'     => now(),
+            'transfer_by'     => Auth::user()->id,
+        ]);
+    }
+
+
 
 
 }
