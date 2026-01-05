@@ -37,6 +37,11 @@ class subCategoryController extends Controller
         return view('users.sub_categories.index',compact('sub_categories','categories'));
     }
 
+    public function get_category(Request $request)
+    {
+        return $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -84,7 +89,20 @@ class subCategoryController extends Controller
         //Notifiction
         $this->notification(Auth::user()->owner_id, null,'App/Models/SubCategory', $sub_category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->sub_category).' sub category created successfully',null, null,2);
 
-        return redirect()->back()->with('toast_success', 'Sub Category created successfully.');
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Sub Category created successfully.',
+            'redirect' => route('sub_category.index', ['company' => request()->route('company')]),
+            'data' => [
+                'id' => $sub_category->id,
+                'name' => $sub_category->name,
+                'category_id' => $sub_category->category_id,
+                'category_name' => $sub_category->category->name,
+            ]
+        ]);
+
+
+        //return redirect()->back()->with('toast_success', 'Sub Category created successfully.');
     }
 
     public function edit(Request $request)

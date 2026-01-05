@@ -534,6 +534,32 @@
         <div class="page-container">
 			<div class="page-content">
             @yield('body')
+
+            <div class="modal fade" id="categoryAdd" tabindex="-1" aria-labelledby="categoryAdd" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content" >
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add Category</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        @include('users.categories.partial')
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="subCategoryAdd" tabindex="-1" aria-labelledby="subCategoryAdd" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add Sub Category</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        @include('users.sub_categories.partial')
+                    </div>
+                </div>
+            </div>
+
 			</div>
             <!-- ========== Footer Start ========== -->
             <!-- <footer class="footer">

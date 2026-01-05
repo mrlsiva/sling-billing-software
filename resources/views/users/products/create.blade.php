@@ -5,6 +5,7 @@
 @endsection
 
 @section('body')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
      <div class="row">
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -33,22 +34,38 @@
                             </div>
 
                             <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="choices-single-groups" class="form-label text-muted">Category</label>
-                                    <span class="text-danger">*</span>
-                                    <select class="form-control" data-choices name="category" id="category">
+                                <div class="mb-3 position-relative">
+                                    <label class="form-label text-muted d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Category <span class="text-danger">*</span>
+                                        </span>
+
+                                        <a data-bs-toggle="modal" data-bs-target="#categoryAdd" class="text-primary" title="Add Category">
+                                            <i class="ri-add-circle-line fs-5">Category</i>
+                                        </a>
+                                    </label>
+
+                                    <select class="form-control" name="category" id="category">
                                         <option value=""> Select </option>
                                         @foreach($categories as $category)
-                                            <option value="{{$category->id}}">{{$category->name}}</option>
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
 
+
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="choices-single-groups" class="form-label text-muted">Sub Category</label>
-                                    <span class="text-danger">*</span>
+                                    <label class="form-label text-muted d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Sub Category <span class="text-danger">*</span>
+                                        </span>
+
+                                        <a data-bs-toggle="modal" data-bs-target="#subCategoryAdd" class="text-primary" title="Add Category">
+                                            <i class="ri-add-circle-line fs-5">Sub Category</i>
+                                        </a>
+                                    </label>
                                     <select class="form-control"  name="sub_category" id="sub_category">
                                         <option value=""> Select </option>
                                     </select>
@@ -246,4 +263,6 @@
 <!-- Optional additional methods (if you need pattern, equalTo, etc.) -->
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
 <script src="{{asset('assets/js/users/product.js')}}"></script>
+<script src="{{asset('assets/js/users/sub_category.js')}}"></script>
+<script src="{{asset('assets/js/users/category.js')}}"></script>
 @endsection

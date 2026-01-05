@@ -72,7 +72,17 @@ class categoryController extends Controller
         //Notifiction
         $this->notification(Auth::user()->owner_id, null,'App/Models/Category', $category->id, null, json_encode($request->all()), now(), Auth::user()->id, Str::ucfirst($request->category). ' category created successfully',null, null,1);
 
-        return redirect()->back()->with('toast_success', 'Category created successfully.');
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Category created successfully.',
+            'redirect' => route('category.index', ['company' => request()->route('company')]),
+            'data' => [
+                'id'   => $category->id,
+                'name' => $category->name,
+            ]
+        ]);
+
+        //return redirect()->back()->with('toast_success', 'Category created successfully.');
     }
 
     public function edit(Request $request)

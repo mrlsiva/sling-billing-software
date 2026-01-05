@@ -107,6 +107,7 @@ else
                             Route::post('/status',[subCategoryController::class, 'status'])->name('status');
                             Route::get('/download',[subCategoryController::class, 'download'])->name('download');
                             Route::post('/bulk_upload',[subCategoryController::class, 'bulk_upload'])->name('bulk_upload');
+                            Route::get('/get_category',[subCategoryController::class, 'get_category'])->name('get_category');
                             
                         });
                     });
