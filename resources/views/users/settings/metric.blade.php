@@ -5,6 +5,8 @@
 @endsection
 
 @section('body')
+	<meta name="csrf-token" content="{{ csrf_token() }}">
+	<meta name="metrics-store-url" content="{{ route('setting.metric.store', ['company' => request()->route('company')]) }}">
 	<div class="row">
 		<div class="col-xl-12">
 			<div class="card">
@@ -100,36 +102,6 @@
 		</div>
 	</div>
 
-
-
-	<div class="modal fade" id="metricAdd" tabindex="-1" aria-labelledby="metricAdd" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" >
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add New</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form class="row" action="{{route('setting.metric.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
-                	@csrf
-	                <div class="modal-body">
-
-	                   	<div class="row">
-		                    <div class="col-md-12">
-		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">Metric</label>
-		                            <input type="text" id="name" name="name" class="form-control" required="">
-		                        </div>
-		                    </div>
-	                   	</div>
-	                </div>
-	                <div class="modal-footer">
-	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	                    <button type="submit" class="btn btn-primary">Submit</button>
-	                </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <div class="modal fade" id="metricEdit" tabindex="-1" aria-labelledby="metricEdit" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">

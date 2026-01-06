@@ -554,8 +554,43 @@
                             <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add Sub Category</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-
                         @include('users.sub_categories.partial')
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="taxAdd" tabindex="-1" aria-labelledby="taxAdd" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content" >
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add New</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        @include('users.settings.partials.tax')
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="metricAdd" tabindex="-1" aria-labelledby="metricAdd" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content" >
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add New</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        @include('users.settings.partials.metric')
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="vendorAdd" tabindex="-1" aria-labelledby="vendorAdd" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content" >
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add New Vendor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        @include('users.vendors.partial')
                     </div>
                 </div>
             </div>

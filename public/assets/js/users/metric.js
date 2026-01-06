@@ -1,3 +1,113 @@
+$('#addMetric').on('submit', function (e) {
+    e.preventDefault();
+
+    let form = this;
+    let formData = new FormData(form);
+
+    $.ajax({
+        url: document.querySelector('meta[name="metrics-store-url"]').content,
+        type: "POST",
+        data: formData,
+        dataType: "json",
+
+        /* REQUIRED FOR FormData */
+        processData: false,
+        contentType: false,
+
+        /* CSRF */
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+
+        beforeSend: function () {
+            $('#addMetricButton').prop('disabled', true).html('<i class="ri-loader-4-line"></i> Submitting...');
+        },
+
+        success: function (response) {
+            console.log(response);
+
+            if (response.status === true) 
+            {
+                let currentUrl = window.location.pathname;
+
+                if (currentUrl.includes('metrics')) 
+                {
+                    alert(response.message);
+                    window.location.href = response.redirect;
+                }
+                else 
+                {
+                    let metric = response.data;
+
+                    let metricSelect = $('#metric');
+
+                    /* Append metric if not exists */
+                    if (metricSelect.find('option[value="' + metric.id + '"]').length === 0) {
+                        metricSelect.append(
+                            `<option value="${metric.id}">
+                                ${metric.name}
+                            </option>`
+                        );
+                    }
+
+                    /* Select newly created metric */
+                    metricSelect.val(metric.id).trigger('change');
+
+                    /* Close modal */
+                    $('#metricAdd').modal('hide');
+
+                    /* Reset form */
+                    $('#addMetric')[0].reset();
+
+                    /* Restore submit button */
+                    $('#addMetricButton').prop('disabled', false).html('<i class="ri-save-line"></i> Submit');
+                }
+            }
+            else
+            {
+                alert(response.message);
+                $('#addMetricButton').prop('disabled', false).html('<i class="ri-save-line"></i> Submit');
+            }
+        },
+
+        error: function (xhr, status, error) {
+            console.error('STATUS:', xhr.status);
+            console.error('RESPONSE:', xhr.responseText);
+            console.error('ERROR:', error);
+
+            let message = 'Something went wrong. Please try again.';
+
+            /* Laravel Validation Errors (422) */
+            if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                let errors = xhr.responseJSON.errors;
+                let messages = [];
+
+                $.each(errors, function (key, value) {
+                    messages.push(value[0]);
+                });
+
+                message = messages.join('\n');
+            }
+
+            /* CSRF expired (419) */
+            else if (xhr.status === 419) {
+                message = 'Session expired. Please refresh the page.';
+            }
+
+            /* Server error */
+            else if (xhr.responseJSON && xhr.responseJSON.message) {
+                message = xhr.responseJSON.message;
+            }
+
+            alert(message);
+
+            /* Restore submit button */
+            $('#addMetricButton').prop('disabled', false).html('<i class="ri-save-line"></i> Submit');
+        }
+    });
+});
+
+
 function metric_edit(element) {
     var system_id = $(element).data("system_id");
     console.log(system_id);

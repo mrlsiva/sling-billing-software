@@ -75,6 +75,16 @@ class vendorController extends Controller
         //Notifiction
         $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' vendor created successfully',null, null,6);
 
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Vendor created successfully.',
+            'redirect' => route('vendor.index', ['company' => request()->route('company')]),
+            'data' => [
+                'id' => $vendor->id,
+                'name' => $vendor->name,
+            ]
+        ]);
+
         return redirect()->back()->with('toast_success', 'Vendor created successfully.');
     }
 

@@ -55,6 +55,16 @@ class metricController extends Controller
         //Notifiction
         $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' metric created successfully',null, null,4);
 
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Metric created successfully.',
+            'redirect' => route('setting.metric.index', ['company' => request()->route('company')]),
+            'data' => [
+                'id' => $metric->id,
+                'name' => $metric->name,
+            ]
+        ]);
+
         return redirect()->back()->with('toast_success', 'Metric created successfully.');
     }
 

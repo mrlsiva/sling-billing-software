@@ -6,6 +6,7 @@
 
 @section('body')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="vendor-store-url" content="{{ route('vendor.store', ['company' => request()->route('company')]) }}">
 <div class="row">
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -33,7 +34,15 @@
                         
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label class="form-label text-muted">Vendor <span class="text-danger">*</span></label>
+                                <label class="form-label text-muted d-flex justify-content-between align-items-center">
+                                    <span>
+                                        Vendor <span class="text-danger">*</span>
+                                    </span>
+
+                                    <a data-bs-toggle="modal" data-bs-target="#vendorAdd" class="text-primary" title="Add Vendor">
+                                        <i class="ri-add-circle-line fs-5">Vendor</i>
+                                    </a>
+                                </label>
                                 <select class="form-control" name="vendor" id="vendor" required="">
                                     <option value=""> Select </option>
                                     @foreach($vendors as $vendor)
@@ -256,4 +265,5 @@
 
 @section('script')
 <script src="{{asset('assets/js/users/purchase.js')}}"></script>
+<script src="{{asset('assets/js/users/vendor.js')}}"></script>
 @endsection

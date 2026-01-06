@@ -5,7 +5,9 @@
 @endsection
 
 @section('body')
-
+	
+	<meta name="csrf-token" content="{{ csrf_token() }}">
+	<meta name="vendor-store-url" content="{{ route('vendor.store', ['company' => request()->route('company')]) }}">
 	<div class="row">
 		<div class="col-xl-12">
 			<div class="card">
@@ -141,87 +143,6 @@
 		</div>
 	</div>
 
-	<div class="modal fade" id="vendorAdd" tabindex="-1" aria-labelledby="vendorAdd" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" >
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add New Vendor</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form class="row" action="{{route('vendor.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data" id="addVendor">
-                	@csrf
-	                <div class="modal-body">
-
-	                   	<div class="row">
-		                    <div class="col-md-6">
-		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">Name</label>
-		                            <input type="text" id="name" name="name" class="form-control" required="" placeholder="Enter Name">
-		                        </div>
-		                    </div>
-		                    <div class="col-md-6">
-		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">Phone</label>
-		                            <input type="text" id="phone" name="phone" class="form-control" required="" placeholder="Enter Phone">
-		                        </div>
-		                    </div>
-	                   	</div>
-
-	                   	<div class="row">
-		                    <div class="col-md-6">
-		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">Email</label>
-		                            <input type="email" id="email" name="email" class="form-control" placeholder="Enter Email">
-		                        </div>
-		                    </div>
-		                    <div class="col-md-6">
-		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">GST</label>
-		                            <input type="text" id="gst" name="gst" class="form-control" placeholder="Enter GST number">
-		                        </div>
-		                    </div>
-	                   	</div>
-
-	                   	<div class="row">
-		                    <div class="col-md-6">
-		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">Address</label>
-		                            <input type="text" id="address" name="address" class="form-control" placeholder="Enter Address">
-		                        </div>
-		                    </div>
-		                    <div class="col-md-6">
-		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">Address1</label>
-		                            <input type="text" id="address1" name="address1" class="form-control" placeholder="Enter Alternate Address">
-		                        </div>
-		                    </div>
-	                   	</div>
-
-	                   	<div class="row">
-		                    <div class="col-md-6">
-		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">City</label>
-		                            <input type="text" id="city" name="city" class="form-control" placeholder="Enter City">
-		                        </div>
-		                    </div>
-		                    <div class="col-md-6">
-		                        <div class="mb-3">
-		                            <label for="choices-single-groups" class="form-label text-muted">State</label>
-		                            <input type="text" id="state" name="state" class="form-control" placeholder="Enter State">
-		                        </div>
-		                    </div>
-	                   	</div>
-
-	                </div>
-	                <div class="modal-footer">
-	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	                    <button type="submit" class="btn btn-primary">Submit</button>
-	                </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <div class="modal fade" id="vendorEdit" tabindex="-1" aria-labelledby="vendorEdit" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" >
@@ -306,127 +227,5 @@
 @endsection
 
 @section('script')
-	<script type="text/javascript">
-		document.addEventListener("click", function(e) {
-		    if (e.target.closest("a[data-bs-target='#vendorEdit']")) {
-		        const btn = e.target.closest("a[data-bs-target='#vendorEdit']");
-
-		        document.getElementById("vendor_id").value      = btn.getAttribute("data-id");
-		        document.getElementById("vendor_name").value    = btn.getAttribute("data-name");
-		        document.getElementById("vendor_phone").value   = btn.getAttribute("data-phone");
-		        document.getElementById("vendor_email").value   = btn.getAttribute("data-email");
-		        document.getElementById("vendor_address").value = btn.getAttribute("data-address");
-		        document.getElementById("vendor_address1").value= btn.getAttribute("data-address1");
-		        document.getElementById("vendor_city").value    = btn.getAttribute("data-city");
-		        document.getElementById("vendor_state").value   = btn.getAttribute("data-state");
-		        document.getElementById("vendor_gst").value     = btn.getAttribute("data-gst");
-		    }
-		});
-	</script>
-
-	<script type="text/javascript">
-		
-		document.addEventListener("DOMContentLoaded", function () {
-		    let searchInput = document.getElementById("searchInput");
-		    let clearFilter = document.getElementById("clearFilter");
-
-		    function toggleClear() {
-		        if (searchInput.value.trim() !== "") {
-		            clearFilter.style.display = "inline-flex";
-		        } else {
-		            clearFilter.style.display = "none";
-		        }
-		    }
-
-		    // Run on load (for prefilled request values)
-		    toggleClear();
-
-		    // Run on typing
-		    searchInput.addEventListener("input", toggleClear);
-		});
-
-	</script>
-
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-		    let form = document.getElementById("addVendor");
-
-		    form.addEventListener("submit", function (e) {
-		        let name = document.getElementById("name").value.trim();
-		        let phone = document.getElementById("phone").value.trim();
-		        let gst = document.getElementById("gst").value.trim();
-		        let errors = [];
-
-		        // Name validation
-		        if (!name) {
-		            errors.push("Name is required");
-		        }
-
-		        // Phone validation (10 digits only)
-		        let phoneRegex = /^[0-9]{10}$/;
-		        if (!phone) {
-		            errors.push("Phone is required");
-		        } else if (!phoneRegex.test(phone)) {
-		            errors.push("Phone must be 10 digits number");
-		        }
-
-		        // GST validation (only if provided)
-		        if (gst) {
-		            let gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i;
-		            if (!gstRegex.test(gst)) {
-		                errors.push("Invalid GST format");
-		            }
-		        }
-
-		        // If errors, stop submit and alert
-		        if (errors.length > 0) {
-		            e.preventDefault();
-		            alert(errors.join("\n"));
-		        }
-		    });
-		});
-	</script>
-
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-		    let editForm = document.getElementById("editVendor");
-
-		    editForm.addEventListener("submit", function (e) {
-		        let name = document.getElementById("vendor_name").value.trim();
-		        let phone = document.getElementById("vendor_phone").value.trim();
-		        let gst = document.getElementById("vendor_gst").value.trim();
-		        let errors = [];
-
-		        // Name validation
-		        if (!name) {
-		            errors.push("Name is required");
-		        }
-
-		        // Phone validation (10 digits only)
-		        let phoneRegex = /^[0-9]{10}$/;
-		        if (!phone) {
-		            errors.push("Phone is required");
-		        } else if (!phoneRegex.test(phone)) {
-		            errors.push("Phone must be a 10-digit number");
-		        }
-
-		        // GST validation (only if provided)
-		        if (gst) {
-		            let gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i;
-		            if (!gstRegex.test(gst)) {
-		                errors.push("Invalid GST format");
-		            }
-		        }
-
-		        // If errors, stop submit and alert
-		        if (errors.length > 0) {
-		            e.preventDefault();
-		            alert(errors.join("\n"));
-		        }
-		    });
-		});
-	</script>
-
-
-
+	<script src="{{asset('assets/js/users/vendor.js')}}"></script>
 @endsection

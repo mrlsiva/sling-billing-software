@@ -6,6 +6,8 @@
 
 @section('body')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="metrics-store-url" content="{{ route('setting.metric.store', ['company' => request()->route('company')]) }}">
+    <meta name="taxes-store-url" content="{{ route('setting.tax.store', ['company' => request()->route('company')]) }}">
      <div class="row">
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -115,8 +117,15 @@
 
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="choices-single-groups" class="form-label text-muted">Tax</label>
-                                    <span class="text-danger">*</span>
+                                    <label class="form-label text-muted d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Tax <span class="text-danger">*</span>
+                                        </span>
+
+                                        <a data-bs-toggle="modal" data-bs-target="#taxAdd" class="text-primary" title="Add Tax">
+                                            <i class="ri-add-circle-line fs-5">Tax</i>
+                                        </a>
+                                    </label>
                                     <select class="form-control"  name="tax" id="tax">
                                         <option value=""> Select </option>
                                         @foreach($taxes as $tax)
@@ -128,8 +137,15 @@
 
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="choices-single-groups" class="form-label text-muted">Metric</label>
-                                    <span class="text-danger">*</span>
+                                    <label class="form-label text-muted d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Metric <span class="text-danger">*</span>
+                                        </span>
+
+                                        <a data-bs-toggle="modal" data-bs-target="#metricAdd" class="text-primary" title="Add Metric">
+                                            <i class="ri-add-circle-line fs-5">Metric</i>
+                                        </a>
+                                    </label>
                                     <select class="form-control"  name="metric" id="metric">
                                         <option value=""> Select </option>
                                         @foreach($metrics as $metric)
@@ -265,4 +281,6 @@
 <script src="{{asset('assets/js/users/product.js')}}"></script>
 <script src="{{asset('assets/js/users/sub_category.js')}}"></script>
 <script src="{{asset('assets/js/users/category.js')}}"></script>
+<script src="{{asset('assets/js/users/tax.js')}}"></script>
+<script src="{{asset('assets/js/users/metric.js')}}"></script>
 @endsection

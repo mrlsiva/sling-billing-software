@@ -56,6 +56,17 @@ class taxController extends Controller
         //Notifiction
         $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.'% tax created successfully',null, null,3);
 
+
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Tax created successfully.',
+            'redirect' => route('setting.tax.index', ['company' => request()->route('company')]),
+            'data' => [
+                'id' => $tax->id,
+                'name' => $tax->name,
+            ]
+        ]);
+
         return redirect()->back()->with('toast_success', 'Tax created successfully.');
     }
 
