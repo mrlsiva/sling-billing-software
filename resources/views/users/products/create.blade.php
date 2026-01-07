@@ -8,6 +8,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="metrics-store-url" content="{{ route('setting.metric.store', ['company' => request()->route('company')]) }}">
     <meta name="taxes-store-url" content="{{ route('setting.tax.store', ['company' => request()->route('company')]) }}">
+    <meta name="size-store-url" content="{{ route('setting.size.store', ['company' => request()->route('company')]) }}">
+    <meta name="colour-store-url" content="{{ route('setting.colour.store', ['company' => request()->route('company')]) }}">
+
      <div class="row">
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -208,11 +211,19 @@
                             @endif
 
                             <div class="col-md-12" id="sizes-section" style="display:none;">
-                                <label class="mt-3"><strong>Select Sizes</strong></label>
+                                <label class="form-label text-muted d-flex justify-content-start align-items-center">
+                                    <span>
+                                        Select Size
+                                    </span>
+
+                                    <a data-bs-toggle="modal" data-bs-target="#sizeAdd" class="text-primary" title="Add Size">
+                                        <i class="ri-add-circle-line fs-5">Size</i>
+                                    </a>
+                                </label>
                                 <div class="row">
 
                                     @foreach($sizes as $size)
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <div class="form-check">
                                                 <input class="form-check-input size-checkbox"
                                                        type="checkbox"
@@ -231,10 +242,18 @@
                             </div>
 
                             <div class="col-md-12" id="colours-section" style="display:none;">
-                                <label class="mt-3"><strong>Select Colours</strong></label>
+                                <label class="form-label text-muted d-flex justify-content-start align-items-center">
+                                    <span>
+                                        Select Colours
+                                    </span>
+
+                                    <a data-bs-toggle="modal" data-bs-target="#colourAdd" class="text-primary" title="Add Colour">
+                                        <i class="ri-add-circle-line fs-5">Colour</i>
+                                    </a>
+                                </label>
                                 <div class="row">
                                     @foreach($colours as $colour)
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <div class="form-check">
                                                 <input class="form-check-input colour-checkbox"
                                                        type="checkbox"
@@ -283,4 +302,6 @@
 <script src="{{asset('assets/js/users/category.js')}}"></script>
 <script src="{{asset('assets/js/users/tax.js')}}"></script>
 <script src="{{asset('assets/js/users/metric.js')}}"></script>
+<script src="{{asset('assets/js/users/size.js')}}"></script>
+<script src="{{asset('assets/js/users/colour.js')}}"></script>
 @endsection

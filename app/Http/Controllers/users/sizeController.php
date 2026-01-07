@@ -56,6 +56,16 @@ class sizeController extends Controller
         //Notifiction
         $this->notification(Auth::user()->owner_id, null,'App/Models/Size', $size->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' size created successfully',null, null,16);
 
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Size created successfully.',
+            'redirect' => route('setting.size.index', ['company' => request()->route('company')]),
+            'data' => [
+                'id' => $size->id,
+                'name' => $size->name,
+            ]
+        ]);
+
         return redirect()->back()->with('toast_success', 'Size created successfully.');
     }
 

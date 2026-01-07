@@ -55,6 +55,16 @@ class colourController extends Controller
         //Notifiction
         $this->notification(Auth::user()->owner_id, null,'App/Models/Colour', $colour->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' colour created successfully',null, null,16);
 
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Colour created successfully.',
+            'redirect' => route('setting.colour.index', ['company' => request()->route('company')]),
+            'data' => [
+                'id' => $colour->id,
+                'name' => $colour->name,
+            ]
+        ]);
+
         return redirect()->back()->with('toast_success', 'Colour created successfully.');
     }
 

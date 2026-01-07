@@ -583,6 +583,30 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="sizeAdd" tabindex="-1" aria-labelledby="sizeAdd" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content" >
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add New</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        @include('users.settings.partials.size')
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="colourAdd" tabindex="-1" aria-labelledby="colourAdd" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content" >
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add New</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        @include('users.settings.partials.colour')
+                    </div>
+                </div>
+            </div>
+
             <div class="modal fade" id="vendorAdd" tabindex="-1" aria-labelledby="vendorAdd" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content" >
