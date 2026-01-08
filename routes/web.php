@@ -190,6 +190,7 @@ else
                                 Route::name('transfer')->group(function () {
 
                                     Route::get('/',[inventoryController::class, 'transfer']);
+                                    Route::get('/{id}/get_bill',[inventoryController::class, 'get_bill'])->name('.get_bill');
                                     Route::get('/get_sub_category',[inventoryController::class, 'get_sub_category'])->name('.get_sub_category');
                                     Route::get('/get_product',[inventoryController::class, 'get_product'])->name('get_product');
                                     Route::get('/get_product_detail',[inventoryController::class, 'get_product_detail'])->name('.get_product_detail');

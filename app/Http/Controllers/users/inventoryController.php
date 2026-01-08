@@ -117,6 +117,14 @@ class inventoryController extends Controller
         return view('users.inventories.transfer',compact('categories','transfers','branches'));
     }
 
+    public function get_bill(Request $request,$company,$id)
+    {
+        $transfer_detail = ProductHistory::where('id',$id)->first();
+        $transfer_products = ProductHistory::where('invoice',$transfer_detail->invoice)->get();
+
+         return view('users.inventories.bill',compact('transfer_detail','transfer_products'));
+    }
+
     public function get_sub_category(Request $request)
     {
         return $sub_categories = SubCategory::where([['user_id',Auth::user()->id],['category_id',$request->id],['is_active',1]])->get();
@@ -265,7 +273,12 @@ class inventoryController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Quantity Updated','App/Models/Poduct','products',$product->id,'Update',null,$request,'Success','Quantity Updated for this product');
 
+        $lastInvoice = ProductHistory::lockForUpdate()->max('invoice');
+
+        $invoice = str_pad( ($lastInvoice !== null ? (int)$lastInvoice + 1 : 0), 5, '0',STR_PAD_LEFT );
+
         $transfer = ProductHistory::create([
+            'invoice'        => $invoice,
             'from'           => Auth::user()->id,
             'to'             => $request->branch,
             'category_id'    => $request->category,

@@ -224,15 +224,6 @@
                             </a>
                         </li>
 
-                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/excel/history/*') ? 'active' : '' }}">
-                            <a class="menu-link" href="{{route('excel.history', ['company' => request()->route('company')])}}">
-                                <span class="nav-icon">
-                                    <i class="ri-history-line"></i>
-                                </span>
-                                <span class="nav-text"> Bulk Upload History </span>
-                            </a>
-                        </li>
-
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/settings/*') ? 'active' : '' }}">
                             <a class="menu-link menu-arrow" href="#sidebarSetting" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSetting">
                                 <span class="nav-icon">
@@ -484,6 +475,11 @@
                                 @else
                                     <a class="dropdown-item" href="{{route('my_profile', ['company' => request()->route('company')])}}">
                                         <i class="bx bx-user-circle fs-18 align-middle me-2"></i><span class="align-middle">My Account</span>
+                                    </a>
+                                @endif
+                                @if(Auth::user()->role_id == 2)
+                                    <a class="dropdown-item" href="{{route('excel.history', ['company' => request()->route('company')])}}">
+                                        <i class="bx bx-task fs-18 align-middle me-2"></i><span class="align-middle">Bulk Upload History</span>
                                     </a>
                                 @endif
                                 <a class="dropdown-item" href="#">

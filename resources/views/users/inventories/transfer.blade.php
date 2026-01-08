@@ -74,6 +74,7 @@
                                     <th>Product</th>
                                     <th>Stock</th>
                                     <th>Transfer On</th>
+                                    <th>Bill</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -101,6 +102,9 @@
 
 										<td>
 											{{ \Carbon\Carbon::parse($transfer->transfer_on)->format('d M Y') }}
+										</td>
+										<td>
+											<a href="{{ route('inventory.transfer.get_bill', ['company' => request()->route('company'),'id' => $transfer->id ]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
 										</td>
 									</tr>
 									@endforeach
