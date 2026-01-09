@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\notificationController;
 
+//Version
+use App\Http\Controllers\versionController;
+
 //Controller
 use App\Http\Controllers\auth\loginController;
 use App\Http\Controllers\auth\homeController;
@@ -48,6 +51,9 @@ Route::get('/clear', function() {
     Artisan::call('route:clear');
     return "Cleared!!!";
 });
+
+//Version
+Route::get('version_update',[versionController::class, 'update'])->name('update');
 
 Route::get('/', function () {
     return view('home');
