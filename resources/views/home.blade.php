@@ -358,8 +358,8 @@
           @csrf
 
           <!-- Hidden fields -->
-          <input type="hidden" name="password" value="Password@1234">
-          <input type="hidden" name="password_confirmation" value="Password@1234">
+          <input type="hidden" name="password" value="Test@1234">
+          <input type="hidden" name="password_confirmation" value="Test@1234">
           <input type="hidden" name="bill_type" value="1">
           <input type="hidden" name="payment_method" value="1">
 

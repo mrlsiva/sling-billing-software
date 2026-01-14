@@ -400,6 +400,7 @@ else
                                     Route::get('/get_product',[stockController::class, 'get_product'])->name('get_product');
                                     Route::get('/get_product_detail',[stockController::class, 'get_product_detail'])->name('get_product_detail');
                                     Route::post('/store',[stockController::class, 'store'])->name('store');
+                                    Route::get('/{id}/get_bill',[stockController::class, 'get_bill'])->name('get_bill');
                                 });
                             });
 

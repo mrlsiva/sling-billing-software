@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductHistory extends Model
 {
     protected $fillable = [
-        'from','to','category_id','sub_category_id','product_id','quantity','transfer_on','transfer_by'
+        'from','to','category_id','sub_category_id','product_id','quantity','transfer_on','transfer_by','invoice'
     ];
 
     public function transfer_from()

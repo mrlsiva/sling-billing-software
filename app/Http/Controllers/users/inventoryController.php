@@ -89,33 +89,54 @@ class inventoryController extends Controller
 
     public function transfer(Request $request)
     {
-        $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
-        $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
+        $categories = Category::where([
+            ['user_id', Auth::user()->owner_id],
+            ['is_active', 1]
+        ])->get();
 
-        $transfers = ProductHistory::where(function ($q) {
-            $q->where('from', Auth::user()->owner_id)
-              ->orWhere('to', Auth::user()->owner_id);
-        })
-        ->when(request()->filled('product'), function ($query) {
-            $product = request('product');
-            $query->whereHas('product', function ($q) use ($product) {
-                $q->where('name', 'like', "%{$product}%");
-            });
-        })
-        ->when(request()->filled('branch'), function ($query) {
-            $branch = request('branch');
-            $query->where(function ($q) use ($branch) {
-                $q->where('to', $branch)
-                  ->orWhere('from', $branch);
-            });
-        })
-        ->with(['product.metric', 'transfer_from', 'transfer_to']) // eager load for performance
-        ->orderBy('transfer_on', 'desc') // sort by latest transfer
-        ->paginate(10);
+        $branches = User::where([
+            ['parent_id', Auth::user()->owner_id],
+            ['is_active', 1],
+            ['is_lock', 0],
+            ['is_delete', 0]
+        ])->get();
 
+        $transfers = ProductHistory::selectRaw('
+                MAX(id) as id,
+                invoice,
+                MAX(`to`) as `to`,
+                MAX(transfer_on) as transfer_on,
+                MAX(transfer_by) as transfer_by
+            ')
+            ->where(function ($q) {
+                $q->where('from', Auth::user()->owner_id)
+                  ->orWhere('to', Auth::user()->owner_id);
+            })
+            ->when(request()->filled('product'), function ($query) {
+                $product = request('product');
+                $query->whereHas('product', function ($q) use ($product) {
+                    $q->where('name', 'like', "%{$product}%");
+                });
+            })
+            ->when(request()->filled('branch'), function ($query) {
+                $branch = request('branch');
+                $query->where(function ($q) use ($branch) {
+                    $q->where('to', $branch)
+                      ->orWhere('from', $branch);
+                });
+            })
+            ->groupBy('invoice')
+            ->with(['transfer_from', 'transfer_to']) // product not needed since grouped
+            ->orderBy('id', 'Desc')
+            ->paginate(10);
 
-        return view('users.inventories.transfer',compact('categories','transfers','branches'));
+        return view('users.inventories.transfer', compact(
+            'categories',
+            'transfers',
+            'branches'
+        ));
     }
+
 
     public function get_bill(Request $request,$company,$id)
     {
@@ -275,7 +296,9 @@ class inventoryController extends Controller
 
         $lastInvoice = ProductHistory::lockForUpdate()->max('invoice');
 
-        $invoice = str_pad( ($lastInvoice !== null ? (int)$lastInvoice + 1 : 0), 5, '0',STR_PAD_LEFT );
+        $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
+
+        $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
 
         $transfer = ProductHistory::create([
             'invoice'        => $invoice,

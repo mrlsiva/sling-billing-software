@@ -65,14 +65,12 @@
 						<table class="table align-middle mb-0 table-hover table-centered">
 							<thead class="bg-light-subtle">
 								<tr>
-									<th>S.No</th>
+                                    <th>S.No</th>
+									<th>Invoice</th>
 									<th>From</th>
 									<th>To</th>
-                                   	<th>Image</th>
-                                    <th>Categoy</th>
-                                    <th>Product</th>
-                                    <th>Stock</th>
                                     <th>Transfer On</th>
+                                    <th>Bill</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -82,26 +80,18 @@
 											{{ ($transfers->currentPage() - 1) * $transfers->perPage() + $loop->iteration }}
 										</td>
 
+										<td>{{$transfer->invoice}}</td>
+
 										<td>{{$transfer->transfer_from->user_name}}</td>
 
 										<td>{{$transfer->transfer_to->user_name}}</td>
 
 										<td>
-											@if($transfer->product->image != null)
-												<img src="{{ asset('storage/' . $transfer->product->image) }}" class="logo-dark me-1" alt="Product" height="30">
-											@else
-												<img src="{{ asset('assets/images/category.jpg') }}" class="logo-dark me-1" alt="Product" height="30">
-											@endif
-											
+											{{ \Carbon\Carbon::parse($transfer->transfer_on)->format('d M Y') }}
 										</td>
-										<td>{{$transfer->category->name}} >> {{$transfer->sub_category->name}}</td>
-
-										<td>{{$transfer->product->name}}</td>
-
-										<td>{{$transfer->quantity}} ({{$transfer->product->metric->name}})</td>
 
 										<td>
-											{{ \Carbon\Carbon::parse($transfer->transfer_on)->format('d M Y') }}
+											<a href="{{ route('branch.stock_transfer.get_bill', ['company' => request()->route('company'),'id' => $transfer->id ]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
 										</td>
 									</tr>
 									@endforeach
