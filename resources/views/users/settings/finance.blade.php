@@ -89,6 +89,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($finances->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

@@ -289,6 +289,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                    @if($purchase_orders->isEmpty())
+                        @include('no-data')
+                    @endif
                 </div>
             </div> <!-- end card body -->
             <div class="card-footer border-0">

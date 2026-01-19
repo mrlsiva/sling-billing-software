@@ -120,6 +120,9 @@
 								@endforeach
 							</tbody>
 						</table>
+						@if($shops->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

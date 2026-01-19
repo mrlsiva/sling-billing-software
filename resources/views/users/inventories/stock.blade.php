@@ -109,6 +109,9 @@
                                 	@endforeach
                                 </tbody>
                             </table>
+                            @if($stocks->isEmpty())
+                                @include('no-data')
+                            @endif
                         </div>
                     </div>
                 </div>

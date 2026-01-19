@@ -142,7 +142,22 @@ jQuery(document).ready(function () {
 
         if (allowed && selected > allowed) {
             $(this).prop('checked', false);
-            alert("You can select only " + allowed + " IMEIs.");
+
+            const event = new CustomEvent("toast", {
+                detail: {
+                    text: "You can select only " + allowed + " IMEIs.",
+                    gravity: "top",
+                    position: "right",
+                    className: "success",
+                    duration: 5000,
+                    close: true,
+                }
+            });
+
+            document.dispatchEvent(event);
+            setTimeout(() => {
+                window.location.href = response.redirect;
+            }, 800);
         }
     });
 
@@ -152,7 +167,19 @@ jQuery(document).ready(function () {
         let selected = $(".imei-checkbox:checked").length;
 
         if (allowed < selected) {
-            alert("Quantity reduced! Removing extra selected IMEIs.");
+            const event = new CustomEvent("toast", {
+                detail: {
+                    text: "Quantity reduced! Removing extra selected IMEIs.",
+                    gravity: "top",
+                    position: "right",
+                    className: "success",
+                    duration: 5000,
+                    close: true,
+                }
+            });
+
+            document.dispatchEvent(event);
+
             $(".imei-checkbox:checked").slice(allowed).prop('checked', false);
         }
     });
@@ -170,7 +197,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (quantity > available) {
             e.preventDefault();
-            alert('Quantity can’t be greater than stock.');
+
+            const event = new CustomEvent("toast", {
+                detail: {
+                    text: "Quantity can’t be greater than stock.",
+                    gravity: "top",
+                    position: "right",
+                    className: "success",
+                    duration: 5000,
+                    close: true,
+                }
+            });
+
+            document.dispatchEvent(event);
         }
         // else { no need to call form.submit() because the form will submit naturally }
     });
@@ -229,7 +268,19 @@ $(document).on('change', '.imei-checkbox', function () {
 
     if (checkedCount > maxQty) {
         this.checked = false;
-        alert('You can select only ' + maxQty + ' IMEI(s).');
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "You can select only " + maxQty + " IMEI(s).",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return false;
     }
 });

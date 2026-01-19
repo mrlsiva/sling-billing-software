@@ -91,6 +91,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($metrics->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

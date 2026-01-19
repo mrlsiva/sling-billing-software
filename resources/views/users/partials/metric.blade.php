@@ -1,1 +1,0 @@
-metric.blade.php

@@ -92,6 +92,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($taxes->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

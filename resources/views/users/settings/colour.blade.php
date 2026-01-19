@@ -93,6 +93,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($colours->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

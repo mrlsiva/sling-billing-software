@@ -269,6 +269,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        @if($branches->isEmpty())
+                            @include('no-data')
+                        @endif
                     </div>
                     <div class="card-footer border-0">
                         {!! $branches->withQueryString()->links('pagination::bootstrap-5') !!}

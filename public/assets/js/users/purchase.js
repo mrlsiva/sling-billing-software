@@ -499,8 +499,23 @@ $('#purchaseOrderCreate').on('submit', function (e) {
             console.log(response);
 
             if (response.status === true) {
-                alert(response.message);
-                window.location.href = response.redirect;
+                const event = new CustomEvent("toast", {
+                    detail: {
+                        text: response.message,
+                        gravity: "top",
+                        position: "right",
+                        className: "success",
+                        duration: 5000,
+                        close: true,
+                    }
+                });
+
+                document.dispatchEvent(event);
+
+                
+                setTimeout(() => {
+                    window.location.href = response.redirect;
+                }, 800);
             }
             else
             {

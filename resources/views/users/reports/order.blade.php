@@ -118,6 +118,9 @@
 								@endforeach
                                 </tbody>
                             </table>
+                            @if($orders->isEmpty())
+                                @include('no-data')
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -109,6 +109,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($users->isEmpty())
+							@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

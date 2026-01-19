@@ -97,6 +97,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($transfers->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

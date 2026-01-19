@@ -63,8 +63,23 @@ $('#addSubCategory').on('submit', function (e) {
 
                 if (currentUrl.includes('sub_categories')) 
                 {
-                    alert(response.message);
-                    window.location.href = response.redirect;
+                    const event = new CustomEvent("toast", {
+                        detail: {
+                            text: response.message,
+                            gravity: "top",
+                            position: "right",
+                            className: "success", // or "error" based on response
+                            duration: 5000,
+                            close: true,
+                        }
+                    });
+
+                    document.dispatchEvent(event);
+
+                    // optional delay so user can see the toast
+                    setTimeout(() => {
+                        window.location.href = response.redirect;
+                    }, 800);
                 }
                 else {
                     let subCategory = response.data;

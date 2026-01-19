@@ -113,6 +113,9 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            @if($bills->isEmpty())
+                                @include('no-data')
+                            @endif
                         </div>
                     </div>
                 </div>

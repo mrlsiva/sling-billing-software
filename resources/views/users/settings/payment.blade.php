@@ -56,6 +56,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($shop_payments->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 				</div>
 			</div>

@@ -92,6 +92,9 @@
 								@endforeach
 							</tbody>
 						</table>
+						@if($staffs->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

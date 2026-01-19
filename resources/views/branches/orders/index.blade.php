@@ -97,6 +97,9 @@
 								@endforeach
 							</tbody>
 						</table>
+						@if($orders->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

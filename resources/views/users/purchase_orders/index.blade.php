@@ -66,6 +66,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($purchase_orders->isEmpty())
+                            @include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

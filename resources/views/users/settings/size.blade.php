@@ -91,6 +91,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($sizes->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

@@ -132,6 +132,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($vendors->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

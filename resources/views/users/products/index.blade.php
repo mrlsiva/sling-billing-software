@@ -118,6 +118,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($products->isEmpty())
+                            @include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>

@@ -118,6 +118,9 @@
 									@endforeach
 							</tbody>
 						</table>
+						@if($sub_categories->isEmpty())
+                        	@include('no-data')
+                        @endif
 					</div>
 					<!-- end table-responsive -->
 				</div>
