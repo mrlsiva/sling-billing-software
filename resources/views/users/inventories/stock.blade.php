@@ -102,7 +102,7 @@
                                                     </a>
                                                 </td>
                                             @else
-                                                -
+                                                <td>-</td>
                                             @endif
 
                                 		</tr>

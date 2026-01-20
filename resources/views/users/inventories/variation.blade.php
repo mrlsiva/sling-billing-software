@@ -1,3 +1,6 @@
+@if($stock->imei)
+    <div class="mb-3"><strong>IMEI:</strong> {{ $stock->imei }}</div>
+@endif
 @if($variations->count())
 <table class="table table-bordered table-sm">
     <thead>
