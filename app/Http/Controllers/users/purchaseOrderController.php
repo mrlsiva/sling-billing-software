@@ -185,6 +185,27 @@ class purchaseOrderController extends Controller
                     $imeiList = [];
                 }
 
+                $sizeList   = [];
+                $colourList = [];
+
+                if (!empty($item['variation']) && is_array($item['variation'])) {
+                    foreach ($item['variation'] as $var) {
+
+                        if (!empty($var['size_id'])) {
+                            $sizeList[] = $var['size_id'];
+                        }
+
+                        if (!empty($var['colour_id'])) {
+                            $colourList[] = $var['colour_id'];
+                        }
+                    }
+                }
+
+                // Remove duplicates
+                $sizeList   = array_unique($sizeList);
+                $colourList = array_unique($colourList);
+
+
                 $purchaseOrder = PurchaseOrder::create([
                     'shop_id'        => Auth::user()->owner_id,
                     'vendor_id'      => $request->vendor,
@@ -203,6 +224,9 @@ class purchaseOrderController extends Controller
                     'net_cost'       => $item['net_cost'],
                     'gross_cost'     => $item['gross_cost'],
                     'imei'           => !empty($imeiList) ? implode(',', $imeiList) : null,
+                    // ✅ NEW
+                    'size'            => !empty($sizeList) ? implode(',', $sizeList) : null,
+                    'colour'          => !empty($colourList) ? implode(',', $colourList) : null,
                     'status'         => 0, // pending
                 ]);
 

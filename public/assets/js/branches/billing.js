@@ -166,7 +166,18 @@ function add_to_cart(element) {
             console.log(data.variations.length);
             if(data.stock.quantity == 0)
             {
-                alert('No stock for this product');  
+                const event = new CustomEvent("toast", {
+                    detail: {
+                        text: "No stock for this product",
+                        gravity: "top",
+                        position: "right",
+                        className: "success",
+                        duration: 5000,
+                        close: true,
+                    }
+                });
+
+                document.dispatchEvent(event);
             }
             else
             {
@@ -215,7 +226,19 @@ function add_to_cart(element) {
                         $qtyInput.val(currentQty + 1);
                         updateCartSummary();
                     } else {
-                        alert("Cannot add more. Stock limit reached (" + maxQty + ").");
+
+                        const event = new CustomEvent("toast", {
+                            detail: {
+                                text: "Cannot add more. Stock limit reached (" + maxQty + ").",
+                                gravity: "top",
+                                position: "right",
+                                className: "success",
+                                duration: 5000,
+                                close: true,
+                            }
+                        });
+
+                        document.dispatchEvent(event);
                     }
                     return;
                 }
@@ -290,7 +313,19 @@ function addVariationToCart(productId, variationId) {
                     input.val(current + 1);
                     updateCartSummary();
                 } else {
-                    alert("Stock limit reached!");
+
+                    const event = new CustomEvent("toast", {
+                        detail: {
+                            text: "Stock limit reached!",
+                            gravity: "top",
+                            position: "right",
+                            className: "success",
+                            duration: 5000,
+                            close: true,
+                        }
+                    });
+
+                    document.dispatchEvent(event);
                 }
                 return;
             }
@@ -430,7 +465,19 @@ $(document).on('click', '.plus', function () {
         $qtyInput.val(currentQty + 1);
         updateCartSummary();
     } else {
-        alert("Cannot add more. Stock limit reached (" + maxQty + ").");
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Cannot add more. Stock limit reached (" + maxQty + ").",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
     }
 });
 
@@ -540,7 +587,19 @@ $(document).ready(function () {
             method: 'POST',
             data: $(this).serialize(),
             success: function (response) {
-                alert('Customer added successfully');
+
+                const event = new CustomEvent("toast", {
+                    detail: {
+                        text: "Customer added successfully",
+                        gravity: "top",
+                        position: "right",
+                        className: "success",
+                        duration: 5000,
+                        close: true,
+                    }
+                });
+
+                document.dispatchEvent(event);
                 $('#customerAdd').modal('hide');
                 $('#customer_add')[0].reset();
             },
@@ -855,7 +914,19 @@ function appendPaymentRow(method, amount, extraData = {}) {
     console.log(amount);
     console.log("Total after adding:", received + amt);
     if ((received + amt) > payable) {
-        alert("Received amount cant be greater than payable amount.");
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Received amount cant be greater than payable amount.",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
 
@@ -955,7 +1026,18 @@ function updateTotal() {
 function cash_add() {
     let cash_amount = $("#cash_amount").val().trim();
     if (cash_amount === "" || isNaN(cash_amount) || parseFloat(cash_amount) <= 0) {
-        alert('Amount is required');
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Amount is required",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
     appendPaymentRow("Cash", cash_amount);
@@ -972,19 +1054,55 @@ function card_add() {
 
     // Validate name
     if (card_name === "") {
-        alert('Card name cannot be empty');
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Card name cannot be empty",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
 
     // Validate amount
     if (card_amount === "" || isNaN(card_amount) || parseFloat(card_amount) <= 0) {
-        alert('Please enter a valid positive amount');
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Please enter a valid positive amount",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
 
     // Validate card number only if entered
     if (card_number !== "" && !/^\d{13,19}$/.test(card_number)) {
-        alert('Invalid card number (must be 13–19 digits)');
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Invalid card number (must be 13–19 digits)",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
 
@@ -1005,11 +1123,35 @@ function finance_add() {
     let finance_amount = $("#finance_amount").val().trim();
 
     if (finance_type === "" || finance_amount === "" || isNaN(finance_amount) || parseFloat(finance_amount) <= 0) {
-        alert('Invalid Input');
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Invalid Input",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
     if (finance_card !== "" && !/^\d{8,}$/.test(finance_card)) {
-        alert('Invalid Finance Card Number (min 8 digits)');
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Invalid Finance Card Number (min 8 digits)",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+
         return;
     }
 
@@ -1030,7 +1172,18 @@ function finance_add() {
 function exchange_add() {
     let exchange_amount = $("#exchange_amount").val().trim();
     if (exchange_amount === "" || isNaN(exchange_amount) || parseFloat(exchange_amount) <= 0) {
-        alert('Invalid Input');
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Invalid Input",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
     appendPaymentRow("Exchange", exchange_amount);
@@ -1042,7 +1195,18 @@ function exchange_add() {
 function credit_add() {
     let credit_amount = $("#credit_amount").val().trim();
     if (credit_amount === "" || isNaN(credit_amount) || parseFloat(credit_amount) <= 0) {
-        alert('Invalid Input');
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Invalid Input",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
     appendPaymentRow("Credit", credit_amount);
@@ -1056,11 +1220,35 @@ function cheque_add() {
     let cheque_amount = $("#cheque_amount").val().trim();
 
     if (cheque_number === "" || cheque_amount === "" || isNaN(cheque_amount) || parseFloat(cheque_amount) <= 0) {
-        alert('Invalid Input');
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Invalid Input",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
     if (!/^\d{6,}$/.test(cheque_number)) {
-        alert('Invalid Cheque Number (min 6 digits)');
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Invalid Cheque Number (min 6 digits)",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+
         return;
     }
 
@@ -1077,7 +1265,18 @@ function cheque_add() {
 function upi_add() {
     let upi_amount = $("#upi_amount").val().trim();
     if (upi_amount === "" || isNaN(upi_amount) || parseFloat(upi_amount) <= 0) {
-        alert('Invalid Input');
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Invalid Input",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
     appendPaymentRow("UPI", upi_amount);
@@ -1136,32 +1335,109 @@ function submit() {
 
     // --- Customer validation ---
     if (!/^[0-9]{10}$/.test(phone)) {
-        alert("Please enter a valid 10-digit Phone number.");
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Please enter a valid 10-digit Phone number.",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+
         return;
     }
 
     if (altPhone !== "" && !/^[0-9]{10}$/.test(altPhone)) {
-        alert("Alternate Phone must be a valid 10-digit number.");
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Alternate Phone must be a valid 10-digit number.",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+
         return;
     }
 
     if (altPhone !== "" && phone === altPhone) {
-        alert("Phone and Alternate Phone cannot be the same.");
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Phone and Alternate Phone cannot be the same.",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
         return;
     }
 
     if (name === "") {
-        alert("Name is required.");
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Name is required.",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+
         return;
     }
 
     if (address === "") {
-        alert("Address is required.");
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Address is required.",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+
         return;
     }
 
     if (billed_by === "") {
-        alert("Billed by is required.");
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Billed by is required.",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+
         return;
     }
 
@@ -1171,7 +1447,20 @@ function submit() {
 
     // Compare both
     if (payable !== received) {
-        alert("Received amount (" + received.toFixed(2) + ") must be equal to Payable amount (" + payable.toFixed(2) + ").");
+
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Received amount (" + received.toFixed(2) + ") must be equal to Payable amount (" + payable.toFixed(2) + ").",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+
         return; // Stop submit
     }
 
@@ -1249,7 +1538,19 @@ function submit() {
                 location.reload();
             }
             else {
-                alert(data.message);
+
+                const event = new CustomEvent("toast", {
+                    detail: {
+                        text: data.message,
+                        gravity: "top",
+                        position: "right",
+                        className: "success",
+                        duration: 5000,
+                        close: true,
+                    }
+                });
+
+                document.dispatchEvent(event);
             }
 
             //alert('Order Saved');

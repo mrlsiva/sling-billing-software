@@ -13,6 +13,9 @@
                     <th>Discount</th>
                     <th>Net Cost</th>
                     <th>Gross Cost</th>
+                    <th>IMEI</th>
+                    <th>Size</th>
+                    <th>Colour</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -30,6 +33,9 @@
                     <td>{{ $purchase_order->discount !== null ? '₹ ' . number_format($purchase_order->discount, 2) : '-' }}</td>
                     <td>₹ {{number_format($purchase_order->net_cost,2) }}</td>
                     <td>₹ {{number_format( $purchase_order->gross_cost,2) }}</td>
+                    <td>{{ $purchase_order->imei ?? '-' }}</td>
+                    <td>{{ $purchase_order->size_names }}</td>
+                    <td>{{ $purchase_order->colour_names }}</td>
                     <td>
                         @if($purchase_order->status == 0)
                         <span class="badge badge-soft-danger">Unpaid</span>
