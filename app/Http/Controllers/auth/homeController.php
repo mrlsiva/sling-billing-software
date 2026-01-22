@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\SMTPController;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Illuminate\Validation\Rule;
+use App\Models\EmailTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\ShopPayment;
@@ -18,6 +20,8 @@ use App\Models\User;
 use App\Traits\Log;
 use Carbon\Carbon;
 use DB;
+use URL;
+use to;
 
 class homeController extends Controller
 {
@@ -34,6 +38,17 @@ class homeController extends Controller
 
     public function register(Request $request)
     {
+        // Remove spaces & special characters (keep only letters and numbers)
+        $name = preg_replace('/[^A-Za-z0-9]/', '', $request->name);
+
+        // Optional: make it lowercase
+        $name = strtolower($name);
+
+        // Merge into request as slug_name
+        $request->merge([
+            'slug_name' => $name,
+        ]);
+
         $request->validate([
             'logo' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Allow jpg, jpeg, png up to 2MB
             'name' => 'required|string|max:50',
@@ -41,6 +56,7 @@ class homeController extends Controller
             'phone' => 'required|digits:10|different:phone1|unique:users',
             'phone1' => 'nullable|digits:10|different:phone|unique:users,alt_phone',
             'password' => 'required|min:6|max:20|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/', // optional confirmation
+            'slug_name' => 'required|alpha_dash|unique:users,slug_name|max:50',
             'address' => 'nullable|string|max:100',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i|unique:user_details,gst',
             'bill_type' => 'required',
@@ -75,12 +91,6 @@ class homeController extends Controller
         ]);
 
         DB::beginTransaction();
-
-        // Remove spaces & special characters (keep only letters and numbers)
-        $name = preg_replace('/[^A-Za-z0-9]/', '', $request->name);
-
-        // Optional: make it lowercase
-        $name = strtolower($name);
 
         $user = User::create([ 
             'role_id' => 2,
@@ -178,6 +188,20 @@ class homeController extends Controller
         }
 
         DB::commit();
+
+        //Email
+        $emailsetting = EmailTemplate::where([['id',1],['is_active',1]])->first(); 
+        if($emailsetting)
+        {
+            $email_template = $emailsetting->template;
+            $route =  preg_replace('#^(http(s)?://)?w{3}\.#', '$1', URL::to('')).'/'.$name;
+            $emailContentReplace=['##name##'=>$name, '##user_name##'=>$name, '##route##'=>$route, '##password##'=>$request->password];
+            $txt = strtr($email_template,$emailContentReplace);
+            $emailId = $request->email;
+            $cc = $emailsetting->cc_to;
+            $subject = $emailsetting->subject;
+            $mailstatus = SMTPController::sendMail($emailId,$cc,$subject,$txt,null);
+        }
 
         return redirect()->back()->with('success_alert', 'Registered successfully. Please check your email for further details.');
     }
