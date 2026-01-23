@@ -105,6 +105,8 @@ $('#addSubCategory').on('submit', function (e) {
                     /* 5. Reset form */
                     $('#addSubCategory')[0].reset();
 
+                    $('#subCategorySubmit').prop('disabled', false).html('<i class="ri-save-line"></i> Submit');
+
                     /* 6. Feedback */
                     //alert(response.message);
                 }
