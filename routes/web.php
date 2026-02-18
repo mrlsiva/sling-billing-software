@@ -42,6 +42,7 @@ use App\Http\Controllers\branches\branchDashboardController;
 use App\Http\Controllers\branches\orderController;
 use App\Http\Controllers\branches\staffController;
 use App\Http\Controllers\branches\orderReportController;
+use App\Http\Controllers\branches\gstBillController;
 
 Route::get('/clear', function() {
     Artisan::call('cache:clear');
@@ -462,6 +463,19 @@ else
                                     });
                                 });
                             });
+
+                            Route::prefix('gst_bills')->group(function () {
+                                Route::name('gst_bill.')->group(function () {
+                                    Route::get('/',[gstBillController::class, 'index'])->name('index');
+                                    Route::get('/create',[gstBillController::class, 'create'])->name('create');
+                                    Route::get('/get_sub_category',[gstBillController::class, 'get_sub_category'])->name('get_sub_category');
+                                    Route::get('/get_product',[gstBillController::class, 'get_product'])->name('get_product');
+                                    Route::post('/store',[gstBillController::class, 'store'])->name('store');
+                                    Route::get('/view_bill/{id}',[gstBillController::class, 'view_bill'])->name('view_bill');
+                                });
+                            });
+
+                            
 
                         });
                     });

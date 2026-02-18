@@ -482,6 +482,11 @@
                                         <i class="bx bx-task fs-18 align-middle me-2"></i><span class="align-middle">Bulk Upload History</span>
                                     </a>
                                 @endif
+                                @if(Auth::user()->role_id == 3)
+                                    <a class="dropdown-item" href="{{route('branch.gst_bill.index', ['company' => request()->route('company')])}}">
+                                        <i class="bx bx-edit fs-18 align-middle me-2"></i><span class="align-middle">GST Bill</span>
+                                    </a>
+                                @endif
                                 <a class="dropdown-item" href="#">
                                     <i class="bx bx-help-circle fs-18 align-middle me-2"></i><span class="align-middle">Help</span>
                                 </a>
