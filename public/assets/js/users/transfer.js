@@ -91,7 +91,8 @@ jQuery(document).ready(function () {
 
                     data.variations.forEach(function (v) {
 
-                        if (v.quantity > 0) {
+                        if (v.quantity > 0 && (v.size != null || v.colour != null)) {
+                            document.getElementById('quantity').readOnly = true;
                             $("#variations_section").append(`
                                 <div class="row mb-2 p-2 border rounded">
                                     <div class="col-md-3"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
@@ -103,6 +104,10 @@ jQuery(document).ready(function () {
                                     </div>
                                 </div>
                             `);
+                        }
+                        else
+                        {
+                            document.getElementById('quantity').readOnly = false;
                         }
                     });
 

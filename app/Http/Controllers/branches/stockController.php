@@ -65,10 +65,10 @@ class stockController extends Controller
 
     public function transfer(Request $request)
     {
-        $categories = Category::where([
-            ['user_id', Auth::user()->parent_id],
-            ['is_active', 1]
-        ])->get();
+
+        $stock_categories = Stock::where('branch_id', Auth::user()->id)->select('category_id')->get();
+
+        $categories = Category::whereIn('id',$stock_categories)->where('is_active', 1)->get();
 
         $branches = User::where([
             ['parent_id', Auth::user()->parent_id],
@@ -115,13 +115,15 @@ class stockController extends Controller
 
     public function get_sub_category(Request $request)
     {
-        return $sub_categories = SubCategory::where([['user_id',Auth::user()->parent_id],['category_id',$request->id],['is_active',1]])->get();
+        $stock_subcategories = Stock::where('branch_id', Auth::user()->id)->select('sub_category_id')->get();
+        return $sub_categories = SubCategory::whereIn('id',$stock_subcategories)->where([['user_id',Auth::user()->parent_id],['category_id',$request->id],['is_active',1]])->get();
     }
 
 
     public function get_product(Request $request)
     {
-        return $products = Product::where([['user_id',Auth::user()->parent_id],['category_id',$request->category],['sub_category_id',$request->sub_category],['is_active',1]])->get();
+        $stock_products = Stock::where('branch_id', Auth::user()->id)->select('product_id')->get();
+        return $products = Product::whereIn('id',$stock_products)->where([['user_id',Auth::user()->parent_id],['category_id',$request->category],['sub_category_id',$request->sub_category],['is_active',1]])->get();
     }
 
     public function get_product_detail(Request $request)

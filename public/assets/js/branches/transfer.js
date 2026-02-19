@@ -95,18 +95,25 @@ jQuery(document).ready(function () {
                     $("#variations_section").html("");
 
                     data.variations.forEach(function (v) {
-                        $("#variations_section").append(`
-                            <div class="row mb-2 p-2 border rounded">
-                                <div class="col-md-5"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
-                                <div class="col-md-7">
-                                    <input type="number" class="form-control variation-qty"
-                                        data-max="${v.quantity}"
-                                        max="${v.quantity}" min="0"
-                                        name="variation_qty[${v.id}]"
-                                        placeholder="Available: ${v.quantity}">
+                        if (v.quantity > 0 && (v.size != null || v.colour != null)) {
+                            document.getElementById('quantity').readOnly = true;
+                            $("#variations_section").append(`
+                                <div class="row mb-2 p-2 border rounded">
+                                    <div class="col-md-5"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
+                                    <div class="col-md-7">
+                                        <input type="number" class="form-control variation-qty"
+                                            data-max="${v.quantity}"
+                                            max="${v.quantity}" min="0"
+                                            name="variation_qty[${v.id}]"
+                                            placeholder="Available: ${v.quantity}">
+                                    </div>
                                 </div>
-                            </div>
-                        `);
+                            `);
+                        }
+                        else
+                        {
+                            document.getElementById('quantity').readOnly = false;
+                        }
                     });
 
                     /* ============================
