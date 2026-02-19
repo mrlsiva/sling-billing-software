@@ -4,6 +4,10 @@ namespace App\Http\Controllers\branches;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use App\Imports\GstBillImport;
+use App\Models\BulkUploadLog;
 use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\SubCategory;
@@ -131,6 +135,89 @@ class gstBillController extends Controller
 
         return view('bills.gst_bill',compact('gst_bill','user','gst_bill_details'));
     }
+
+    public function bulk_upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx|max:10000',
+        ]);
+
+        do {
+            $run_id = rand(100000, 999999);
+        } while (BulkUploadLog::where('run_id', $run_id)->exists());
+
+        $import = new GstBillImport($run_id);
+        Excel::import($import, $request->file('file'));
+
+        $successRecords = $import->getSuccessCount();
+        $errorRecords   = $import->failures()->count();
+        $totalRecords   = $successRecords + $errorRecords;
+
+        $skipped = [];
+        foreach ($import->failures() as $failure) {
+            $skipped[] = "Row {$failure->row()}: " . implode(', ', $failure->errors());
+        }
+
+        $directory = "bulk_uploads/gst_bills/{$run_id}";
+        Storage::disk('public')->makeDirectory($directory);
+
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $excelPath    = $uploadedFile->storeAs($directory, $originalName, 'public');
+
+        $logContent  = "======================" . PHP_EOL;
+        $logContent .= "Bulk Upload Report" . PHP_EOL;
+        $logContent .= "Run ID: {$run_id}" . PHP_EOL;
+        $logContent .= "Uploaded On: " . now() . PHP_EOL;
+        $logContent .= "Total Records: {$totalRecords}" . PHP_EOL;
+        $logContent .= "Successful Records: {$successRecords}" . PHP_EOL;
+        $logContent .= "Error Records: {$errorRecords}" . PHP_EOL;
+
+        if ($errorRecords > 0) {
+            $logContent .= "Error Details:" . PHP_EOL;
+            foreach ($skipped as $error) {
+                $logContent .= "- {$error}" . PHP_EOL;
+            }
+        }
+
+        $logFile = "{$directory}/log.txt";
+        Storage::disk('public')->put($logFile, $logContent);
+
+        $bulk_upload = BulkUploadLog::create([
+            'user_id'            => auth()->id(),
+            'run_id'             => $run_id,
+            'run_on'             => now(),
+            'module'             => 'GstBill',
+            'total_record'       => $totalRecords,
+            'successfull_record' => $successRecords,
+            'error_record'       => $errorRecords,
+            'excel'              => $excelPath,
+            'log'                => $logFile,
+        ]);
+
+        $this->notification(
+            Auth::user()->owner_id,
+            null,
+            'App/Models/BulkUploadLog',
+            $bulk_upload->id,
+            null,
+            json_encode($request->all()),
+            now(),
+            Auth::id(),
+            'Bulk upload done for GST Bill',
+            null,
+            $logFile,
+            1
+        );
+
+        if ($errorRecords > 0) {
+            return back()->with('error_alert', 'Some rows were skipped: ' . implode(' | ', $skipped));
+        }
+
+        return back()->with('toast_success', 'GST Bills uploaded successfully.');
+    }
+
+
 
     
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class GstBill extends Model
 {
     protected $fillable = [
-        'shop_id','branch_id','order_id','reference_no','transfer_on','issued_by','sold_by','customer_name','customer_phone','customer_address','category','sub_category','product','imie','item_code','quantity','gross'
+        'shop_id','branch_id','order_id','reference_no','transfer_on','issued_by','sold_by','customer_name','customer_phone','customer_address','category','sub_category','product','imie','item_code','quantity','gross','run_id'
     ];
 
     public function shop()

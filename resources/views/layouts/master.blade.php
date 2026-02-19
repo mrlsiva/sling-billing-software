@@ -486,6 +486,9 @@
                                     </a>
                                 @endif
                                 @if(Auth::user()->role_id == 3)
+                                    <a class="dropdown-item" href="{{route('branch.excel.history', ['company' => request()->route('company')])}}">
+                                        <i class="bx bx-task fs-18 align-middle me-2"></i><span class="align-middle">Bulk Upload History</span>
+                                    </a>
                                     <a class="dropdown-item" href="{{route('branch.gst_bill.index', ['company' => request()->route('company')])}}">
                                         <i class="bx bx-edit fs-18 align-middle me-2"></i><span class="align-middle">GST Bill</span>
                                     </a>

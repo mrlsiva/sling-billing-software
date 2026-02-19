@@ -21,7 +21,6 @@
 							<thead class="bg-light-subtle">
 								<tr>
 									<th>S.No</th>
-									<th>Uploaded By</th>
 									<th>Upload On</th>
 									<th>Module</th>
 									<th>Total Record</th>
@@ -37,8 +36,6 @@
 									    <td>
 									        {{ ($histories->currentPage() - 1) * $histories->perPage() + $loop->iteration }}
 									    </td>
-
-									    <td> {{$history->user->user_name}}</td>
 
 									    <td>
 									        {{ $history->run_on ? \Carbon\Carbon::parse($history->run_on)->format('d M Y, h:i A') : '-' }}
