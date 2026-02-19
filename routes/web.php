@@ -32,6 +32,7 @@ use App\Http\Controllers\users\orderReportsController;
 use App\Http\Controllers\users\billingsController;
 use App\Http\Controllers\users\sizeController;
 use App\Http\Controllers\users\colourController;
+use App\Http\Controllers\users\gstBillingController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -356,6 +357,17 @@ else
                     Route::prefix('excel')->group(function () {
                         Route::name('excel.')->group(function () {
                             Route::get('/history',[excelController::class, 'history'])->name('history');
+                        });
+                    });
+
+                    Route::prefix('gst_bills')->group(function () {
+                        Route::name('gst_bill.')->group(function () {
+                            Route::get('index/{branch}',[gstBillingController::class, 'index'])->name('index');
+                            Route::get('/create/{branch}',[gstBillingController::class, 'create'])->name('create');
+                            Route::get('/get_sub_category',[gstBillingController::class, 'get_sub_category'])->name('get_sub_category');
+                            Route::get('/get_product',[gstBillingController::class, 'get_product'])->name('get_product');
+                            Route::post('/store',[gstBillingController::class, 'store'])->name('store');
+                            Route::get('/view_bill/{id}',[gstBillingController::class, 'view_bill'])->name('view_bill');
                         });
                     });
 
