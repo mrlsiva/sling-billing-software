@@ -612,7 +612,7 @@ class purchaseOrderController extends Controller
                 'product',
                 'metric'
             ])
-            ->where('invoice_no', $id)
+            ->where('shop_id', Auth::user()->owner_id)->where('invoice_no', $id)
             ->get(); // 👈 or ->first() if single invoice
 
         return view('users.purchase_orders.detail', compact('purchase_orders'));

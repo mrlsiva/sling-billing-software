@@ -90,7 +90,7 @@ jQuery(document).ready(function () {
                     $("#variations_section").html("");
 
                     data.variations.forEach(function (v) {
-
+                        $('input[name="variation_id"]').val(v.id);
                         if (v.quantity > 0 && (v.size != null || v.colour != null)) {
                             document.getElementById('quantity').readOnly = true;
                             $("#variations_section").append(`

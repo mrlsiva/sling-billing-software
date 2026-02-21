@@ -204,6 +204,7 @@
 						</div>
 
 						<div id="variations_section"></div>
+						<input type="hidden" name="variation_id" id="variation_id">
 
 	                </div>
 	                <div class="modal-footer">

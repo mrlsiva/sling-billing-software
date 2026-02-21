@@ -312,35 +312,71 @@ class inventoryController extends Controller
             'transfer_by'    => Auth::user()->id,
         ]);
 
-        foreach ($request->variation_qty as $variationId => $qty) 
+        if($request->variation_qty != null)
         {
-            if ($qty > 0) {
+            foreach ($request->variation_qty as $variationId => $qty) 
+            {
+                if ($qty > 0) {
 
-                $mainV = StockVariation::find($variationId);
+                    $mainV = StockVariation::find($variationId);
+                    $mainV->update([
+                            'quantity' => $mainV->quantity - $qty
+                        ]);
 
-                // Find if variation already exists for this branch
-                $branchV = StockVariation::where([
-                    ['stock_id', $branchStock->id],
-                    ['size_id', $mainV->size_id],
-                    ['colour_id', $mainV->colour_id],
-                    ['product_id', $request->product],
-                ])->first();
+                    // Find if variation already exists for this branch
+                    $branchV = StockVariation::where([
+                        ['stock_id', $branchStock->id],
+                        ['size_id', $mainV->size_id],
+                        ['colour_id', $mainV->colour_id],
+                        ['product_id', $request->product],
+                    ])->first();
 
-                if ($branchV) {
-                    $branchV->update([
-                        'quantity' => $branchV->quantity + $qty
-                    ]);
-                } else {
-                    StockVariation::create([
-                        'stock_id'  => $branchStock->id,
-                        'product_id'=> $request->product,
-                        'size_id'   => $mainV->size_id,
-                        'colour_id' => $mainV->colour_id,
-                        'quantity'  => $qty,
-                        'price'     => $mainV->price
-                    ]);
+                    if ($branchV) {
+                        $branchV->update([
+                            'quantity' => $branchV->quantity + $qty
+                        ]);
+                    } else {
+                        StockVariation::create([
+                            'stock_id'  => $branchStock->id,
+                            'product_id'=> $request->product,
+                            'size_id'   => $mainV->size_id,
+                            'colour_id' => $mainV->colour_id,
+                            'quantity'  => $qty,
+                            'price'     => $mainV->price
+                        ]);
+                    }
                 }
             }
+        }
+        else
+        {
+            $mainV = StockVariation::find($request->variation_id);
+            $mainV->update([
+                            'quantity' => $mainV->quantity - $request->quantity
+                        ]);
+
+                    // Find if variation already exists for this branch
+                    $branchV = StockVariation::where([
+                        ['stock_id', $branchStock->id],
+                        ['size_id', $mainV->size_id],
+                        ['colour_id', $mainV->colour_id],
+                        ['product_id', $request->product],
+                    ])->first();
+
+                    if ($branchV) {
+                        $branchV->update([
+                            'quantity' => $branchV->quantity + $request->quantity
+                        ]);
+                    } else {
+                        StockVariation::create([
+                            'stock_id'  => $branchStock->id,
+                            'product_id'=> $request->product,
+                            'size_id'   => $mainV->size_id,
+                            'colour_id' => $mainV->colour_id,
+                            'quantity'  => $request->quantity,
+                            'price'     => $mainV->price
+                        ]);
+                    }
         }
 
 
