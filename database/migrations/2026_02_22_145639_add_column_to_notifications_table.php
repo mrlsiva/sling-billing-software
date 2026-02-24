@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('notifications', function (Blueprint $table) {
-            $table->foreignId('notification_type_id')->after('bulk_upload_file')->nullable();
+            $table->boolean('is_read')->after('notification_type_id')->default(false);
         });
     }
 

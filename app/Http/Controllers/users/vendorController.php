@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use App\Traits\Notifications;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Models\Vendor;
 use App\Traits\Log;
 use DB;
@@ -73,7 +74,7 @@ class vendorController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Vendor Create','App/Models/Vendor','vendors',$vendor->id,'Insert',null,json_encode($request->all()),'Success','Vendor Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' vendor created successfully',null, null,6);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Vendor "'.Str::ucfirst($request->name).'" created successfully',null, null,6);
 
         return response()->json([
             'status'   => true,
@@ -156,7 +157,7 @@ class vendorController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Vendor Update','App/Models/Vendor','vendors',$vendor->id,'Update',null,$request,'Success','Vendor Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->vendor_name. ' vendor updated successfully',null, null,6);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Vendor', $vendor->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Vendor "'.Str::ucfirst($request->vendor_name).'" updated successfully',null, null,6);
 
         return redirect()->back()->with('toast_success', 'Vendor updated successfully.');
 

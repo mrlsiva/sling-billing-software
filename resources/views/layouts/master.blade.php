@@ -511,10 +511,22 @@
 
                                 @else
 
+                                    @if(Auth::user()->role_id == 3)
+                                        @php
+                                            $notification_count = App\Models\Notification::where('shop_id',Auth::user()->parent_id)->where('branch_id',Auth::user()->id)->where('is_read',0)->count(); 
+                                        @endphp
+                                    @endif
+
+                                    @if(Auth::user()->role_id == 2)
+                                        @php
+                                            $notification_count = App\Models\Notification::where('shop_id',Auth::user()->owner_id)->where('branch_id',null)->where('is_read',0)->count();
+                                        @endphp 
+                                    @endif
+
                                     <a class="dropdown-item" href="{{route('notification', ['company' => request()->route('company')])}}">
                                         <i class="bx bx-photo-album fs-18 align-middle me-2"></i>
                                         <span class="align-middle">Notification</span>
-                                        <span class="align-middle float-end badge badge-soft-danger">0</span>
+                                        <span class="align-middle float-end badge badge-soft-danger">{{$notification_count}}</span>
                                     </a>
                                 @endif
 

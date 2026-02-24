@@ -368,7 +368,7 @@ class purchaseOrderController extends Controller
 
                 // Log and Notification per product row
                 $this->addToLog($this->unique(), Auth::user()->id, 'Purchase Order Created', 'App/Models/PurchaseOrder', 'purchase_orders', $purchaseOrder->id, 'Insert', null, json_encode($item), 'Success', 'Purchase Order Created');
-                $this->notification(Auth::user()->owner_id, null, 'App/Models/PurchaseOrder', $purchaseOrder->id, null, json_encode($item), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully', null, null, 7);
+                $this->notification(Auth::user()->owner_id, null, 'App/Models/PurchaseOrder', $purchaseOrder->id, null, json_encode($item), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully with quantity '.$item['quantity'], null, null, 7);
             }
 
             // --- Handle prepaid balance ---
@@ -461,7 +461,7 @@ class purchaseOrderController extends Controller
             );
 
             //Notifiction
-            $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase->id, null, json_encode($request->all()), now(), Auth::user()->id, 'purchase order updated for product '.$purchase->product->name.' done successfully',null, null,7);
+            $this->notification(Auth::user()->owner_id, null,'App/Models/PurchaseOrder', $purchase->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Purchase order updated for product '.$purchase->product->name.' done successfully',null, null,7);
 
             
             $paymentsForThis = VendorPaymentDetail::where('purchase_order_id', $purchase->id)->orderBy('id', 'desc')->get();

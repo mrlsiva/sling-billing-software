@@ -53,7 +53,7 @@ class metricController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Metric Create','App/Models/Metric','metrics',$metric->id,'Insert',null, json_encode($request->all()),'Success','Metric Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' metric created successfully',null, null,4);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Metric "'.$request->name.'" created successfully',null, null,4);
 
         return response()->json([
             'status'   => true,
@@ -117,6 +117,7 @@ class metricController extends Controller
 
         DB::beginTransaction();
 
+        $old_metric = Metric::find($request->metric_id);
         $metric = Metric::find($request->metric_id);
 
         $metric->update([ 
@@ -129,7 +130,7 @@ class metricController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Metric Update','App/Models/Metric','metrics',$metric->id,'Update',null,$request,'Success','Metric Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->metric.' metric updated successfully',null, null,4);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Metric', $metric->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Metric "'.$old_metric->name.'" updated to "'.$request->metric.'" successfully',null, null,4);
 
         return redirect()->back()->with('toast_success', 'Metric updated successfully.');
     }

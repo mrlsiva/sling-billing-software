@@ -53,7 +53,7 @@ class colourController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Colour Create','App/Models/Colour','colours',$colour->id,'Insert',null, json_encode($request->all()),'Success','Colour Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Colour', $colour->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' colour created successfully',null, null,16);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Colour', $colour->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Colour "'.$request->name.'" created successfully',null, null,16);
 
         return response()->json([
             'status'   => true,
@@ -117,6 +117,7 @@ class colourController extends Controller
 
         DB::beginTransaction();
 
+        $old_colour = Colour::find($request->colour_id);
         $colour = Colour::find($request->colour_id);
 
         $colour->update([ 
@@ -129,7 +130,7 @@ class colourController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Colour Update','App/Models/Colour','colours',$colour->id,'Update',null,$request,'Success','Colour Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Colour', $colour->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->colour.' colour updated successfully',null, null,16);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Colour', $colour->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Colour "'.$old_colour->name.'" updated to "'.$request->colour.'" successfully',null, null,16);
 
         return redirect()->back()->with('toast_success', 'Colour updated successfully.');
     }

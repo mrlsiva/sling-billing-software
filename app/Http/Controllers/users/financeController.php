@@ -53,7 +53,7 @@ class financeController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Finance Create','App/Models/Finance','finances',$finance->id,'Insert',null,json_encode($request->all()),'Success','Finance Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' finance created successfully',null, null,9);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Finance "'.$request->name.'" created successfully',null, null,9);
 
         return redirect()->back()->with('toast_success', 'Finance created successfully.');
     }
@@ -107,6 +107,7 @@ class financeController extends Controller
 
         DB::beginTransaction();
 
+        $old_finance = Finance::find($request->finance_id);
         $finance = Finance::find($request->finance_id);
 
         $finance->update([ 
@@ -119,7 +120,7 @@ class financeController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Finance Update','App/Models/Finance','finances',$finance->id,'Update',null,$request,'Success','Finance Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->finance.' finance updated successfully',null, null,9);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Finance', $finance->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Finance "'.$old_finance->name.'" updated to "'.$request->finance.'" successfully',null, null,9);
 
         return redirect()->back()->with('toast_success', 'Finance updated successfully.');
     }

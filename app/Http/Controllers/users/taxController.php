@@ -54,7 +54,7 @@ class taxController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Tax Create','App/Models/Tax','taxes',$tax->id,'Insert',null,json_encode($request->all()),'Success','Tax Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.'% tax created successfully',null, null,3);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Tax "'.$request->name.'%" created successfully',null, null,3);
 
 
         return response()->json([
@@ -120,6 +120,7 @@ class taxController extends Controller
 
         DB::beginTransaction();
 
+        $old_tax = Tax::find($request->tax_id);
         $tax = Tax::find($request->tax_id);
 
         $tax->update([ 
@@ -132,7 +133,7 @@ class taxController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Tax Update','App/Models/Tax','taxes',$tax->id,'Update',null,$request,'Success','Tax Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->tax.'% tax updated successfully',null, null,3);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Tax', $tax->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Tax "'.$old_tax->name.'%" updated to "'.$request->tax.'%" successfully',null, null,3);
 
         return redirect()->back()->with('toast_success', 'Tax updated successfully.');
     }

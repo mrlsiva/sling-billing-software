@@ -258,7 +258,7 @@ class productController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Product Create','App/Models/Product','products',$product->id,'Insert',null,json_encode($request->all()),'Success','Product Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Created Successfully',null, null,5);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product "'.Str::ucfirst($request->name).'" created successfully',null, null,5);
 
         DB::commit();
 
@@ -515,7 +515,7 @@ class productController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Product Update','App/Models/Product','products',$product->id,'Update',null, json_encode($request->all()),'Success','Product Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product Updated Successfully',null, null,5);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $product->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Product "'.Str::ucfirst($request->name).'" updated successfully',null, null,5);
 
         DB::commit();
         
@@ -539,7 +539,7 @@ class productController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Product Status Update','App/Models/Product','products',$request->id,'Update',null,null,'Success',$statusText);
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, $statusText,null, null,5);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Product', $request->id, null, json_encode($request->all()), now(), Auth::user()->id, '"'.$product->name.'" '.$statusText,null, null,5);
 
         return redirect()->back()->with('toast_success', $statusText);
     }

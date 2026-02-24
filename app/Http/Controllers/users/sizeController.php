@@ -54,7 +54,7 @@ class sizeController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Size Create','App/Models/Size','sizes',$size->id,'Insert',null, json_encode($request->all()),'Success','Size Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Size', $size->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->name.' size created successfully',null, null,16);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Size', $size->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Size "'.$request->name.'" created successfully',null, null,16);
 
         return response()->json([
             'status'   => true,
@@ -118,6 +118,7 @@ class sizeController extends Controller
 
         DB::beginTransaction();
 
+        $old_size = Size::find($request->size_id);
         $size = Size::find($request->size_id);
 
         $size->update([ 
@@ -130,7 +131,7 @@ class sizeController extends Controller
         $this->addToLog($this->unique(),Auth::user()->id,'Size Update','App/Models/Size','sizes',$size->id,'Update',null,$request,'Success','Size Updated Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->owner_id, null,'App/Models/Size', $size->id, null, json_encode($request->all()), now(), Auth::user()->id, $request->size.' size updated successfully',null, null,16);
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Size', $size->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Size "'.$old_size->name.'" updated to "'.$request->size.'" successfully',null, null,16);
 
         return redirect()->back()->with('toast_success', 'Size updated successfully.');
     }
