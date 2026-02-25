@@ -382,7 +382,7 @@ class billingsController extends Controller
         $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
 
         //Notifiction
-        $this->notification(Auth::user()->id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.$user->name. ' placed one order for cutomer '.$customer->name,null, null,14);
+        $this->notification(Auth::user()->id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO ' . $user->name . ' placed an order for customer ' . $customer->name . ' with an amount of ' . $billAmount. '.',null, null,14);
 
         DB::commit();
         

@@ -459,7 +459,7 @@ class billingController extends Controller
             json_encode($request->all()),
             now(),
             Auth::user()->id,
-            'Branch ' . Auth::user()->name . ' placed one order for customer ' . $customer->name,
+            'Branch ' . Auth::user()->name . ' placed one order for customer ' . $customer->name. ' with an amount of ' . $billAmount. '.',
             null,
             null,
             14

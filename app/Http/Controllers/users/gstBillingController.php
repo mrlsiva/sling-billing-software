@@ -141,6 +141,20 @@ class gstBillingController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Gst Bill Create','App/Models/GstBill','gst_bills',$gst_bill->id,'Insert',null,$request,'Success','Gst Bill Created Successfully');
 
+        if($gst_bill->branch_id == null)
+        {
+            //Notifiction
+            $this->notification(Auth::user()->id, null,'App/Models/GstBill', $gst_bill->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO ' . Auth::user()->user_name . ' created a GST bill for the amount of ' . $request->gross . '.',null, null,17);
+        }
+        else
+        {
+            $branch = User::where('id',$request->branch)->first();
+            //Notifiction
+            $this->notification(Auth::user()->id, null,'App/Models/GstBill', $gst_bill->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch ' . $branch->user_name . ' created a GST bill for the amount of ' . $request->gross . '.',null, null,17);
+        }
+
+        
+
         return redirect()->back()->with('toast_success', 'GST Bill Created Successfully.');
     }
 
