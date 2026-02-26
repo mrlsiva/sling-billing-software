@@ -19,4 +19,9 @@ class OrderDetail extends Model
     {
         return $this->belongsTo(Colour::class);
     }
+
+    public function order() 
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

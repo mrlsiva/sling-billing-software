@@ -9,12 +9,15 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductExport;
 use App\Imports\ProductImport;
 use Illuminate\Validation\Rule;
+use App\Models\PurchaseOrder;
+use App\Models\ProductHistory;
 use App\Models\StockVariation;
 use App\Traits\Notifications;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\BulkUploadLog;
 use App\Models\SubCategory;
+use App\Models\OrderDetail;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Metric;
@@ -655,4 +658,62 @@ class productController extends Controller
 
         return Excel::download(new ProductExport($products), 'Products.xlsx'); // ✅ pass $products
     }
+
+    public function detail(Request $request, $company, Product $product)
+    {
+        $purchaseOrders = PurchaseOrder::with('vendor')
+        ->where('product_id', $product->id)
+        ->get();
+
+        $transferHistories = ProductHistory::with(['transfer_from','transfer_to'])
+        ->where('product_id', $product->id)
+        ->get();
+
+        $order_details = OrderDetail::with('order')
+            ->where('product_id', $product->id)
+            ->get();
+
+        $timeline = collect();
+
+        $timeline->push([
+            'message' => 'Product created in the system',
+            'date'    => $product->created_at,
+            'type'    => 'create'
+        ]);
+
+        // Purchase Entries (Stock In)
+        foreach ($purchaseOrders as $po) {
+            $timeline->push([
+                'message' => 'Product purchased from vendor ' . $po->vendor->name . 
+                             ' (Invoice: ' . $po->invoice_no . ')',
+                'date' => $po->created_at,
+                'type' => 'in'
+            ]);
+        }
+
+        // Transfer Entries
+        foreach ($transferHistories as $history) {
+            $timeline->push([
+                'message' => 'Product transferred from ' . $history->transfer_from->name . 
+                             ' to ' . $history->transfer_to->name,
+                'date' => $history->created_at,
+                'type' => 'transfer'
+            ]);
+        }
+
+        // Sales Entries (Stock Out)
+        foreach ($order_details as $order_detail) {
+            $timeline->push([
+                'message' => 'Product sold to customer ' . $order_detail->order->customer->name . 
+                             ' (Order No: ' . $order_detail->order->bill_id . ')',
+                'date' => $order_detail->created_at,
+                'type' => 'out'
+            ]);
+        }
+
+        // Sort by date
+        $timeline = $timeline->sortByDesc('date')->values();
+
+        return view('users.products.detail', compact('product', 'timeline'));
+    }   
 }

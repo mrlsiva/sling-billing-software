@@ -82,7 +82,11 @@
 												@endif
 											</td>
 											<td>{{$stock->category->name}} - {{$stock->sub_category->name}}</td>
-											<td>{{$stock->product->name}}</td>
+											<td>
+                                                <a href="{{ route('product.detail', ['company' => request()->route('company'),'product' => $stock->product->id]) }}" class="text-decoration-underline text-decoration-none" title="View Details">
+                                                    {{$stock->product->name}}
+                                                </a>
+                                            </td>
 											<td>{{$stock->product->metric->name}}</td>
 											<td>{{$stock->product->price}}</td>
 											<td>{{$stock->quantity}}</td>
@@ -94,10 +98,7 @@
 
                                             @if($variation && ($variation->size_id !== null || $variation->colour_id !== null))
                                                 <td>
-                                                    <a href="#!"
-                                                       class="text-dark view-variations"
-                                                       data-stock-id="{{ $stock->id }}"
-                                                       title="View Variations">
+                                                    <a href="#!" class="text-dark view-variations" data-stock-id="{{ $stock->id }}" title="View Variations">
                                                         <i class="ri-eye-line fs-18"></i>
                                                     </a>
                                                 </td>
