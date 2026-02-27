@@ -151,7 +151,7 @@
 
 
 	                    <div class="row">
-	                        <div class="col-md-12">
+	                        <div class="col-md-6">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Category</label>
 	                                <select class="form-control" data-choices name="category" id="category">
@@ -162,9 +162,8 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-6">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Sub Category</label>
 	                                <select class="form-control" name="sub_category" id="sub_category">
@@ -172,9 +171,8 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-6">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Product</label>
 	                                <select class="form-control" name="product" id="product">
@@ -182,25 +180,22 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-6">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Matrics</label>
 	                                <input type="text" id="unit" name="unit" class="form-control" disabled="">
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-6">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Available</label>
 	                                <input disabled="" type="text" id="available" name="available" class="form-control" placeholder="0">
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-6">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Enter Quantity</label>
 	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1">
