@@ -150,7 +150,7 @@
                 </div>
                 <form class="row" action="{{route('branch.customer.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
                 	@csrf
-	                <div class="modal-body">
+	                <div class="modal-body px-4">
 
 	                   	<div class="row">
 		                    <div class="col-md-12">
@@ -160,48 +160,39 @@
 		                            <input type="text" id="name" name="name" class="form-control" required="">
 		                        </div>
 		                    </div>
-	                   	</div>
-
-	                   	<div class="row">
-		                    <div class="col-md-12">
+							<div class="col-md-6">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Phone</label>
 		                            <span class="text-danger">*</span>
 		                            <input type="tel" name="phone" id="phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
 		                        </div>
 		                    </div>
-	                   	</div>
+	              
 
-	                   	<div class="row">
-		                    <div class="col-md-12">
+
+		                    <div class="col-md-6">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Alternate Phone</label>
 		                            <input type="tel" id="alt_phone" name="alt_phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
 		                        </div>
 		                    </div>
-	                   	</div>
 
-	                   	<div class="row">
-		                    <div class="col-md-12">
+		                    <div class="col-md-6">
 		                        <div class="mb-3">
 		                            <label for="choices-single-groups" class="form-label text-muted">Address</label>
 		                            <span class="text-danger">*</span>
 		                            <input type="text" id="address" name="address" class="form-control" required="">
 		                        </div>
 		                    </div>
-	                   	</div>
 
-		                <div class="row">
-		                	<div class="col-md-12">
+		                	<div class="col-md-6">
 		                		<div class="mb-3">
 		                			<label for="choices-single-groups" class="form-label text-muted">Pincode</label>
 		                			<input type="number" id="pincode" name="pincode" class="form-control" min="1">
 		                		</div>
 		                	</div>
-		                </div>
 
-		                <div class="row">
-		                	<div class="col-md-12">
+		                	<div class="col-md-4">
 		                		<div class="mb-3">
 		                			 <label for="payment_method" class="form-label">Gender</label>
                                     <select class="form-control" data-choices name="gender" id="gender">
@@ -212,19 +203,15 @@
                                     </select>
 		                		</div>
 		                	</div>
-		                </div>
 
-		                <div class="row">
-		                	<div class="col-md-12">
+		                	<div class="col-md-4">
 		                		<div class="mb-3">
 		                			<label for="choices-single-groups" class="form-label text-muted">DOB</label>
 		                			<input type="date" id="dob" name="dob" class="form-control" max="{{ date('Y-m-d') }}">
 		                		</div>
 		                	</div>
-		                </div>
 
-		                <div class="row">
-		                	<div class="col-md-12">
+		                	<div class="col-md-4">
 		                		<div class="mb-3">
 		                			<label for="gst" class="form-label text-muted">GST</label>
 		                			<input type="text" id="gst" name="gst" class="form-control" >

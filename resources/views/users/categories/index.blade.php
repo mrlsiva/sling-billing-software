@@ -66,7 +66,7 @@
 									<th>S.No</th>
 									<th>Image</th>
 									<th>Category Name</th>
-									<th>No.Of sub Category</th>
+									<th>No. of Subcategories</th>
 									<th>Active / In-Active</th>
 									<th>Status</th>
 									<th>Action</th>
