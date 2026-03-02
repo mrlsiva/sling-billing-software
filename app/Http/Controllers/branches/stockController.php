@@ -296,7 +296,15 @@ class stockController extends Controller
                 }
             }
 
+            $lastInvoice = ProductHistory::where('shop_id',Auth::user()->parent_id)->lockForUpdate()->max('invoice');
+
+            $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
+
+            $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
+
             $transfer = ProductHistory::create([
+                'shop_id' => Auth::user()->parent_id,
+                'invoice' => $invoice,
                 'from' => Auth::user()->id,
                 'to'   => Auth::user()->parent_id,
                 'category_id'    => $request->category,
@@ -380,50 +388,61 @@ class stockController extends Controller
             Product::where('id', $request->product)->update(['quantity' => $product->quantity - $request->quantity]);
 
             /** ================= VARIATION TRANSFER ================== **/
-            foreach ($request->variation_qty as $variationId => $qty) 
+            if($request->variation_qty != null)
             {
-                if ($qty > 0) {
+                foreach ($request->variation_qty as $variationId => $qty) 
+                {
+                    if ($qty > 0) {
 
-                    $mainV = StockVariation::find($variationId);
+                        $mainV = StockVariation::find($variationId);
 
-                    // Find if variation already exists for this branch
-                    $branchV = StockVariation::where([
-                        ['stock_id', $branchStock->id],
-                        ['size_id', $mainV->size_id],
-                        ['colour_id', $mainV->colour_id],
-                        ['product_id', $request->product],
-                    ])->first();
+                        // Find if variation already exists for this branch
+                        $branchV = StockVariation::where([
+                            ['stock_id', $branchStock->id],
+                            ['size_id', $mainV->size_id],
+                            ['colour_id', $mainV->colour_id],
+                            ['product_id', $request->product],
+                        ])->first();
 
-                    if ($branchV) {
-                        $branchV->update([
-                            'quantity' => $branchV->quantity + $qty
-                        ]);
+                        if ($branchV) {
+                            $branchV->update([
+                                'quantity' => $branchV->quantity + $qty
+                            ]);
+
+                            // 🔥 FIX: Reduce variation quantity from main stock
+                            $mainV->update([
+                                'quantity' => $mainV->quantity - $qty
+                            ]);
+                        
+                        } else {
+                            StockVariation::create([
+                                'stock_id'  => $branchStock->id,
+                                'product_id'=> $request->product,
+                                'size_id'   => $mainV->size_id,
+                                'colour_id' => $mainV->colour_id,
+                                'quantity'  => $qty,
+                                'price'     => $mainV->price
+                            ]);
+                        }
 
                         // 🔥 FIX: Reduce variation quantity from main stock
                         $mainV->update([
                             'quantity' => $mainV->quantity - $qty
                         ]);
-                    
-                    } else {
-                        StockVariation::create([
-                            'stock_id'  => $branchStock->id,
-                            'product_id'=> $request->product,
-                            'size_id'   => $mainV->size_id,
-                            'colour_id' => $mainV->colour_id,
-                            'quantity'  => $qty,
-                            'price'     => $mainV->price
-                        ]);
                     }
-
-                    // 🔥 FIX: Reduce variation quantity from main stock
-                    $mainV->update([
-                        'quantity' => $mainV->quantity - $qty
-                    ]);
                 }
             }
 
+            $lastInvoice = ProductHistory::where('shop_id',Auth::user()->parent_id)->lockForUpdate()->max('invoice');
+
+            $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
+
+            $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
+
 
             $transfer = ProductHistory::create([
+                'shop_id'        => Auth::user()->parent_id,
+                'invoice' => $invoice,
                 'from'           => Auth::user()->id,
                 'to'             => $request->branch,
                 'category_id'    => $request->category,

@@ -294,13 +294,14 @@ class inventoryController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::user()->id,'Quantity Updated','App/Models/Poduct','products',$product->id,'Update',null,$request,'Success','Quantity Updated for this product');
 
-        $lastInvoice = ProductHistory::lockForUpdate()->max('invoice');
+        $lastInvoice = ProductHistory::where('shop_id',Auth::user()->owner_id)->lockForUpdate()->max('invoice');
 
         $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
 
         $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
 
         $transfer = ProductHistory::create([
+            'shop_id'        => Auth::user()->owner_id,
             'invoice'        => $invoice,
             'from'           => Auth::user()->id,
             'to'             => $request->branch,
