@@ -11,6 +11,7 @@ use App\Imports\ProductImport;
 use Illuminate\Validation\Rule;
 use App\Models\PurchaseOrder;
 use App\Models\ProductHistory;
+use App\Models\PurchaseOrderRefund;
 use App\Models\StockVariation;
 use App\Traits\Notifications;
 use Illuminate\Support\Str;
@@ -662,58 +663,85 @@ class productController extends Controller
     public function detail(Request $request, $company, Product $product)
     {
         $purchaseOrders = PurchaseOrder::with('vendor')
-        ->where('product_id', $product->id)
-        ->get();
+            ->where('product_id', $product->id)
+            ->get();
 
         $transferHistories = ProductHistory::with(['transfer_from','transfer_to'])
-        ->where('product_id', $product->id)
-        ->get();
-
-        $order_details = OrderDetail::with('order')
             ->where('product_id', $product->id)
+            ->get();
+
+        $orderDetails = OrderDetail::with('order.customer')
+            ->where('product_id', $product->id)
+            ->get();
+
+        // ✅ Refund / Tracking
+        $trackings = PurchaseOrderRefund::with(['vendor','purchase_order'])
+            ->whereHas('purchase_order', function ($q) use ($product) {
+                $q->where('product_id', $product->id);
+            })
             ->get();
 
         $timeline = collect();
 
+        // Product Created
         $timeline->push([
             'message' => 'Product created in the system',
             'date'    => $product->created_at,
-            'type'    => 'create'
+            'type'    => 'Created',
+            'qty'     => null,
+            'amount'  => null
         ]);
 
-        // Purchase Entries (Stock In)
+        // Stock In
         foreach ($purchaseOrders as $po) {
             $timeline->push([
-                'message' => 'Product purchased from vendor ' . $po->vendor->name . 
-                             ' (Invoice: ' . $po->invoice_no . ')',
+                'message' => 'Purchased from ' . $po->vendor->name .
+                            ' (Invoice: ' . $po->invoice_no . ')',
                 'date' => $po->created_at,
-                'type' => 'in'
+                'type' => 'Stock In',
+                'qty'  => $po->quantity,
+                'amount' => null
             ]);
         }
 
-        // Transfer Entries
+        // Transfer
         foreach ($transferHistories as $history) {
             $timeline->push([
-                'message' => 'Product transferred from ' . $history->transfer_from->name . 
-                             ' to ' . $history->transfer_to->name,
+                'message' => 'Transferred from ' . $history->transfer_from->name .
+                            ' to ' . $history->transfer_to->name,
                 'date' => $history->created_at,
-                'type' => 'transfer'
+                'type' => 'Transfer',
+                'qty'  => $history->quantity,
+                'amount' => null
             ]);
         }
 
-        // Sales Entries (Stock Out)
-        foreach ($order_details as $order_detail) {
+        // Stock Out
+        foreach ($orderDetails as $orderDetail) {
             $timeline->push([
-                'message' => 'Product sold to customer ' . $order_detail->order->customer->name . 
-                             ' (Order No: ' . $order_detail->order->bill_id . ')',
-                'date' => $order_detail->created_at,
-                'type' => 'out'
+                'message' => 'Sold to ' . $orderDetail->order->customer->name .
+                            ' (Order No: ' . $orderDetail->order->bill_id . ')',
+                'date' => $orderDetail->created_at,
+                'type' => 'Stock Out',
+                'qty'  => $orderDetail->quantity,
+                'amount' => null
             ]);
         }
 
-        // Sort by date
+        // Refund Tracking
+        foreach ($trackings as $tracking) {
+            $timeline->push([
+                'message' => 'Refund processed to vendor ' . $tracking->vendor->name .
+                            ($tracking->reason ? ' (Reason: ' . $tracking->reason . ')' : ''),
+                'date' => $tracking->refund_on ?? $tracking->created_at,
+                'type' => 'Refund',
+                'qty'  => $tracking->quantity,
+                'amount' => $tracking->refund_amount
+            ]);
+        }
+
         $timeline = $timeline->sortByDesc('date')->values();
 
-        return view('users.products.detail', compact('product', 'timeline'));
-    }   
+        return response()->json($timeline);
+    }
 }

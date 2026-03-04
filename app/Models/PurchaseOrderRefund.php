@@ -19,4 +19,9 @@ class PurchaseOrderRefund extends Model
     {
         return $this->belongsTo('App\Models\Staff','refunded_by');
     }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
 }

@@ -638,6 +638,40 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="productTimelineModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                Product Report - <span id="productTitle"></span>
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 20%">Date</th>
+                                            <th style="width: 20%">Type</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="timelineTableBody">
+                                        <tr>
+                                            <td colspan="3" class="text-center">Loading...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
 			</div>
             <!-- ========== Footer Start ========== -->
             <!-- <footer class="footer">
@@ -716,6 +750,61 @@
     @endif
 
     <script src="{{ asset('assets/js/pages/pos.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+
+    <script>
+        $(document).on('click', '.viewProductTimeline', function () {
+
+            let productId = $(this).data('id');
+            let productName = $(this).data('name');
+
+            $('#productTitle').text(productName);
+            $('#timelineTableBody').html(
+                '<tr><td colspan="3" class="text-center">Loading...</td></tr>'
+            );
+
+            $.ajax({
+                url: "{{ route('product.detail', ['company' => request()->route('company'), 'product' => ':id']) }}"
+                        .replace(':id', productId),
+                type: "GET",
+                success: function (response) {
+
+                    let rows = '';
+
+                    if (response.length === 0) {
+                        rows = '<tr><td colspan="3" class="text-center">No history found</td></tr>';
+                    } else {
+
+                        response.forEach(function (item) {
+
+                            let badgeClass = 'secondary';
+
+                            if (item.type === 'Stock In') badgeClass = 'success';
+                            if (item.type === 'Stock Out') badgeClass = 'danger';
+                            if (item.type === 'Transfer') badgeClass = 'primary';
+                            if (item.type === 'Refund') badgeClass = 'warning';
+                            if (item.type === 'Created') badgeClass = 'dark';
+
+                            let qtyText = item.qty ? ` (Qty: ${item.qty})` : '';
+                            let amountText = item.amount ? ` | Refund: ₹${item.amount}` : '';
+
+                            rows += `
+                                <tr>
+                                    <td>${moment(item.date).format('DD MMM YYYY hh:mm A')}</td>
+                                    <td><span class="badge bg-${badgeClass}">
+                                        ${item.type}
+                                    </span></td>
+                                    <td>${item.message}${qtyText}${amountText}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+
+                    $('#timelineTableBody').html(rows);
+                }
+            });
+        });
+    </script>
     @yield('script')
 </body>
 </html>

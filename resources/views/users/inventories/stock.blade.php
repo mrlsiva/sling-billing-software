@@ -83,9 +83,14 @@
 											</td>
 											<td>{{$stock->category->name}} - {{$stock->sub_category->name}}</td>
 											<td>
-                                                <a href="{{ route('product.detail', ['company' => request()->route('company'),'product' => $stock->product->id]) }}" class="text-decoration-underline text-decoration-none" title="View Details">
-                                                    {{$stock->product->name}}
-                                                </a>
+                                                <a href="javascript:void(0)"
+   class="text-decoration-underline text-decoration-none viewProductTimeline"
+   data-id="{{ $stock->product->id }}"
+   data-name="{{ $stock->product->name }}"
+   data-bs-toggle="modal"
+   data-bs-target="#productTimelineModal">
+    {{$stock->product->name}}
+</a>
                                             </td>
 											<td>{{$stock->product->metric->name}}</td>
 											<td>{{$stock->product->price}}</td>
