@@ -159,13 +159,13 @@
                         $variationText = ($sizeName || $colorName)
                             ? '(' . trim(($sizeName ?? '') . ' - ' . ($colorName ?? ''), ' - ') . ')'
                             : '';
-
-                        $imeiText = $order_detail->imei ?? ' ';
                     @endphp
 
                     {{ $order_detail->name }} {{ $variationText }}
-                    <br>
-                    <small class="text-muted">IMEI: {{ $imeiText }}</small>
+                    @if(!empty($order_detail->imei))
+                        <br>
+                        <small class="text-muted">IMEI: {{ $order_detail->imei }}</small>
+                    @endif
                 </td>
                 <td>{{$order_detail->quantity}}</td>
                 <td>₹ {{ $order_detail->price - $order_detail->tax_amount }}</td>

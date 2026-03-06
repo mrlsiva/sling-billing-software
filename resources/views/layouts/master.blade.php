@@ -750,6 +750,8 @@
     @endif
 
     <script src="{{ asset('assets/js/pages/pos.js') }}"></script>
+
+    @if(!Auth::user()->hasRole('Super Admin'))
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 
     <script>
@@ -805,6 +807,8 @@
             });
         });
     </script>
+    @endif
+
     @yield('script')
 </body>
 </html>
