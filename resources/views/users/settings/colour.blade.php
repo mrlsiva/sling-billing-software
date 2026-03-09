@@ -37,7 +37,7 @@
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Colour" name="colour" value="{{ request('colour') }}" id="searchInput">
-                                <span class="input-group-text" id="clearFilter" style="display: {{ request('colour') ? 'inline-flex' : 'none' }}"><a href="{{route('setting.colour.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
+                                <span class="input-group-text" id="clearFilter" style="display: {{ request('colour') ? 'inline-flex' : 'none' }}"><a href="{{route('setting.colour.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-close-large-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
 

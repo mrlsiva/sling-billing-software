@@ -103,7 +103,7 @@
                 <td colspan="2"><strong>Mobile No:</strong> {{$order->customer->phone}} </td>
                 <td colspan="2"><strong>Inv. No:</strong> {{$order->bill_id}} </td>
                 <td colspan="2">
-                    <strong>Inv. Date:</strong> {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}
+                    <strong>Inv. Date:</strong> {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y h:i A') }}
                 </td>
             </tr>
             <tr>

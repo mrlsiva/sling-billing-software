@@ -64,7 +64,7 @@
     <table width="100%">
         <tr>
             <td>Invoice #: {{$order->bill_id}}</td>
-            <td class="right">Date: {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}</td>
+            <td class="right">Date: {{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y h:i A') }}</td>
         </tr>
     </table>
 

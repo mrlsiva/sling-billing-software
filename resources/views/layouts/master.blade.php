@@ -666,6 +666,8 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <div id="paginationLinks" class="mt-3 text-center"></div>
                         </div>
 
                     </div>
@@ -755,29 +757,27 @@
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 
     <script>
-        $(document).on('click', '.viewProductTimeline', function () {
 
-            let productId = $(this).data('id');
-            let productName = $(this).data('name');
-
-            $('#productTitle').text(productName);
+        function loadTimeline(url)
+        {
             $('#timelineTableBody').html(
                 '<tr><td colspan="3" class="text-center">Loading...</td></tr>'
             );
 
             $.ajax({
-                url: "{{ route('product.detail', ['company' => request()->route('company'), 'product' => ':id']) }}"
-                        .replace(':id', productId),
+                url: url,
                 type: "GET",
                 success: function (response) {
 
                     let rows = '';
 
-                    if (response.length === 0) {
+                    let data = Array.isArray(response.data) ? response.data : Object.values(response.data);
+
+                    if (data.length === 0) {
                         rows = '<tr><td colspan="3" class="text-center">No history found</td></tr>';
                     } else {
 
-                        response.forEach(function (item) {
+                        data.forEach(function (item) {
 
                             let badgeClass = 'secondary';
 
@@ -803,9 +803,60 @@
                     }
 
                     $('#timelineTableBody').html(rows);
+
+                    let pagination = '<ul class="pagination justify-content-center">';
+
+                    response.links.forEach(function(link){
+
+                        if(link.url === null){
+                            pagination += `<li class="page-item disabled"><span class="page-link">${link.label}</span></li>`;
+                        }else{
+
+                            let active = link.active ? 'active' : '';
+
+                            pagination += `
+                                <li class="page-item ${active}">
+                                    <a class="page-link timeline-page-link" href="#" data-url="${link.url}">
+                                        ${link.label}
+                                    </a>
+                                </li>
+                            `;
+                        }
+
+                    });
+
+                    pagination += '</ul>';
+
+                    $('#paginationLinks').html(pagination);
                 }
             });
+        }
+
+        $(document).on('click', '.viewProductTimeline', function () {
+
+            let productId = $(this).data('id');
+            let productName = $(this).data('name');
+
+            $('#productTitle').text(productName);
+
+            let url = "{{ route('product.detail', ['company' => request()->route('company'), 'product' => ':id']) }}"
+                        .replace(':id', productId);
+
+            loadTimeline(url);
         });
+
+        $(document).on('click', '.timeline-page-link', function(e){
+
+            e.preventDefault();
+
+            let url = $(this).data('url');
+
+            if(url){
+                loadTimeline(url);
+            }
+
+        });
+
     </script>
     @endif
 

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\users;
-
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -742,6 +742,18 @@ class productController extends Controller
 
         $timeline = $timeline->sortByDesc('date')->values();
 
-        return response()->json($timeline);
+        // Pagination
+        $page = $request->get('page', 1);
+        $perPage = 10;
+
+        $paginated = new LengthAwarePaginator(
+            $timeline->forPage($page, $perPage),
+            $timeline->count(),
+            $perPage,
+            $page,
+            ['path' => url()->current()]
+        );
+
+        return response()->json($paginated);
     }
 }

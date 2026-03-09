@@ -24,7 +24,7 @@
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Branch Name/ Branch Username/ Customer Name/ Customer Phone/ Customer GST/ Bill No" name="order" value="{{ request('order') }}">
-                                <span class="input-group-text"><a href="{{route('customer.order', ['company' => request()->route('company'),'id' => request()->route('id')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
+                                <span class="input-group-text"><a href="{{route('customer.order', ['company' => request()->route('company'),'id' => request()->route('id')])}}" class="link-dark"><i class="ri-close-large-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
 

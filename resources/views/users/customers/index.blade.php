@@ -27,7 +27,7 @@
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Customer Name/ Customer Phone" name="customer" value="{{ request('customer') }}" id="searchInput">
-                                <span class="input-group-text" id="clearFilter" style="display: {{ request('customer') ? 'inline-flex' : 'none' }}"><a href="{{route('customer.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-filter-off-line align-middle fs-20"></i></a></span>
+                                <span class="input-group-text" id="clearFilter" style="display: {{ request('customer') ? 'inline-flex' : 'none' }}"><a href="{{route('customer.index', ['company' => request()->route('company')])}}" class="link-dark"><i class="ri-close-large-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
 
