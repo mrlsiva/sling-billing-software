@@ -215,8 +215,8 @@
 
                         @endif
 
-                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/reports/orders/*') ? 'active' : '' }}">
-                            <a class="menu-link" href="{{route('report.order', ['company' => request()->route('company'),'branch' => 0])}}">
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/reports/*') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{route('report', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-file-chart-line"></i>
                                 </span>

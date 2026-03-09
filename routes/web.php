@@ -33,6 +33,8 @@ use App\Http\Controllers\users\billingsController;
 use App\Http\Controllers\users\sizeController;
 use App\Http\Controllers\users\colourController;
 use App\Http\Controllers\users\gstBillingController;
+use App\Http\Controllers\users\reportController;
+use App\Http\Controllers\users\dailyReportsController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -343,14 +345,25 @@ else
                     });
 
                     Route::prefix('reports')->group(function () {
-                        Route::name('report.')->group(function () {
+                        Route::name('report')->group(function () {
+
+                             Route::get('/',[reportController::class, 'report']);
 
                             Route::prefix('orders')->group(function () {
-                                Route::name('order')->group(function () {
+                                Route::name('.order')->group(function () {
 
                                     Route::get('/{branch}',[orderReportsController::class, 'order']);
                                     Route::get('/{branch}/download/pdf',[orderReportsController::class, 'download_pdf'])->name('.download_pdf');
                                     Route::get('/{branch}/download/excel',[orderReportsController::class, 'download_excel'])->name('.download_excel');
+                                });
+                            });
+
+                            Route::prefix('daily')->group(function () {
+                                Route::name('.daily')->group(function () {
+
+                                    Route::get('/{branch}',[dailyReportsController::class, 'daily']);
+                                    Route::get('/{branch}/download/pdf',[dailyReportsController::class, 'download_pdf'])->name('.download_pdf');
+                                    Route::get('/{branch}/download/excel',[dailyReportsController::class, 'download_excel'])->name('.download_excel');
                                 });
                             });
                         });

@@ -14,4 +14,14 @@ class VendorPaymentDetail extends Model
     {
         return $this->belongsTo('App\Models\Payment');
     }
+
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(\App\Models\PurchaseOrder::class);
+    }
+
+    public function vendorPayment()
+    {
+        return $this->belongsTo(\App\Models\VendorPayment::class);
+    }
 }

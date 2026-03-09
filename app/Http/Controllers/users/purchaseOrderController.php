@@ -666,7 +666,7 @@ class purchaseOrderController extends Controller
         {
             $purchase->update(['status' => 1]); // fully paid
         } 
-        elseif ($totalPaid < $order->gross_cost) 
+        elseif ($totalPaid < $purchase->gross_cost) 
         {
             $purchase->update(['status' => 2]); // partial paid
         }

@@ -9,9 +9,13 @@
     <div class="col-xl-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <p class="card-title">Order Report</p>
-                </div>
+    
+                <p class="card-title mb-0">Order Report</p>
+
+                <a href="{{route('report', ['company' => request()->route('company')])}}" class="btn btn-sm btn-outline-secondary">
+                    <i class="ri-arrow-left-line me-1"></i> Back
+                </a>
+
             </div>
             <div class="card-body pt-2 ">
                 <ul class="nav nav-tabs nav-justified">
@@ -54,7 +58,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-2">
+                                <div class="col-md-2 mt-4">
                                     <button class="btn btn-primary"> Search </button>
                                 </div>
                             </div>

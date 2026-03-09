@@ -15,9 +15,9 @@ class PurchaseOrderRefund extends Model
         return $this->belongsTo('App\Models\PurchaseOrder');
     }
 
-    public function refunded_by()
+    public function refundedBy()
     {
-        return $this->belongsTo('App\Models\Staff','refunded_by');
+        return $this->belongsTo('App\Models\User','refunded_by');
     }
 
     public function vendor()
