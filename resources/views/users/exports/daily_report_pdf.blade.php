@@ -51,23 +51,27 @@
 
             <tr>
                 <th>Total Sales</th>
+                @if(request()->route('branch') == 0)
                 <th>Total Purchase</th>
                 <th>Vendor Paid</th>
                 <th>Total Refund</th>
                 <th>Profit</th>
+                @endif
             </tr>
 
             <tr>
                 <td>₹ {{ number_format($totalSales,2) }}</td>
+                @if(request()->route('branch') == 0)
                 <td>₹ {{ number_format($totalPurchase,2) }}</td>
                 <td>₹ {{ number_format($totalVendorPaid,2) }}</td>
                 <td>₹ {{ number_format($totalRefund,2) }}</td>
                 <td><b>₹ {{ number_format($profit,2) }}</b></td>
+                @endif
             </tr>
 
         </table>
 
-
+         @if(request()->route('branch') == 0)
         <table>
 
             <tr class="section">
@@ -159,6 +163,7 @@
             @endforeach
 
         </table>
+        @endif
 
 
         <table>

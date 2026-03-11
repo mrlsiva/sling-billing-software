@@ -34,9 +34,25 @@ class dailyReportsController extends Controller
         $date = $request->date ?? Carbon::today()->toDateString();
 
         /*
-        |--------------------------------------------------------------------------
-        | Orders (Sales)
-        |--------------------------------------------------------------------------
+        |--------------------------------------------------
+        | Default values (Important for Branch view)
+        |--------------------------------------------------
+        */
+
+        $purchases = collect();
+        $payments = collect();
+        $refunds = collect();
+
+        $totalSales = 0;
+        $totalPurchase = 0;
+        $totalVendorPaid = 0;
+        $totalRefund = 0;
+        $profit = 0;
+
+        /*
+        |--------------------------------------------------
+        | Orders
+        |--------------------------------------------------
         */
 
         $orderQuery = Order::where('shop_id', Auth::user()->owner_id);
@@ -52,62 +68,41 @@ class dailyReportsController extends Controller
             ->orderByDesc('id')
             ->paginate(10);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Purchases
-        |--------------------------------------------------------------------------
-        */
-
-        $purchaseQuery = PurchaseOrder::where('shop_id', Auth::user()->owner_id);
-
-        if ($branch != 0) {
-            $purchaseQuery->where('branch_id', $branch);
-        }
-
-        $purchaseQuery->whereDate('invoice_date', $date);
-
-        $purchases = $purchaseQuery
-            ->with(['vendor','product'])
-            ->orderByDesc('id')
-            ->get();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Vendor Payments
-        |--------------------------------------------------------------------------
-        */
-
-        $payments = VendorPaymentDetail::with([
-            'purchaseOrder.vendor',
-            'vendorPayment'
-        ])
-        ->whereDate('paid_on', $date)
-        ->orderByDesc('id')
-        ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Refunds
-        |--------------------------------------------------------------------------
-        */
-
-        $refunds = PurchaseOrderRefund::with(['purchase_order.product','vendor','refundedBy'])
-                    ->whereDate('refund_on', $date)
-                    ->orderByDesc('id')
-                    ->get();
-
         $totalSales = $orders->sum('bill_amount');
 
-        $totalPurchase = $purchases->sum('gross_cost');
+        /*
+        |--------------------------------------------------
+        | HO Only Data
+        |--------------------------------------------------
+        */
 
-        $totalVendorPaid = $payments->sum('amount');
+        if ($branch == 0) {
 
-        $totalRefund = $refunds->sum('refund_amount');
+            $purchases = PurchaseOrder::where('shop_id', Auth::user()->owner_id)
+                ->whereDate('invoice_date', $date)
+                ->with(['vendor','product'])
+                ->orderByDesc('id')
+                ->get();
 
-        $profit = $totalSales - $totalPurchase + $totalRefund;
+            $payments = VendorPaymentDetail::with([
+                    'purchaseOrder.vendor',
+                    'vendorPayment'
+                ])
+                ->whereDate('paid_on', $date)
+                ->orderByDesc('id')
+                ->get();
 
+            $refunds = PurchaseOrderRefund::with(['purchase_order.product','vendor','refundedBy'])
+                ->whereDate('refund_on', $date)
+                ->orderByDesc('id')
+                ->get();
+
+            $totalPurchase = $purchases->sum('gross_cost');
+            $totalVendorPaid = $payments->sum('amount');
+            $totalRefund = $refunds->sum('refund_amount');
+
+            $profit = $totalSales - $totalPurchase + $totalRefund;
+        }
 
         return view('users.reports.daily', compact(
             'orders',
@@ -119,7 +114,8 @@ class dailyReportsController extends Controller
             'totalPurchase',
             'totalVendorPaid',
             'totalRefund',
-            'profit'
+            'profit',
+            'branch'
         ));
     }
 
@@ -128,8 +124,21 @@ class dailyReportsController extends Controller
         $date = $request->date ?? Carbon::today()->toDateString();
 
         /*
-        | Orders
+        |----------------------------------------
+        | Default Values (for branch)
+        |----------------------------------------
         */
+
+        $purchases = collect();
+        $payments = collect();
+        $refunds = collect();
+
+        /*
+        |----------------------------------------
+        | Orders
+        |----------------------------------------
+        */
+
         $orderQuery = Order::where('shop_id', Auth::user()->owner_id);
 
         if ($branch != 0) {
@@ -142,42 +151,36 @@ class dailyReportsController extends Controller
             ->get();
 
         /*
-        | Purchases
+        |----------------------------------------
+        | HO Only Data
+        |----------------------------------------
         */
-        $purchaseQuery = PurchaseOrder::where('shop_id', Auth::user()->owner_id);
 
-        if ($branch != 0) {
-            $purchaseQuery->where('branch_id', $branch);
+        if ($branch == 0) {
+
+            $purchases = PurchaseOrder::where('shop_id', Auth::user()->owner_id)
+                ->whereDate('invoice_date', $date)
+                ->with(['vendor','product'])
+                ->get();
+
+            $payments = VendorPaymentDetail::with([
+                    'purchaseOrder.vendor',
+                    'vendorPayment'
+                ])
+                ->whereDate('paid_on', $date)
+                ->get();
+
+            $refunds = PurchaseOrderRefund::with([
+                    'purchase_order.product',
+                    'vendor',
+                    'refundedBy'
+                ])
+                ->whereDate('refund_on', $date)
+                ->get();
         }
 
-        $purchases = $purchaseQuery
-            ->whereDate('invoice_date', $date)
-            ->with(['vendor','product'])
-            ->get();
-
-        /*
-        | Vendor Payments
-        */
-        $payments = VendorPaymentDetail::with([
-            'purchaseOrder.vendor',
-            'vendorPayment'
-        ])
-        ->whereDate('paid_on', $date)
-        ->get();
-
-        /*
-        | Refunds
-        */
-        $refunds = PurchaseOrderRefund::with([
-            'purchase_order.product',
-            'vendor',
-            'refundedBy'
-        ])
-        ->whereDate('refund_on', $date)
-        ->get();
-
         return Excel::download(
-            new DailyReportExport($orders,$purchases,$payments,$refunds),
+            new DailyReportExport($orders, $purchases, $payments, $refunds),
             'daily_report.xlsx'
         );
     }
@@ -186,6 +189,27 @@ class dailyReportsController extends Controller
     {
         $date = $request->date ?? Carbon::today()->toDateString();
 
+        /*
+        |----------------------------------------
+        | Default Values
+        |----------------------------------------
+        */
+
+        $purchases = collect();
+        $payments = collect();
+        $refunds = collect();
+
+        $totalPurchase = 0;
+        $totalVendorPaid = 0;
+        $totalRefund = 0;
+        $profit = 0;
+
+        /*
+        |----------------------------------------
+        | Orders
+        |----------------------------------------
+        */
+
         $orderQuery = Order::where('shop_id', Auth::user()->owner_id);
 
         if ($branch != 0) {
@@ -197,37 +221,42 @@ class dailyReportsController extends Controller
             ->with(['branch','customer','billedBy'])
             ->get();
 
-        $purchaseQuery = PurchaseOrder::where('shop_id', Auth::user()->owner_id);
-
-        if ($branch != 0) {
-            $purchaseQuery->where('branch_id', $branch);
-        }
-
-        $purchases = $purchaseQuery
-            ->whereDate('invoice_date', $date)
-            ->with(['vendor','product'])
-            ->get();
-
-        $payments = VendorPaymentDetail::with([
-            'purchaseOrder.vendor',
-            'vendorPayment'
-        ])
-        ->whereDate('paid_on', $date)
-        ->get();
-
-        $refunds = PurchaseOrderRefund::with([
-            'purchase_order.product',
-            'vendor',
-            'refundedBy'
-        ])
-        ->whereDate('refund_on', $date)
-        ->get();
-
         $totalSales = $orders->sum('bill_amount');
-        $totalPurchase = $purchases->sum('gross_cost');
-        $totalVendorPaid = $payments->sum('amount');
-        $totalRefund = $refunds->sum('refund_amount');
-        $profit = $totalSales - $totalPurchase + $totalRefund;
+
+        /*
+        |----------------------------------------
+        | HO Only Data
+        |----------------------------------------
+        */
+
+        if ($branch == 0) {
+
+            $purchases = PurchaseOrder::where('shop_id', Auth::user()->owner_id)
+                ->whereDate('invoice_date', $date)
+                ->with(['vendor','product'])
+                ->get();
+
+            $payments = VendorPaymentDetail::with([
+                    'purchaseOrder.vendor',
+                    'vendorPayment'
+                ])
+                ->whereDate('paid_on', $date)
+                ->get();
+
+            $refunds = PurchaseOrderRefund::with([
+                    'purchase_order.product',
+                    'vendor',
+                    'refundedBy'
+                ])
+                ->whereDate('refund_on', $date)
+                ->get();
+
+            $totalPurchase = $purchases->sum('gross_cost');
+            $totalVendorPaid = $payments->sum('amount');
+            $totalRefund = $refunds->sum('refund_amount');
+
+            $profit = $totalSales - $totalPurchase + $totalRefund;
+        }
 
         $user = Auth::user();
 
@@ -241,7 +270,8 @@ class dailyReportsController extends Controller
             'totalVendorPaid',
             'totalRefund',
             'profit',
-            'user'
+            'user',
+            'branch'
         ))->setPaper('a4','landscape');
 
         return $pdf->download('daily_report.pdf');

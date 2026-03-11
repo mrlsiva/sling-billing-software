@@ -8,6 +8,7 @@
         <td>{{ number_format($totalSales,2) }}</td>
     </tr>
 
+    @if(request()->route('branch') == 0)
     <tr>
         <td>Total Purchase</td>
         <td>{{ number_format($totalPurchase,2) }}</td>
@@ -27,13 +28,14 @@
         <td><b>Profit</b></td>
         <td><b>{{ number_format($profit,2) }}</b></td>
     </tr>
+    @endif
 
 </table>
 
 
 <br><br>
 
-
+@if(request()->route('branch') == 0)
 <table>
     <thead>
         <tr>
@@ -140,6 +142,8 @@
 
 
 <br><br>
+
+@endif
 
 
 <table>
