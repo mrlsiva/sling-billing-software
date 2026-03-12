@@ -352,7 +352,7 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('branch.report.order', ['company' => request()->route('company')])}}">
+                            <a class="menu-link" href="{{route('branch.report', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-file-chart-line"></i>
                                 </span>

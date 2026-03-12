@@ -9,13 +9,16 @@
 		<div class="col-xl-12">
 			<div class="card p-3">
 				<div class="card-header d-flex justify-content-between align-items-center">
-					<div>
-						<p class="card-title">Order Report</p>
-					</div>
+					
+					<p class="card-title mb-0">Order Report</p>
+
+					<a href="{{route('branch.report', ['company' => request()->route('company')])}}" class="btn btn-sm btn-outline-secondary">
+                    	<i class="ri-arrow-left-line me-1"></i> Back
+                	</a>
 
 				</div>
 
-				<form method="get" action="{{route('branch.report.order', ['company' => request()->route('company')])}}">
+				<form class="mt-3" method="get" action="{{route('branch.report.order', ['company' => request()->route('company')])}}">
                     <div class="row mb-2">
                     	<div class="col-md-5">
                     		<div class="mb-2">
@@ -31,7 +34,7 @@
                         	</div>
                         </div>
 
-                        <div class="col-md-2">
+                        <div class="col-md-2 mt-4">
                             <button class="btn btn-primary"> Search </button>
                         </div>
                     </div>
@@ -40,16 +43,21 @@
 				<div class="">
 
 					<div class="d-flex justify-content-end p-3">
-						<form method="get" action="{{route('branch.report.order.download_excel', ['company' => request()->route('company')])}}">
-							<input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
-							<input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
-							<button class="btn btn-success"> <i class="ri-file-excel-2-line"></i> Excel </button>
-						</form>
-						<form method="get" action="{{route('branch.report.order.download_pdf', ['company' => request()->route('company')])}}">
-							<input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
-							<input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
-							<button class="btn btn-success"> <i class="ri-file-pdf-2-line"></i> PDF </button>
-						</form>
+					    <form method="get" class="me-2" action="{{route('branch.report.order.download_excel', ['company' => request()->route('company')])}}">
+					        <input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
+					        <input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
+					        <button class="btn btn-success">
+					            <i class="ri-file-excel-2-line"></i> Excel
+					        </button>
+					    </form>
+
+					    <form method="get" action="{{route('branch.report.order.download_pdf', ['company' => request()->route('company')])}}">
+					        <input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
+					        <input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
+					        <button class="btn btn-success">
+					            <i class="ri-file-pdf-2-line"></i> PDF
+					        </button>
+					    </form>
 					</div>
 
 					<div class="table-responsive">

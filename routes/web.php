@@ -44,7 +44,9 @@ use App\Http\Controllers\branches\settingController;
 use App\Http\Controllers\branches\branchDashboardController;
 use App\Http\Controllers\branches\orderController;
 use App\Http\Controllers\branches\staffController;
+use App\Http\Controllers\branches\reportsController;
 use App\Http\Controllers\branches\orderReportController;
+use App\Http\Controllers\branches\dailyReportController;
 use App\Http\Controllers\branches\gstBillController;
 use App\Http\Controllers\branches\bulkExcelController;
 
@@ -479,16 +481,28 @@ else
                             });
 
                             Route::prefix('reports')->group(function () {
-                                Route::name('report.')->group(function () {
+                                Route::name('report')->group(function () {
+
+                                    Route::get('/',[reportsController::class, 'report']);
 
                                     Route::prefix('orders')->group(function () {
-                                        Route::name('order')->group(function () {
+                                        Route::name('.order')->group(function () {
 
                                             Route::get('/',[orderReportController::class, 'order']);
                                             Route::get('/download/pdf',[orderReportController::class, 'download_pdf'])->name('.download_pdf');
                                             Route::get('/download/excel',[orderReportController::class, 'download_excel'])->name('.download_excel');
                                         });
                                     });
+
+                                    Route::prefix('daily')->group(function () {
+                                        Route::name('.daily')->group(function () {
+
+                                            Route::get('/',[dailyReportController::class, 'daily']);
+                                            Route::get('/download/pdf',[dailyReportController::class, 'download_pdf'])->name('.download_pdf');
+                                            Route::get('/download/excel',[dailyReportController::class, 'download_excel'])->name('.download_excel');
+                                        });
+                                    });
+
                                 });
                             });
 

@@ -32,7 +32,7 @@ class orderReportController extends Controller
 
         $orders = $query->orderBy('id', 'desc')->paginate(10);
 
-        return view('branches.reports.index', compact('orders'));
+        return view('branches.reports.order', compact('orders'));
     }
 
     public function download_excel(Request $request)
