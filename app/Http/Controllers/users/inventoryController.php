@@ -141,7 +141,7 @@ class inventoryController extends Controller
     public function get_bill(Request $request,$company,$id)
     {
         $transfer_detail = ProductHistory::where('id',$id)->first();
-        $transfer_products = ProductHistory::where('invoice',$transfer_detail->invoice)->get();
+        $transfer_products = ProductHistory::where([['shop_id',Auth::user()->owner_id],['invoice',$transfer_detail->invoice]])->get();
 
          return view('users.inventories.bill',compact('transfer_detail','transfer_products'));
     }
@@ -642,8 +642,17 @@ class inventoryController extends Controller
         // Update product quantity
         $product->decrement('quantity', $data['quantity']);
 
+        $lastInvoice = ProductHistory::where('shop_id',Auth::user()->owner_id)->lockForUpdate()->max('invoice');
+
+        $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
+
+        $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
+
+
         // History
         ProductHistory::create([
+            'shop_id'        => Auth::user()->owner_id,
+            'invoice'        => $invoice,
             'from'            => Auth::user()->id,
             'to'              => $data['branch_id'],
             'category_id'     => $data['category_id'],

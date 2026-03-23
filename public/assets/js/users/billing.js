@@ -274,7 +274,7 @@ function add_to_cart(element) {
                             </div>
                             <div class="d-flex align-content-center gap-1">
                                 ${hasImei ?
-                                    `<a href="#!" class="btn btn-soft-info avatar-xs rounded d-flex align-items-center justify-content-center imei-btn" onclick="openImeiModal(${data.id})">
+                                    `<a href="#!" class="btn btn-soft-info avatar-xs rounded d-flex align-items-center justify-content-center imei-btn" onclick='openImeiModal(${data.id}, ${JSON.stringify(data.name)})'>
                                         <i class="ri-barcode-line align-middle fs-12"></i>
                                     </a>` : ``}
 
@@ -381,7 +381,7 @@ function addVariationToCart(productId, variationId) {
                             </div>
                             <div class="d-flex align-content-center gap-1">
                                 ${hasImei ?
-                                    `<a href="#!" class="btn btn-soft-info avatar-xs rounded d-flex align-items-center justify-content-center imei-btn" onclick="openImeiModal(${productId})">
+                                    `<a href="#!" class="btn btn-soft-info avatar-xs rounded d-flex align-items-center justify-content-center imei-btn" onclick='openImeiModal(${productId}, ${JSON.stringify(v.product_name)})'>
                                         <i class="ri-barcode-line align-middle fs-12"></i>
                                     </a>` : ``}
 
@@ -1596,9 +1596,9 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // IMEI selection functionality
-function openImeiModal(productId) {
+function openImeiModal(productId,productName) {
     $('#imeiModalProductId').val(productId);
-    $('#imeiModalTitle').text('Select IMEI Numbers for Product #' + productId);
+    $('#imeiModalTitle').text('Select IMEI Numbers for Product #' + productName);
 
     // Get currently selected IMEIs for this product
     const cartItem = $(`[data-product-id="${productId}"]`);

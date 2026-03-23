@@ -38,6 +38,9 @@
                                 </div>
                             </div>
 
+                            <input type="hidden" id="old_category" value="{{ old('category') }}">
+                            <input type="hidden" id="old_sub_category" value="{{ old('sub_category') }}">
+
                             <div class="col-md-4">
                                 <div class="mb-3 position-relative">
                                     <label class="form-label text-muted d-flex justify-content-between align-items-center">
@@ -53,7 +56,7 @@
                                     <select class="form-control" name="category" id="category">
                                         <option value=""> Select </option>
                                         @foreach($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            <option value="{{ $category->id }}" {{ old('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -132,7 +135,7 @@
                                     <select class="form-control"  name="tax" id="tax">
                                         <option value=""> Select </option>
                                         @foreach($taxes as $tax)
-                                            <option value="{{$tax->id}}">{{$tax->name}}%</option>
+                                            <option value="{{$tax->id}}" {{ old('tax') == $tax->id ? 'selected' : '' }}>{{$tax->name}}%</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -152,7 +155,7 @@
                                     <select class="form-control"  name="metric" id="metric">
                                         <option value=""> Select </option>
                                         @foreach($metrics as $metric)
-                                            <option value="{{$metric->id}}">{{$metric->name}}</option>
+                                            <option value="{{$metric->id}}" {{ old('metric') == $metric->id ? 'selected' : '' }}>{{$metric->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -163,8 +166,8 @@
                                     <label for="choices-single-groups" class="form-label text-muted">Discount Type</label>
                                     <select class="form-control"  name="discount_type" id="discount_type">
                                         <option value=""> Select </option>
-                                        <option value="1"> Flat </option>
-                                        <option value="2"> Percentage </option>
+                                        <option value="1" {{ old('discount_type') == 1 ? 'selected' : '' }}> Flat </option>
+                                        <option value="2" {{ old('discount_type') == 2 ? 'selected' : '' }}> Percentage </option>
                                     </select>
                                 </div>
                             </div>
@@ -187,7 +190,7 @@
                                         <input class="form-check-input" type="checkbox"
                                                id="is_size_differentiation_available"
                                                name="is_size_differentiation_available"
-                                               value="1">
+                                               value="1" {{ old('is_size_differentiation_available') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="is_size_differentiation_available">Is Size Differentiation Available</label>
                                         <span class="text-danger">*</span>
                                     </div>
@@ -202,7 +205,7 @@
                                         <input class="form-check-input" type="checkbox"
                                                id="is_colour_differentiation_available"
                                                name="is_colour_differentiation_available"
-                                               value="1">
+                                               value="1" {{ old('is_colour_differentiation_available') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="is_colour_differentiation_available">Is Colour Differentiation Available</label>
                                         <span class="text-danger">*</span>
                                     </div>
@@ -228,7 +231,7 @@
                                                 <input class="form-check-input size-checkbox"
                                                        type="checkbox"
                                                        name="sizes[]"
-                                                       value="{{ $size->id }}"
+                                                       value="{{ $size->id }}" {{ in_array($size->id, old('sizes', [])) ? 'checked' : '' }}
                                                        id="size_{{ $size->id }}">
 
                                                 <label class="form-check-label" for="size_{{ $size->id }}">
@@ -258,7 +261,7 @@
                                                 <input class="form-check-input colour-checkbox"
                                                        type="checkbox"
                                                        name="colours[]"
-                                                       value="{{ $colour->id }}"
+                                                       value="{{ $colour->id }}" {{ in_array($colour->id, old('colours', [])) ? 'checked' : '' }}
                                                        id="colour_{{ $colour->id }}">
 
                                                 <label class="form-check-label" for="colour_{{ $colour->id }}">

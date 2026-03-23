@@ -1,3 +1,45 @@
+$(document).ready(function () {
+
+    let oldCategory = $('#old_category').val();
+    let oldSubCategory = $('#old_sub_category').val();
+
+    function loadSubCategory(category, selectedSubCategory = null) {
+
+        $.ajax({
+            url: 'get_sub_category',
+            type: 'GET',
+            dataType: 'json',
+            data: { id: category },
+
+            success: function (response) {
+
+                let option = '<option value=""> Select </option>';
+
+                $.each(response, function (key, value) {
+
+                    let selected = (selectedSubCategory == value.id) ? 'selected' : '';
+
+                    option += '<option value="' + value.id + '" ' + selected + '>' + value.name + '</option>';
+                });
+
+                $('#sub_category').html(option);
+            }
+        });
+    }
+
+    // Change event
+    $('#category').on('change', function () {
+        let category = $(this).val();
+        loadSubCategory(category);
+    });
+
+    // Page load retain
+    if (oldCategory) {
+        loadSubCategory(oldCategory, oldSubCategory);
+    }
+
+});
+
 jQuery(document).ready(function ()
 {
 	jQuery('select[name="category"]').on('change',function(){

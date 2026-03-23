@@ -152,6 +152,14 @@ class purchaseOrderController extends Controller
                         continue;
                     }
 
+                    // ✅ IMEI must be exactly 15 digits
+                    // if (!preg_match('/^[0-9]{15}$/', $imei)) {
+                    //     return response()->json([
+                    //         'status'  => false,
+                    //         'message' => "IMEI number $imei must be exactly 15 digits."
+                    //     ]);
+                    // }
+
                     if (in_array($imei, $allImeis)) {
 
                         // return back()->withErrors([
@@ -605,6 +613,7 @@ class purchaseOrderController extends Controller
 
     public function get_detail($company,$id)
     {
+        $purchase_order = PurchaseOrder::where('id',$id)->first();
         $purchase_orders = PurchaseOrder::with([
                 'vendor',
                 'category',
@@ -612,7 +621,7 @@ class purchaseOrderController extends Controller
                 'product',
                 'metric'
             ])
-            ->where('shop_id', Auth::user()->owner_id)->where('invoice_no', $id)
+            ->where('shop_id', Auth::user()->owner_id)->where('invoice_no', $purchase_order->invoice_no)
             ->get(); // 👈 or ->first() if single invoice
 
         return view('users.purchase_orders.detail', compact('purchase_orders'));
