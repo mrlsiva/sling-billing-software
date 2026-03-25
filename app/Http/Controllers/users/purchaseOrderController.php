@@ -153,12 +153,12 @@ class purchaseOrderController extends Controller
                     }
 
                     // ✅ IMEI must be exactly 15 digits
-                    // if (!preg_match('/^[0-9]{15}$/', $imei)) {
-                    //     return response()->json([
-                    //         'status'  => false,
-                    //         'message' => "IMEI number $imei must be exactly 15 digits."
-                    //     ]);
-                    // }
+                    if (!preg_match('/^[0-9]{1,15}$/', $imei)) {
+                        return response()->json([
+                            'status'  => false,
+                            'message' => "IMEI number $imei must not exceed 15 digits."
+                        ]);
+                    }
 
                     if (in_array($imei, $allImeis)) {
 
@@ -213,6 +213,7 @@ class purchaseOrderController extends Controller
                 $sizeList   = array_unique($sizeList);
                 $colourList = array_unique($colourList);
 
+                $imeiList = array_filter(array_map('trim', $imeiList));
 
                 $purchaseOrder = PurchaseOrder::create([
                     'shop_id'        => Auth::user()->owner_id,
@@ -241,6 +242,7 @@ class purchaseOrderController extends Controller
                 // Update Product quantity
                 $product = Product::find($item['product']);
                 $product->increment('quantity', $item['quantity']);
+                $imeiList = array_filter(array_map('trim', $imeiList));
 
                 // Check if stock already exists
                 $stock = Stock::where([
@@ -258,6 +260,7 @@ class purchaseOrderController extends Controller
                         : [];
 
                     $mergedImeis = array_unique(array_merge($existingImeis, $imeiList));
+                    $mergedImeis = array_filter(array_map('trim', $mergedImeis));
 
                     // Update existing stock
                     $stock->update([

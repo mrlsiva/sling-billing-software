@@ -45,6 +45,7 @@
 									<th>Stock</th>
 									<th>Total Price (₹)</th>
 									<th>Variation</th>
+									<th>IMEI</th>
 									<th>Action</th>
 								</tr>
 							</thead>
@@ -83,6 +84,19 @@
                                             	-
                                             </td>
                                         @endif
+
+                                        <td>
+                                        	@if(!empty($stock->imei))
+	                                        	<a href="javascript:void(0);" 
+	                                        	onclick="showImei('{{ $stock->imei }}')" 
+	                                        	title="View IMEI">
+	                                        	<i class="ri-eye-line fs-18"></i>
+                                        		</a>
+                                        	@else
+                                        		-
+                                        	@endif
+                                    	</td>
+
 										<td>
 											@php
 												$user_detail = App\Models\UserDetail::where('user_id',Auth::user()->id)->first();
@@ -111,6 +125,18 @@
 					{!! $stocks->withQueryString()->links('pagination::bootstrap-5') !!}
 				</div>
 				
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="imeiModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">IMEI Numbers</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body" id="imeiList"></div>
 			</div>
 		</div>
 	</div>
@@ -195,6 +221,26 @@
             }
         });
     });
+</script>
+
+<script>
+    function showImei(imei) {
+        let list = imei.split(',');
+        let html = '<ul>';
+
+        list.forEach(function(item) {
+            if(item.trim() !== '') {
+                html += '<li>' + item.trim() + '</li>';
+            }
+        });
+
+        html += '</ul>';
+
+        document.getElementById('imeiList').innerHTML = html;
+
+        let modal = new bootstrap.Modal(document.getElementById('imeiModal'));
+        modal.show();
+    }
 </script>
 
 @endsection

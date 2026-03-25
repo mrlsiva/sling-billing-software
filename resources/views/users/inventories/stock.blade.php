@@ -65,6 +65,7 @@
                                         <th>Price (₹)</th>
                                         <th>Stock at</th>
                                         <th>Total Price (₹)</th>
+                                        <th>IMEI</th>
                                         <th>Variations</th>
                                     </tr>
                                 </thead> 
@@ -83,19 +84,26 @@
 											</td>
 											<td>{{$stock->category->name}} - {{$stock->sub_category->name}}</td>
 											<td>
-                                                <a href="javascript:void(0)"
-   class="text-decoration-underline text-decoration-none viewProductTimeline"
-   data-id="{{ $stock->product->id }}"
-   data-name="{{ $stock->product->name }}"
-   data-bs-toggle="modal"
-   data-bs-target="#productTimelineModal">
-    {{$stock->product->name}}
-</a>
+                                                <a href="javascript:void(0)" class="text-decoration-underline text-decoration-none viewProductTimeline" data-id="{{ $stock->product->id }}"data-name="{{ $stock->product->name }}"data-bs-toggle="modal" data-bs-target="#productTimelineModal">
+                                                    {{$stock->product->name}}
+                                                </a>
                                             </td>
 											<td>{{$stock->product->metric->name}}</td>
 											<td>{{$stock->product->price}}</td>
 											<td>{{$stock->quantity}}</td>
 											<td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
+
+                                            <td>
+                                                @if(!empty($stock->imei))
+                                                    <a href="javascript:void(0);" 
+                                                       onclick="showImei('{{ $stock->imei }}')" 
+                                                       title="View IMEI">
+                                                        <i class="ri-eye-line fs-18"></i>
+                                                    </a>
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
 
                                             @php
                                                 $variation = \App\Models\StockVariation::where('stock_id', $stock->id)->first();
@@ -127,6 +135,18 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="modal fade" id="imeiModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">IMEI Numbers</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="imeiList"></div>
+    </div>
+  </div>
 </div>
 
 @endsection
@@ -191,6 +211,25 @@
     });
 </script>
 
+<script>
+    function showImei(imei) {
+        let list = imei.split(',');
+        let html = '<ul>';
+
+        list.forEach(function(item) {
+            if(item.trim() !== '') {
+                html += '<li>' + item.trim() + '</li>';
+            }
+        });
+
+        html += '</ul>';
+
+        document.getElementById('imeiList').innerHTML = html;
+
+        let modal = new bootstrap.Modal(document.getElementById('imeiModal'));
+        modal.show();
+    }
+</script>
 
 
 @endsection
