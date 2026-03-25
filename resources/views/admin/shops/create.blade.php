@@ -295,5 +295,5 @@
 
 <!-- Optional additional methods (if you need pattern, equalTo, etc.) -->
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
-    <script src="{{asset('assets/js/admins/shop.js')}}"></script>
+    <script src="{{asset('assets/js/admins/shop.js?' . $version)}}"></script>
 @endsection

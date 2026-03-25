@@ -140,5 +140,5 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/users/metric.js')}}"></script>
+<script src="{{asset('assets/js/users/metric.js?' . $version)}}"></script>
 @endsection

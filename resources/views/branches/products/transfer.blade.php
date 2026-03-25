@@ -229,5 +229,5 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/branches/transfer.js')}}"></script>
+<script src="{{asset('assets/js/branches/transfer.js?' . $version)}}"></script>
 @endsection

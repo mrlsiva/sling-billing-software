@@ -302,5 +302,5 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/admins/shop.js')}}"></script>
+<script src="{{asset('assets/js/admins/shop.js?' . $version)}}"></script>
 @endsection

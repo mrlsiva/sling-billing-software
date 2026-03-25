@@ -102,7 +102,7 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/users/purchase.js')}}"></script>
+<script src="{{asset('assets/js/users/purchase.js?' . $version)}}"></script>
 <script type="text/javascript">
 	document.addEventListener("DOMContentLoaded", function () {
     let searchInput = document.getElementById("searchInput");

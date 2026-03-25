@@ -139,5 +139,5 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/users/size.js')}}"></script>
+<script src="{{asset('assets/js/users/size.js?' . $version)}}"></script>
 @endsection

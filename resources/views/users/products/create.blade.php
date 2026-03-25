@@ -300,11 +300,11 @@
 
 <!-- Optional additional methods (if you need pattern, equalTo, etc.) -->
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
-<script src="{{asset('assets/js/users/product.js')}}"></script>
-<script src="{{asset('assets/js/users/sub_category.js')}}"></script>
-<script src="{{asset('assets/js/users/category.js')}}"></script>
-<script src="{{asset('assets/js/users/tax.js')}}"></script>
-<script src="{{asset('assets/js/users/metric.js')}}"></script>
-<script src="{{asset('assets/js/users/size.js')}}"></script>
-<script src="{{asset('assets/js/users/colour.js')}}"></script>
+<script src="{{asset('assets/js/users/product.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/sub_category.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/category.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/tax.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/metric.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/size.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/colour.js?' . $version)}}"></script>
 @endsection
