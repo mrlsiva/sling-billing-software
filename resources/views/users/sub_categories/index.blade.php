@@ -229,5 +229,5 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/users/sub_category.js')}}"></script>
+<script src="{{asset('assets/js/users/sub_category.js?' . $version)}}"></script>
 @endsection

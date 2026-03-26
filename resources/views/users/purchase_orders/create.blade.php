@@ -264,6 +264,6 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/users/purchase.js')}}"></script>
-<script src="{{asset('assets/js/users/vendor.js')}}"></script>
+<script src="{{asset('assets/js/users/purchase.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/vendor.js?' . $version)}}"></script>
 @endsection

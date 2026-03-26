@@ -141,5 +141,5 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/users/colour.js')}}"></script>
+<script src="{{asset('assets/js/users/colour.js?' . $version)}}"></script>
 @endsection

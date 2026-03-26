@@ -140,5 +140,5 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/js/users/tax.js')}}"></script>
+<script src="{{asset('assets/js/users/tax.js?' . $version)}}"></script>
 @endsection

@@ -23,7 +23,7 @@
 	<link rel="stylesheet" href="{{ asset('assets/css/icons.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
-    <script src="{{ asset('assets/js/config.min.js') }}"></script>
+    <script src="{{ asset('assets/js/config.min.js?' . $version) }}"></script>
     <link rel="icon" type="image/png" href="{{ $user->fav_icon ? asset('storage/' . $user->fav_icon) : asset('assets/images/favicon.png') }}">
 
 
@@ -693,11 +693,11 @@
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ asset('assets/js/vendor.js?' . $version) }}"></script>
-    <script src="{{ asset('assets/js/app.js') }}"></script>
+    <script src="{{ asset('assets/js/app.js?' . $version) }}"></script>
 	<!-- Dashboard Js -->
-    <script src="{{ asset('assets/js/pages/dashboard.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/dashboard.js?' . $version) }}"></script>
 	<!-- Page Js -->
-    <script src="{{ asset('assets/js/pages/categories.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/categories.js?' . $version) }}"></script>
     <script>
         document.addEventListener("toast", function (e) {
             const d = e.detail;
@@ -751,7 +751,7 @@
         </script>
     @endif
 
-    <script src="{{ asset('assets/js/pages/pos.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/pos.js?' . $version) }}"></script>
 
     @if(!Auth::user()->hasRole('Super Admin'))
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
