@@ -38,6 +38,7 @@
 								<tr>
 									<th>S.No</th>
 									<th>Vendor</th>
+									<th>Billed On</th>
 									<th>Invoice No</th>
 									<th>Invoice Date</th>
 									<th>Due Date</th>
@@ -51,6 +52,7 @@
 											{{ ($purchase_orders->currentPage() - 1) * $purchase_orders->perPage() + $loop->iteration }}
 										</td>
 										<td>{{$purchase_order->vendor->name}}</td>
+										<td>{{ \Carbon\Carbon::parse($purchase_order->created_on)->format('d M Y') }}</td>
 										<td>{{$purchase_order->invoice_no}}</td>
 										<td>{{ \Carbon\Carbon::parse($purchase_order->invoice_date)->format('d M Y') }}</td>
 										<td>{{ \Carbon\Carbon::parse($purchase_order->due_date)->format('d M Y') }}</td>
