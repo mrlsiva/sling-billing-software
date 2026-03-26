@@ -99,7 +99,7 @@
             <!-- Buyer Info -->
             <tr>
                 <td colspan="2"><strong>Buyer Name:</strong> {{$order->customer->name}} </td>
-                <td colspan="2"><strong>GST:</strong> @if($order->customer->gst != null) {{$order->customer->gst}} @else - @endif </td>
+                @if($order->customer->gst != null)<td colspan="2"><strong>GST:</strong> @if($order->customer->gst != null) {{$order->customer->gst}} @else - @endif </td>@endif
                 <td colspan="2"><strong>Mobile No:</strong> {{$order->customer->phone}} </td>
                 <td colspan="2"><strong>Inv. No:</strong> {{$order->bill_id}} </td>
                 <td colspan="2">

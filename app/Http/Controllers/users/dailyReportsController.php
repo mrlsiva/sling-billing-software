@@ -10,8 +10,10 @@ use App\Models\VendorPaymentDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\DailyReportExport;
 use Illuminate\Http\Request;
-use App\Models\PurchaseOrder;
+use App\Models\OrderPaymentDetail;
+use App\Models\ProductHistory;
 use App\Models\VendorPayment;
+use App\Models\PurchaseOrder;
 use App\Models\Order;
 use App\Models\User;
 use App\Traits\Log;
@@ -64,11 +66,71 @@ class dailyReportsController extends Controller
         $orderQuery->whereDate('billed_on', $date);
 
         $orders = $orderQuery
-            ->with(['branch','shop','customer','billedBy'])
+            ->with(['branch','shop','customer','billedBy','payments.payment'])
             ->orderByDesc('id')
             ->paginate(10);
 
         $totalSales = $orders->sum('bill_amount');
+
+        $orderIds = $orders->pluck('id');
+
+        $paymentSummary = OrderPaymentDetail::select(
+                'payment_id',
+                DB::raw('SUM(amount) as total_amount')
+            )
+            ->whereIn('order_id', $orderIds)
+            ->groupBy('payment_id')
+            ->get();
+
+        /*
+        |--------------------------------------------------
+        | Product History (IN / OUT)
+        |--------------------------------------------------
+        */
+
+        $productInAmount = 0;
+        $productOutAmount = 0;
+
+        if ($branch == 0) 
+        {
+
+            $productIn = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('to', Auth::user()->owner_id)
+                ->get();
+
+            $productOut = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('from', Auth::user()->owner_id)
+                ->get();
+
+        } else 
+        {
+
+            $productIn = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('to', $branch)
+                ->get();
+
+            $productOut = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('from', $branch)
+                ->get();
+        }
+
+        /*
+        |--------------------------------------------------
+        | Calculate Amount (price * quantity)
+        |--------------------------------------------------
+        */
+
+        $productInAmount = $productIn->sum(function ($item) {
+            return ($item->product->price ?? 0) * $item->quantity;
+        });
+
+        $productOutAmount = $productOut->sum(function ($item) {
+            return ($item->product->price ?? 0) * $item->quantity;
+        });
 
         /*
         |--------------------------------------------------
@@ -115,7 +177,12 @@ class dailyReportsController extends Controller
             'totalVendorPaid',
             'totalRefund',
             'profit',
-            'branch'
+            'branch',
+            'productIn',
+            'productOut',
+            'productInAmount',
+            'productOutAmount',
+            'paymentSummary',
         ));
     }
 

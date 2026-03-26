@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\BranchDailyReportExport;
+use App\Models\ProductHistory;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\User;
@@ -20,22 +21,69 @@ class dailyReportController extends Controller
 
     public function daily(Request $request, $company)
     {
-
         $date = $request->date ?? Carbon::today()->toDateString();
 
-        $orderQuery = Order::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id);
+        /*
+        |--------------------------------------------------
+        | Orders
+        |--------------------------------------------------
+        */
 
-        $orderQuery->whereDate('billed_on', $date);
+        $orderQuery = Order::where('shop_id', Auth::user()->parent_id)
+            ->where('branch_id', Auth::user()->id)
+            ->whereDate('billed_on', $date);
+
+        // ✅ Correct total (before pagination)
+        $totalSales = $orderQuery->sum('bill_amount');
 
         $orders = $orderQuery
-            ->with(['branch','shop','customer','billedBy'])
+            ->with([
+                'branch',
+                'shop',
+                'customer',
+                'billedBy',
+                'payments.payment' // ✅ IMPORTANT for mode of payment
+            ])
             ->orderByDesc('id')
             ->paginate(10);
 
-        $totalSales = $orders->sum('bill_amount');
+        /*
+        |--------------------------------------------------
+        | Product History (IN / OUT)
+        |--------------------------------------------------
+        */
+
+        $productIn = ProductHistory::with('product')
+            ->whereDate('transfer_on', $date)
+            ->where('to', Auth::user()->id)
+            ->get();
+
+        $productOut = ProductHistory::with('product')
+            ->whereDate('transfer_on', $date)
+            ->where('from', Auth::user()->id)
+            ->get();
+
+        /*
+        |--------------------------------------------------
+        | Calculate Amount (price * quantity)
+        |--------------------------------------------------
+        */
+
+        $productInAmount = $productIn->sum(function ($item) {
+            return ($item->product->price ?? 0) * $item->quantity;
+        });
+
+        $productOutAmount = $productOut->sum(function ($item) {
+            return ($item->product->price ?? 0) * $item->quantity;
+        });
 
         return view('branches.reports.daily', compact(
-            'orders','totalSales'
+            'orders',
+            'totalSales',
+            'productIn',
+            'productOut',
+            'productInAmount',
+            'productOutAmount'
         ));
     }
 
