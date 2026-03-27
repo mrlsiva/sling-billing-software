@@ -7,11 +7,16 @@ use Maatwebsite\Excel\Concerns\FromView;
 
 class BranchDailyReportExport implements FromView
 {
-    protected $orders;
+    protected $orders, $productIn, $productOut;
+    protected $productInAmount, $productOutAmount;
 
-    public function __construct($orders)
+    public function __construct($orders,$productIn,$productOut,$productInAmount,$productOutAmount)
     {
         $this->orders = $orders;
+        $this->productIn = $productIn;
+        $this->productOut = $productOut;
+        $this->productInAmount = $productInAmount;
+        $this->productOutAmount = $productOutAmount;
     }
 
     public function view(): View
@@ -21,6 +26,10 @@ class BranchDailyReportExport implements FromView
         return view('branches.exports.daily_report',[
             'orders'=>$this->orders,
             'totalSales'=>$totalSales,
+            'productIn'=>$this->productIn,
+            'productOut'=>$this->productOut,
+            'productInAmount'=>$this->productInAmount,
+            'productOutAmount'=>$this->productOutAmount,
         ]);
     }
 }

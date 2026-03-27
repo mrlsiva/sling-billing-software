@@ -29,4 +29,9 @@ class Order extends Model
     {
         return $this->belongsTo('App\Models\Staff','billed_by');
     }
+
+    public function payments()
+    {
+        return $this->hasMany(OrderPaymentDetail::class, 'order_id');
+    }
 }

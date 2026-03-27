@@ -4,29 +4,35 @@
     </tr>
 
     <tr>
-        <td>Total Sales</td>
+        <td>Today Sales</td>
         <td>{{ number_format($totalSales,2) }}</td>
+    </tr>
+
+    <tr>
+        <td>Product In</td>
+        <td>{{ number_format($productInAmount,2) }}</td>
+    </tr>
+
+
+    <tr>
+        <td>Product Out</td>
+        <td>{{ number_format($productOutAmount,2) }}</td>
     </tr>
 
     @if(request()->route('branch') == 0)
     <tr>
-        <td>Total Purchase</td>
+        <td>Today Purchase</td>
         <td>{{ number_format($totalPurchase,2) }}</td>
     </tr>
 
     <tr>
-        <td>Vendor Paid</td>
+        <td>Today Vendor Payment</td>
         <td>{{ number_format($totalVendorPaid,2) }}</td>
     </tr>
 
     <tr>
-        <td>Total Refund</td>
+        <td>Today Vendor Refund Amount</td>
         <td>{{ number_format($totalRefund,2) }}</td>
-    </tr>
-
-    <tr>
-        <td><b>Profit</b></td>
-        <td><b>{{ number_format($profit,2) }}</b></td>
     </tr>
     @endif
 
@@ -145,6 +151,57 @@
 
 @endif
 
+<h5>Product IN</h5>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($productIn as $item)
+        @php
+            $price = $item->product->price ?? 0;
+            $amount = $price * $item->quantity;
+        @endphp
+        <tr>
+            <td>{{ $item->product->name ?? '-' }}</td>
+            <td>{{ $item->quantity }}</td>
+            <td>{{ $price }}</td>
+            <td>{{ $amount }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+
+<h5>Product OUT</h5>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($productOut as $item)
+        @php
+            $price = $item->product->price ?? 0;
+            $amount = $price * $item->quantity;
+        @endphp
+        <tr>
+            <td>{{ $item->product->name ?? '-' }}</td>
+            <td>{{ $item->quantity }}</td>
+            <td>{{ $price }}</td>
+            <td>{{ $amount }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
 
 <table>
     <thead>
@@ -159,6 +216,7 @@
             <th>Amount</th>
             <th>Billed On</th>
             <th>Billed By</th>
+            <th>Payment Mode</th>
             <th>Customer</th>
         </tr>
     </thead>
@@ -178,6 +236,16 @@
             <td>{{ $order->bill_amount }}</td>
             <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}</td>
             <td>{{ $order->billedBy->name }}</td>
+            <td>
+                @if($order->payments->count())
+                    @foreach($order->payments as $pay)
+                        {{ $pay->payment->name ?? '-' }} 
+                        (₹{{ $pay->amount }})<br>
+                    @endforeach
+                @else
+                    -
+                @endif
+            </td>
             <td>{{ $order->customer->phone }} ({{ $order->customer->name }})</td>
         </tr>
         @endforeach

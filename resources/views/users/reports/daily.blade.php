@@ -76,10 +76,34 @@
 						<div class="row mb-3">
 
 						    <div class="col-md-3">
+							    <div class="card border shadow-sm">
+							        <div class="card-body text-center">
+							            <h6 class="text-muted">
+							                Today Sales
+							                <i class="ri-eye-fill text-primary me-2"
+							                   style="cursor:pointer;"
+							                   data-bs-toggle="modal"
+							                   data-bs-target="#salesModal"></i>
+							            </h6>
+							            <h4 class="text-success">₹ {{ number_format($totalSales,2) }}</h4>
+							        </div>
+							    </div>
+							</div>
+
+						    <div class="col-md-3">
 						        <div class="card border shadow-sm">
 						            <div class="card-body text-center">
-						                <h6 class="text-muted">Total Sales</h6>
-						                <h4 class="text-success">₹ {{ number_format($totalSales,2) }}</h4>
+						                <h6 class="text-muted">Product In</h6>
+						                <h4 class="text-success">₹ {{ number_format($productInAmount, 2) }} </h4>
+						            </div>
+						        </div>
+						    </div>
+
+						    <div class="col-md-3">
+						        <div class="card border shadow-sm">
+						            <div class="card-body text-center">
+						                <h6 class="text-muted">Product Out</h6>
+						                <h4 class="text-danger">₹ {{ number_format($productOutAmount, 2) }} </h4>
 						            </div>
 						        </div>
 						    </div>
@@ -89,7 +113,7 @@
 						    <div class="col-md-3">
 						        <div class="card border shadow-sm">
 						            <div class="card-body text-center">
-						                <h6 class="text-muted">Total Purchase</h6>
+						                <h6 class="text-muted">Today Purchase</h6>
 						                <h4 class="text-primary">₹ {{ number_format($totalPurchase,2) }}</h4>
 						            </div>
 						        </div>
@@ -98,7 +122,7 @@
 						    <div class="col-md-3">
 						        <div class="card border shadow-sm">
 						            <div class="card-body text-center">
-						                <h6 class="text-muted">Vendor Paid</h6>
+						                <h6 class="text-muted">Today Vendor Payment</h6>
 						                <h4 class="text-warning">₹ {{ number_format($totalVendorPaid,2) }}</h4>
 						            </div>
 						        </div>
@@ -107,24 +131,13 @@
 						    <div class="col-md-3">
 							    <div class="card border shadow-sm">
 							        <div class="card-body text-center">
-							            <h6 class="text-muted">Refund Amount</h6>
+							            <h6 class="text-muted">Today Vendor Refund Amount</h6>
 							            <h4 class="text-danger">
 							                ₹ {{ number_format($totalRefund,2) }}
 							            </h4>
 							        </div>
 							    </div>
 							</div>
-
-						    <div class="col-md-3">
-						        <div class="card border shadow-sm">
-						            <div class="card-body text-center">
-						                <h6 class="text-muted">Profit</h6>
-						                <h4 class="{{ $profit >= 0 ? 'text-success' : 'text-danger' }}">
-						                    ₹ {{ number_format($profit,2) }}
-						                </h4>
-						            </div>
-						        </div>
-						    </div>
 
 						    @endif
 
@@ -302,6 +315,7 @@
 										<th>Amount (In ₹)</th>
 										<th>Billed On</th>
 										<th>Billed By</th>
+										<th>Mode Of Payment</th>
 										<th>Customer</th>
                                     </tr>
                                 </thead> 
@@ -331,6 +345,16 @@
 											{{ $order->billedBy->name }}
 										</td>
 										<td>
+										    @forelse($order->payments as $payment)
+										        <span class="badge bg-primary">
+										            {{ $payment->payment->name ?? 'N/A' }} 
+										            ₹ {{ number_format($payment->amount, 2) }}
+										        </span><br>
+										    @empty
+										        -
+										    @endforelse
+										</td>
+										<td>
 											{{ $order->customer->phone }} ({{ $order->customer->name }})
 										</td>
 									</tr>
@@ -342,9 +366,114 @@
                             @endif
                         </div>
 
+                        <h5 class="mt-4">Product In</h5>
+
+						<div class="table-responsive">
+						    <table class="table table-bordered table-hover">
+						        <thead class="table-light">
+						            <tr>
+						                <th>S.No</th>
+						                <th>Product</th>
+						                <th>Quantity</th>
+						                <th>Amount (In ₹)</th>
+						            </tr>
+						        </thead> 
+						        <tbody>
+						            @foreach($productIn as $index => $product_in)
+						                @php
+						                    $price = $product_in->product->price ?? 0;
+						                    $amount = $price * $product_in->quantity;
+						                @endphp
+						                <tr>
+						                    <td>{{ $index + 1 }}</td>
+						                    <td>{{ $product_in->product->name ?? '-' }}</td>
+						                    <td>{{ $product_in->quantity }}</td>
+						                    <td>₹ {{ number_format($amount, 2) }}</td>
+						                </tr>
+						            @endforeach
+						        </tbody>
+						    </table>
+						    @if($productIn->isEmpty())
+						        @include('no-data')
+						    @endif
+						</div>
+
+						<h5 class="mt-4">Product Out</h5>
+
+						<div class="table-responsive">
+						    <table class="table table-bordered table-hover">
+						        <thead class="table-light">
+						            <tr>
+						                <th>S.No</th>
+						                <th>Product</th>
+						                <th>Quantity</th>
+						                <th>Amount (In ₹)</th>
+						            </tr>
+						        </thead> 
+						        <tbody>
+						            @foreach($productOut as $index => $product_out)
+						                @php
+						                    $price = $product_out->product->price ?? 0;
+						                    $amount = $price * $product_out->quantity;
+						                @endphp
+						                <tr>
+						                    <td>{{ $index + 1 }}</td>
+						                    <td>{{ $product_out->product->name ?? '-' }}</td>
+						                    <td>{{ $product_out->quantity }}</td>
+						                    <td>₹ {{ number_format($amount, 2) }}</td>
+						                </tr>
+						            @endforeach
+						        </tbody>
+						    </table>
+						    @if($productOut->isEmpty())
+						        @include('no-data')
+						    @endif
+						</div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="salesModal" tabindex="-1">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Mode Summary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Payment Mode</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($paymentSummary as $index => $payment)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>
+                                    {{ $payment->payment->name ?? 'N/A' }}
+                                </td>
+                                <td>
+                                    ₹ {{ number_format($payment->total_amount, 2) }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center">No Data</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 </div>
