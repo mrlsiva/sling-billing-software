@@ -87,7 +87,7 @@ class SMTPController extends Controller
 
     public static function sendMail($emailId,$cc=null,$subject,$txt=null,$attachment=null) {
 
-        $user = User::where('email',$emailId)->first();
+        //$user = User::where('email',$emailId)->first();
         $now = Carbon::now();
         
         Mail::send([], [], function($message) use ($emailId,$cc,$subject,$txt,$attachment){

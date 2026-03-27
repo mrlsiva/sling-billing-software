@@ -54,8 +54,8 @@
 				            <div class="card-body text-center">
 				                <i class="ri-shopping-bag-4-line text-success fs-1"></i>
 				                <h5 class="mt-3">Purchase Report</h5>
-				                <p class="text-muted">Track purchse movements</p>
-				                <a href="#" class="btn btn-success btn-sm">View Report</a>
+				                <p class="text-muted">Track purchase movements</p>
+				                <a href="{{route('report.purchase', ['company' => request()->route('company')])}}" class="btn btn-success btn-sm">View Report</a>
 				            </div>
 				        </div>
 				    </div>
@@ -64,9 +64,20 @@
 				        <div class="card border shadow-sm">
 				            <div class="card-body text-center">
 				                <i class="ri-money-rupee-circle-line text-warning fs-1"></i>
-				                <h5 class="mt-3">GP Report</h5>
-				                <p class="text-muted">GP Report</p>
-				                <a href="#" class="btn btn-warning btn-sm">View Report</a>
+				                <h5 class="mt-3">Sales Report</h5>
+				                <p class="text-muted">Track your sales</p>
+				                <a href="{{route('report.sales', ['company' => request()->route('company'),'branch' => 0])}}" class="btn btn-warning btn-sm">View Report</a>
+				            </div>
+				        </div>
+				    </div>
+
+				    <div class="col-xl-3 col-md-6">
+				        <div class="card border shadow-sm">
+				            <div class="card-body text-center">
+				                <i class="ri-money-rupee-circle-line text-warning fs-1"></i>
+				                <h5 class="mt-3">Transfer Report</h5>
+				                <p class="text-muted">Track your product movements</p>
+				                <a href="{{route('report.transfer', ['company' => request()->route('company'),'branch' => 0])}}" class="btn btn-warning btn-sm">View Report</a>
 				            </div>
 				        </div>
 				    </div>

@@ -35,6 +35,9 @@ use App\Http\Controllers\users\colourController;
 use App\Http\Controllers\users\gstBillingController;
 use App\Http\Controllers\users\reportController;
 use App\Http\Controllers\users\dailyReportsController;
+use App\Http\Controllers\users\purchaseReportController;
+use App\Http\Controllers\users\productTransferReportController;
+use App\Http\Controllers\users\salesReportController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -368,6 +371,34 @@ else
                                     Route::get('/{branch}/download/excel',[dailyReportsController::class, 'download_excel'])->name('.download_excel');
                                 });
                             });
+
+                            Route::prefix('purchase')->group(function () {
+                                Route::name('.purchase')->group(function () {
+
+                                    Route::get('/',[purchaseReportController::class, 'purchase']);
+                                    Route::get('/download/pdf',[purchaseReportController::class, 'download_pdf'])->name('.download_pdf');
+                                    Route::get('/download/excel',[purchaseReportController::class, 'download_excel'])->name('.download_excel');
+                                });
+                            });
+
+                            Route::prefix('transfer')->group(function () {
+                                Route::name('.transfer')->group(function () {
+
+                                    Route::get('/{branch}',[productTransferReportController::class, 'transfer']);
+                                    Route::get('/{branch}/download/pdf',[productTransferReportController::class, 'download_pdf'])->name('.download_pdf');
+                                    Route::get('/{branch}/download/excel',[productTransferReportController::class, 'download_excel'])->name('.download_excel');
+                                });
+                            });
+
+                            Route::prefix('sales')->group(function () {
+                                Route::name('.sales')->group(function () {
+
+                                    Route::get('/{branch}',[salesReportController::class, 'sales']);
+                                    Route::get('/{branch}/download/pdf',[salesReportController::class, 'download_pdf'])->name('.download_pdf');
+                                    Route::get('/{branch}/download/excel',[salesReportController::class, 'download_excel'])->name('.download_excel');
+                                });
+                            });
+
                         });
                     });
 
@@ -502,6 +533,8 @@ else
                                             Route::get('/download/excel',[dailyReportController::class, 'download_excel'])->name('.download_excel');
                                         });
                                     });
+
+                                    
 
                                 });
                             });
