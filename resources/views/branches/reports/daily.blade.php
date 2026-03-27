@@ -58,7 +58,7 @@
                         <div class="card border shadow-sm">
                             <div class="card-body text-center">
                                 <h6 class="text-muted">
-                                    Total Sales
+                                    Today Sales
                                     <i class="ri-eye-fill text-primary me-2"
                                        style="cursor:pointer;"
                                        data-bs-toggle="modal"

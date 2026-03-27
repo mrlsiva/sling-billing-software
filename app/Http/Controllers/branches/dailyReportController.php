@@ -91,15 +91,38 @@ class dailyReportController extends Controller
     {
         $date = $request->date ?? Carbon::today()->toDateString();
 
-        $orderQuery = Order::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id);
-
-        $orders = $orderQuery
+        $orders = Order::where('shop_id', Auth::user()->parent_id)
+            ->where('branch_id', Auth::user()->id)
             ->whereDate('billed_on', $date)
-            ->with(['branch','customer','billedBy'])
+            ->with(['branch','customer','billedBy','payments.payment','shop'])
             ->get();
 
+        /*
+        |----------------------------------------
+        | Product IN / OUT
+        |----------------------------------------
+        */
+        $productIn = ProductHistory::with('product')
+            ->whereDate('transfer_on', $date)
+            ->where('to', Auth::user()->id)
+            ->get();
+
+        $productOut = ProductHistory::with('product')
+            ->whereDate('transfer_on', $date)
+            ->where('from', Auth::user()->id)
+            ->get();
+
+        $productInAmount = $productIn->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
+        $productOutAmount = $productOut->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
+
         return Excel::download(
-            new BranchDailyReportExport($orders),
+            new BranchDailyReportExport(
+                $orders,
+                $productIn,
+                $productOut,
+                $productInAmount,
+                $productOutAmount
+            ),
             'daily_report.xlsx'
         );
     }
@@ -108,20 +131,34 @@ class dailyReportController extends Controller
     {
         $date = $request->date ?? Carbon::today()->toDateString();
 
-        $orderQuery = Order::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id);
-
-        $orders = $orderQuery
+        $orders = Order::where('shop_id', Auth::user()->parent_id)
+            ->where('branch_id', Auth::user()->id)
             ->whereDate('billed_on', $date)
-            ->with(['branch','customer','billedBy'])
+            ->with(['branch','customer','billedBy','payments.payment','shop'])
             ->get();
 
         $totalSales = $orders->sum('bill_amount');
 
+        $productIn = ProductHistory::with('product')
+            ->whereDate('transfer_on', $date)
+            ->where('to', Auth::user()->id)
+            ->get();
 
-        $user = Auth::user();
+        $productOut = ProductHistory::with('product')
+            ->whereDate('transfer_on', $date)
+            ->where('from', Auth::user()->id)
+            ->get();
+
+        $productInAmount = $productIn->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
+        $productOutAmount = $productOut->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
 
         $pdf = Pdf::loadView('branches.exports.daily_report_pdf', compact(
-            'orders','totalSales'
+            'orders',
+            'totalSales',
+            'productIn',
+            'productOut',
+            'productInAmount',
+            'productOutAmount'
         ))->setPaper('a4','landscape');
 
         return $pdf->download('daily_report.pdf');

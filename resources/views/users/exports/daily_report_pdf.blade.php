@@ -50,22 +50,24 @@
         <table class="summary">
 
             <tr>
-                <th>Total Sales</th>
+                <th>Today Sales</th>
+                <th>Product In</th>
+                <th>Product Out</th>
                 @if(request()->route('branch') == 0)
-                <th>Total Purchase</th>
-                <th>Vendor Paid</th>
-                <th>Total Refund</th>
-                <th>Profit</th>
+                <th>Today Purchase</th>
+                <th>Today Vendor Payment</th>
+                <th>Today Vendor Refund Amount</th>
                 @endif
             </tr>
 
             <tr>
                 <td>₹ {{ number_format($totalSales,2) }}</td>
+                <td>₹ {{ number_format($productInAmount,2) }}</td>
+                <td>₹ {{ number_format($productOutAmount,2) }}</td>
                 @if(request()->route('branch') == 0)
                 <td>₹ {{ number_format($totalPurchase,2) }}</td>
                 <td>₹ {{ number_format($totalVendorPaid,2) }}</td>
                 <td>₹ {{ number_format($totalRefund,2) }}</td>
-                <td><b>₹ {{ number_format($profit,2) }}</b></td>
                 @endif
             </tr>
 
@@ -169,7 +171,7 @@
         <table>
 
             <tr class="section">
-                <th colspan="7">Order Report</th>
+                <th colspan="8">Order Report</th>
             </tr>
 
             <tr>
@@ -180,26 +182,103 @@
                 <th>Billed On</th>
                 <th>Billed By</th>
                 <th>Customer</th>
+                <th>Payment Mode</th>
             </tr>
 
             @foreach($orders as $order)
             <tr>
                 <td>{{ $loop->iteration }}</td>
+
                 <td>
                     @if($order->branch_id)
-                    {{ $order->branch->user_name }}
+                        {{ $order->branch->user_name }}
                     @else
-                    {{ $order->shop->user_name }}
+                        {{ $order->shop->user_name }}
                     @endif
                 </td>
+
                 <td>{{ $order->bill_id }}</td>
                 <td>{{ $order->bill_amount }}</td>
                 <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}</td>
                 <td>{{ $order->billedBy->name }}</td>
                 <td>{{ $order->customer->phone }} ({{ $order->customer->name }})</td>
+
+                <td>
+                    @if($order->payments->count())
+                        @foreach($order->payments as $pay)
+                            {{ $pay->payment->name ?? '-' }} 
+                            (₹{{ number_format($pay->amount,2) }})<br>
+                        @endforeach
+                    @else
+                        -
+                    @endif
+                </td>
             </tr>
             @endforeach
 
+        </table>
+
+
+        <table>
+            <tr class="section">
+                <th colspan="4">Product IN</th>
+            </tr>
+
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Amount</th>
+            </tr>
+
+            @foreach($productIn as $item)
+            @php
+                $price = $item->product->price ?? 0;
+                $amount = $price * $item->quantity;
+            @endphp
+            <tr>
+                <td>{{ $item->product->name ?? '-' }}</td>
+                <td>{{ $item->quantity }}</td>
+                <td>{{ number_format($price,2) }}</td>
+                <td>{{ number_format($amount,2) }}</td>
+            </tr>
+            @endforeach
+
+            <tr>
+                <td colspan="3"><b>Total</b></td>
+                <td><b>₹ {{ number_format($productInAmount,2) }}</b></td>
+            </tr>
+        </table>
+
+        <table>
+            <tr class="section">
+                <th colspan="4">Product OUT</th>
+            </tr>
+
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Amount</th>
+            </tr>
+
+            @foreach($productOut as $item)
+            @php
+                $price = $item->product->price ?? 0;
+                $amount = $price * $item->quantity;
+            @endphp
+            <tr>
+                <td>{{ $item->product->name ?? '-' }}</td>
+                <td>{{ $item->quantity }}</td>
+                <td>{{ number_format($price,2) }}</td>
+                <td>{{ number_format($amount,2) }}</td>
+            </tr>
+            @endforeach
+
+            <tr>
+                <td colspan="3"><b>Total</b></td>
+                <td><b>₹ {{ number_format($productOutAmount,2) }}</b></td>
+            </tr>
         </table>
 
 

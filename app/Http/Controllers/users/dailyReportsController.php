@@ -190,12 +190,6 @@ class dailyReportsController extends Controller
     {
         $date = $request->date ?? Carbon::today()->toDateString();
 
-        /*
-        |----------------------------------------
-        | Default Values (for branch)
-        |----------------------------------------
-        */
-
         $purchases = collect();
         $payments = collect();
         $refunds = collect();
@@ -214,12 +208,65 @@ class dailyReportsController extends Controller
 
         $orders = $orderQuery
             ->whereDate('billed_on', $date)
-            ->with(['branch','customer','billedBy'])
+            ->with(['branch','customer','billedBy','payments.payment'])
+            ->get();
+
+        $orderIds = $orders->pluck('id');
+
+        /*
+        |----------------------------------------
+        | Payment Summary (Mode of Payment)
+        |----------------------------------------
+        */
+
+        $paymentSummary = OrderPaymentDetail::select(
+                'payment_id',
+                DB::raw('SUM(amount) as total_amount')
+            )
+            ->whereIn('order_id', $orderIds)
+            ->groupBy('payment_id')
+            ->with('payment')
             ->get();
 
         /*
         |----------------------------------------
-        | HO Only Data
+        | Product IN / OUT
+        |----------------------------------------
+        */
+
+        if ($branch == 0) {
+            $productIn = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('to', Auth::user()->owner_id)
+                ->get();
+
+            $productOut = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('from', Auth::user()->owner_id)
+                ->get();
+        } else {
+            $productIn = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('to', $branch)
+                ->get();
+
+            $productOut = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('from', $branch)
+                ->get();
+        }
+
+        $productInAmount = $productIn->sum(function ($item) {
+            return ($item->product->price ?? 0) * $item->quantity;
+        });
+
+        $productOutAmount = $productOut->sum(function ($item) {
+            return ($item->product->price ?? 0) * $item->quantity;
+        });
+
+        /*
+        |----------------------------------------
+        | HO Data
         |----------------------------------------
         */
 
@@ -247,7 +294,17 @@ class dailyReportsController extends Controller
         }
 
         return Excel::download(
-            new DailyReportExport($orders, $purchases, $payments, $refunds),
+            new DailyReportExport(
+                $orders,
+                $purchases,
+                $payments,
+                $refunds,
+                $productIn,
+                $productOut,
+                $productInAmount,
+                $productOutAmount,
+                $paymentSummary
+            ),
             'daily_report.xlsx'
         );
     }
@@ -284,11 +341,57 @@ class dailyReportsController extends Controller
         }
 
         $orders = $orderQuery
-            ->whereDate('billed_on', $date)
-            ->with(['branch','customer','billedBy'])
-            ->get();
+        ->whereDate('billed_on', $date)
+        ->with(['branch','customer','billedBy','payments.payment','shop'])
+        ->get();
 
         $totalSales = $orders->sum('bill_amount');
+
+        $orderIds = $orders->pluck('id');
+
+        /*
+        |----------------------------------------
+        | Payment Summary (optional if needed)
+        |----------------------------------------
+        */
+        $paymentSummary = OrderPaymentDetail::select(
+                'payment_id',
+                DB::raw('SUM(amount) as total_amount')
+            )
+            ->whereIn('order_id', $orderIds)
+            ->groupBy('payment_id')
+            ->with('payment')
+            ->get();
+
+        /*
+        |----------------------------------------
+        | Product IN / OUT
+        |----------------------------------------
+        */
+        if ($branch == 0) {
+            $productIn = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('to', Auth::user()->owner_id)
+                ->get();
+
+            $productOut = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('from', Auth::user()->owner_id)
+                ->get();
+        } else {
+            $productIn = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('to', $branch)
+                ->get();
+
+            $productOut = ProductHistory::with('product')
+                ->whereDate('transfer_on', $date)
+                ->where('from', $branch)
+                ->get();
+        }
+
+        $productInAmount = $productIn->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
+        $productOutAmount = $productOut->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
 
         /*
         |----------------------------------------
@@ -338,7 +441,11 @@ class dailyReportsController extends Controller
             'totalRefund',
             'profit',
             'user',
-            'branch'
+            'branch',
+            'productIn',
+            'productOut',
+            'productInAmount',
+            'productOutAmount'
         ))->setPaper('a4','landscape');
 
         return $pdf->download('daily_report.pdf');
