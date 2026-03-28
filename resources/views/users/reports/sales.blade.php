@@ -67,14 +67,16 @@
 
                         <div class="d-flex justify-content-end p-3 gap-2">
                             <form method="get" action="{{route('report.sales.download_excel', ['company' => request()->route('company'),'branch' => request('branch')])}}">
-                                <input type="hidden" name="date" value="{{ request('date') }}">
+                                <input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
+                                <input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
                                 <button class="btn btn-success">
                                     <i class="ri-file-excel-2-line"></i> Excel
                                 </button>
                             </form>
 
                             <form method="get" action="{{route('report.sales.download_pdf', ['company' => request()->route('company'),'branch' => request('branch')])}}">
-                                <input type="hidden" name="date" value="{{ request('date') }}">
+                                <input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
+                                <input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
                                 <button class="btn btn-success">
                                     <i class="ri-file-pdf-2-line"></i> PDF
                                 </button>
@@ -84,19 +86,57 @@
                         <div class="table-responsive">
                             <table class="table align-middle mb-0 table-hover table-centered">
                                 <thead class="bg-light-subtle">
-                                    
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Date Time</th>
+                                        <th>Issued By</th>
+                                        <th>Sales By</th>
+                                        <th>Customer</th>
+                                        <th>Mobile</th>
+                                        <th>Address</th>
+                                        <th>Category</th>
+                                        <th>Subcategory</th>
+                                        <th>Item</th>
+                                        <th>Item Code</th>
+                                        <th>Qty</th>
+                                        <th>Gross (In ₹)</th>
+                                        <th>Tax (In ₹)</th>
+                                        <th>Net (In ₹)</th>
+                                    </tr>   
                                 </thead> 
                                 <tbody>
-                                   
+                                    @foreach($orders as $order)
+                                        @foreach($order->details as $detail)
+                                            <tr>
+                                                <td>{{ $order->bill_id }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y H:i') }}</td>
+                                                <td>User</td>
+                                                <td>{{ $order->billedBy->name ?? '' }}</td>
+                                                <td>{{ $order->customer->name ?? '' }}</td>
+                                                <td>{{ $order->customer->phone ?? '' }}</td>
+                                                <td>{{ $order->customer->address ?? '' }}</td>
+                                                <td>{{ $detail->product->category->name ?? '' }}</td>
+                                                <td>{{ $detail->product->sub_category->name ?? '' }}</td>
+                                                <td>{{ $detail->name }}</td>
+                                                <td>{{ $detail->product_id }}</td>
+                                                <td>{{ $detail->quantity }}</td>
+                                                <td>{{ $detail->price * $detail->quantity}}</td>
+                                                <td>{{ $detail->tax_amount * $detail->quantity }}</td>
+                                                <td>{{ ($detail->price - $detail->tax_amount) * $detail->quantity}}</td>
+                                            </tr>
+                                        @endforeach
+                                    @endforeach
                                 </tbody>
                             </table>
-                            
+                            @if($orders->isEmpty())
+                                @include('no-data')
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-footer border-0">
-				
+				{!! $orders->withQueryString()->links('pagination::bootstrap-5') !!}
 			</div>
         </div>
     </div>

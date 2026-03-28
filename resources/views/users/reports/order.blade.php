@@ -64,16 +64,21 @@
                             </div>
                         </form>
 
-                        <div class="d-flex justify-content-end p-3">
+                        <div class="d-flex justify-content-end p-3 gap-2">
                             <form method="get" action="{{route('report.order.download_excel', ['company' => request()->route('company'),'branch' => request('branch')])}}">
-                                <input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
-                                <input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
-                                <button class="btn btn-success"> <i class="ri-file-excel-2-line"></i> Excel </button>
+                                <input type="hidden" name="from" value="{{ request('from') }}">
+                                <input type="hidden" name="to" value="{{ request('to') }}">
+                                <button class="btn btn-success">
+                                    <i class="ri-file-excel-2-line"></i> Excel
+                                </button>
                             </form>
+
                             <form method="get" action="{{route('report.order.download_pdf', ['company' => request()->route('company'),'branch' => request('branch')])}}">
-                                <input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
-                                <input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
-                                <button class="btn btn-success"> <i class="ri-file-pdf-2-line"></i> PDF </button>
+                                <input type="hidden" name="from" value="{{ request('from') }}">
+                                <input type="hidden" name="to" value="{{ request('to') }}">
+                                <button class="btn btn-success">
+                                    <i class="ri-file-pdf-2-line"></i> PDF
+                                </button>
                             </form>
                         </div>
 

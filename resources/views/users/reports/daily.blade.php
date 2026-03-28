@@ -158,7 +158,7 @@
 										<th>Invoice No</th>
 										<th>Product</th>
 										<th>Quantity</th>
-										<th>Amount</th>
+										<th>Amount (In ₹)</th>
 										<th>Date</th>
 										</tr>
 									</thead>
@@ -203,7 +203,7 @@
 											<th>S.No</th>
 											<th>Vendor</th>
 											<th>Purchase Invoice</th>
-											<th>Amount</th>
+											<th>Amount (In ₹)</th>
 											<th>Paid On</th>
 											<th>Comment</th>
 										</tr>
@@ -261,7 +261,7 @@
 											<th>Invoice</th>
 											<th>Product</th>
 											<th>Quantity</th>
-											<th>Refund Amount</th>
+											<th>Refund Amount (In ₹)</th>
 											<th>Refund On</th>
 											<th>Refunded By</th>
 										</tr>
@@ -451,7 +451,7 @@
                         <tr>
                             <th>S.No</th>
                             <th>Payment Mode</th>
-                            <th>Amount</th>
+                            <th>Amount (In ₹)</th>
                         </tr>
                     </thead>
                     <tbody>

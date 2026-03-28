@@ -46,14 +46,16 @@
 
                         <div class="d-flex justify-content-end p-3 gap-2">
                             <form method="get" action="{{route('report.purchase.download_excel', ['company' => request()->route('company')])}}">
-                                <input type="hidden" name="date" value="{{ request('date') }}">
+                                <input type="hidden" name="from" value="{{ request('from') }}">
+                                <input type="hidden" name="to" value="{{ request('to') }}">
                                 <button class="btn btn-success">
                                     <i class="ri-file-excel-2-line"></i> Excel
                                 </button>
                             </form>
 
                             <form method="get" action="{{route('report.purchase.download_pdf', ['company' => request()->route('company')])}}">
-                                <input type="hidden" name="date" value="{{ request('date') }}">
+                                <input type="hidden" name="from" value="{{ request('from') }}">
+                                <input type="hidden" name="to" value="{{ request('to') }}">
                                 <button class="btn btn-success">
                                     <i class="ri-file-pdf-2-line"></i> PDF
                                 </button>
@@ -76,11 +78,11 @@
                                         <th>Item</th>
                                         <th>Item Code</th>
                                         <th class="text-end">Qty</th>
-                                        <th class="text-end">Base Rate</th>
-                                        <th class="text-end">Value</th>
-                                        <th class="text-end">GST</th>
-                                        <th class="text-end">Base Value</th>
-                                        <th class="text-end">NLC</th>
+                                        <th class="text-end">Base Rate (In ₹)</th>
+                                        <th class="text-end">Value (In ₹)</th>
+                                        <th class="text-end">GST (In ₹)</th>
+                                        <th class="text-end">Base Value (In ₹)</th>
+                                        <th class="text-end">NLC (In ₹)</th>
                                     </tr>
                                 </thead> 
                                 <tbody>
@@ -117,7 +119,7 @@
 
                                             <td class="text-end">{{ number_format($data->gross_cost, 2) }}</td>
 
-                                            <td class="text-end">{{ number_format($data->tax, 2) }}</td>
+                                            <td class="text-end">{{ number_format($data->gross_cost - $data->net_cost, 2) }}</td>
 
                                             <td class="text-end">{{ number_format($data->net_cost, 2) }}</td>
 
