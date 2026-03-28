@@ -3,14 +3,37 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class SalesReportExport implements FromCollection
+class SalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
     protected $orders;
 
     public function __construct($orders)
     {
         $this->orders = $orders;
+    }
+
+    public function headings(): array
+    {
+        return [
+            'Order ID',
+            'Date Time',
+            'Issued By',
+            'Sales By',
+            'Customer',
+            'Mobile',
+            'Address',
+            'Category',
+            'Subcategory',
+            'Item',
+            'Item Code',
+            'Qty',
+            'Gross (₹)',
+            'Tax (₹)',
+            'Net (₹)',
+        ];
     }
 
     public function collection()
@@ -20,27 +43,29 @@ class SalesReportExport implements FromCollection
         foreach ($this->orders as $order) {
             foreach ($order->details as $detail) {
 
-                $qty   = $detail->quantity;
-                $net   = ($detail->price - $detail->tax_amount) * $detail->quantity;
-                $tax   = $detail->tax_amount * $detail->quantity;
-                $gross = $detail->price * $detail->quantity;
+                $qty = $detail->quantity;
+
+                // ✅ Your current logic
+                $gross = $detail->price * $qty;
+                $tax   = $detail->tax_amount * $qty;
+                $net   = ($detail->price - $detail->tax_amount) * $qty;
 
                 $rows[] = [
-                    'Order ID' => $order->bill_id,
-                    'Date Time' => \Carbon\Carbon::parse($order->billed_on)->format('d M Y H:i'),
-                    'Issued By' => 'User',
-                    'Sales By' => optional($order->billedBy)->name,
-                    'Customer' => optional($order->customer)->name,
-                    'Mobile' => optional($order->customer)->phone,
-                    'Address' => optional($order->customer)->address,
-                    'Category' => optional($detail->product->category)->name,
-                    'Subcategory' => optional($detail->product->sub_category)->name,
-                    'Item' => $detail->name,
-                    'Item Code' => $detail->product_id,
-                    'Qty' => $qty,
-                    'Gross' => round($gross, 2),
-                    'Tax' => round($tax, 2),
-                    'Net' => round($net, 2),
+                    $order->bill_id,
+                    \Carbon\Carbon::parse($order->billed_on)->format('d M Y H:i'),
+                    'User',
+                    optional($order->billedBy)->name,
+                    optional($order->customer)->name,
+                    optional($order->customer)->phone,
+                    optional($order->customer)->address,
+                    optional($detail->product->category)->name,
+                    optional($detail->product->sub_category)->name,
+                    $detail->name,
+                    $detail->product_id,
+                    $qty,
+                    round($gross, 2),
+                    round($tax, 2),
+                    round($net, 2),
                 ];
             }
         }

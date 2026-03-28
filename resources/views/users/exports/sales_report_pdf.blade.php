@@ -62,9 +62,9 @@
                     <th>Item</th>
                     <th>Item Code</th>
                     <th>Qty</th>
-                    <th>Gross</th>
-                    <th>Tax</th>
-                    <th>Net</th>
+                    <th>Gross (In ₹)</th>
+                    <th>Tax (In ₹)</th>
+                    <th>Net (In ₹)</th>
                 </tr>
             </thead>
 
