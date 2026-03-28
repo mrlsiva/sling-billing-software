@@ -215,7 +215,7 @@ class billingController extends Controller
             'base_price'    => (float) $product->price,
             'price'         => (float) $product->price,
             'tax_amount'    => (float) $product->tax_amount,
-            'tax'           => $product->tax->name
+            'tax'           => $product->tax->name ?? '0'
         ]);
     }
 
@@ -385,7 +385,7 @@ class billingController extends Controller
                 'price'         => $item['price'],
                 'selling_price' => $item['price'],
                 'tax_amount'    => $item['tax_amount'],
-                'tax_percent'   => $product->tax->name,
+                'tax_percent'   => $product->tax->name ?? '0',
                 'discount_type' => $product->discount_type,
                 'discount'      => $product->discount,
                 'imei'          => !empty($item['imeis']) ? implode(',', $item['imeis']) : null,

@@ -62,6 +62,12 @@ Route::get('/clear', function() {
     return "Cleared!!!";
 });
 
+Route::get('/brochure/download', function () {
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('brochure')
+        ->setPaper('a4', 'portrait');
+    return $pdf->download('Sling-Billing-Software-Brochure.pdf');
+})->name('brochure.download');
+
 //Version
 Route::get('version_update',[versionController::class, 'update'])->name('update');
 

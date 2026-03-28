@@ -88,7 +88,7 @@
                                                     {{$stock->product->name}}
                                                 </a>
                                             </td>
-											<td>{{$stock->product->metric->name}}</td>
+											<td>{{$stock->product->metric->name ?? '-'}}</td>
 											<td>{{$stock->product->price}}</td>
 											<td>{{$stock->quantity}}</td>
 											<td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>

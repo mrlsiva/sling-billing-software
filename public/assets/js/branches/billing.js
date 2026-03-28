@@ -270,7 +270,7 @@ function add_to_cart(element) {
 
                         <div class="d-flex align-items-center justify-content-between px-1">
                             <div>
-                                <p class="text-dark fw-semibold fs-16 mb-0">₹${data.price} <span class="fs-10">(${data.tax.name}%)</span></p>
+                                <p class="text-dark fw-semibold fs-16 mb-0">₹${data.price} <span class="fs-10">(${data.tax ? data.tax.name : '0'}%)</span></p>
                             </div>
                             <div class="d-flex align-content-center gap-1">
                                 ${hasImei ?
