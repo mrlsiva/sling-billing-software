@@ -33,7 +33,7 @@ class productTransferReportController extends Controller
             'category',
             'sub_category',
             'product'
-        ]);
+        ])->where('shop_id', Auth::user()->owner_id);
 
         // Branch filter
         if ($branch && $branch != 0) {

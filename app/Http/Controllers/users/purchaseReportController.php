@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
 use App\Traits\Log;
@@ -15,7 +16,7 @@ class purchaseReportController extends Controller
 
     public function purchase(Request $request)
     {
-        $query = PurchaseOrder::query()
+        $query = PurchaseOrder::query()->where('shop_id',Auth::user()->owner_id)
             ->with(['vendor', 'category', 'sub_category', 'product']);
 
         // Date filters
