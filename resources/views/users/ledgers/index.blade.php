@@ -22,10 +22,19 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
-                    <a href="{{route('vendor.index', ['company' => request()->route('company')])}}" class="btn btn-sm"> <i class="bx bx-arrow-back me-1"></i></a>
+                    <a href="{{route('vendor.index', ['company' => request()->route('company')])}}" class="btn btn-sm">
+                        <i class="bx bx-arrow-back me-1"></i>
+                    </a>
                     <p class="card-title mb-0">{{$vendor->name}}</p>
                 </div>
-                <a data-bs-toggle="modal" data-bs-target="#paymentAdd" class="btn btn-sm btn-success"> <i class="bx bx-plus me-1"></i>New Entry </a>
+                <div class="d-flex align-items-center gap-2">
+                    <a data-bs-toggle="modal" data-bs-target="#paymentAdd" class="btn btn-sm btn-success">
+                        <i class="bx bx-plus me-1"></i> New Entry
+                    </a>
+                    <a data-bs-toggle="modal" data-bs-target="#overDue" class="btn btn-sm btn-warning">
+                        <i class="bx bx-plus me-1"></i> Over Due
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -57,7 +66,9 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-3">
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-3">
+    <div class="col">
         <div class="card">
             <div class="card-body ">
                 <div class="d-flex align-items-center gap-3">
@@ -77,7 +88,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-3">
+    <div class="col">
         <div class="card">
             <div class="card-body ">
                 <div class="d-flex align-items-center gap-3">
@@ -98,7 +109,7 @@
         </div>
     </div>
 
-    <div class="col-md-6 col-xl-3">
+    <div class="col">
         <div class="card">
             <div class="card-body ">
                 <div class="d-flex align-items-center gap-3">
@@ -119,7 +130,7 @@
         </div>
     </div>
 
-    <div class="col-md-6 col-xl-3">
+    <div class="col">
         <div class="card">
             <div class="card-body ">
                 <div class="d-flex align-items-center gap-3">
@@ -139,6 +150,29 @@
             </div>
         </div>
     </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-body ">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="assets/images/food-icon/sup-4.png" alt="" class="img-fluid">
+                    <div>
+                        <p class="text-dark fw-semibold fs-26 mb-1" >
+                            Rs. {{ number_format($over_due, 2) }}
+                        </p>
+                        <p class="card-title mb-0">Over Due Amount</p>
+                    </div>
+                    <!-- <div class="ms-auto">
+                        <a href="#!" class="btn btn-primary avatar-sm rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="ri-eye-line align-middle fs-16 text-white"></i>
+                        </a>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
 </div>
 <div class="row">
     <div class="col">
@@ -488,6 +522,37 @@
                         </div>
                     </div>
 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="overDue" tabindex="-1" aria-labelledby="overDue" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Over Due</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form class="row" action="{{route('vendor.over_due.store', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data" id="overDueStore">
+                @csrf
+                <div class="modal-body">
+
+                    <input type="hidden" name="vendor_id" value="{{$vendor->id}}">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Over Due Amount</label>
+                                <input type="number" id="amount" name="amount" class="form-control" required="">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

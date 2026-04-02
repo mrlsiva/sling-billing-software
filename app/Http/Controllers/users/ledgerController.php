@@ -11,8 +11,11 @@ use App\Models\PurchaseOrderRefund;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use App\Models\ShopPayment;
+use App\Models\VendorOverDue;
+use App\Models\VendorOverDuePayment;
 use App\Models\Vendor;
 use App\Models\Payment;
+use DB;
 
 
 class ledgerController extends Controller
@@ -62,8 +65,9 @@ class ledgerController extends Controller
         $refund = PurchaseOrderRefund::where([['vendor_id', $id],['need_to_deduct',1]])->sum('refund_amount');
         $vendor_payments = VendorPayment::where('vendor_id',$id)->get();
         $totalPaid  = $vendor_payments->sum('amount') - $refund;
+        $over_due = VendorOverDue::where([['vendor_id', $id],['shop_id', Auth::user()->owner_id]])->sum('remaining_amount');
 
-        return view('users.ledgers.index',compact('vendor','purchase_orders','payments','totalGross','totalPaid','balance','payment_methods'));
+        return view('users.ledgers.index',compact('vendor','purchase_orders','payments','totalGross','totalPaid','balance','payment_methods','over_due'));
     }
 
     public function payment(Request $request)
@@ -74,66 +78,116 @@ class ledgerController extends Controller
             'vendor_id' => 'required|exists:vendors,id',
         ]);
 
-        $vendor_payment = VendorPayment::create([
-            'vendor_id'    => $request->vendor_id,
-            'payment_id'   => $request->payment,
-            'amount'       => $request->payment_amount,
-            'paid_on'      => now(),
-            'comment'      => $request->comment,
-        ]);
+        DB::beginTransaction();
 
-        $amountToDistribute = $request->payment_amount;
-        $paymentId = $request->payment;
-        $comment = $request->comment;
+        try {
 
-        // get vendor purchase orders sorted by id
-        $purchaseOrders = PurchaseOrder::where([['vendor_id', $request->vendor_id],['status','!=',1]])->orderBy('id')->get();
+            $vendor = Vendor::findOrFail($request->vendor_id);
 
-        foreach ($purchaseOrders as $order) {
-            if ($amountToDistribute <= 0) break;
-
-            // already paid for this order
-            $alreadyPaid = VendorPaymentDetail::where('purchase_order_id', $order->id)->sum('amount');
-            $remainingForOrder = $order->gross_cost - $alreadyPaid;
-
-            if ($remainingForOrder <= 0) {
-                continue; // order already fully paid
-            }
-
-            // how much to allocate now
-            $allocatable = min($amountToDistribute, $remainingForOrder);
-
-            VendorPaymentDetail::create([
-                'vendor_payment_id' => $vendor_payment->id,
-                'purchase_order_id' => $order->id,
-                'payment_id'        => $paymentId,
-                'amount'            => $allocatable,
-                'paid_on'           => now(),
-                'comment'           => $comment,
+            $vendor_payment = VendorPayment::create([
+                'vendor_id'    => $request->vendor_id,
+                'payment_id'   => $request->payment,
+                'amount'       => $request->payment_amount,
+                'paid_on'      => now(),
+                'comment'      => $request->comment,
             ]);
 
-            // reduce the balance
-            $amountToDistribute -= $allocatable;
+            $amountToDistribute = $request->payment_amount;
+            $paymentId = $request->payment;
+            $comment = $request->comment;
 
-            // 🔑 Recalculate total paid for this order
-            $totalPaid = VendorPaymentDetail::where('purchase_order_id', $order->id)->sum('amount');
+            /*
+            |--------------------------------------------------
+            | ✅ STEP 1: Clear Vendor Overdues First
+            |--------------------------------------------------
+            */
+            $overdues = VendorOverDue::where('vendor_id', $vendor->id)
+                            ->where('remaining_amount', '>', 0)
+                            ->orderBy('id')
+                            ->get();
 
-            // 🔑 Update status
-            if ($totalPaid >= $order->gross_cost) {
-                $order->update(['status' => 1]); // fully paid
-            } elseif ($totalPaid > 0 && $totalPaid < $order->gross_cost) {
-                $order->update(['status' => 2]); // partial paid
+            foreach ($overdues as $due) {
+                if ($amountToDistribute <= 0) break;
+
+                $remainingDue = $due->remaining_amount;
+
+                $payAmount = min($amountToDistribute, $remainingDue);
+
+                // ✅ Store payment entry
+                VendorOverDuePayment::create([
+                    'vendor_over_due_id' => $due->id,
+                    'amount'             => $payAmount,
+                    'paid_on'            => now(),
+                    'comment'            => $comment ?? 'Paid via vendor payment',
+                ]);
+
+                // ✅ Update remaining
+                $due->remaining_amount -= $payAmount;
+                $due->save();
+
+                $amountToDistribute -= $payAmount;
             }
-        }
 
-        // ✅ If any balance remains, store it in vendor's prepaid_amount
-        if ($amountToDistribute > 0) {
-            $vendor = Vendor::findOrFail($request->vendor_id);
-            $vendor->prepaid_amount = $vendor->prepaid_amount + $amountToDistribute;
-            $vendor->save();
-        }
+            /*
+            |--------------------------------------------------
+            | ✅ STEP 2: Allocate to Purchase Orders
+            |--------------------------------------------------
+            */
+            $purchaseOrders = PurchaseOrder::where([
+                    ['vendor_id', $vendor->id],
+                    ['status', '!=', 1]
+                ])
+                ->orderBy('id')
+                ->get();
 
-        return redirect()->back()->with('toast_success', 'Payment allocated successfully!');
+            foreach ($purchaseOrders as $order) {
+                if ($amountToDistribute <= 0) break;
+
+                $alreadyPaid = VendorPaymentDetail::where('purchase_order_id', $order->id)->sum('amount');
+                $remainingForOrder = $order->gross_cost - $alreadyPaid;
+
+                if ($remainingForOrder <= 0) continue;
+
+                $allocatable = min($amountToDistribute, $remainingForOrder);
+
+                VendorPaymentDetail::create([
+                    'vendor_payment_id' => $vendor_payment->id,
+                    'purchase_order_id' => $order->id,
+                    'payment_id'        => $paymentId,
+                    'amount'            => $allocatable,
+                    'paid_on'           => now(),
+                    'comment'           => $comment,
+                ]);
+
+                $amountToDistribute -= $allocatable;
+
+                $totalPaid = VendorPaymentDetail::where('purchase_order_id', $order->id)->sum('amount');
+
+                if ($totalPaid >= $order->gross_cost) {
+                    $order->update(['status' => 1]); // paid
+                } elseif ($totalPaid > 0) {
+                    $order->update(['status' => 2]); // partial
+                }
+            }
+
+            /*
+            |--------------------------------------------------
+            | ✅ STEP 3: Store Remaining as Prepaid
+            |--------------------------------------------------
+            */
+            if ($amountToDistribute > 0) {
+                $vendor->prepaid_amount += $amountToDistribute;
+                $vendor->save();
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('toast_success', 'Payment allocated successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('toast_error', $e->getMessage());
+        }
     }
 
     public function getPayment(Request $request,$company,$id)
@@ -141,6 +195,71 @@ class ledgerController extends Controller
         $payments = VendorPayment::with('payment')->where('vendor_id', $id)->orderBy('paid_on', 'desc')->get();
 
         return response()->json($payments);
+    }
+
+    public function over_due_store(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'vendor_id' => 'required|exists:vendors,id',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $vendor = Vendor::findOrFail($request->vendor_id);
+
+            $amount = $request->amount;
+            $prepaid = $vendor->prepaid_amount ?? 0;
+
+            $used_prepaid = 0;
+            $remaining_amount = $amount;
+
+            // ✅ If prepaid available
+            if ($prepaid > 0) {
+
+                if ($prepaid >= $amount) {
+                    // Full covered
+                    $used_prepaid = $amount;
+                    $remaining_amount = 0;
+                    $vendor->prepaid_amount = $prepaid - $amount;
+                } else {
+                    // Partial covered
+                    $used_prepaid = $prepaid;
+                    $remaining_amount = $amount - $prepaid;
+                    $vendor->prepaid_amount = 0;
+                }
+
+                $vendor->save();
+            }
+
+            // ✅ Create Overdue Entry
+            $overDue = VendorOverDue::create([
+                'shop_id'         => Auth::user()->owner_id,
+                'vendor_id'       => $vendor->id,
+                'amount'          => $amount,
+                'remaining_amount'=> $remaining_amount,
+                'added_on'        => now(),
+            ]);
+
+            // ✅ Store prepaid usage as payment record
+            if ($used_prepaid > 0) {
+                VendorOverDuePayment::create([
+                    'vendor_over_due_id' => $overDue->id,
+                    'amount'             => $used_prepaid,
+                    'paid_on'            => now(),
+                    'comment'            => 'Adjusted from prepaid amount',
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('toast_success', 'Over Due added successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('toast_error', $e->getMessage());
+        }
     }
 
 
