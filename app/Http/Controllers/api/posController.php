@@ -278,7 +278,7 @@ class posController extends Controller
                     'price'         => $item['price'],
                     'selling_price' => $item['price'],
                     'tax_amount'    => $item['tax_amount'],
-                    'tax_percent'   => $product->tax->name,
+                    'tax_percent'   => $product->tax->name ?? '0',
                     'discount_type' => $product->discount_type,
                     'discount'      => $product->discount,
                 ]);
@@ -420,7 +420,7 @@ class posController extends Controller
                     'price'         => $item['price'],
                     'selling_price' => $item['price'],
                     'tax_amount'    => $item['tax_amount'],
-                    'tax_percent'   => $product->tax->name,
+                    'tax_percent'   => $product->tax->name ?? '0',
                     'discount_type' => $product->discount_type,
                     'discount'      => $product->discount,
                 ]);

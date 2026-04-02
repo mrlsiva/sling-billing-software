@@ -86,9 +86,9 @@
 										<td>{{$product->name}}</td>
 										<!-- <td>{{$product->hsn_code}}</td> -->
 										<td>{{$product->price}}</td>
-										<td>{{ $product->tax->name }}%</td>
+										<td>{{ $product->tax->name ?? '-' }}%</td>
 
-										<td>{{$product->quantity}}({{$product->metric->name}})</td>
+										<td>{{$product->quantity}}({{$product->metric->name ?? '-'}})</td>
 
 										<td>
 										    <form action="{{ route('product.status', ['company' => request()->route('company')]) }}" method="post" onsubmit="return confirm('Are you sure you want to change the product status?')">
