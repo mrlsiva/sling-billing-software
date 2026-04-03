@@ -90,7 +90,12 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="text-primary">Products</h5>
+                                <h5 class="text-primary mb-0">Products</h5>
+
+                                <a href="javascript:void(0)" id="bulkBtn" class="btn btn-primary">
+                                    <i class="bx bx-upload"></i> Bulk Purchase Order
+                                </a>
+
                             </div>
                         </div>
                     </div>
@@ -261,9 +266,78 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="bulkUploadModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="{{ route('vendor.purchase_order.bulk_upload', ['company' => request()->route('company')]) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            <!-- Hidden Fields -->
+            <input type="hidden" name="vendor_id" id="bulk_vendor">
+            <input type="hidden" name="invoice_no" id="bulk_invoice">
+            <input type="hidden" name="invoice_date" id="bulk_invoice_date">
+            <input type="hidden" name="due_date" id="bulk_due_date">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bulk Purchase Upload</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- Download Template -->
+                    <div class="mb-3">
+                        <a href="{{ asset('assets/templates/bulk_purchase_order.xlsx') }}" download="PurchaseOrder.xlsx" class="btn btn-success w-100">
+                            Download Template
+                        </a>
+                    </div>
+
+                    <!-- Upload File -->
+                    <div class="mb-3">
+                        <label class="form-label">Upload File</label>
+                        <input type="file" name="file" class="form-control" required accept=".xlsx">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 @endsection
 
 @section('script')
 <script src="{{asset('assets/js/users/purchase.js?' . $version)}}"></script>
 <script src="{{asset('assets/js/users/vendor.js?' . $version)}}"></script>
+
+<script>
+$(document).on('click', '#bulkBtn', function () {
+
+    let vendor        = $('#vendor').val();
+    let invoice       = $('#invoice').val();
+    let invoice_date  = $('#invoice_date').val();
+    let due_date      = $('#due_date').val();
+
+    // Validation
+    if (!vendor || !invoice || !invoice_date) {
+        alert('Please fill all required fields (Vendor, Invoice No, Invoice Date)');
+        return;
+    }
+
+    // Set hidden fields
+    $('#bulk_vendor').val(vendor);
+    $('#bulk_invoice').val(invoice);
+    $('#bulk_invoice_date').val(invoice_date);
+    $('#bulk_due_date').val(due_date);
+
+    // Open modal
+    $('#bulkUploadModal').modal('show');
+});
+</script>
+
 @endsection

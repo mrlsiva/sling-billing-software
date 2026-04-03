@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use App\Traits\Notifications;
 use Illuminate\Http\Request;
+use App\Imports\PurchaseBulkImport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\VendorPaymentDetail;
 use App\Models\PurchaseOrderDetail;
 use App\Models\PurchaseOrderRefund;
@@ -693,4 +695,42 @@ class purchaseOrderController extends Controller
 
         return redirect()->back()->with('toast_success', 'Purchase refunded successfully!');
     }
+
+    public function bulk_upload(Request $request)
+    {
+        $request->validate([
+            'vendor_id' => 'required',
+            'invoice_no' => [
+                'required',
+                Rule::unique('purchase_orders', 'invoice_no')
+                    ->where(function ($query) use ($request) {
+                        return $query->where('vendor_id', $request->vendor_id)
+                                     ->where('shop_id', Auth::user()->owner_id);
+                    }),
+            ],
+            'invoice_date' => 'required|date',
+            'file' => 'required|mimes:xlsx,csv'
+        ]);
+
+        try {
+
+            Excel::import(
+                new PurchaseBulkImport([
+                    'vendor'       => $request->vendor_id,
+                    'invoice'      => $request->invoice_no,
+                    'invoice_date' => $request->invoice_date,
+                    'due_date'     => $request->due_date,
+                ]),
+                $request->file('file')
+            );
+
+            return redirect()->back()->with('toast_success', 'Bulk upload successful.');
+
+        } catch (\Exception $e) {
+
+            return redirect()->back()->with('toast_error', $e->getMessage());
+        }
+    }
+
+
 }

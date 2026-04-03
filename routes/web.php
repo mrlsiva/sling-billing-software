@@ -193,6 +193,7 @@ else
                                     Route::post('/update',[purchaseOrderController::class, 'update'])->name('update');
                                     Route::get('/{id}/get_detail',[purchaseOrderController::class, 'get_detail'])->name('get_detail');
                                      Route::post('/refund',[purchaseOrderController::class, 'refund'])->name('refund');
+                                     Route::post('/bulk_upload',[purchaseOrderController::class, 'bulk_upload'])->name('bulk_upload');
 
                                 });
                             });
