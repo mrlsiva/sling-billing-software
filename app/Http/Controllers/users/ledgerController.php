@@ -11,8 +11,8 @@ use App\Models\PurchaseOrderRefund;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use App\Models\ShopPayment;
-use App\Models\VendorOverDue;
-use App\Models\VendorOverDuePayment;
+use App\Models\VendorOpeningBalance;
+use App\Models\VendorOpeningBalancePayment;
 use App\Models\Vendor;
 use App\Models\Payment;
 use DB;
@@ -61,13 +61,15 @@ class ledgerController extends Controller
         $refund = PurchaseOrderRefund::whereIn('id', $purchaseOrderIds)->where('need_to_deduct',1)->sum('refund_amount');
         $totalGross = PurchaseOrder::whereIn('id', $purchaseOrderIds)->sum('gross_cost');
         $totalPaid  = $payments->sum('amount') - $refund;
-        $balance    = $totalGross - $totalPaid;
+        $remaining_opening_balance = VendorOpeningBalance::where([['vendor_id', $id],['shop_id', Auth::user()->owner_id]])->sum('remaining_amount');
+        $balance    = $totalGross - $totalPaid + $remaining_opening_balance;
         $refund = PurchaseOrderRefund::where([['vendor_id', $id],['need_to_deduct',1]])->sum('refund_amount');
         $vendor_payments = VendorPayment::where('vendor_id',$id)->get();
         $totalPaid  = $vendor_payments->sum('amount') - $refund;
-        $over_due = VendorOverDue::where([['vendor_id', $id],['shop_id', Auth::user()->owner_id]])->sum('remaining_amount');
+        
+        
 
-        return view('users.ledgers.index',compact('vendor','purchase_orders','payments','totalGross','totalPaid','balance','payment_methods','over_due'));
+        return view('users.ledgers.index',compact('vendor','purchase_orders','payments','totalGross','totalPaid','balance','payment_methods','remaining_opening_balance'));
     }
 
     public function payment(Request $request)
@@ -101,7 +103,7 @@ class ledgerController extends Controller
             | ✅ STEP 1: Clear Vendor Overdues First
             |--------------------------------------------------
             */
-            $overdues = VendorOverDue::where('vendor_id', $vendor->id)
+            $overdues = VendorOpeningBalance::where('vendor_id', $vendor->id)
                             ->where('remaining_amount', '>', 0)
                             ->orderBy('id')
                             ->get();
@@ -114,8 +116,8 @@ class ledgerController extends Controller
                 $payAmount = min($amountToDistribute, $remainingDue);
 
                 // ✅ Store payment entry
-                VendorOverDuePayment::create([
-                    'vendor_over_due_id' => $due->id,
+                VendorOpeningBalancePayment::create([
+                    'vendor_opening_balance_id' => $due->id,
                     'amount'             => $payAmount,
                     'paid_on'            => now(),
                     'comment'            => $comment ?? 'Paid via vendor payment',
@@ -195,71 +197,6 @@ class ledgerController extends Controller
         $payments = VendorPayment::with('payment')->where('vendor_id', $id)->orderBy('paid_on', 'desc')->get();
 
         return response()->json($payments);
-    }
-
-    public function over_due_store(Request $request)
-    {
-        $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'vendor_id' => 'required|exists:vendors,id',
-        ]);
-
-        DB::beginTransaction();
-
-        try {
-            $vendor = Vendor::findOrFail($request->vendor_id);
-
-            $amount = $request->amount;
-            $prepaid = $vendor->prepaid_amount ?? 0;
-
-            $used_prepaid = 0;
-            $remaining_amount = $amount;
-
-            // ✅ If prepaid available
-            if ($prepaid > 0) {
-
-                if ($prepaid >= $amount) {
-                    // Full covered
-                    $used_prepaid = $amount;
-                    $remaining_amount = 0;
-                    $vendor->prepaid_amount = $prepaid - $amount;
-                } else {
-                    // Partial covered
-                    $used_prepaid = $prepaid;
-                    $remaining_amount = $amount - $prepaid;
-                    $vendor->prepaid_amount = 0;
-                }
-
-                $vendor->save();
-            }
-
-            // ✅ Create Overdue Entry
-            $overDue = VendorOverDue::create([
-                'shop_id'         => Auth::user()->owner_id,
-                'vendor_id'       => $vendor->id,
-                'amount'          => $amount,
-                'remaining_amount'=> $remaining_amount,
-                'added_on'        => now(),
-            ]);
-
-            // ✅ Store prepaid usage as payment record
-            if ($used_prepaid > 0) {
-                VendorOverDuePayment::create([
-                    'vendor_over_due_id' => $overDue->id,
-                    'amount'             => $used_prepaid,
-                    'paid_on'            => now(),
-                    'comment'            => 'Adjusted from prepaid amount',
-                ]);
-            }
-
-            DB::commit();
-
-            return redirect()->back()->with('toast_success', 'Over Due added successfully!');
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            return back()->with('toast_error', $e->getMessage());
-        }
     }
 
 

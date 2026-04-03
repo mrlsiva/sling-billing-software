@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Size;
 use App\Models\Colour;
 use App\Models\Stock;
+use App\Models\Tax;
 
 class PurchaseBulkImport implements ToCollection
 {
@@ -38,39 +39,45 @@ class PurchaseBulkImport implements ToCollection
             $sizeName        = trim($row[3]);
             $colourName      = trim($row[4]);
             $qty             = (float)$row[5];
-            $discount        = (float)$row[6];
-            $imeiRaw         = $row[7];
+            $price    = (float)$row[6];
+            $taxInput = (float)$row[7];
+            $discount = (float)$row[8];
+            $imeiRaw  = $row[9];
 
             // ✅ Find IDs
             $category = Category::where('name', $categoryName)->first();
             $subCategory = SubCategory::where('name', $subCategoryName)->first();
             $product = Product::where('name', $productName)->first();
+            $taxModel = Tax::where('shop_id', auth()->user()->owner_id)->where('name', $taxInput)->first();
 
             $errors = [];
 
             if (!$category) {
-                $errors[] = "Category '{$categoryName}' not found";
+                $errors[] = "Category $categoryName not found";
             }
 
             if (!$subCategory) {
-                $errors[] = "Sub Category '{$subCategoryName}' not found";
+                $errors[] = "Sub Category $subCategoryName not found";
             }
 
             if (!$product) {
-                $errors[] = "Product '{$productName}' not found";
+                $errors[] = "Product $productName not found";
             }
+
+            if (!$taxModel) {
+               $errors[] = "Tax $taxInput% not found in shop for product $productName";
+            }
+
 
             if (!empty($errors)) {
                 throw new \Exception(implode(', ', $errors));
             }
 
-            // ✅ Price & Tax from product
-            $price = $product->price ?? 0;
-            $tax = 0;
+            
 
-            if ($product->tax) {
-                $tax = $product->tax->name ?? $product->tax->name ?? 0;
-            }
+            // ✅ Price & Tax from product
+            $price = $price; // from Excel
+            $tax   = $taxModel->name;
 
             // ✅ Calculation (same as JS)
             $net = $qty * $price;

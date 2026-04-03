@@ -62,6 +62,15 @@
 			</div>
 		</div>
 
+		<div class="row">
+			<div class="col-md-6">
+				<div class="mb-3">
+					<label for="choices-single-groups" class="form-label text-muted">Opening Balance</label>
+					<input type="text" id="opening_balance" name="opening_balance" class="form-control" placeholder="Enter Opening Balance">
+				</div>
+			</div>
+		</div>
+
 	</div>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\VendorOpeningBalance;
 use Illuminate\Validation\Rule;
 use App\Traits\Notifications;
 use Illuminate\Http\Request;
@@ -44,6 +45,7 @@ class vendorController extends Controller
             'phone' => 'required|digits:10',
             'email' => 'nullable|email',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
+            'opening_balance' => 'numeric|min:1',
 
         ], 
         [
@@ -67,6 +69,21 @@ class vendorController extends Controller
             'gst' => $request->gst,
             'is_active' => 1,
         ]);
+
+        if($request->opening_balance != null)
+        {
+
+            $amount = $request->opening_balance;
+
+            // ✅ Create Overdue Entry
+            $overDue = VendorOpeningBalance::create([
+                'shop_id'         => Auth::user()->owner_id,
+                'vendor_id'       => $vendor->id,
+                'amount'          => $amount,
+                'remaining_amount'=> $amount,
+                'added_on'        => now(),
+            ]);
+        }
 
         DB::commit();
 

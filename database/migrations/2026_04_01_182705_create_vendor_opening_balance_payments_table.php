@@ -11,9 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vendor_over_due_payments', function (Blueprint $table) {
+        Schema::create('vendor_opening_balance_payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vendor_over_due_id')->constrained()->onDelete('cascade');
+
+            $table->unsignedBigInteger('vendor_opening_balance_id');
+
+            // ✅ Short constraint name
+            $table->foreign('vendor_opening_balance_id', 'vobp_vob_id_fk')
+                  ->references('id')
+                  ->on('vendor_opening_balances')
+                  ->onDelete('cascade');
+
             $table->string('amount');
             $table->timestamp('paid_on')->nullable();
             $table->string('comment')->nullable();
@@ -26,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vendor_over_due_payments');
+        Schema::dropIfExists('vendor_opening_balance_payments');
     }
 };

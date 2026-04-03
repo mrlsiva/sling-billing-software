@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vendor_over_dues', function (Blueprint $table) {
+        Schema::create('vendor_opening_balances', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('shop_id')->nullable();
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vendor_over_dues');
+        Schema::dropIfExists('vendor_opening_balances');
     }
 };

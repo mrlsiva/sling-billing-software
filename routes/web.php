@@ -169,12 +169,6 @@ else
                                 });
                             });
 
-                            Route::prefix('over_due')->group(function () {
-                                Route::name('over_due.')->group(function () {
-                                    Route::post('/store',[ledgerController::class, 'over_due_store'])->name('store');
-                                });
-                            });
-
                             Route::prefix('payments')->group(function () {
                                 Route::name('payment.')->group(function () {
                                     Route::post('/store',[ledgerController::class, 'payment'])->name('store');
