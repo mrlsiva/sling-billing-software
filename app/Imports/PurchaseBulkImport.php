@@ -25,6 +25,7 @@ class PurchaseBulkImport implements ToCollection
         $products = [];
         $allImeis = [];
         $grouped = [];
+        $stock = null;
 
         foreach ($rows as $index => $row) {
 
@@ -161,12 +162,14 @@ class PurchaseBulkImport implements ToCollection
             }
 
             // ✅ Add variation row (important for stock logic)
-            $grouped[$key]['variation'][] = [
-                'stock_id'  => optional($stock)->id,
-                'size_id'   => $this->getSizeId($sizeName),
-                'colour_id' => $this->getColourId($colourName),
-                'qty'       => $qty,
-            ];
+            if ($stock) {
+                $grouped[$key]['variation'][] = [
+                    'stock_id'  => $stock->id,
+                    'size_id'   => $this->getSizeId($sizeName),
+                    'colour_id' => $this->getColourId($colourName),
+                    'qty'       => $qty,
+                ];
+            }
 
             
         }
