@@ -92,21 +92,19 @@
 
 										        <small class="text-danger error-msg d-none"></small>
 
+										        @if($order_detail->imei != null)
 										        <!-- IMEI CHECKBOXES -->
 										        <div class="imei-box mt-2">
 										            <label><strong>Select IMEIs</strong></label><br>
 
 										            @foreach($imeis as $imei)
 										                <label class="d-block">
-										                    <input type="checkbox"
-										                           class="imei-checkbox imei-{{ $order_detail->id }}"
-										                           data-id="{{ $order_detail->id }}"
-										                           name="imeis[{{ $order_detail->id }}][]"
-										                           value="{{ trim($imei) }}">
+										                    <input type="checkbox" class="imei-checkbox imei-{{ $order_detail->id }}" data-id="{{ $order_detail->id }}" name="imeis[{{ $order_detail->id }}][]" value="{{ trim($imei) }}">
 										                    {{ trim($imei) }}
 										                </label>
 										            @endforeach
 										        </div>
+										        @endif
 										    </td>
 										</tr>
 
