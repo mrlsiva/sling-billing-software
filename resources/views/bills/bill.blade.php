@@ -34,7 +34,7 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            border: 1px solid #000; /* outer table border — covers filler row edges */
+            /* border: 1px solid #000;  outer table border — covers filler row edges */
         }
         .main-table td, .main-table th {
             border: 1px solid #000;
@@ -53,21 +53,23 @@
 
         /* ── Column widths (total = 100%) ── */
         .c1  { width:  1%; }   /* S.No        — narrow  */
-        .c2  { width: 40%; }   /* Description — widest  */
-        .c3  { width:  1%; }   /* Qty         — narrow  */
-        .c4  { width:  8%; }   /* Rate        — fit     */
-        .c5  { width:  9%; }   /* Taxable     — fit     */
-        .c6  { width:  7%; }   /* CGST %      — fit     */
-        .c7  { width:  9%; }   /* CGST Amt    — fit     */
-        .c8  { width:  7%; }   /* SGST %      — fit     */
-        .c9  { width:  9%; }   /* SGST Amt    — fit     */
-        .c10 { width:  9%; }   /* Amount      — fit     */
+        .c2  { width:  8%; }   /* HSN Code    — fit     */
+        .c3  { width: 35%; }   /* Description — widest  */
+        .c4  { width:  1%; }   /* Qty         — narrow  */
+        .c5  { width:  9%; }   /* Rate        — fit     */
+        .c6  { width: 10%; }   /* Taxable     — fit     */
+        .c7  { width: 10%; }   /* CGST Amt    — fit     */
+        .c8  { width: 10%; }   /* SGST Amt    — fit     */
+        .c9  { width: 16%; }   /* Amount      — fit     */
 
         /* ── Header inner tables ── */
         .hdr-wrap {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid #000;
+            border-top: none;
+            border-left: none;
+            border-right: none;
         }
         .hdr-wrap td {  padding: 4px 7px; vertical-align: middle; }
         .buyer-wrap {
@@ -163,22 +165,21 @@
 <table class="main-table">
 <colgroup>
     <col style="width:4%">   {{-- S.No --}}
-    <col style="width:35%">  {{-- Description --}}
+    <col style="width:8%">   {{-- HSN Code --}}
+    <col style="width:34%">  {{-- Description --}}
     <col style="width:3%">   {{-- Qty --}}
-    <col style="width:8%">   {{-- Rate --}}
-    <col style="width:9%">   {{-- Taxable --}}
-    <col style="width:7%">   {{-- CGST % --}}
-    <col style="width:9%">   {{-- CGST Amt --}}
-    <col style="width:7%">   {{-- SGST % --}}
-    <col style="width:9%">   {{-- SGST Amt --}}
-    <col style="width:9%">   {{-- Amount --}}
+    <col style="width:9%">   {{-- Rate --}}
+    <col style="width:10%">  {{-- Taxable --}}
+    <col style="width:10%">  {{-- CGST Amt --}}
+    <col style="width:10%">  {{-- SGST Amt --}}
+    <col style="width:12%">  {{-- Amount --}}
 </colgroup>
 
     {{-- ════ THEAD: repeats on every page (browser print + DomPDF) ════ --}}
     <thead>
         {{-- Row 1: header block (company + invoice meta + buyer) --}}
         <tr>
-            <td colspan="10" class="no-border" style="padding:0;">
+            <td colspan="9" class="no-border" style="padding:0;">
 
                 {{-- Company + Title + Invoice meta --}}
                 <table class="hdr-wrap">
@@ -226,15 +227,15 @@
                 {{-- Buyer + Sales info --}}
                 <table class="buyer-wrap">
                     <tr>
-                        <td style="width:55%; border-right:1px solid #000;">
+                        <td style="width:50%; border-left:1px solid #000; border-right:1px solid #000;">
                             <table class="inner">
                                 <tr>
                                     <td style="width:30%;"><strong>Buyer</strong></td>
-                                    <td>: <strong>{{ $order->customer->name }}</strong></td>
+                                    <td>: <strong>{{ strtoupper($order->customer->name) }}</strong></td>
                                 </tr>
                                 <tr>
                                     <td><strong>Address</strong></td>
-                                    <td>: {{ $order->customer->address }}@if($order->customer->pincode != null), {{ $order->customer->pincode }}@endif</td>
+                                    <td>: {{ strtoupper($order->customer->address) }}@if($order->customer->pincode != null), {{ $order->customer->pincode }}@endif</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Mobile</strong></td>
@@ -248,7 +249,7 @@
                                 @endif
                             </table>
                         </td>
-                        <td style="width:45%;">
+                        <td style="width:50%; border-right:1px solid #000;">
                             <table class="inner">
                                 <tr>
                                     <td style="width:42%;"><strong>Sales Person</strong></td>
@@ -258,6 +259,12 @@
                                     <td><strong>Terms of Pay</strong></td>
                                     <td>: &#x2014;</td>
                                 </tr>
+                                @foreach($order_payment_details as $opd)
+                                <tr>
+                                    <td><strong>{{ $opd->payment->name }}</strong></td>
+                                    <td>: &#x20B9; {{ number_format($opd->amount, 2) }}</td>
+                                </tr>
+                                @endforeach
                             </table>
                         </td>
                     </tr>
@@ -269,15 +276,14 @@
         {{-- Row 2: column headers --}}
         <tr>
             <th class="c1">S.No</th>
-            <th class="c2">Description of Goods</th>
-            <th class="c3">Qty</th>
-            <th class="c4">Rate (&#x20B9;)</th>
-            <th class="c5">Taxable (&#x20B9;)</th>
-            <th class="c6">CGST %</th>
+            <th class="c2">HSN/SAC</th>
+            <th class="c3">Description of Goods</th>
+            <th class="c4">Qty</th>
+            <th class="c5">Rate (&#x20B9;)</th>
+            <th class="c6">Taxable (&#x20B9;)</th>
             <th class="c7">CGST Amt</th>
-            <th class="c8">SGST %</th>
-            <th class="c9">SGST Amt</th>
-            <th class="c10">Amount (&#x20B9;)</th>
+            <th class="c8">SGST Amt</th>
+            <th class="c9">Amount (&#x20B9;)</th>
         </tr>
     </thead>
 
@@ -299,51 +305,48 @@
         @endphp
         <tr>
             <td class="c1 center">{{ $loop->iteration }}</td>
-            <td class="c2">
+            <td class="c2 center">{{ $order_detail->product->hsn_code ?? '-' }}</td>
+            <td class="c3">
                 {{ $order_detail->name }}{{ $variationText ? ' ' . $variationText : '' }}
                 @if(!empty($order_detail->imei))
                     <br><small style="font-size:9px;">IMEI: {{ $order_detail->imei }}</small>
                 @endif
             </td>
-            <td class="c3 center">{{ $qty }}</td>
-            <td class="c4 right">{{ number_format($basePrice, 2) }}</td>
-            <td class="c5 right">{{ number_format($taxableAmt, 2) }}</td>
-            <td class="c6 center">{{ number_format((float)$order_detail->tax_percent / 2, 2) }}</td>
+            <td class="c4 center">{{ $qty }}</td>
+            <td class="c5 right">{{ number_format($basePrice, 2) }}</td>
+            <td class="c6 right">{{ number_format($taxableAmt, 2) }}</td>
             <td class="c7 right">{{ number_format($cgstVal, 2) }}</td>
-            <td class="c8 center">{{ number_format((float)$order_detail->tax_percent / 2, 2) }}</td>
-            <td class="c9 right">{{ number_format($sgstVal, 2) }}</td>
-            <td class="c10 right">{{ number_format($totalAmt, 2) }}</td>
+            <td class="c8 right">{{ number_format($sgstVal, 2) }}</td>
+            <td class="c9 right">{{ number_format($totalAmt, 2) }}</td>
         </tr>
         @endforeach
 
         {{-- Filler rows — keep vertical column lines, remove horizontal row lines --}}
         @for($i = 0; $i < $emptyRowCount; $i++)
         <tr style="height:8mm;">
-            <td class="c1"  style="border-top:none; border-bottom:none;"></td>
-            <td class="c2"  style="border-top:none; border-bottom:none;"></td>
-            <td class="c3"  style="border-top:none; border-bottom:none;"></td>
-            <td class="c4"  style="border-top:none; border-bottom:none;"></td>
-            <td class="c5"  style="border-top:none; border-bottom:none;"></td>
-            <td class="c6"  style="border-top:none; border-bottom:none;"></td>
-            <td class="c7"  style="border-top:none; border-bottom:none;"></td>
-            <td class="c8"  style="border-top:none; border-bottom:none;"></td>
-            <td class="c9"  style="border-top:none; border-bottom:none;"></td>
-            <td class="c10" style="border-top:none; border-bottom:none;"></td>
+            <td class="c1" style="border-top:none; border-bottom:none;"></td>
+            <td class="c2" style="border-top:none; border-bottom:none;"></td>
+            <td class="c3" style="border-top:none; border-bottom:none;"></td>
+            <td class="c4" style="border-top:none; border-bottom:none;"></td>
+            <td class="c5" style="border-top:none; border-bottom:none;"></td>
+            <td class="c6" style="border-top:none; border-bottom:none;"></td>
+            <td class="c7" style="border-top:none; border-bottom:none;"></td>
+            <td class="c8" style="border-top:none; border-bottom:none;"></td>
+            <td class="c9" style="border-top:none; border-bottom:none;"></td>
         </tr>
         @endfor
 
         {{-- Totals row --}}
         <tr class="total-row">
             <td class="c1 center">&#x2014;</td>
-            <td class="c2 center bold">TOTAL</td>
-            <td class="c3 center bold">{{ $totalQty }}</td>
-            <td class="c4"></td>
-            <td class="c5 right bold">{{ number_format($totalTaxable, 2) }}</td>
-            <td class="c6"></td>
+            <td class="c2"></td>
+            <td class="c3 center bold">TOTAL</td>
+            <td class="c4 center bold">{{ $totalQty }}</td>
+            <td class="c5"></td>
+            <td class="c6 right bold">{{ number_format($totalTaxable, 2) }}</td>
             <td class="c7 right bold">{{ number_format($totalCgst, 2) }}</td>
-            <td class="c8"></td>
-            <td class="c9 right bold">{{ number_format($totalSgst, 2) }}</td>
-            <td class="c10 right bold">{{ number_format($totalAmount, 2) }}</td>
+            <td class="c8 right bold">{{ number_format($totalSgst, 2) }}</td>
+            <td class="c9 right bold">{{ number_format($totalAmount, 2) }}</td>
         </tr>
     </tbody>
 
