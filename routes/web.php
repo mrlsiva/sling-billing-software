@@ -52,6 +52,8 @@ use App\Http\Controllers\branches\orderReportController;
 use App\Http\Controllers\branches\dailyReportController;
 use App\Http\Controllers\branches\gstBillController;
 use App\Http\Controllers\branches\bulkExcelController;
+use App\Http\Controllers\branches\productTransferReportsController;
+use App\Http\Controllers\branches\salesReportsController;
 
 Route::get('/clear', function() {
     Artisan::call('cache:clear');
@@ -541,8 +543,23 @@ else
                                         });
                                     });
 
-                                    
+                                    Route::prefix('transfer')->group(function () {
+                                        Route::name('.transfer')->group(function () {
 
+                                            Route::get('/',[productTransferReportsController::class, 'transfer']);
+                                            Route::get('/download/pdf',[productTransferReportsController::class, 'download_pdf'])->name('.download_pdf');
+                                            Route::get('/download/excel',[productTransferReportsController::class, 'download_excel'])->name('.download_excel');
+                                        });
+                                    });
+
+                                    Route::prefix('sales')->group(function () {
+                                        Route::name('.sales')->group(function () {
+
+                                            Route::get('/',[salesReportsController::class, 'sales']);
+                                            Route::get('/download/pdf',[salesReportsController::class, 'download_pdf'])->name('.download_pdf');
+                                            Route::get('/download/excel',[salesReportsController::class, 'download_excel'])->name('.download_excel');
+                                        });
+                                    });
                                 });
                             });
 

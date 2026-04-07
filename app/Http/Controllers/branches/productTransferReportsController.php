@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\users;
+namespace App\Http\Controllers\branches;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ProductTransferReportExport;
+use App\Exports\BranchProductTransferReportExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\ProductHistory;
@@ -14,18 +14,12 @@ use App\Traits\Log;
 use Carbon\Carbon;
 use DB;
 
-class productTransferReportController extends Controller
+class productTransferReportsController extends Controller
 {
     use Log;
 
-    public function transfer(Request $request, $company, $branch)
+    public function transfer(Request $request)
     {
-        $branches = User::where([
-            ['parent_id', Auth::user()->owner_id],
-            ['is_active', 1],
-            ['is_lock', 0],
-            ['is_delete', 0]
-        ])->get();
 
         $query = ProductHistory::with([
             'transfer_from',
@@ -33,15 +27,8 @@ class productTransferReportController extends Controller
             'category',
             'sub_category',
             'product'
-        ])->where('shop_id', Auth::user()->owner_id);
-
-        // Branch filter
-        if ($branch && $branch != 0) {
-            $query->where(function ($q) use ($branch) {
-                $q->where('from', $branch)
-                  ->orWhere('to', $branch);
-            });
-        }
+        ])->where('shop_id', Auth::user()->parent_id)->where('from', Auth::user()->id)->orWhere('to', Auth::user()->id);
+            
 
         // Date filters
         if ($request->filled('from')) {
@@ -54,22 +41,14 @@ class productTransferReportController extends Controller
 
         $datas = $query->latest('transfer_on')->paginate(10);
 
-        return view('users.reports.transfer', compact('datas', 'branches', 'branch'));
+        return view('branches.reports.transfer', compact('datas'));
     }
 
-    public function download_excel(Request $request, $company, $branch)
+    public function download_excel(Request $request)
     {
-        $current_branch = $branch;
         $query = ProductHistory::with([
             'transfer_from','transfer_to','category','sub_category','product'
-        ])->where('shop_id', Auth::user()->owner_id);
-
-        if ($branch && $branch != 0) {
-            $query->where(function ($q) use ($branch) {
-                $q->where('from', $branch)
-                  ->orWhere('to', $branch);
-            });
-        }
+        ])->where('shop_id', Auth::user()->parent_id)->where('from', Auth::user()->id)->orWhere('to', Auth::user()->id);
 
         if ($request->filled('from')) {
             $query->whereDate('transfer_on', '>=', $request->from);
@@ -95,23 +74,15 @@ class productTransferReportController extends Controller
             ];
         });
 
-        return Excel::download(new \App\Exports\ProductTransferReportExport($data), 'transfer_report.xlsx');
+        return Excel::download(new \App\Exports\BranchProductTransferReportExport($data), 'transfer_report.xlsx');
     }
 
-    public function download_pdf(Request $request, $company, $branch)
+    public function download_pdf(Request $request)
     {
-        $current_branch = $branch;
 
         $query = ProductHistory::with([
             'transfer_from','transfer_to','category','sub_category','product'
-        ])->where('shop_id', Auth::user()->owner_id);
-
-        if ($branch && $branch != 0) {
-            $query->where(function ($q) use ($branch) {
-                $q->where('from', $branch)
-                  ->orWhere('to', $branch);
-            });
-        }
+        ])->where('shop_id', Auth::user()->parent_id)->where('from', Auth::user()->id)->orWhere('to', Auth::user()->id);
 
         if ($request->filled('from')) {
             $query->whereDate('transfer_on', '>=', $request->from);
@@ -123,8 +94,9 @@ class productTransferReportController extends Controller
 
         $datas = $query->get();
 
-        $pdf = Pdf::loadView('users.exports.transfer_report_pdf', compact('datas','current_branch'));
+        $pdf = Pdf::loadView('branches.exports.transfer_report_pdf', compact('datas'));
 
         return $pdf->download('transfer_report.pdf');
     }
+    
 }
