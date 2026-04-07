@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-<title>{{ config('app.name')}} | Transfer Report</title>
+<title>{{ config('app.name')}} | Sales Report</title>
 @endsection
 
 @section('body')
@@ -10,7 +10,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
     
-                <p class="card-title mb-0">Transfer Report</p>
+                <p class="card-title mb-0">Sales Report</p>
 
                 <a href="{{route('report', ['company' => request()->route('company')])}}" class="btn btn-sm btn-outline-secondary">
                     <i class="ri-arrow-left-line me-1"></i> Back
@@ -19,31 +19,10 @@
             </div>
             <div class="card-body pt-2 ">
 
-                <ul class="nav nav-tabs nav-justified">
-
-                     <li class="nav-item">
-                        <a href="{{route('report.transfer', ['company' => request()->route('company'),'branch' => 0])}}" class="nav-link {{ request()->route('branch') == 0 ? 'active' : '' }}" id="{{Auth::user()->id}}">
-                            <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
-                            <span class="d-none d-sm-block"><i class="ri-store-2-line me-2"></i>{{Auth::user()->user_name}}</span>
-                        </a>
-                    </li>
-
-                   
-                    @foreach($branches as $branch)
-                        <li class="nav-item">
-                            <a href="{{route('report.transfer', ['company' => request()->route('company'),'branch' => $branch->id])}}" class="nav-link {{ request()->route('branch') == $branch->id ? 'active' : '' }}" id="{{$branch->id}}">
-                                <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
-                                <span class="d-none d-sm-block"><i class="ri-store-2-line me-2"></i></i>{{$branch->user_name}}</span>
-                            </a>
-                        </li>
-                    @endforeach
-
-                </ul>
-
                 <div class="tab-content pt-2 text-muted">
                     <div class="tab-pane show active" id="homeTabsJustified">
 
-                        <form method="get" action="{{route('report.transfer', ['company' => request()->route('company'),'branch' => request('branch')])}}">
+                        <form method="get" action="{{route('branch.report.sales', ['company' => request()->route('company'),'branch' => request('branch')])}}">
                             <div class="row mb-2">
                                 <div class="col-md-5">
                                     <div class="mb-2">
@@ -66,7 +45,7 @@
                         </form>
 
                         <div class="d-flex justify-content-end p-3 gap-2">
-                            <form method="get" action="{{route('report.transfer.download_excel', ['company' => request()->route('company'),'branch' => request('branch')])}}">
+                            <form method="get" action="{{route('branch.report.sales.download_excel', ['company' => request()->route('company'),'branch' => request('branch')])}}">
                                 <input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
                                 <input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
                                 <button class="btn btn-success">
@@ -74,7 +53,7 @@
                                 </button>
                             </form>
 
-                            <form method="get" action="{{route('report.transfer.download_pdf', ['company' => request()->route('company'),'branch' => request('branch')])}}">
+                            <form method="get" action="{{route('branch.report.sales.download_pdf', ['company' => request()->route('company'),'branch' => request('branch')])}}">
                                 <input type="hidden" class="form-control" name="from" value="{{ request('from') }}">
                                 <input type="hidden" class="form-control" name="to" value="{{ request('to') }}">
                                 <button class="btn btn-success">
@@ -87,59 +66,48 @@
                             <table class="table align-middle mb-0 table-hover table-centered">
                                 <thead class="bg-light-subtle">
                                     <tr>
-                                        <th>S.No</th>
-                                        <th>Transfer Datetime</th>
-                                        <th>Type</th>
-                                        <th>From Branch</th>
-                                        <th>To Branch</th>
+                                        <th>Order ID</th>
+                                        <th>Date Time</th>
+                                        <th>Issued By</th>
+                                        <th>Sales By</th>
+                                        <th>Customer</th>
+                                        <th>Mobile</th>
+                                        <th>Address</th>
                                         <th>Category</th>
                                         <th>Subcategory</th>
                                         <th>Item</th>
                                         <th>Item Code</th>
-                                        <th class="text-end">Qty</th>
-                                    </tr>
+                                        <th>Qty</th>
+                                        <th>Gross (In ₹)</th>
+                                        <th>Tax (In ₹)</th>
+                                        <th>Net (In ₹)</th>
+                                    </tr>   
                                 </thead> 
                                 <tbody>
-                                    @foreach($datas as $key => $data)
-                                    <tr>
-                                        <td>{{ $datas->firstItem() + $key }}</td>
-
-                                        <td>{{ \Carbon\Carbon::parse($data->transfer_on)->format('d M Y H:i') }}</td>
-
-                                        <td>
-                                            @if(request('branch') == 0)
-                                                @if($data->to == Auth::user()->id)
-                                                    <span class="badge bg-success">Stock_In</span>
-                                                @else
-                                                    <span class="badge bg-danger">Stock_Out</span>
-                                                @endif
-                                            @else
-                                                @if($data->to == request('branch'))
-                                                    <span class="badge bg-success">Stock_In</span>
-                                                @else
-                                                    <span class="badge bg-danger">Stock_Out</span>
-                                                @endif
-                                            @endif
-                                        </td>
-
-                                        <td>{{ $data->transfer_from->user_name ?? '-' }}</td>
-
-                                        <td>{{ $data->transfer_to->user_name ?? '-' }}</td>
-
-                                        <td>{{ $data->category->name ?? '-' }}</td>
-
-                                        <td>{{ $data->sub_category->name ?? '-' }}</td>
-
-                                        <td>{{ $data->product->name ?? '-' }}</td>
-
-                                        <td>{{ $data->product->code ?? '-' }}</td>
-
-                                        <td class="text-end">{{ $data->quantity }}</td>
-                                    </tr>
+                                    @foreach($orders as $order)
+                                        @foreach($order->details as $detail)
+                                            <tr>
+                                                <td>{{ $order->bill_id }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y H:i') }}</td>
+                                                <td>User</td>
+                                                <td>{{ $order->billedBy->name ?? '' }}</td>
+                                                <td>{{ $order->customer->name ?? '' }}</td>
+                                                <td>{{ $order->customer->phone ?? '' }}</td>
+                                                <td>{{ $order->customer->address ?? '' }}</td>
+                                                <td>{{ $detail->product->category->name ?? '' }}</td>
+                                                <td>{{ $detail->product->sub_category->name ?? '' }}</td>
+                                                <td>{{ $detail->name }}</td>
+                                                <td>{{ $detail->product_id }}</td>
+                                                <td>{{ $detail->quantity }}</td>
+                                                <td>{{ $detail->price * $detail->quantity}}</td>
+                                                <td>{{ $detail->tax_amount * $detail->quantity }}</td>
+                                                <td>{{ ($detail->price - $detail->tax_amount) * $detail->quantity}}</td>
+                                            </tr>
+                                        @endforeach
                                     @endforeach
                                 </tbody>
                             </table>
-                            @if($datas->isEmpty())
+                            @if($orders->isEmpty())
                                 @include('no-data')
                             @endif
                         </div>
@@ -147,7 +115,7 @@
                 </div>
             </div>
             <div class="card-footer border-0">
-				{!! $datas->withQueryString()->links('pagination::bootstrap-5') !!}
+				{!! $orders->withQueryString()->links('pagination::bootstrap-5') !!}
 			</div>
         </div>
     </div>
