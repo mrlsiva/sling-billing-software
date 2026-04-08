@@ -304,7 +304,6 @@ class billingsController extends Controller
 
             $product = Product::where('id',$item['product_id'])->first();
             $variation = !empty($item['variation_id'])? StockVariation::find($item['variation_id']) : null;
-
             OrderDetail::create([
                 'order_id'      => $order->id,
                 'product_id'    => $item['product_id'],

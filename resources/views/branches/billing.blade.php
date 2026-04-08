@@ -844,6 +844,37 @@
     </div>
 </div>
 
+<!-- Edit Price Modal -->
+<div class="modal fade" id="editPriceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Price</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="edit_product_id">
+                <input type="hidden" id="edit_product_tax">
+
+                <div class="mb-2">
+                    <label>Product Name</label>
+                    <input type="text" id="edit_product_name" class="form-control" readonly>
+                </div>
+
+                <div class="mb-2">
+                    <label>Price Per Unit</label>
+                    <input type="number" id="edit_product_price" class="form-control">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="update_price_btn">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('script')
