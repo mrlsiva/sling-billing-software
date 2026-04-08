@@ -252,6 +252,7 @@ function add_to_cart(element) {
                         data-price="${data.price}"
                         data-tax_amount="${data.tax_amount}" 
                         data-tax-id="${data.tax_id}" 
+                        data-tax="${data.tax.name}"
                         data-stock-qty="${maxQty}">
 
                         <div class="d-flex flex-wrap align-items-center gap-3">
@@ -280,6 +281,9 @@ function add_to_cart(element) {
 
                                 <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center remove-item">
                                     <i class="ri-delete-bin-5-line align-middle fs-12"></i>
+                                </a>
+                                <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center edit-item">
+                                    <i class="ri-edit-line align-middle fs-12"></i>
                                 </a>
                             </div>
                         </div>
@@ -358,6 +362,7 @@ function addVariationToCart(productId, variationId) {
                         data-price="${v.price}"
                         data-tax_amount="${v.tax_amount}" 
                         data-tax-id="${v.tax_id}" 
+                        data-tax="${v.tax}"
                         data-stock-qty="${v.quantity}">
 
                         <div class="d-flex flex-wrap align-items-center gap-3">
@@ -387,6 +392,9 @@ function addVariationToCart(productId, variationId) {
 
                                 <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center remove-item">
                                     <i class="ri-delete-bin-5-line align-middle fs-12"></i>
+                                </a>
+                                <a href="#!" class="btn btn-soft-danger avatar-xs rounded d-flex align-items-center justify-content-center edit-item">
+                                    <i class="ri-edit-line align-middle fs-12"></i>
                                 </a>
                             </div>
                         </div>
@@ -421,6 +429,41 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateCartSummary();
     });
+});
+
+$(document).on('click', '.edit-item', function () {
+    let parent = $(this).closest('[data-product-id]');
+
+    let productId = parent.data('product-id');
+    let productName = parent.find('a.text-dark').text();
+    let price = parent.data('price');
+    let tax = parent.data('tax');
+
+    $('#edit_product_id').val(productId);
+    $('#edit_product_name').val(productName);
+    $('#edit_product_price').val(price);
+    $('#edit_product_tax').val(tax);
+
+    $('#editPriceModal').modal('show');
+});
+
+$('#update_price_btn').on('click', function () {
+
+    let productId = $('#edit_product_id').val();
+    let newPrice = $('#edit_product_price').val();
+    let tax = $('#edit_product_tax').val();
+
+    let item = $(`[data-product-id="${productId}"]`);
+
+    // Update data attribute
+    item.data('price', newPrice);
+    item.attr('data-price', newPrice);
+
+    // Update UI
+    item.find('.fw-semibold').html(`₹${newPrice} <span class="fs-10">(${tax}%)</span>`);
+
+    $('#editPriceModal').modal('hide');
+    updateCartSummary();
 });
 
 // Update totals, tax, and amount
