@@ -162,7 +162,7 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             ],
 
             '*.code' => ['required','max:50', Rule::unique('products','code')->where(fn($q) => $q->where('user_id',$userId))],
-            '*.hsn_code' => ['nullable','max:50', Rule::unique('products','hsn_code')->where(fn($q) => $q->where('user_id',$userId))],
+            '*.hsn_code' => ['nullable','max:50'],
             '*.price' => ['required','numeric','min:0'],
             '*.tax' => ['required', function($attr,$val,$fail) use($userId){ 
                 if(!Tax::where('shop_id',$userId)->whereRaw('LOWER(name)=?',[strtolower($val)])->exists()) 
