@@ -120,7 +120,7 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
         $row = $this->currentRow;
 
         return [
-            '*.name' => ['required','string','max:50',
+            '*.name' => ['required','string','max:100',
                 function ($attribute, $value, $fail) use ($row, $userId) {
                     $categoryName = trim($row['category'] ?? '');
                     $subCategoryName = trim($row['sub_category'] ?? '');
