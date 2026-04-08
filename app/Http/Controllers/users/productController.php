@@ -559,6 +559,8 @@ class productController extends Controller
 
     public function bulk_upload(Request $request)
     {
+        set_time_limit(300); // allow up to 5 minutes for large files
+
         $request->validate([
             'file' => 'required|mimes:xlsx|max:10000',
         ]);
