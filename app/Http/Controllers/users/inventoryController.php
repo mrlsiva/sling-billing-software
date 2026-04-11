@@ -494,6 +494,13 @@ class inventoryController extends Controller
              |--------------------------------------------------------------------------
              */
 
+             $lastInvoice = ProductHistory::where('shop_id',Auth::user()->owner_id)->lockForUpdate()->max('invoice');
+
+            $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
+
+            $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
+
+
             // AFTER validation success
             foreach ($import->validRows as $row) {
 
@@ -504,6 +511,7 @@ class inventoryController extends Controller
                     'product_id'      => $row['product_id'],
                     'quantity'        => $row['quantity'],
                     'imeis'           => $row['imeis'],
+                    'invoice'           => $invoice,
                 ]);
             }
 
@@ -642,17 +650,11 @@ class inventoryController extends Controller
         // Update product quantity
         $product->decrement('quantity', $data['quantity']);
 
-        $lastInvoice = ProductHistory::where('shop_id',Auth::user()->owner_id)->lockForUpdate()->max('invoice');
-
-        $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
-
-        $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
-
 
         // History
         ProductHistory::create([
-            'shop_id'        => Auth::user()->owner_id,
-            'invoice'        => $invoice,
+            'shop_id'         => Auth::user()->owner_id,
+            'invoice'         => $data['invoice'],
             'from'            => Auth::user()->id,
             'to'              => $data['branch_id'],
             'category_id'     => $data['category_id'],
