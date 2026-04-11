@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(grep -n \"state\\\\|pincode\" c:/xampp/htdocs/sling-billing-software/database/migrations/*user_details*)"
-    ]
-  }
-}

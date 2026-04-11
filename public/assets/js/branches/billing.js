@@ -251,7 +251,8 @@ function add_to_cart(element) {
                         data-product-id="${data.id}" 
                         data-price="${data.price}"
                         data-tax_amount="${data.tax_amount}" 
-                        data-tax-id="${data.tax_id}" 
+                        data-tax-id="${data.tax_id}"
+                        data-tax="${data.tax.name}" 
                         data-stock-qty="${maxQty}">
 
                         <div class="d-flex flex-wrap align-items-center gap-3">
@@ -342,6 +343,7 @@ function addVariationToCart(productId, variationId) {
                         data-price="${v.price}"
                         data-tax_amount="${v.tax_amount}" 
                         data-tax-id="${v.tax_id}" 
+                        data-tax="${v.tax}"
                         data-stock-qty="${v.quantity}">
 
                         <div class="d-flex flex-wrap align-items-center gap-3">
