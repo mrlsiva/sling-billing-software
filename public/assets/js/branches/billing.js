@@ -432,19 +432,32 @@ $(document).on('click', '.edit-item', function () {
 $('#update_price_btn').on('click', function () {
 
     let productId = $('#edit_product_id').val();
-    let newPrice = $('#edit_product_price').val();
-    let tax = $('#edit_product_tax').val();
+    let newPrice = parseFloat($('#edit_product_price').val());
+    let tax = parseFloat($('#edit_product_tax').val());
+
+    // ✅ Calculate base price (without tax)
+    let basePrice = newPrice / (1 + (tax / 100));
+    basePrice = Math.round(basePrice * 100) / 100;
+
+    // ✅ Calculate tax amount
+    let taxAmount = newPrice - basePrice;
+    taxAmount = Math.round(taxAmount * 100) / 100;
 
     let item = $(`[data-product-id="${productId}"]`);
 
-    // Update data attribute
-    item.data('price', newPrice);
+    // ✅ Update data attributes
     item.attr('data-price', newPrice);
+    item.attr('data-tax_amount', taxAmount);
 
-    // Update UI
+    // ✅ Sync jQuery cache
+    item.data('price', newPrice);
+    item.data('tax_amount', taxAmount);
+
+    // ✅ Update UI
     item.find('.fw-semibold').html(`₹${newPrice} <span class="fs-10">(${tax}%)</span>`);
 
     $('#editPriceModal').modal('hide');
+
     updateCartSummary();
 });
 
