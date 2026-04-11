@@ -69,7 +69,7 @@ class productController extends Controller
             'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // up to 2MB
             'category' => 'required',
             'sub_category' => 'required',
-            'name' => ['required','string','max:50',
+            'name' => ['required','string','max:100',
                 Rule::unique('products')->where(function ($query) use ($request) {
                     return $query->where('user_id', Auth::user()->owner_id)
                                  ->where('category_id', $request->category)
@@ -295,7 +295,7 @@ class productController extends Controller
             'image' => 'nullable|mimes:jpg,jpeg,png,gif,webp|max:2048', // up to 2MB
             'category_id' => 'required',
             'sub_category' => 'required',
-            'name' => ['required','string','max:50',
+            'name' => ['required','string','max:100',
                 Rule::unique('products')->where(function ($query) use ($request) {
                     return $query->where('user_id', Auth::user()->owner_id)
                                  ->where('category_id', $request->category_id)
@@ -559,6 +559,8 @@ class productController extends Controller
 
     public function bulk_upload(Request $request)
     {
+        set_time_limit(300); // allow up to 5 minutes for large files
+
         $request->validate([
             'file' => 'required|mimes:xlsx|max:10000',
         ]);

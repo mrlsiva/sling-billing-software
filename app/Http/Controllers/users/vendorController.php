@@ -45,7 +45,7 @@ class vendorController extends Controller
             'phone' => 'required|digits:10',
             'email' => 'nullable|email',
             'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
-            'opening_balance' => 'numeric|min:1',
+            'opening_balance' => 'nullable|numeric|min:0',
 
         ], 
         [
