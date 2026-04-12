@@ -398,6 +398,9 @@ class inventoryController extends Controller
 
     public function bulk(Request $request)
     {
+        // Allow extra time for large Excel files
+        set_time_limit(300);
+
         $request->validate([
             'branch' => 'required',
             'file'   => 'required|file|mimes:xlsx,xls|max:10000',
@@ -494,6 +497,11 @@ class inventoryController extends Controller
              |--------------------------------------------------------------------------
              */
 
+            // Compute the starting invoice number once before the loop
+            // to avoid a lockForUpdate()->max() scan on every row
+            $lastInvoice    = ProductHistory::where('shop_id', Auth::user()->owner_id)->max('invoice');
+            $invoiceCounter = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
+
             // AFTER validation success
             foreach ($import->validRows as $row) {
 
@@ -504,6 +512,7 @@ class inventoryController extends Controller
                     'product_id'      => $row['product_id'],
                     'quantity'        => $row['quantity'],
                     'imeis'           => $row['imeis'],
+                    'invoice'         => str_pad($invoiceCounter++, 5, '0', STR_PAD_LEFT),
                 ]);
             }
 
@@ -642,12 +651,11 @@ class inventoryController extends Controller
         // Update product quantity
         $product->decrement('quantity', $data['quantity']);
 
-        $lastInvoice = ProductHistory::where('shop_id',Auth::user()->owner_id)->lockForUpdate()->max('invoice');
-
-        $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
-
-        $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
-
+        // Invoice is pre-computed once in bulk() to avoid per-row table scans
+        $invoice = $data['invoice'] ?? str_pad(
+            ((int) ltrim(ProductHistory::where('shop_id', Auth::user()->owner_id)->max('invoice'), '0') + 1),
+            5, '0', STR_PAD_LEFT
+        );
 
         // History
         ProductHistory::create([
