@@ -251,7 +251,8 @@ function add_to_cart(element) {
                         data-product-id="${data.id}" 
                         data-price="${data.price}"
                         data-tax_amount="${data.tax_amount}" 
-                        data-tax-id="${data.tax_id}" 
+                        data-tax-id="${data.tax_id}"
+                        data-tax="${data.tax.name}" 
                         data-stock-qty="${maxQty}">
 
                         <div class="d-flex flex-wrap align-items-center gap-3">
@@ -342,6 +343,7 @@ function addVariationToCart(productId, variationId) {
                         data-price="${v.price}"
                         data-tax_amount="${v.tax_amount}" 
                         data-tax-id="${v.tax_id}" 
+                        data-tax="${v.tax}"
                         data-stock-qty="${v.quantity}">
 
                         <div class="d-flex flex-wrap align-items-center gap-3">
@@ -430,19 +432,32 @@ $(document).on('click', '.edit-item', function () {
 $('#update_price_btn').on('click', function () {
 
     let productId = $('#edit_product_id').val();
-    let newPrice = $('#edit_product_price').val();
-    let tax = $('#edit_product_tax').val();
+    let newPrice = parseFloat($('#edit_product_price').val());
+    let tax = parseFloat($('#edit_product_tax').val());
+
+    // ✅ Calculate base price (without tax)
+    let basePrice = newPrice / (1 + (tax / 100));
+    basePrice = Math.round(basePrice * 100) / 100;
+
+    // ✅ Calculate tax amount
+    let taxAmount = newPrice - basePrice;
+    taxAmount = Math.round(taxAmount * 100) / 100;
 
     let item = $(`[data-product-id="${productId}"]`);
 
-    // Update data attribute
-    item.data('price', newPrice);
+    // ✅ Update data attributes
     item.attr('data-price', newPrice);
+    item.attr('data-tax_amount', taxAmount);
 
-    // Update UI
+    // ✅ Sync jQuery cache
+    item.data('price', newPrice);
+    item.data('tax_amount', taxAmount);
+
+    // ✅ Update UI
     item.find('.fw-semibold').html(`₹${newPrice} <span class="fs-10">(${tax}%)</span>`);
 
     $('#editPriceModal').modal('hide');
+
     updateCartSummary();
 });
 

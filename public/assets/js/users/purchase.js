@@ -444,23 +444,41 @@ jQuery(document).ready(function () {
     }
     
     $(document).on('click', '.view-detail', function (e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    let id = $(this).data('id');
+        let id = $(this).data('id');
 
-    $.ajax({
-        url: id + "/get_detail",
-        type: "GET",
-        success: function (html) {
-            $("#purchaseDetail .modal-body").html(html);
-            $("#purchaseDetail").modal("show");
-        },
-        error: function (xhr) {
-            alert("Failed to load details");
-            console.error(xhr.responseText);
-        }
+        $.ajax({
+            url: id + "/get_detail",
+            type: "GET",
+            success: function (html) {
+                $("#purchaseDetail .modal-body").html(html);
+                $("#purchaseDetail").modal("show");
+            },
+            error: function (xhr) {
+                alert("Failed to load details");
+                console.error(xhr.responseText);
+            }
+        });
     });
-});
+
+    // PAGINATION CLICK (VERY IMPORTANT)
+    $(document).on('click', '#purchaseDetail .pagination a', function (e) {
+        e.preventDefault();
+
+        let url = $(this).attr('href');
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            success: function (response) {
+                $("#purchaseDetail .modal-body").html(response);
+            },
+            error: function () {
+                alert("Pagination load failed");
+            }
+        });
+    });
 
 
 

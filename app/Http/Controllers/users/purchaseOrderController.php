@@ -594,9 +594,10 @@ class purchaseOrderController extends Controller
         }
     }
 
-    public function get_detail($company,$id)
+    public function get_detail($company, $id)
     {
-        $purchase_order = PurchaseOrder::where('id',$id)->first();
+        $purchase_order = PurchaseOrder::findOrFail($id);
+
         $purchase_orders = PurchaseOrder::with([
                 'vendor',
                 'category',
@@ -604,9 +605,11 @@ class purchaseOrderController extends Controller
                 'product',
                 'metric'
             ])
-            ->where('shop_id', Auth::user()->owner_id)->where('invoice_no', $purchase_order->invoice_no)
-            ->get(); // 👈 or ->first() if single invoice
+            ->where('shop_id', Auth::user()->owner_id)
+            ->where('invoice_no', $purchase_order->invoice_no)
+            ->paginate(10); // 👈 change to 5 or 10
 
+        // IMPORTANT: return only blade view (for AJAX)
         return view('users.purchase_orders.detail', compact('purchase_orders'));
     }
 

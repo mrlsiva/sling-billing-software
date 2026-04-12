@@ -57,8 +57,7 @@
 										<td>{{ \Carbon\Carbon::parse($purchase_order->invoice_date)->format('d M Y') }}</td>
 										<td>{{ \Carbon\Carbon::parse($purchase_order->due_date)->format('d M Y') }}</td>
 										<td>
-										    <a href="#!" class="link-dark view-detail"
-										       data-id="{{ $purchase_order->id }}">
+										    <a href="#" class="link-dark view-detail" data-id="{{ $purchase_order->id }}">
 										        <i class="ri-eye-line align-middle fs-20" title="View Order"></i>
 										    </a>
 										</td>

@@ -497,10 +497,12 @@ class inventoryController extends Controller
              |--------------------------------------------------------------------------
              */
 
-            // Compute the starting invoice number once before the loop
-            // to avoid a lockForUpdate()->max() scan on every row
-            $lastInvoice    = ProductHistory::where('shop_id', Auth::user()->owner_id)->max('invoice');
-            $invoiceCounter = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
+             $lastInvoice = ProductHistory::where('shop_id',Auth::user()->owner_id)->lockForUpdate()->max('invoice');
+
+            $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
+
+            $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
+
 
             // AFTER validation success
             foreach ($import->validRows as $row) {
@@ -512,7 +514,7 @@ class inventoryController extends Controller
                     'product_id'      => $row['product_id'],
                     'quantity'        => $row['quantity'],
                     'imeis'           => $row['imeis'],
-                    'invoice'         => str_pad($invoiceCounter++, 5, '0', STR_PAD_LEFT),
+                    'invoice'           => $invoice,
                 ]);
             }
 
@@ -651,16 +653,11 @@ class inventoryController extends Controller
         // Update product quantity
         $product->decrement('quantity', $data['quantity']);
 
-        // Invoice is pre-computed once in bulk() to avoid per-row table scans
-        $invoice = $data['invoice'] ?? str_pad(
-            ((int) ltrim(ProductHistory::where('shop_id', Auth::user()->owner_id)->max('invoice'), '0') + 1),
-            5, '0', STR_PAD_LEFT
-        );
 
         // History
         ProductHistory::create([
-            'shop_id'        => Auth::user()->owner_id,
-            'invoice'        => $invoice,
+            'shop_id'         => Auth::user()->owner_id,
+            'invoice'         => $data['invoice'],
             'from'            => Auth::user()->id,
             'to'              => $data['branch_id'],
             'category_id'     => $data['category_id'],
