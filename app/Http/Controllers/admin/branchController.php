@@ -215,7 +215,7 @@ class branchController extends Controller
         $pos_setting = PosSetting::create([ 
             'shop_id' => $request->parent_id,
             'branch_id' => $user->id,
-            'pagination' => 21,
+            'pagination' => 15,
         ]);
 
         //Log

@@ -34,7 +34,7 @@ class posController extends Controller
         {
             // Get pagination setting
             $paginationSetting = PosSetting::where([['shop_id', Auth::user()->owner_id],['branch_id',null]])->first();
-            $pagination = $paginationSetting ? $paginationSetting->pagination : 21;
+            $pagination = $paginationSetting ? $paginationSetting->pagination : 15;
 
             // Build stock query
             $stocks = Stock::with(['product.category', 'product.sub_category'])->where([['shop_id',Auth::user()->owner_id],['branch_id',null],['is_active',1]])
@@ -64,7 +64,7 @@ class posController extends Controller
         {
             // Get pagination setting
             $paginationSetting = PosSetting::where('branch_id', Auth::user()->id)->first();
-            $pagination = $paginationSetting ? $paginationSetting->pagination : 21;
+            $pagination = $paginationSetting ? $paginationSetting->pagination : 15;
 
             // Build stock query
             $stocks = Stock::with(['product.category', 'product.sub_category'])->where('branch_id', Auth::user()->id)->where('is_active', 1)
@@ -517,7 +517,7 @@ class posController extends Controller
 
             if($pagination)
             {
-                PosSetting::where([['shop_id',Auth::user()->parent_id],['branch_id',Auth::user()->id]])->update(['pgination' => $request->pagination]);
+                PosSetting::where([['shop_id',Auth::user()->parent_id],['branch_id',Auth::user()->id]])->update(['pagination' => $request->pagination]);
             }
             else
             {

@@ -48,7 +48,11 @@ class inventoryController extends Controller
                         $q3->where('name', 'like', "%{$search}%");
                     });
                 });
-            })->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
+            })
+            ->when(request('show_available'), function ($query) {
+                $query->where('quantity', '>', 0);
+            })
+            ->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
         }
         else
         {
@@ -69,7 +73,11 @@ class inventoryController extends Controller
                         $q3->where('name', 'like', "%{$search}%");
                     });
                 });
-            })->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
+            })
+            ->when(request('show_available'), function ($query) {
+                $query->where('quantity', '>', 0);
+            })
+            ->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
         }
 
         $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();

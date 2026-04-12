@@ -35,7 +35,7 @@
 
                 </ul>
 
-                <form method="get" action="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}">
+                <form method="get" action="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}" id="stockFilterForm">
                     <div class="row mb-2 p-3">
                         <div class="col-md-11">
                             <div class="input-group">
@@ -47,6 +47,15 @@
 
                         <div class="col-md-1">
                             <button class="btn btn-primary"> Search </button>
+                        </div>
+
+                        <div class="col-md-12 mt-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="show_available" id="show_available" value="1"
+                                    {{ request('show_available') ? 'checked' : '' }}
+                                    onchange="document.getElementById('stockFilterForm').submit();">
+                                <label class="form-check-label" for="show_available">Show available stock</label>
+                            </div>
                         </div>
                     </div>
                 </form>
