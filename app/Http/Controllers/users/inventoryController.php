@@ -29,7 +29,6 @@ class inventoryController extends Controller
 
     public function stock(Request $request, $company, $shop, $branch)
     {
-        //return $request;
         $query = Stock::where('shop_id', $shop);
 
         if ($branch != 0) {
