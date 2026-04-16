@@ -211,206 +211,7 @@ class purchaseOrderController extends Controller
         DB::beginTransaction();
 
         try {
-            $vendor = Vendor::findOrFail($request->vendor);
-            $totalGross = 0;
-
-            foreach ($request->products as $item) {
-                //return $item;
-
-                if (!empty($item['imei'])) {
-                    $imeiList = is_array($item['imei']) ? $item['imei'] : explode(',', $item['imei']);
-                } else {
-                    $imeiList = [];
-                }
-
-                $sizeList   = [];
-                $colourList = [];
-
-                if (!empty($item['variation']) && is_array($item['variation'])) {
-                    foreach ($item['variation'] as $var) {
-
-                        if (!empty($var['size_id'])) {
-                            $sizeList[] = $var['size_id'];
-                        }
-
-                        if (!empty($var['colour_id'])) {
-                            $colourList[] = $var['colour_id'];
-                        }
-                    }
-                }
-
-                // Remove duplicates
-                $sizeList   = array_unique($sizeList);
-                $colourList = array_unique($colourList);
-
-                $imeiList = array_filter(array_map('trim', $imeiList));
-
-                $purchaseOrder = PurchaseOrder::create([
-                    'shop_id'        => Auth::user()->owner_id,
-                    'vendor_id'      => $request->vendor,
-                    'payment_id'     => $request->payment,
-                    'invoice_no'     => $request->invoice,
-                    'invoice_date'   => $request->invoice_date,
-                    'due_date'       => $request->due_date,
-                    'category_id'    => $item['category'],
-                    'sub_category_id'=> $item['sub_category'],
-                    'product_id'     => $item['product'],
-                    'metric_id'      => $item['unit'],
-                    'quantity'       => $item['quantity'],
-                    'price_per_unit' => $item['price_per_unit'],
-                    'tax'            => $item['tax'] ?? 0,
-                    'discount'       => $item['discount'] ?? 0,
-                    'net_cost'       => $item['net_cost'],
-                    'gross_cost'     => $item['gross_cost'],
-                    'imei'           => !empty($imeiList) ? implode(',', $imeiList) : null,
-                    // ✅ NEW
-                    'size'            => !empty($sizeList) ? implode(',', $sizeList) : null,
-                    'colour'          => !empty($colourList) ? implode(',', $colourList) : null,
-                    'status'         => 0, // pending
-                ]);
-
-                // Update Product quantity
-                $product = Product::find($item['product']);
-                $product->increment('quantity', $item['quantity']);
-                $imeiList = array_filter(array_map('trim', $imeiList));
-
-                // Check if stock already exists
-                $stock = Stock::where([
-                    'shop_id'        => Auth::user()->owner_id,
-                    'branch_id'      => null,
-                    'category_id'    => $item['category'],
-                    'sub_category_id'=> $item['sub_category'],
-                    'product_id'     => $item['product'],
-                ])->first();
-
-                if ($stock) {
-                    // Merge IMEI numbers
-                    $existingImeis = !empty($stock->imei)
-                        ? explode(',', $stock->imei)
-                        : [];
-
-                    $mergedImeis = array_unique(array_merge($existingImeis, $imeiList));
-                    $mergedImeis = array_filter(array_map('trim', $mergedImeis));
-
-                    // Update existing stock
-                    $stock->update([
-                        'quantity' => $stock->quantity + $item['quantity'],
-                        'imei'     => !empty($mergedImeis) ? implode(',', $mergedImeis) : null,
-                    ]);
-
-                } else {
-                    // Create new stock
-                    Stock::create([
-                        'shop_id'        => Auth::user()->owner_id,
-                        'branch_id'      => null,
-                        'category_id'    => $item['category'],
-                        'sub_category_id'=> $item['sub_category'],
-                        'product_id'     => $item['product'],
-                        'quantity'       => $item['quantity'],
-                        'imei'           => !empty($imeiList) ? implode(',', $imeiList) : null,
-                    ]);
-                }
-                
-
-                // Handle IMEI Numbers
-                if (!empty($item['imei'])) {
-                    // Normalize IMEI input: accept both array and comma-separated string
-                    $imeiList = is_array($item['imei']) ? $item['imei'] : explode(',', $item['imei']);
-
-                    $imeiNumbers = array_filter(array_map('trim', $imeiList));
-
-                    foreach ($imeiNumbers as $imei) {
-                        ProductImeiNumber::create([
-                            'purchase_order_id' => $purchaseOrder->id,
-                            'product_id'        => $item['product'],
-                            'name'              => $imei,
-                            'is_sold'           => 0,
-                        ]);
-                    }
-                }
-
-                $productId  = $item['product'];
-                $quantity   = (float)$item['quantity'];
-                $netCost    = (float)$item['net_cost'];
-
-                $stock = Stock::where('product_id', $productId)
-                ->where('shop_id', auth()->user()->owner_id)
-                ->whereNull('branch_id')
-                ->first();
-
-                if (!empty($item['variation']) && is_array($item['variation'])) 
-                {
-
-                    foreach ($item['variation'] as $var) {
-
-                        $stockId  = $var['stock_id'];
-                        $sizeId   = $var['size_id'] ?? null;
-                        $colourId = $var['colour_id'] ?? null;
-                        $qty      = (int) ($var['qty'] ?? 0);
-
-                        if ($qty <= 0) {
-                            continue;
-                        }
-
-                        // FIND VARIATION (null-safe)
-                        $variation = StockVariation::where('stock_id', $stockId)
-                            ->where('product_id', $productId)
-                            ->where(function ($q) use ($sizeId) {
-                                $sizeId === null ? $q->whereNull('size_id') : $q->where('size_id', $sizeId);
-                            })
-                            ->where(function ($q) use ($colourId) {
-                                $colourId === null ? $q->whereNull('colour_id') : $q->where('colour_id', $colourId);
-                            })
-                            ->lockForUpdate()
-                            ->first();
-
-                        if (!$variation) {
-                            // Optional: create variation if missing
-                            $variation = StockVariation::create([
-                                'stock_id'   => $stockId,
-                                'product_id' => $productId,
-                                'size_id'    => $sizeId,
-                                'colour_id'  => $colourId,
-                                'quantity'   => 0,
-                                'price'      => $product->price,
-                            ]);
-                        }
-
-                        // UPDATE QUANTITY
-                        $variation->update([
-                            'quantity' => $variation->quantity + $qty,
-                            'price'    => $product->price,
-                        ]);
-                    }
-
-                } 
-                else 
-                {
-
-                    // DEFAULT VARIATION (no size / no colour)
-                    $defaultVariation = StockVariation::where('stock_id', $stock->id)
-                        ->where('product_id', $productId)
-                        ->whereNull('size_id')
-                        ->whereNull('colour_id')
-                        ->lockForUpdate()
-                        ->first();
-
-                    if ($defaultVariation) {
-                        $defaultVariation->update([
-                            'quantity' => $defaultVariation->quantity + $quantity,
-                            'price'    => $product->price,
-                        ]);
-                    }
-                }
-
-
-
-                $totalGross += $item['gross_cost'];
-
-                // Log and Notification per product row
-                $this->addToLog($this->unique(), Auth::user()->id, 'Purchase Order Created', 'App/Models/PurchaseOrder', 'purchase_orders', $purchaseOrder->id, 'Insert', null, json_encode($item), 'Success', 'Purchase Order Created');
-                $this->notification(Auth::user()->owner_id, null, 'App/Models/PurchaseOrder', $purchaseOrder->id, null, json_encode($item), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully with quantity '.$item['quantity'], null, null, 7);
-            }
+            [$purchaseOrder, $totalGross, $vendor] = $this->processOrderStorage($request->vendor, $request->payment, $request->invoice, $request->invoice_date, $request->due_date, $request->products);
 
             // --- Handle prepaid balance ---
             $prepaid = $vendor->prepaid_amount ?? 0;
@@ -434,14 +235,13 @@ class purchaseOrderController extends Controller
 
                 VendorPaymentDetail::create([
                     'vendor_payment_id' => null,
-                    'purchase_order_id' => $purchaseOrder->id, // last created order
+                    'purchase_order_id' => $purchaseOrder->id,
                     'payment_id'        => 1,
                     'amount'            => $allocatable,
                     'paid_on'           => now(),
                     'comment'           => $comment,
                 ]);
 
-                // Update status for all orders in this invoice
                 PurchaseOrder::where('invoice_no', $request->invoice)
                     ->update(['status' => $status]);
             }
@@ -454,12 +254,190 @@ class purchaseOrderController extends Controller
                 'redirect' => route('vendor.purchase_order.index', ['company' => request()->route('company')])
             ]);
 
-            //return redirect()->route('vendor.purchase_order.index', ['company' => request()->route('company')])->with('toast_success', 'Purchase order created successfully.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('toast_error', 'Error creating purchase order: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Core DB logic for creating purchase order rows, stock, IMEI, and variations.
+     * Shared by store() and bulk_upload() to avoid running slow wildcard validation
+     * on large product arrays from bulk import.
+     *
+     * @return array [$lastPurchaseOrder, $totalGross, $vendor]
+     */
+    public function processOrderStorage($vendorId, $paymentId, $invoiceNo, $invoiceDate, $dueDate, array $products)
+    {
+        $vendor     = Vendor::findOrFail($vendorId);
+        $totalGross = 0;
+        $purchaseOrder = null;
+
+        foreach ($products as $item) {
+
+            if (!empty($item['imei'])) {
+                $imeiList = is_array($item['imei']) ? $item['imei'] : explode(',', $item['imei']);
+            } else {
+                $imeiList = [];
+            }
+
+            $sizeList   = [];
+            $colourList = [];
+
+            if (!empty($item['variation']) && is_array($item['variation'])) {
+                foreach ($item['variation'] as $var) {
+                    if (!empty($var['size_id'])) {
+                        $sizeList[] = $var['size_id'];
+                    }
+                    if (!empty($var['colour_id'])) {
+                        $colourList[] = $var['colour_id'];
+                    }
+                }
+            }
+
+            $sizeList   = array_unique($sizeList);
+            $colourList = array_unique($colourList);
+            $imeiList   = array_filter(array_map('trim', $imeiList));
+
+            $purchaseOrder = PurchaseOrder::create([
+                'shop_id'         => Auth::user()->owner_id,
+                'vendor_id'       => $vendorId,
+                'payment_id'      => $paymentId,
+                'invoice_no'      => $invoiceNo,
+                'invoice_date'    => $invoiceDate,
+                'due_date'        => $dueDate,
+                'category_id'     => $item['category'],
+                'sub_category_id' => $item['sub_category'],
+                'product_id'      => $item['product'],
+                'metric_id'       => $item['unit'],
+                'quantity'        => $item['quantity'],
+                'price_per_unit'  => $item['price_per_unit'],
+                'tax'             => $item['tax'] ?? 0,
+                'discount'        => $item['discount'] ?? 0,
+                'net_cost'        => $item['net_cost'],
+                'gross_cost'      => $item['gross_cost'],
+                'imei'            => !empty($imeiList) ? implode(',', $imeiList) : null,
+                'size'            => !empty($sizeList) ? implode(',', $sizeList) : null,
+                'colour'          => !empty($colourList) ? implode(',', $colourList) : null,
+                'status'          => 0,
+            ]);
+
+            $product = Product::find($item['product']);
+            $product->increment('quantity', $item['quantity']);
+            $imeiList = array_filter(array_map('trim', $imeiList));
+
+            $stock = Stock::where([
+                'shop_id'         => Auth::user()->owner_id,
+                'branch_id'       => null,
+                'category_id'     => $item['category'],
+                'sub_category_id' => $item['sub_category'],
+                'product_id'      => $item['product'],
+            ])->first();
+
+            if ($stock) {
+                $existingImeis = !empty($stock->imei) ? explode(',', $stock->imei) : [];
+                $mergedImeis   = array_filter(array_map('trim', array_unique(array_merge($existingImeis, $imeiList))));
+
+                $stock->update([
+                    'quantity' => $stock->quantity + $item['quantity'],
+                    'imei'     => !empty($mergedImeis) ? implode(',', $mergedImeis) : null,
+                ]);
+            } else {
+                Stock::create([
+                    'shop_id'         => Auth::user()->owner_id,
+                    'branch_id'       => null,
+                    'category_id'     => $item['category'],
+                    'sub_category_id' => $item['sub_category'],
+                    'product_id'      => $item['product'],
+                    'quantity'        => $item['quantity'],
+                    'imei'            => !empty($imeiList) ? implode(',', $imeiList) : null,
+                ]);
+            }
+
+            if (!empty($item['imei'])) {
+                $imeiNumbers = array_filter(array_map('trim', is_array($item['imei']) ? $item['imei'] : explode(',', $item['imei'])));
+
+                foreach ($imeiNumbers as $imei) {
+                    ProductImeiNumber::create([
+                        'purchase_order_id' => $purchaseOrder->id,
+                        'product_id'        => $item['product'],
+                        'name'              => $imei,
+                        'is_sold'           => 0,
+                    ]);
+                }
+            }
+
+            $productId = $item['product'];
+            $quantity  = (float)$item['quantity'];
+
+            $stock = Stock::where('product_id', $productId)
+                ->where('shop_id', auth()->user()->owner_id)
+                ->whereNull('branch_id')
+                ->first();
+
+            if (!empty($item['variation']) && is_array($item['variation'])) {
+
+                foreach ($item['variation'] as $var) {
+
+                    $stockId  = $var['stock_id'];
+                    $sizeId   = $var['size_id'] ?? null;
+                    $colourId = $var['colour_id'] ?? null;
+                    $qty      = (int) ($var['qty'] ?? 0);
+
+                    if ($qty <= 0) continue;
+
+                    $variation = StockVariation::where('stock_id', $stockId)
+                        ->where('product_id', $productId)
+                        ->where(function ($q) use ($sizeId) {
+                            $sizeId === null ? $q->whereNull('size_id') : $q->where('size_id', $sizeId);
+                        })
+                        ->where(function ($q) use ($colourId) {
+                            $colourId === null ? $q->whereNull('colour_id') : $q->where('colour_id', $colourId);
+                        })
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$variation) {
+                        $variation = StockVariation::create([
+                            'stock_id'   => $stockId,
+                            'product_id' => $productId,
+                            'size_id'    => $sizeId,
+                            'colour_id'  => $colourId,
+                            'quantity'   => 0,
+                            'price'      => $product->price,
+                        ]);
+                    }
+
+                    $variation->update([
+                        'quantity' => $variation->quantity + $qty,
+                        'price'    => $product->price,
+                    ]);
+                }
+
+            } else {
+
+                $defaultVariation = StockVariation::where('stock_id', $stock->id)
+                    ->where('product_id', $productId)
+                    ->whereNull('size_id')
+                    ->whereNull('colour_id')
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($defaultVariation) {
+                    $defaultVariation->update([
+                        'quantity' => $defaultVariation->quantity + $quantity,
+                        'price'    => $product->price,
+                    ]);
+                }
+            }
+
+            $totalGross += $item['gross_cost'];
+
+            $this->addToLog($this->unique(), Auth::user()->id, 'Purchase Order Created', 'App/Models/PurchaseOrder', 'purchase_orders', $purchaseOrder->id, 'Insert', null, json_encode($item), 'Success', 'Purchase Order Created');
+            $this->notification(Auth::user()->owner_id, null, 'App/Models/PurchaseOrder', $purchaseOrder->id, null, json_encode($item), now(), Auth::user()->id, 'Purchase order created for product '.$product->name.' done successfully with quantity '.$item['quantity'], null, null, 7);
+        }
+
+        return [$purchaseOrder, $totalGross, $vendor];
     }
 
 
@@ -729,6 +707,9 @@ class purchaseOrderController extends Controller
 
     public function bulk_upload(Request $request)
     {
+        // Allow extra time for large Excel files
+        set_time_limit(300);
+
         $request->validate([
             'vendor_id' => 'required',
             'invoice_no' => [

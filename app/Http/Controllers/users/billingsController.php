@@ -48,7 +48,7 @@ class billingsController extends Controller
         $categories = Category::whereIn('id',$categories)->get();
         $staffs = Staff::where([['shop_id',Auth::user()->owner_id],['branch_id',null],['is_active',1]])->get();
 
-        $pagination = 21;
+        $pagination = 15;
 
         $stocks = Stock::where([['shop_id',Auth::user()->owner_id],['branch_id',null],['is_active',1]])
             ->when($request->category, function ($query, $category) {
@@ -82,7 +82,7 @@ class billingsController extends Controller
 
     public function get_product(Request $request)
     {
-        $pagination = 21;
+        $pagination = 15;
         
         $stocks = Stock::with(['product.category', 'product.sub_category'])
             ->where([['shop_id',Auth::user()->owner_id],['branch_id',null],['is_active',1]])

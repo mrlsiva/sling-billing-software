@@ -55,7 +55,7 @@ class billingController extends Controller
         }
         else
         {
-            $pagination = 21;
+            $pagination = 15;
         }
 
         $stocks = Stock::where('branch_id', Auth::user()->id)->where('is_active', 1)
@@ -111,7 +111,7 @@ class billingController extends Controller
         }
         else
         {
-            $pagination = 21;
+            $pagination = 15;
         }
         
         $stocks = Stock::with(['product.category', 'product.sub_category'])

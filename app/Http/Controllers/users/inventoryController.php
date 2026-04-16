@@ -442,6 +442,9 @@ class inventoryController extends Controller
 
     public function bulk(Request $request)
     {
+        // Allow extra time for large Excel files
+        set_time_limit(300);
+
         $request->validate([
             'branch' => 'required',
             'file'   => 'required|file|mimes:xlsx,xls|max:10000',
