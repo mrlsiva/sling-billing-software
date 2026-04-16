@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Imports\ProductTransferImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductTransferErrorExport;
+use App\Exports\StockExport;
 use App\Models\BulkUploadLog;
 use Illuminate\Http\Request;
 use App\Traits\Notifications;
@@ -26,56 +27,99 @@ class inventoryController extends Controller
 {
     use Log, Notifications;
 
-    public function stock(Request $request,$company,$shop,$branch)
+    public function stock(Request $request, $company, $shop, $branch)
     {
+        //return $request;
+        $query = Stock::where('shop_id', $shop);
 
         if ($branch != 0) {
-
-            $stocks = Stock::where('shop_id', $shop)->where('branch_id', $branch)
-            ->when(request('product'), function ($query) {
-                $search = request('product');
-                $query->where(function ($q) use ($search) {
-                    // product name
-                    $q->whereHas('product', function ($q1) use ($search) {
-                        $q1->where('name', 'like', "%{$search}%");
-                    })
-                    // category name
-                    ->orWhereHas('product.category', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%{$search}%");
-                    })
-                    // subcategory name
-                    ->orWhereHas('product.sub_category', function ($q3) use ($search) {
-                        $q3->where('name', 'like', "%{$search}%");
-                    });
-                });
-            })->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
-        }
-        else
-        {
-            $stocks = Stock::where('shop_id', $shop)->whereNull('branch_id')
-            ->when(request('product'), function ($query) {
-                $search = request('product');
-                $query->where(function ($q) use ($search) {
-                    // product name
-                    $q->whereHas('product', function ($q1) use ($search) {
-                        $q1->where('name', 'like', "%{$search}%");
-                    })
-                    // category name
-                    ->orWhereHas('product.category', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%{$search}%");
-                    })
-                    // subcategory name
-                    ->orWhereHas('product.sub_category', function ($q3) use ($search) {
-                        $q3->where('name', 'like', "%{$search}%");
-                    });
-                });
-            })->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
+            $query->where('branch_id', $branch);
+        } else {
+            $query->whereNull('branch_id');
         }
 
-        $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
-        $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
+        // Product search
+        $query->when($request->product, function ($query) use ($request) {
+            $search = $request->product;
 
-        return view('users.inventories.stock',compact('stocks','branches','categories'));
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('product', function ($q1) use ($search) {
+                    $q1->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('product.category', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('product.sub_category', function ($q3) use ($search) {
+                    $q3->where('name', 'like', "%{$search}%");
+                });
+            });
+        });
+
+        // Show only in-stock items
+        $query->when($request->has('stock_in'), function ($query) {
+            $query->where('quantity', '>', 0);
+        });
+
+        $stocks = $query->orderBy('category_id')
+                        ->orderBy('sub_category_id')
+                        ->orderBy('product_id')
+                        ->paginate(10)
+                        ->withQueryString();
+
+        $branches = User::where([
+            ['parent_id', Auth::user()->owner_id],
+            ['is_active', 1],
+            ['is_lock', 0],
+            ['is_delete', 0]
+        ])->get();
+
+        $categories = Category::where([
+            ['user_id', Auth::user()->owner_id],
+            ['is_active', 1]
+        ])->get();
+
+        return view('users.inventories.stock', compact('stocks', 'branches', 'categories'));
+    }
+
+    public function download(Request $request, $company, $shop, $branch)
+    {
+        $query = Stock::where('shop_id', $shop);
+
+        if ($branch != 0) {
+            $query->where('branch_id', $branch);
+        } else {
+            $query->whereNull('branch_id');
+        }
+
+        // product search
+        $query->when($request->product, function ($query) use ($request) {
+            $search = $request->product;
+
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('product', function ($q1) use ($search) {
+                    $q1->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('product.category', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('product.sub_category', function ($q3) use ($search) {
+                    $q3->where('name', 'like', "%{$search}%");
+                });
+            });
+        });
+
+        // ✅ FIXED stock filter
+        $query->when($request->stock_in == 1, function ($query) {
+            $query->where('quantity', '>', 0);
+        });
+
+        $stocks = $query->orderBy('category_id')
+                        ->orderBy('sub_category_id')
+                        ->orderBy('product_id')
+                        ->get(); // ❗ use get() for download
+
+        // 👉 your export logic (Excel / CSV / PDF)
+        return Excel::download(new StockExport($stocks), 'stocks.xlsx');
     }
 
     public function get_stock_variation($company, Stock $stock)

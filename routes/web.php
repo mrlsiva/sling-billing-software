@@ -205,6 +205,7 @@ else
                                 Route::name('stock')->group(function () {
 
                                     Route::get('/{shop}/{branch}',[inventoryController::class, 'stock']);
+                                    Route::get('/{shop}/{branch}/download',[inventoryController::class, 'download'])->name('.download');
 
                                 });
                             });
@@ -458,6 +459,7 @@ else
                                 Route::name('product.')->group(function () {
 
                                     Route::get('/index',[stockController::class, 'index'])->name('index');
+                                    Route::get('/download',[stockController::class, 'download'])->name('download');
                                     Route::get('/{stock}/get_stock_variation',[stockController::class, 'get_stock_variation'])->name('.get_stock_variation');
                                     Route::get('/{product}/qrcode',[stockController::class, 'qrcode'])->name('qrcode');
                                     Route::get('/{id}/barcode',[stockController::class, 'barcode'])->name('barcode');

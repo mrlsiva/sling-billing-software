@@ -87,7 +87,10 @@ class orderController extends Controller
                     'quantity'    => $qty,
                     'price'       => $detail->price,
                     'tax_amount'  => $detail->tax_amount,
+                    'tax_percent' => $detail->tax_percent,
                     'imei'        => $imeiString,
+                    'size_id'     => $detail->size_id,
+                    'colour_id'   => $detail->colour_id,
                 ]);
 
 

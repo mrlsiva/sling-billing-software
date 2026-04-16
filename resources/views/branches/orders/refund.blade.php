@@ -73,7 +73,7 @@
 										    </td>
 
 										    <td>{{ $loop->iteration }}</td>
-										    <td>{{ $order_detail->name }}</td>
+										    <td>{{ $order_detail->name }} @if($order_detail->colour_id) - {{$order_detail->colour->name}} @endif @if($order_detail->size_id) - {{$order_detail->size->name}} @endif</td>
 										    <td>{{ $order_detail->quantity }}</td>
 										    <td>₹ {{ $order_detail->price - $order_detail->tax_amount }}</td>
 										    <td>₹ {{ $order_detail->tax_amount }}</td>

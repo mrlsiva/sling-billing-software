@@ -340,4 +340,35 @@ $(document).on('click', '#bulkBtn', function () {
 });
 </script>
 
+<script>
+$(document).ready(function () {
+
+    // When invoice date changes
+    $('#invoice_date').on('change', function () {
+        let invoiceDate = $(this).val();
+        let dueDate = $('#due_date').val();
+
+        // Set minimum allowed due date
+        $('#due_date').attr('min', invoiceDate);
+
+        // If already selected due date is invalid → reset
+        if (dueDate && dueDate < invoiceDate) {
+            $('#due_date').val('');
+        }
+    });
+
+    // When due date changes
+    $('#due_date').on('change', function () {
+        let invoiceDate = $('#invoice_date').val();
+        let dueDate = $(this).val();
+
+        if (invoiceDate && dueDate < invoiceDate) {
+            alert('Due date must be greater than or equal to Invoice date');
+            $(this).val('');
+        }
+    });
+
+});
+</script>
+
 @endsection

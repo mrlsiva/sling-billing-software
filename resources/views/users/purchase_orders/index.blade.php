@@ -42,6 +42,7 @@
 									<th>Invoice No</th>
 									<th>Invoice Date</th>
 									<th>Due Date</th>
+									<th>Status</th>
 									<th>Action</th>
 								</tr>
 							</thead>
@@ -55,7 +56,21 @@
 										<td>{{ \Carbon\Carbon::parse($purchase_order->created_at)->format('d M Y') }}</td>
 										<td>{{$purchase_order->invoice_no}}</td>
 										<td>{{ \Carbon\Carbon::parse($purchase_order->invoice_date)->format('d M Y') }}</td>
-										<td>{{ \Carbon\Carbon::parse($purchase_order->due_date)->format('d M Y') }}</td>
+										<td>{{ $purchase_order->due_date ? \Carbon\Carbon::parse($purchase_order->due_date)->format('d M Y') : '-' }}</td>
+										<td>
+										    @if($purchase_order->computed_status == 'paid')
+										        <span class="badge bg-success">Paid</span>
+
+										    @elseif($purchase_order->computed_status == 'unpaid')
+										        <span class="badge bg-danger">Unpaid</span>
+
+										    @elseif($purchase_order->computed_status == 'partial')
+										        <span class="badge bg-warning">Partial</span>
+
+										    @elseif($purchase_order->computed_status == 'overdue')
+										        <span class="badge bg-dark">Overdue</span>
+										    @endif
+										</td>
 										<td>
 										    <a href="#" class="link-dark view-detail" data-id="{{ $purchase_order->id }}">
 										        <i class="ri-eye-line align-middle fs-20" title="View Order"></i>

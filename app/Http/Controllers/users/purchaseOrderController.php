@@ -34,24 +34,51 @@ class purchaseOrderController extends Controller
     {
         $purchase_orders = PurchaseOrder::with('vendor')
             ->where('shop_id', Auth::user()->owner_id)
+
             ->whereIn('id', function ($sub) {
                 $sub->selectRaw('MAX(id)')
                     ->from('purchase_orders')
                     ->where('shop_id', Auth::user()->owner_id)
                     ->groupBy('invoice_no');
             })
-            ->when(request('vendor'), function ($query, $vendor) {
+
+            ->when($request->vendor, function ($query, $vendor) {
                 $query->whereHas('vendor', function ($q) use ($vendor) {
                     $q->where('name', 'like', "%{$vendor}%");
                 });
             })
+
             ->orderBy('id', 'desc')
             ->paginate(10);
 
+        // ✅ Attach computed status
+        foreach ($purchase_orders as $po) {
+
+            $allItems = PurchaseOrder::where('invoice_no', $po->invoice_no)
+                ->where('shop_id', Auth::user()->owner_id)
+                ->get();
+
+            $total = $allItems->count();
+            $paid = $allItems->where('status', 1)->count();
+            $unpaid = $allItems->where('status', 0)->count();
+
+            // Overdue check
+            if ($po->due_date && Carbon::parse($po->due_date)->lt(Carbon::today()) && $paid != $total) {
+                $po->computed_status = 'overdue';
+            }
+            elseif ($paid == $total) {
+                $po->computed_status = 'paid';
+            }
+            elseif ($unpaid == $total) {
+                $po->computed_status = 'unpaid';
+            }
+            else {
+                $po->computed_status = 'partial';
+            }
+        }
+
         return view('users.purchase_orders.index', compact('purchase_orders'));
     }
-
-
 
 
     public function create(Request $request)
@@ -112,6 +139,7 @@ class purchaseOrderController extends Controller
                     }),
             ],
             'invoice_date' => 'required|date',
+            'due_date' => 'nullable|date|after_or_equal:invoice_date',
             'products' => 'required|array|min:1',
             'products.*.category' => 'required',
             'products.*.sub_category' => 'required',

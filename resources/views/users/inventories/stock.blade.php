@@ -36,6 +36,7 @@
                 </ul>
 
                 <form method="get" action="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}">
+                    <input type="hidden" name="stock_in" value="{{ request('stock_in') }}">
                     <div class="row mb-2 p-3">
                         <div class="col-md-11">
                             <div class="input-group">
@@ -50,6 +51,34 @@
                         </div>
                     </div>
                 </form>
+
+                <form method="get" action="{{ route('inventory.stock', ['company' => request()->route('company'), 'shop' => request()->route('shop'), 'branch' => request()->route('branch')]) }}">
+                    <div class="col-md-4">
+                        <input type="hidden" name="product" value="{{ request('product') }}">
+
+                        <div class="form-check">
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   id="checkbox-stock"
+                                   name="stock_in"
+                                   value="1"
+                                   {{ request('stock_in') == 1 ? 'checked' : '' }}
+                                   onchange="this.form.submit()">
+
+                            <label class="form-check-label" for="checkbox-stock">
+                                Show in stock products only
+                            </label>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="d-flex justify-content-end p-3">
+                    <form method="get" action="{{ route('inventory.stock.download', ['company' => request()->route('company'), 'shop' => request()->route('shop'), 'branch' => request()->route('branch')]) }}">
+                        <input type="hidden" class="form-control" name="product" value="{{ request('product') }}">
+                        <input type="hidden" name="stock_in" value="{{ request('stock_in') }}">
+                        <button class="btn btn-success"> Download </button>
+                    </form>
+                </div>
 
                 <div class="tab-content pt-2 text-muted">
                     <div class="tab-pane show active" id="homeTabsJustified">

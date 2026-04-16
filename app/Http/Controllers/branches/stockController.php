@@ -4,6 +4,8 @@ namespace App\Http\Controllers\branches;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StockExport;
 use App\Models\StockVariation;
 use App\Models\ProductHistory;
 use App\Traits\Notifications;
@@ -23,22 +25,79 @@ class stockController extends Controller
     public function index(Request $request)
     {
         $stocks = Stock::where('branch_id', Auth::user()->id)
-        ->when(request('product'), function ($query) {
-            $search = request('product');
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('product', function ($q1) use ($search) {
-                    $q1->where('name', 'like', "%{$search}%");
-                })
-                ->orWhereHas('product.category', function ($q2) use ($search) {
-                    $q2->where('name', 'like', "%{$search}%");
-                })
-                ->orWhereHas('product.sub_category', function ($q3) use ($search) {
-                    $q3->where('name', 'like', "%{$search}%");
+
+            // ✅ stock filter
+            ->when($request->stock_in == 1, function ($query) {
+                $query->where('quantity', '>', 0);
+            })
+
+            // search filter
+            ->when($request->product, function ($query) use ($request) {
+                $search = $request->product;
+
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('product', function ($q1) use ($search) {
+                        $q1->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('product.category', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('product.sub_category', function ($q3) use ($search) {
+                        $q3->where('name', 'like', "%{$search}%");
+                    });
+                });
+            })
+
+            ->orderBy('category_id')
+            ->orderBy('sub_category_id')
+            ->orderBy('product_id')
+            ->paginate(10);
+
+        return view('branches.products.index', compact('stocks'));
+    }
+
+    public function download(Request $request)
+    {
+        $query = Stock::where('branch_id', Auth::user()->id)
+
+            // stock filter
+            ->when($request->stock_in == 1, function ($query) {
+                $query->where('quantity', '>', 0);
+            })
+
+            // search filter
+            ->when($request->product, function ($query) use ($request) {
+                $search = $request->product;
+
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('product', function ($q1) use ($search) {
+                        $q1->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('product.category', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('product.sub_category', function ($q3) use ($search) {
+                        $q3->where('name', 'like', "%{$search}%");
+                    });
                 });
             });
-        })->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10);
 
-        return view('branches.products.index',compact('stocks'));
+        // ✅ IMPORTANT: eager loading
+        $stocks = $query->with([
+            'product.metric',
+            'product.category',
+            'product.sub_category',
+            'category',
+            'sub_category',
+            'variations.size',
+            'variations.colour'
+        ])
+        ->orderBy('category_id')
+        ->orderBy('sub_category_id')
+        ->orderBy('product_id')
+        ->get();
+
+        return Excel::download(new StockExport($stocks), 'stocks.xlsx');
     }
 
     public function get_stock_variation($company, Stock $stock)
