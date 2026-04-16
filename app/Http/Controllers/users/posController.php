@@ -47,7 +47,7 @@ class posController extends Controller
         }
         else
         {
-            $orders = Order::where('shop_id',Auth::user()->owner_id)
+            $orders = Order::where('shop_id',Auth::user()->owner_id)->where('branch_id',null)
             ->when(request('order'), function ($query) {
                 $search = request('order');
                 $query->where(function ($q) use ($search) {
@@ -88,6 +88,6 @@ class posController extends Controller
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
-        return view('bills.view_bill',compact('user','order','order_details','order_payment_details'));
+        return view('bills.bill',compact('user','order','order_details','order_payment_details'));
     }
 }

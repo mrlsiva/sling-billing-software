@@ -413,7 +413,7 @@ class billingsController extends Controller
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
         $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();
-        return view('bills.view_bill',compact('user','order','order_details','order_payment_details'));
+        return view('bills.bill',compact('user','order','order_details','order_payment_details'));
     }
 
     public function get_imei_product(Request $request)

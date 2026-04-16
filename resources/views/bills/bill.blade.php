@@ -137,11 +137,11 @@
 
     $amountInWords = 'Rupees ' . numToWords($netAmount) . ' Only';
 
-    $totalQty      = $order_details->sum(fn($d) => (int)$d->quantity);
-    $totalTaxable  = $order_details->sum(fn($d) => ((float)$d->price - (float)$d->tax_amount) * (int)$d->quantity);
-    $totalCgst     = $order_details->sum(fn($d) => ((float)$d->tax_amount * (int)$d->quantity) / 2);
-    $totalSgst     = $totalCgst;
-    $totalAmount   = $order_details->sum(fn($d) => (float)$d->price * (int)$d->quantity);
+    $finalQty      = $order_details->sum(fn($d) => (int)$d->quantity);
+    $finalTaxable  = $order_details->sum(fn($d) => ((float)$d->price - (float)$d->tax_amount) * (int)$d->quantity);
+    $finalCgst     = $order_details->sum(fn($d) => ((float)$d->tax_amount * (int)$d->quantity) / 2);
+    $finalSgst     = $finalCgst;
+    $finalAmount   = $order_details->sum(fn($d) => (float)$d->price * (int)$d->quantity);
 
     $taxGroups     = App\Models\OrderDetail::select(
                          'tax_percent',
@@ -160,6 +160,35 @@
        When products overflow the page, emptyRowCount = 0 (no filler). */
     $minRows       = 15;
     $emptyRowCount = max(0, $minRows - $order_details->count());
+@endphp
+
+@php
+    $refundTaxGroups = collect(); // default empty
+    $refundTotalTax  = 0;
+    $refundAmount    = 0;
+
+    if ($order->is_refunded == 1) {
+        $refund = App\Models\Refund::where('order_id', $order->id)->first();
+
+        if ($refund) {
+            $refund_details = App\Models\RefundDetail::where('refund_id', $refund->id)->get();
+
+            $refundAmount = $refund_details->sum(fn($d) =>
+                (float)$d->price * (int)$d->quantity
+            );
+
+            $refundTaxGroups = App\Models\RefundDetail::select(
+                    'tax_percent',
+                    \DB::raw('SUM(CAST(tax_amount AS DECIMAL(10,4)) * quantity) as total_tax')
+                )
+                ->where('refund_id', $refund->id)
+                ->groupBy('tax_percent')
+                ->get()
+                ->keyBy('tax_percent');
+
+            $refundTotalTax = $refundTaxGroups->sum('total_tax');
+        }
+    }
 @endphp
 
 <table class="main-table">
@@ -219,6 +248,15 @@
                                     <td><strong>Payment</strong></td>
                                     <td>: {{ $order_payment_details->map(fn($o) => $o->payment->name)->join(', ') }}</td>
                                 </tr>
+                                @if($order->is_refunded == 1)
+                                <tr>
+                                     @php
+                                        $refund = App\Models\Refund::where('order_id',$order->id)->first();
+                                    @endphp
+                                    <td><strong>Refunded Date:</strong></td>
+                                    <td>:  {{ \Carbon\Carbon::parse($refund->refund_on)->format('d M Y') }}</td>
+                                </tr>
+                                @endif
                             </table>
                         </td>
                     </tr>
@@ -321,6 +359,86 @@
         </tr>
         @endforeach
 
+        @if($order->is_refunded == 1)
+
+            @php
+                $refund = App\Models\Refund::where('order_id',$order->id)->first();
+                $refund_details = App\Models\RefundDetail::where('refund_id',$refund->id)->get();
+            @endphp
+
+            @php
+                $refundQty      = $refund_details->sum(fn($d) => (int)$d->quantity);
+
+                $refundTaxable  = $refund_details->sum(fn($d) =>
+                    ((float)$d->price - (float)$d->tax_amount) * (int)$d->quantity
+                );
+
+                $refundCgst     = $refund_details->sum(fn($d) =>
+                    ((float)$d->tax_amount * (int)$d->quantity) / 2
+                );
+
+                $refundSgst     = $refundCgst;
+
+                $refundAmount   = $refund_details->sum(fn($d) =>
+                    (float)$d->price * (int)$d->quantity
+                );
+            @endphp
+
+            @php
+                $finalQty      = $finalQty - ($refundQty ?? 0);
+                $finalTaxable  = $finalTaxable - ($refundTaxable ?? 0);
+                $finalCgst     = $finalCgst - ($refundCgst ?? 0);
+                $finalSgst     = $finalSgst - ($refundSgst ?? 0);
+                $finalAmount   = $finalAmount - ($refundAmount ?? 0);
+            @endphp
+
+            @php
+
+                // ✅ subtract refund
+                $netAmount = $netAmount - $refundAmount;
+                $netAmount = max(0, $netAmount);
+
+                $amountInWords = 'Rupees ' . numToWords($netAmount) . ' Only';
+            @endphp
+
+            @foreach($refund_details as $refund_detail)
+
+                @php
+                    $sizeName      = $refund_detail->size_id   ? $refund_detail->size->name   : null;
+                    $colorName     = $refund_detail->colour_id ? $refund_detail->colour->name : null;
+                    $variationText = ($sizeName || $colorName)
+                        ? '(' . trim(($sizeName ?? '') . ' - ' . ($colorName ?? ''), ' - ') . ')'
+                        : '';
+                    $basePrice     = (float)$refund_detail->price - (float)$refund_detail->tax_amount;
+                    $qty           = (int)$refund_detail->quantity;
+                    $taxableAmt    = $basePrice * $qty;
+                    $cgstVal       = ((float)$refund_detail->tax_amount * $qty) / 2;
+                    $sgstVal       = $cgstVal;
+                    $totalAmt      = (float)$refund_detail->price * $qty;
+                @endphp
+
+                <tr>
+                    <td class="c1 center"></td>
+                    <td class="c2 center">{{ $refund_detail->product->hsn_code ?? '-' }}</td>
+                    <td class="c2">
+                        {{ $refund_detail->name }}{{ $variationText ? ' ' . $variationText : '' }}
+                        @if(!empty($refund_detail->imei))
+                            <br><small style="font-size:9px;">IMEI: {{ $refund_detail->imei }}</small>
+                        @endif
+                    </td>
+                    <td class="c3 center">{{ $qty }}</td>
+                    <td class="c4 right">{{ number_format($basePrice, 2) }}</td>
+                    <td class="c5 right">{{ number_format($taxableAmt, 2) }}</td>
+                    
+                    <td class="c7 right">{{ number_format($cgstVal, 2) }}</td>
+                    
+                    <td class="c9 right">{{ number_format($sgstVal, 2) }}</td>
+                    <td class="c10 right">{{ number_format($totalAmt, 2) }}</td>
+                </tr>
+            @endforeach
+
+        @endif
+
         {{-- Filler rows — keep vertical column lines, remove horizontal row lines --}}
         @for($i = 0; $i < $emptyRowCount; $i++)
         <tr style="height:8mm;">
@@ -339,14 +457,14 @@
         {{-- Totals row --}}
         <tr class="total-row">
             <td class="c1 center">&#x2014;</td>
-            <td class="c2"></td>
-            <td class="c3 center bold">TOTAL</td>
-            <td class="c4 center bold">{{ $totalQty }}</td>
-            <td class="c5"></td>
-            <td class="c6 right bold">{{ number_format($totalTaxable, 2) }}</td>
-            <td class="c7 right bold">{{ number_format($totalCgst, 2) }}</td>
-            <td class="c8 right bold">{{ number_format($totalSgst, 2) }}</td>
-            <td class="c9 right bold">{{ number_format($totalAmount, 2) }}</td>
+            <td class="c1 center">&#x2014;</td>
+            <td class="c2 center bold">TOTAL</td>
+            <td class="c3 center bold">{{ $finalQty }}</td>
+            <td class="c4"></td>
+            <td class="c5 right bold">{{ number_format($finalTaxable, 2) }}</td>
+            <td class="c7 right bold">{{ number_format($finalCgst, 2) }}</td>
+            <td class="c9 right bold">{{ number_format($finalSgst, 2) }}</td>
+            <td class="c10 right bold">{{ number_format($finalAmount, 2) }}</td>
         </tr>
     </tbody>
 
@@ -366,20 +484,30 @@
                     <td class="bold right" style="width:35%;">Amount (&#x20B9;)</td>
                 </tr>
                 @foreach($taxGroups as $tax)
-                <tr>
-                    <td>CGST</td>
-                    <td class="center">{{ number_format($tax->tax_percent / 2, 2) }}%</td>
-                    <td class="right">{{ number_format($tax->total_tax / 2, 2) }}</td>
-                </tr>
-                <tr>
-                    <td>SGST</td>
-                    <td class="center">{{ number_format($tax->tax_percent / 2, 2) }}%</td>
-                    <td class="right">{{ number_format($tax->total_tax / 2, 2) }}</td>
-                </tr>
+                    @php
+                        $refundTax = $refundTaxGroups[$tax->tax_percent]->total_tax ?? 0;
+                        $finalTax  = $tax->total_tax - $refundTax;
+                    @endphp
+
+                    <tr>
+                        <td>CGST</td>
+                        <td class="center">{{ number_format($tax->tax_percent / 2, 2) }}%</td>
+                        <td class="right">{{ number_format($finalTax / 2, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td>SGST</td>
+                        <td class="center">{{ number_format($tax->tax_percent / 2, 2) }}%</td>
+                        <td class="right">{{ number_format($finalTax / 2, 2) }}</td>
+                    </tr>
                 @endforeach
+
+                @php
+
+                    $finalGrandTax = $grandTotalTax - $refundTotalTax;
+                @endphp
                 <tr style="background:#f0f0f0;">
                     <td colspan="2" class="bold">Total Tax</td>
-                    <td class="right bold">{{ number_format($grandTotalTax, 2) }}</td>
+                    <td class="right bold">{{ number_format($finalGrandTax, 2) }}</td>
                 </tr>
             </table>
         </td>
@@ -435,11 +563,13 @@
 
 </table>
 
+@if(request()->routeIs('billing.get_bill'))
 <script>
     window.onload = function () {
         setTimeout(function () { window.print(); }, 500);
     };
 </script>
+@endif
 
 </body>
 </html>
