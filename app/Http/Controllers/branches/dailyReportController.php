@@ -123,7 +123,7 @@ class dailyReportController extends Controller
                 $productInAmount,
                 $productOutAmount
             ),
-            'daily_report.xlsx'
+            'daily_report_' . now()->format('d-m-Y_h-i A') . '.xlsx'
         );
     }
 
@@ -161,6 +161,6 @@ class dailyReportController extends Controller
             'productOutAmount'
         ))->setPaper('a4','landscape');
 
-        return $pdf->download('daily_report.pdf');
+        return $pdf->download('daily_report_' . now()->format('d-m-Y_h-i A') . '.pdf');
     }
 }

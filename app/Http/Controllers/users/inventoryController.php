@@ -118,7 +118,7 @@ class inventoryController extends Controller
                         ->get(); // ❗ use get() for download
 
         // 👉 your export logic (Excel / CSV / PDF)
-        return Excel::download(new StockExport($stocks), 'stocks.xlsx');
+        return Excel::download(new StockExport($stocks), 'stocks_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
     public function get_stock_variation($company, Stock $stock)

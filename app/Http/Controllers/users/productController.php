@@ -663,7 +663,7 @@ class productController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        return Excel::download(new ProductExport($products), 'Products.xlsx'); // ✅ pass $products
+        return Excel::download(new ProductExport($products), 'Products_' . now()->format('d-m-Y_h-i A') . '.xlsx'); // ✅ pass $products
     }
 
     public function detail(Request $request, $company, Product $product)

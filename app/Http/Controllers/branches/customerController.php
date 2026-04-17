@@ -291,7 +291,7 @@ class customerController extends Controller
             });
         })->orderBy('id','desc')->get();
 
-        return Excel::download(new CustomerExport($users), 'Customers.xlsx');
+        return Excel::download(new CustomerExport($users), 'Customers_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
 

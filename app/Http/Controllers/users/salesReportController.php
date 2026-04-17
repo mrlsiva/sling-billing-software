@@ -70,7 +70,7 @@ class salesReportController extends Controller
 
             ->get();
 
-        return Excel::download(new SalesReportExport($orders), 'sales_report.xlsx');
+        return Excel::download(new SalesReportExport($orders), 'sales_report_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
 
@@ -98,6 +98,6 @@ class salesReportController extends Controller
         $pdf = Pdf::loadView('users.exports.sales_report_pdf', compact('orders'))
             ->setPaper('a4', 'landscape');
 
-        return $pdf->download('sales_report.pdf');
+        return $pdf->download('sales_report_' . now()->format('d-m-Y_h-i A') . '.pdf');
     }
 }

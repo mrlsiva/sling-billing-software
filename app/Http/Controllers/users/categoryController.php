@@ -268,6 +268,6 @@ class categoryController extends Controller
             ->orderBy('id','desc')
             ->get();
 
-        return Excel::download(new CategoriesExport($categories), 'Categories.xlsx');
+        return Excel::download(new CategoriesExport($categories), 'Categories_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 }

@@ -95,7 +95,7 @@ class productTransferReportController extends Controller
             ];
         });
 
-        return Excel::download(new \App\Exports\ProductTransferReportExport($data), 'transfer_report.xlsx');
+        return Excel::download(new \App\Exports\ProductTransferReportExport($data), 'transfer_report_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
     public function download_pdf(Request $request, $company, $branch)
@@ -125,6 +125,6 @@ class productTransferReportController extends Controller
 
         $pdf = Pdf::loadView('users.exports.transfer_report_pdf', compact('datas','current_branch'));
 
-        return $pdf->download('transfer_report.pdf');
+        return $pdf->download('transfer_report_' . now()->format('d-m-Y_h-i A') . '.pdf');
     }
 }

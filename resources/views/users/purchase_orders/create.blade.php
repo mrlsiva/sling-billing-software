@@ -198,6 +198,8 @@
                     <select class="form-control product-select" name="products[0][product]" required>
                         <option value=""> Select </option>
                     </select>
+                    <!-- ✅ Stock display -->
+                    <small class="text-success stock-display">Stock: 0</small>
                 </div>
             </div>
 

@@ -125,6 +125,17 @@ class purchaseOrderController extends Controller
         ]);
     }
 
+    public function get_product_stock(Request $request)
+    {
+        $stock = Stock::where('product_id', $request->product)
+            ->where('shop_id', Auth::user()->owner_id)->where('branch_id', null)
+            ->select('quantity')->first()->quantity;
+
+        return response()->json([
+            'stock' => $stock
+        ]);
+    }
+
     public function store(Request $request)
     {
 

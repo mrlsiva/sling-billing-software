@@ -52,7 +52,7 @@ class purchaseReportController extends Controller
             })
             ->get();
 
-        return Excel::download(new PurchaseReportExport($datas), 'purchase_report.xlsx');
+        return Excel::download(new PurchaseReportExport($datas), 'purchase_report_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
     public function download_pdf(Request $request, $company)
@@ -72,7 +72,7 @@ class purchaseReportController extends Controller
         $pdf = Pdf::loadView('users.exports.purchase_report_pdf', compact('datas'))
             ->setPaper('a4', 'landscape');
 
-        return $pdf->download('purchase_report.pdf');
+        return $pdf->download('purchase_report_' . now()->format('d-m-Y_h-i A') . '.pdf');
     }
     
 }

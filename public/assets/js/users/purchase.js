@@ -152,6 +152,18 @@ jQuery(document).ready(function () {
                 // handled by delegated handlers below
             })
             .fail(function (xhr) { console.error('get_stock_variations failed', xhr); });
+    
+        const stockDisplay = row.find('.stock-display');
+
+        // fetch stock
+        $.getJSON('get_product_stock', { product: product })
+            .done(function (res) {
+                stockDisplay.text('Stock: ' + (res.stock ?? 0));
+            })
+            .fail(function () {
+                stockDisplay.text('Stock: 0');
+            });
+    
     });
 
     // DELEGATED: when variation qty or price changes -> recalc and consolidate

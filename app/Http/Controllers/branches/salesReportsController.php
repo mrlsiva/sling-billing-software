@@ -57,7 +57,7 @@ class salesReportsController extends Controller
 
             ->get();
 
-        return Excel::download(new BranchSalesReportExport($orders), 'sales_report.xlsx');
+        return Excel::download(new BranchSalesReportExport($orders), 'sales_report_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
 
@@ -82,6 +82,6 @@ class salesReportsController extends Controller
         $pdf = Pdf::loadView('branches.exports.sales_report_pdf', compact('orders'))
             ->setPaper('a4', 'landscape');
 
-        return $pdf->download('sales_report.pdf');
+        return $pdf->download('sales_report_' . now()->format('d-m-Y_h-i A') . '.pdf');
     }
 }

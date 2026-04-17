@@ -61,7 +61,7 @@ class orderReportsController extends Controller
 
         $orders = $query->orderBy('id', 'desc')->get();
 
-        return Excel::download(new OrderExport($orders), 'orders_report.xlsx');
+        return Excel::download(new OrderExport($orders), 'orders_report_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
     public function download_pdf(Request $request, $company, $branch)
@@ -88,7 +88,7 @@ class orderReportsController extends Controller
 
         $pdf = Pdf::loadView('users.exports.order_pdf', compact('orders', 'totalOrders', 'totalSales', 'user'))->setPaper('a4', 'landscape');
 
-        return $pdf->download('orders.pdf');
+        return $pdf->download('orders_report_' . now()->format('d-m-Y_h-i A') . '.pdf');
     }
 
 }

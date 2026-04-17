@@ -12,7 +12,7 @@
     
                 <p class="card-title mb-0">Sales Report</p>
 
-                <a href="{{route('report', ['company' => request()->route('company')])}}" class="btn btn-sm btn-outline-secondary">
+                <a href="{{route('branch.report', ['company' => request()->route('company')])}}" class="btn btn-sm btn-outline-secondary">
                     <i class="ri-arrow-left-line me-1"></i> Back
                 </a>
 

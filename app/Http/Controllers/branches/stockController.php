@@ -97,7 +97,7 @@ class stockController extends Controller
         ->orderBy('product_id')
         ->get();
 
-        return Excel::download(new StockExport($stocks), 'stocks.xlsx');
+        return Excel::download(new StockExport($stocks), 'stocks_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
     public function get_stock_variation($company, Stock $stock)

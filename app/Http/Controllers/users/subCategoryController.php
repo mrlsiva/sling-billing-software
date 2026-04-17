@@ -294,7 +294,7 @@ class subCategoryController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        return Excel::download(new SubCategoryExport($sub_categories), 'Sub Categories.xlsx');
+        return Excel::download(new SubCategoryExport($sub_categories), 'Sub Categories_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
 }

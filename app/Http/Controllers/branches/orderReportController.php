@@ -50,7 +50,7 @@ class orderReportController extends Controller
 
         $orders = $query->orderBy('id', 'desc')->paginate(10);
 
-        return Excel::download(new OrdersExport($orders), 'orders.xlsx');
+        return Excel::download(new OrdersExport($orders), 'orders_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 
     public function download_pdf(Request $request)
@@ -76,6 +76,6 @@ class orderReportController extends Controller
         $pdf = Pdf::loadView('branches.exports.order_pdf', compact('orders', 'totalOrders', 'totalSales', 'user'))
                   ->setPaper('a4', 'landscape'); // you can use portrait too
 
-        return $pdf->download('orders.pdf');
+        return $pdf->download('orders_' . now()->format('d-m-Y_h-i A') . '.pdf');
     }
 }
