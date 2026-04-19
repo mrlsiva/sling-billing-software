@@ -91,6 +91,12 @@ class purchaseOrderController extends Controller
         return view('users.purchase_orders.create',compact('vendors','payments','categories','taxes'));
     }
 
+    public function get_categories(Request $request)
+    {
+        return $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
+
+    }
+
     public function get_product(Request $request)
     {
         return $products = Product::where([['user_id',Auth::user()->owner_id],['category_id',$request->category],['sub_category_id',$request->sub_category],['is_active',1]])->get();

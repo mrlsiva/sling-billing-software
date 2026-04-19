@@ -90,15 +90,30 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="d-flex justify-content-between align-items-center mb-3">
+
                                 <h5 class="text-primary mb-0">Products</h5>
 
-                                <a href="javascript:void(0)" id="bulkBtn" class="btn btn-primary">
-                                    <i class="bx bx-upload"></i> Bulk Purchase Order
-                                </a>
+                                <div class="d-flex align-items-center gap-2">
+                                    <a href="javascript:void(0)" id="bulkBtn" class="btn btn-primary">
+                                        <i class="bx bx-upload"></i> Bulk Purchase Order
+                                    </a>
 
+                                    <div class="btn-group">
+                                      <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Category/ Sub Category/ Product
+                                      </button>
+                                      <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#categoryAdd">Category</a></li>
+                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#subCategoryAdd">Sub Category</a></li>
+                                        <li><a class="dropdown-item" href="#">Product</a></li>
+                                      </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+
 
                     <!-- Product Items Container -->
                     <div id="productsContainer"></div>
@@ -176,9 +191,6 @@
                     <label class="form-label text-muted">Category <span class="text-danger">*</span></label>
                     <select class="form-control category-select" name="products[0][category]" required>
                         <option value=""> Select </option>
-                        @foreach($categories as $category)
-                            <option value="{{$category->id}}">{{$category->name}}</option>
-                        @endforeach
                     </select>
                 </div>
             </div>
@@ -316,6 +328,8 @@
 @section('script')
 <script src="{{asset('assets/js/users/purchase.js?' . $version)}}"></script>
 <script src="{{asset('assets/js/users/vendor.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/category.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/sub_category.js?' . $version)}}"></script>
 
 <script>
 $(document).on('click', '#bulkBtn', function () {
@@ -367,6 +381,28 @@ $(document).ready(function () {
         if (invoiceDate && dueDate < invoiceDate) {
             alert('Due date must be greater than or equal to Invoice date');
             $(this).val('');
+        }
+    });
+
+});
+</script>
+
+<script>
+$(document).on('focus', '.category-select', function () {
+
+    let select = $(this);
+    $.ajax({
+        url: 'get-categories', // Laravel route
+        type: 'GET',
+        success: function(response){
+
+            // Clear everything and add fresh default option
+            select.empty().append('<option value="">Select</option>');
+            $.each(response, function(index, category){
+                select.append(
+                    '<option value="'+category.id+'">'+category.name+'</option>'
+                );
+            });
         }
     });
 

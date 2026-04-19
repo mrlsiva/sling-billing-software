@@ -4,8 +4,17 @@ $('#addCategory').on('submit', function (e) {
     let form = this;
     let formData = new FormData(form);
 
+    let currentUrl = window.location.href;
+    let postUrl = '';
+
+    if (currentUrl.includes('purchase_orders')) {
+        postUrl = '../../categories/store';
+    } else {
+        postUrl = '../categories/store';
+    }
+
     $.ajax({
-        url: "../categories/store",
+        url: postUrl,
         type: "POST",
         data: formData,
         dataType: "json",

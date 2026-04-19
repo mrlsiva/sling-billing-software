@@ -7,8 +7,18 @@ jQuery(document).ready(function ()
         {
             return;
         }
+
+        let currentUrl = window.location.href;
+        let postUrl = '';
+
+        if (currentUrl.includes('purchase_orders')) {
+            postUrl = '../../sub_categories/get_category';
+        } else {
+            postUrl = '../sub_categories/get_category';
+        }
+    
         jQuery.ajax({
-            url : '../sub_categories/get_category',
+            url : postUrl,
             type: 'GET',
             dataType: 'json',
             success:function(data)
@@ -35,8 +45,17 @@ $('#addSubCategory').on('submit', function (e) {
     let form = this;
     let formData = new FormData(form);
 
+    let currentUrl = window.location.href;
+    let postUrl = '';
+
+    if (currentUrl.includes('purchase_orders')) {
+        postUrl = '../../sub_categories/store';
+    } else {
+        postUrl = '../sub_categories/store';
+    }
+
     $.ajax({
-        url: "../sub_categories/store",
+        url: postUrl,
         type: "POST",
         data: formData,
         dataType: "json",
