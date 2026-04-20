@@ -13,26 +13,23 @@
                     <p class="card-title">Stock</p>
                 </div>
             </div>
-            <div class="card-body pt-2 ">
-                <ul class="nav nav-tabs nav-justified">
+            <div class="card-body pt-2">
 
+                <ul class="nav nav-tabs nav-justified">
                     <li class="nav-item">
-                        <a href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}" class="nav-link {{ request()->route('branch') == 0 ? 'active' : '' }}" id="{{Auth::user()->id}}">
+                        <a href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => 0])}}" class="nav-link {{ request()->route('branch') == 0 ? 'active' : '' }}">
                             <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
                             <span class="d-none d-sm-block"><i class="ri-shopping-basket-line me-2"></i>{{Auth::user()->user_name}}</span>
                         </a>
                     </li>
-
                     @foreach($branches as $branch)
-                    	<li class="nav-item">
-	                        <a href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => $branch->id])}}" class="nav-link {{ request()->route('branch') == $branch->id ? 'active' : '' }}" id="{{$branch->id}}">
-	                            <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
-	                            <span class="d-none d-sm-block"><i class="ri-shopping-basket-line me-2"></i></i>{{$branch->user_name}}</span>
-	                        </a>
-                    	</li>
+                    <li class="nav-item">
+                        <a href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => Auth::user()->id,'branch' => $branch->id])}}" class="nav-link {{ request()->route('branch') == $branch->id ? 'active' : '' }}">
+                            <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
+                            <span class="d-none d-sm-block"><i class="ri-shopping-basket-line me-2"></i>{{$branch->user_name}}</span>
+                        </a>
+                    </li>
                     @endforeach
-                    
-
                 </ul>
 
                 <form method="get" action="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}">
@@ -42,42 +39,46 @@
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Product/ Categoy/ Sub Category Name" name="product" value="{{ request('product') }}" id="searchInput">
-                                <span class="input-group-text" id="clearFilter" style="display: {{ request('product') ? 'inline-flex' : 'none' }}"><a href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}" class="link-dark"><i class="ri-close-large-line align-middle fs-20"></i></a></span>
+                                <span class="input-group-text" id="clearFilter" style="display: {{ request('product') ? 'inline-flex' : 'none' }}">
+                                    <a href="{{route('inventory.stock', ['company' => request()->route('company'),'shop' => request()->route('shop'),'branch' => request()->route('branch')])}}" class="link-dark">
+                                        <i class="ri-close-large-line align-middle fs-20"></i>
+                                    </a>
+                                </span>
                             </div>
                         </div>
-
                         <div class="col-md-1">
                             <button class="btn btn-primary"> Search </button>
                         </div>
                     </div>
                 </form>
 
-                <form method="get" action="{{ route('inventory.stock', ['company' => request()->route('company'), 'shop' => request()->route('shop'), 'branch' => request()->route('branch')]) }}">
-                    <div class="col-md-4">
-                        <input type="hidden" name="product" value="{{ request('product') }}">
-
-                        <div class="form-check">
-                            <input type="checkbox"
-                                   class="form-check-input"
-                                   id="checkbox-stock"
-                                   name="stock_in"
-                                   value="1"
-                                   {{ request('stock_in') == 1 ? 'checked' : '' }}
-                                   onchange="this.form.submit()">
-
-                            <label class="form-check-label" for="checkbox-stock">
-                                Show in stock products only
-                            </label>
+               <div class="row">
+                    <div class="col-6">
+                        <form method="get" action="{{ route('inventory.stock', ['company' => request()->route('company'), 'shop' => request()->route('shop'), 'branch' => request()->route('branch')]) }}">
+                            <div class="px-3">
+                                <input type="hidden" name="product" value="{{ request('product') }}">
+                                <div class="form-check">
+                                    <input type="checkbox"
+                                        class="form-check-input"
+                                        id="checkbox-stock"
+                                        name="stock_in"
+                                        value="1"
+                                        {{ request('stock_in') == 1 ? 'checked' : '' }}
+                                        onchange="this.form.submit()">
+                                    <label class="form-check-label" for="checkbox-stock">Show only available products</label>
+                                </div>
+                            </div>
+                        </form>
                         </div>
-                    </div>
-                </form>
+                        <div class="col-6 d-flex justify-content-end">
+                        <form method="get" action="{{ route('inventory.stock.download', ['company' => request()->route('company'), 'shop' => request()->route('shop'), 'branch' => request()->route('branch')]) }}">
+                            <input type="hidden" name="product" value="{{ request('product') }}">
+                            <input type="hidden" name="stock_in" value="{{ request('stock_in') }}">
+                            <button class="btn btn-success"> Download </button>
+                        </form>
+                        </div>
 
-                <div class="d-flex justify-content-end p-3">
-                    <form method="get" action="{{ route('inventory.stock.download', ['company' => request()->route('company'), 'shop' => request()->route('shop'), 'branch' => request()->route('branch')]) }}">
-                        <input type="hidden" class="form-control" name="product" value="{{ request('product') }}">
-                        <input type="hidden" name="stock_in" value="{{ request('stock_in') }}">
-                        <button class="btn btn-success"> Download </button>
-                    </form>
+                    </div>
                 </div>
 
                 <div class="tab-content pt-2 text-muted">
@@ -97,59 +98,54 @@
                                         <th>IMEI</th>
                                         <th>Variations</th>
                                     </tr>
-                                </thead> 
+                                </thead>
                                 <tbody>
-                                	@foreach($stocks as $stock)
-                                		<tr>
-                                			<td>
-                                				{{ ($stocks->currentPage() - 1) * $stocks->perPage() + $loop->iteration }}
-                                			</td>
-                                			<td>
-                                				@if($stock->product->image != null)
-													<img src="{{ asset('storage/' . $stock->product->image) }}" class="logo-dark me-1" alt="Product" height="30">
-												@else
-													<img src="{{ asset('assets/images/category.jpg') }}" class="logo-dark me-1" alt="Product" height="30">
-												@endif
-											</td>
-											<td>{{$stock->category->name}} - {{$stock->sub_category->name}}</td>
-											<td>
-                                                <a href="javascript:void(0)" class="text-decoration-underline text-decoration-none viewProductTimeline" data-id="{{ $stock->product->id }}"data-name="{{ $stock->product->name }}"data-bs-toggle="modal" data-bs-target="#productTimelineModal">
-                                                    {{$stock->product->name}}
-                                                </a>
-                                            </td>
-											<td>{{$stock->product->metric->name ?? '-'}}</td>
-											<td>{{$stock->product->price}}</td>
-											<td>{{$stock->quantity}}</td>
-											<td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
-
-                                            <td>
-                                                @if(!empty($stock->imei))
-                                                    <a href="javascript:void(0);" 
-                                                       onclick="showImei('{{ $stock->imei }}')" 
-                                                       title="View IMEI">
-                                                        <i class="ri-eye-line fs-18"></i>
-                                                    </a>
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-
-                                            @php
-                                                $variation = \App\Models\StockVariation::where('stock_id', $stock->id)->first();
-                                            @endphp
-
-                                            @if($variation && ($variation->size_id !== null || $variation->colour_id !== null))
-                                                <td>
-                                                    <a href="#!" class="text-dark view-variations" data-stock-id="{{ $stock->id }}" title="View Variations">
-                                                        <i class="ri-eye-line fs-18"></i>
-                                                    </a>
-                                                </td>
+                                    @foreach($stocks as $stock)
+                                    @php
+                                        $variation = \App\Models\StockVariation::where('stock_id', $stock->id)->first();
+                                    @endphp
+                                    <tr>
+                                        <td>{{ ($stocks->currentPage() - 1) * $stocks->perPage() + $loop->iteration }}</td>
+                                        <td>
+                                            @if($stock->product->image != null)
+                                                <img src="{{ asset('storage/' . $stock->product->image) }}" class="logo-dark me-1" alt="Product" height="30">
                                             @else
-                                                <td>-</td>
+                                                <img src="{{ asset('assets/images/category.jpg') }}" class="logo-dark me-1" alt="Product" height="30">
                                             @endif
-
-                                		</tr>
-                                	@endforeach
+                                        </td>
+                                        <td>{{$stock->category->name}} - {{$stock->sub_category->name}}</td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="text-decoration-underline text-decoration-none viewProductTimeline"
+                                                data-id="{{ $stock->product->id }}"
+                                                data-name="{{ $stock->product->name }}"
+                                                data-bs-toggle="modal" data-bs-target="#productTimelineModal">
+                                                {{$stock->product->name}}
+                                            </a>
+                                        </td>
+                                        <td>{{$stock->product->metric->name ?? '-'}}</td>
+                                        <td>{{$stock->product->price}}</td>
+                                        <td>{{$stock->quantity}}</td>
+                                        <td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
+                                        <td>
+                                            @if(!empty($stock->imei))
+                                                <a href="javascript:void(0);" onclick="showImei('{{ $stock->imei }}')" title="View IMEI">
+                                                    <i class="ri-eye-line fs-18"></i>
+                                                </a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($variation && ($variation->size_id !== null || $variation->colour_id !== null))
+                                                <a href="#!" class="text-dark view-variations" data-stock-id="{{ $stock->id }}" title="View Variations">
+                                                    <i class="ri-eye-line fs-18"></i>
+                                                </a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                             @if($stocks->isEmpty())
@@ -158,6 +154,8 @@
                         </div>
                     </div>
                 </div>
+                
+
             </div>
             <div class="card-footer border-0">
                 {!! $stocks->withQueryString()->links('pagination::bootstrap-5') !!}
@@ -167,15 +165,15 @@
 </div>
 
 <div class="modal fade" id="imeiModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">IMEI Numbers</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="imeiList"></div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">IMEI Numbers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="imeiList"></div>
+        </div>
     </div>
-  </div>
 </div>
 
 @endsection
@@ -196,9 +194,7 @@
 </div>
 @endsection
 
-
 @section('script')
-
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function () {
         let searchInput = document.getElementById("searchInput");
@@ -212,10 +208,7 @@
             }
         }
 
-        // Run on load (for prefilled request values)
         toggleClear();
-
-        // Run on typing
         searchInput.addEventListener("input", toggleClear);
     });
 </script>
@@ -259,6 +252,5 @@
         modal.show();
     }
 </script>
-
 
 @endsection
