@@ -493,14 +493,14 @@
                                         <i class="bx bx-edit fs-18 align-middle me-2"></i><span class="align-middle">GST Bill</span>
                                     </a>
                                 @endif
-                                <a class="dropdown-item" href="#">
+                                <!-- <a class="dropdown-item" href="#">
                                     <i class="bx bx-help-circle fs-18 align-middle me-2"></i><span class="align-middle">Help</span>
-                                </a>
-                                <a class="dropdown-item" href="#">
+                                </a> -->
+                                <!-- <a class="dropdown-item" href="#">
                                     <i class="bx bx-photo-album fs-18 align-middle me-2"></i>
                                     <span class="align-middle">Photos</span>
                                     <span class="align-middle float-end badge badge-soft-danger">New</span>
-                                </a>
+                                </a> -->
                                 @if(request()->segment(1) === 'admin')
 
                                     <a class="dropdown-item" href="{{route('admin.notification', ['company' => request()->route('company')])}}">
@@ -531,9 +531,9 @@
                                 @endif
 
                                 <div class="dropdown-divider my-1"></div>
-                                <a class="dropdown-item" href="#">
+                                <!-- <a class="dropdown-item" href="#">
                                     <i class="bx bx-lock fs-18 align-middle me-2"></i><span class="align-middle">Lock screen</span>
-                                </a>
+                                </a> -->
                                 @if (request()->segment(1) === 'admin')
                                     <a class="dropdown-item" href="{{route('admin.logout')}}">
                                         <i class="bx bx-log-out fs-18 align-middle me-2"></i><span class="align-middle">Logout</span>
