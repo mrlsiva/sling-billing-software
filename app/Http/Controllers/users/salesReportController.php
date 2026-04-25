@@ -57,7 +57,7 @@ class salesReportController extends Controller
         $from = $request->from;
         $to   = $request->to;
 
-        $orders = Order::with(['customer','billedBy','details.product.category','details.product.sub_category'])
+        $orders = Order::with(['customer','billedBy','details.product.category','details.product.sub_category','refunds.details'])
             ->where('shop_id', Auth::user()->owner_id)
 
             ->when($branch != 0, fn($q) => $q->where('branch_id', $branch),
@@ -69,7 +69,8 @@ class salesReportController extends Controller
                     \Carbon\Carbon::parse($to)->endOfDay()
                 ]);
             })
-
+            ->withSum('refunds as total_refund', 'refund_amount')
+            ->latest()
             ->get();
 
         return Excel::download(new SalesReportExport($orders), 'sales_report_' . now()->format('d-m-Y_h-i A') . '.xlsx');
@@ -82,7 +83,7 @@ class salesReportController extends Controller
         $from = $request->from;
         $to   = $request->to;
 
-        $orders = Order::with(['customer','billedBy','details.product.category','details.product.sub_category'])
+        $orders = Order::with(['customer','billedBy','details.product.category','details.product.sub_category','refunds.details'])
             ->where('shop_id', Auth::user()->owner_id)
 
             ->when($branch != 0, fn($q) => $q->where('branch_id', $branch),
@@ -94,7 +95,8 @@ class salesReportController extends Controller
                     \Carbon\Carbon::parse($to)->endOfDay()
                 ]);
             })
-
+            ->withSum('refunds as total_refund', 'refund_amount')
+            ->latest()
             ->get();
 
         $pdf = Pdf::loadView('users.exports.sales_report_pdf', compact('orders'))

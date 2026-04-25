@@ -198,7 +198,7 @@
                 </td>
 
                 <td>{{ $order->bill_id }}</td>
-                <td>{{ $order->bill_amount }}</td>
+                <td>{{ $order->bill_amount - ($order->is_refunded ? ($order->total_refund ?? 0) : 0) }}</td>
                 <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}</td>
                 <td>{{ $order->billedBy->name }}</td>
                 <td>{{ $order->customer->phone }} ({{ $order->customer->name }})</td>
@@ -209,6 +209,12 @@
                             {{ $pay->payment->name ?? '-' }} 
                             (₹{{ number_format($pay->amount,2) }})<br>
                         @endforeach
+                        @if($order->is_refunded)
+                            <span class="badge bg-primary">
+                                Refund 
+                                ₹ {{ number_format($order->total_refund, 2) }}
+                            </span>
+                        @endif
                     @else
                         -
                     @endif

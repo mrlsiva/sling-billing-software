@@ -221,8 +221,23 @@ class dailyReportsController extends Controller
 
         $orders = $orderQuery
             ->whereDate('billed_on', $date)
+            ->withSum('refunds as total_refund', 'refund_amount')
             ->with(['branch','customer','billedBy','payments.payment'])
             ->get();
+
+    
+        $refund = $orderQuery->where('is_refunded', 1)->pluck('id');
+
+        $totalRefund = 0;
+
+        if ($refund->isNotEmpty()) {
+            $totalRefund = Refund::whereIn('order_id', $refund)
+                ->sum('refund_amount');
+        }
+
+        $totalSales = $orders->sum('bill_amount');
+
+        $totalSales = $totalSales - $totalRefund;
 
         $orderIds = $orders->pluck('id');
 
@@ -316,7 +331,8 @@ class dailyReportsController extends Controller
                 $productOut,
                 $productInAmount,
                 $productOutAmount,
-                $paymentSummary
+                $paymentSummary,
+                $totalSales
             ),
             'daily_report_' . now()->format('d-m-Y_h-i A') . '.xlsx'
         );
@@ -355,10 +371,22 @@ class dailyReportsController extends Controller
 
         $orders = $orderQuery
         ->whereDate('billed_on', $date)
+        ->withSum('refunds as total_refund', 'refund_amount')
         ->with(['branch','customer','billedBy','payments.payment','shop'])
         ->get();
 
+        $refund = $orderQuery->where('is_refunded', 1)->pluck('id');
+
+        $totalRefund = 0;
+
+        if ($refund->isNotEmpty()) {
+            $totalRefund = Refund::whereIn('order_id', $refund)
+                ->sum('refund_amount');
+        }
+
         $totalSales = $orders->sum('bill_amount');
+
+        $totalSales = $totalSales - $totalRefund;
 
         $orderIds = $orders->pluck('id');
 
