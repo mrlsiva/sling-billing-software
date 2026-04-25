@@ -38,7 +38,7 @@ class orderReportsController extends Controller
             $query->whereDate('billed_on', '<=', $request->to);
         }
 
-        $orders = $query->orderBy('id', 'desc')->paginate(10);
+        $orders = $query->withSum('refunds as total_refund', 'refund_amount')->orderBy('id', 'desc')->paginate(10);
 
         return view('users.reports.order',compact('orders','branches'));
     }

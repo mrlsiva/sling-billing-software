@@ -39,4 +39,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderDetail::class, 'order_id');
     }
+
+    public function refunds()
+    {
+        return $this->hasMany(Refund::class, 'order_id');
+    }
 }

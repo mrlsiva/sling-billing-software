@@ -14,6 +14,7 @@ use App\Models\OrderPaymentDetail;
 use App\Models\ProductHistory;
 use App\Models\VendorPayment;
 use App\Models\PurchaseOrder;
+use App\Models\Refund;
 use App\Models\Order;
 use App\Models\User;
 use App\Traits\Log;
@@ -67,10 +68,22 @@ class dailyReportsController extends Controller
 
         $orders = $orderQuery
             ->with(['branch','shop','customer','billedBy','payments.payment'])
+            ->withSum('refunds as total_refund', 'refund_amount')
             ->orderByDesc('id')
             ->paginate(10);
 
+        $refund = $orderQuery->where('is_refunded', 1)->pluck('id');
+
+        $totalRefund = 0;
+
+        if ($refund->isNotEmpty()) {
+            $totalRefund = Refund::whereIn('order_id', $refund)
+                ->sum('refund_amount');
+        }
+
         $totalSales = $orders->sum('bill_amount');
+
+        $totalSales = $totalSales - $totalRefund;
 
         $orderIds = $orders->pluck('id');
 

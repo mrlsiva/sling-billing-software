@@ -26,7 +26,7 @@ class salesReportController extends Controller
         $from = $request->from;
         $to   = $request->to;
 
-        $orders = Order::with(['customer','billedBy','details'])
+        $orders = Order::with(['customer','billedBy','details','refunds.details'])
             ->where('shop_id', Auth::user()->owner_id)
 
             // ✅ Branch condition
@@ -43,6 +43,8 @@ class salesReportController extends Controller
                     Carbon::parse($to)->endOfDay()
                 ]);
             })
+
+            ->withSum('refunds as total_refund', 'refund_amount')
 
             ->latest()
             ->paginate(10);
