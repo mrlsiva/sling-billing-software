@@ -105,7 +105,7 @@
                                       <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#categoryAdd">Category</a></li>
                                         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#subCategoryAdd">Sub Category</a></li>
-                                        <li><a class="dropdown-item" href="#">Product</a></li>
+                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#productAdd">Product</a></li>
                                       </ul>
                                     </div>
                                 </div>
@@ -211,7 +211,7 @@
                         <option value=""> Select </option>
                     </select>
                     <!-- ✅ Stock display -->
-                    <small class="text-success stock-display">Stock: 0</small>
+                    <small class="text-success stock-display"></small>
                 </div>
             </div>
 
@@ -330,6 +330,7 @@
 <script src="{{asset('assets/js/users/vendor.js?' . $version)}}"></script>
 <script src="{{asset('assets/js/users/category.js?' . $version)}}"></script>
 <script src="{{asset('assets/js/users/sub_category.js?' . $version)}}"></script>
+<script src="{{asset('assets/js/users/product.js?' . $version)}}"></script>
 
 <script>
 $(document).on('click', '#bulkBtn', function () {

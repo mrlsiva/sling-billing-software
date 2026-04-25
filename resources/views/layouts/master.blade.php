@@ -638,6 +638,18 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="productAdd" tabindex="-1" aria-labelledby="productAdd" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content" >
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredScrollableTitle">Add New Product</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        @include('users.products.partial')
+                    </div>
+                </div>
+            </div>
+
             <div class="modal fade" id="productTimelineModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content">
