@@ -21,6 +21,9 @@ class dashboardController extends Controller
             return $branch;
         });
 
-        return view('users.dashboard', compact('auth', 'branches'));
+        $today_orders = $branches->sum('today_orders');
+        $total_orders = $branches->sum('total_orders');
+
+        return view('users.dashboard', compact('auth', 'branches', 'today_orders', 'total_orders'));
     }
 }

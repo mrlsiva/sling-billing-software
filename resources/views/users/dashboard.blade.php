@@ -20,11 +20,6 @@
 .branch-section-header span { font-size: 14px; font-weight: 700; color: #1a1f36; text-transform: uppercase; letter-spacing: .5px; }
 </style>
 
-@php
-    $category_count    = App\Models\Category::where('user_id', Auth::user()->id)->count();
-    $sub_category_count = App\Models\SubCategory::where('user_id', Auth::user()->id)->count();
-    $product_count     = App\Models\Product::where('user_id', Auth::user()->id)->count();
-@endphp
 
 <div class="row mb-3">
 	<div class="col-12">
@@ -39,18 +34,22 @@
 		</div>
 	</div>
 </div>
-
+<div class="branch-section-header mb-0">
+	<i class="ri-store-line"></i>
+	<span>All branches</span>
+</div>
 <div class="row g-3 mb-4">
+	
 	<div class="col-md-3">
 		<div class="card dash-stat-card h-100">
 			<div class="card-body d-flex align-items-center gap-3">
-				<div class="dash-icon" style="background:#e8f4fd; color:#0d6efd;">
-					<i class="ri-store-2-line"></i>
+				<div class="dash-icon" style="background:#e8fdf0; color:#198754;">
+					<i class="ri-shopping-bag-line"></i>
 				</div>
 				<div>
-					<div class="dash-label">Branches</div>
-					<div class="dash-value">{{ count($branches) }}</div>
-					<div class="dash-sub">Active branches</div>
+					<div class="dash-label">Today Orders</div>
+					<div class="dash-value">{{ $today_orders }}</div>
+					<div class="dash-sub">{{ now()->format('d M Y') }}</div>
 				</div>
 			</div>
 		</div>
@@ -58,13 +57,13 @@
 	<div class="col-md-3">
 		<div class="card dash-stat-card h-100">
 			<div class="card-body d-flex align-items-center gap-3">
-				<div class="dash-icon" style="background:#e8fdf0; color:#198754;">
-					<i class="ri-list-check-2"></i>
+				<div class="dash-icon" style="background:#e8f4fd; color:#0d6efd;">
+					<i class="ri-currency-line"></i>
 				</div>
 				<div>
-					<div class="dash-label">Categories</div>
-					<div class="dash-value">{{ $category_count }}</div>
-					<div class="dash-sub">{{ $sub_category_count }} sub-categories</div>
+					<div class="dash-label">Today Sales</div>
+					<div class="dash-value">&#x20B9; {{ number_format($branches->sum('today_sales'), 2) }}</div>
+					<div class="dash-sub">{{ now()->format('d M Y') }}</div>
 				</div>
 			</div>
 		</div>
@@ -73,12 +72,12 @@
 		<div class="card dash-stat-card h-100">
 			<div class="card-body d-flex align-items-center gap-3">
 				<div class="dash-icon" style="background:#fff8e1; color:#f59e0b;">
-					<i class="ri-shopping-basket-line"></i>
+					<i class="ri-stack-line"></i>
 				</div>
 				<div>
-					<div class="dash-label">Products</div>
-					<div class="dash-value">{{ $product_count }}</div>
-					<div class="dash-sub">Total products</div>
+					<div class="dash-label">Total Orders</div>
+					<div class="dash-value">{{ $total_orders }}</div>
+					<div class="dash-sub">All time</div>
 				</div>
 			</div>
 		</div>
@@ -122,6 +121,20 @@
 	<div class="col-md-3">
 		<div class="card dash-stat-card h-100">
 			<div class="card-body d-flex align-items-center gap-3">
+				<div class="dash-icon" style="background:#fff8e1; color:#f59e0b;">
+					<i class="ri-currency-line"></i>
+				</div>
+				<div>
+					<div class="dash-label">Today Sales</div>
+					<div class="dash-value">&#x20B9; {{ number_format($branch->today_sales, 2) }}</div>
+					<div class="dash-sub">{{ now()->format('d M Y') }}</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+	<div class="col-md-3">
+		<div class="card dash-stat-card h-100">
+			<div class="card-body d-flex align-items-center gap-3">
 				<div class="dash-icon" style="background:#e8fdf0; color:#198754;">
 					<i class="ri-stack-line"></i>
 				</div>
@@ -133,20 +146,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-md-3">
-		<div class="card dash-stat-card h-100">
-			<div class="card-body d-flex align-items-center gap-3">
-				<div class="dash-icon" style="background:#fff8e1; color:#f59e0b;">
-					<i class="ri-currency-line"></i>
-				</div>
-				<div>
-					<div class="dash-label">Today Sales</div>
-					<div class="dash-value">&#x20B9; {{ number_format($branch->today_sales, 2) }}</div>
-					<div class="dash-sub">{{ now()->format('d M Y') }}</div>
-				</div>
-			</div>
-		</div>
-	</div>
+	
 	<div class="col-md-3">
 		<div class="card dash-stat-card h-100">
 			<div class="card-body d-flex align-items-center gap-3">
