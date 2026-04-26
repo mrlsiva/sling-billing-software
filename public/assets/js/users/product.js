@@ -44,10 +44,20 @@ jQuery(document).ready(function ()
 {
 	jQuery('select[name="category"]').on('change',function(){
 		var category = jQuery(this).val();
+
+        let currentUrl = window.location.href;
+        let postUrl = '';
+
+        if (currentUrl.includes('purchase_orders')) {
+            postUrl = '../../products/get_sub_category';
+        } else {
+            postUrl = '../products/get_sub_category';
+        }
+
 		if(category)
 		{
 			jQuery.ajax({
-				url : 'get_sub_category',
+				url : postUrl,
 				type: 'GET',
 				dataType: 'json',
 				data: { id: category },
@@ -390,6 +400,124 @@ document.addEventListener('DOMContentLoaded', function () {
         updateColours();
         colourToggle.addEventListener('change', updateColours);
     }
+});
+
+
+$('#productCreate').on('submit', function (e) {
+    e.preventDefault();
+
+    let form = this;
+    let formData = new FormData(form);
+
+    let currentUrl = window.location.href;
+    let postUrl = '';
+
+    if (currentUrl.includes('purchase_orders')) {
+        postUrl = '../../products/store';
+    } else {
+        postUrl = '../products/store';
+    }
+
+    $.ajax({
+        url: postUrl,
+        type: "POST",
+        data: formData,
+        dataType: "json",
+
+        /* REQUIRED FOR FormData */
+        processData: false,
+        contentType: false,
+
+        /* CSRF */
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+
+        beforeSend: function () {
+            $('#productSubmit').prop('disabled', true).html('<i class="ri-loader-4-line"></i> Submitting...');
+        },
+
+        success: function (response) {
+            console.log(response);
+
+            if (response.status === true) 
+            {
+                let currentUrl = window.location.pathname;
+
+                if (currentUrl.includes('products')) 
+                {
+                    const event = new CustomEvent("toast", {
+                        detail: {
+                            text: response.message,
+                            gravity: "top",
+                            position: "right",
+                            className: "success", // or "error" based on response
+                            duration: 5000,
+                            close: true,
+                        }
+                    });
+
+                    document.dispatchEvent(event);
+
+                    // optional delay so user can see the toast
+                    setTimeout(() => {
+                        window.location.href = response.redirect;
+                    }, 800);
+                }
+                else
+                {
+                    /* Close modal */
+                    $('#productAdd').modal('hide');
+
+                    /* Reset form */
+                    form.reset();
+
+                    /* Restore submit button */
+                    $('#productSubmit').prop('disabled', false).html('<i class="ri-save-line"></i> Submit');
+                }
+            }
+            else
+            {
+                alert(response.message);
+                $('#productSubmit').prop('disabled', false).html('<i class="ri-save-line"></i> Submit');
+            }
+        },
+
+        error: function (xhr, status, error) {
+            console.error('STATUS:', xhr.status);
+            console.error('RESPONSE:', xhr.responseText);
+            console.error('ERROR:', error);
+
+            let message = 'Something went wrong. Please try again.';
+
+            /* Laravel Validation Errors (422) */
+            if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                let errors = xhr.responseJSON.errors;
+                let messages = [];
+
+                $.each(errors, function (key, value) {
+                    messages.push(value[0]);
+                });
+
+                message = messages.join('\n');
+            }
+
+            /* CSRF expired (419) */
+            else if (xhr.status === 419) {
+                message = 'Session expired. Please refresh the page.';
+            }
+
+            /* Server error */
+            else if (xhr.responseJSON && xhr.responseJSON.message) {
+                message = xhr.responseJSON.message;
+            }
+
+            alert(message);
+
+            /* Restore submit button */
+            $('#productSubmit').prop('disabled', false).html('<i class="ri-save-line"></i> Submit');
+        }
+    });
 });
 
 

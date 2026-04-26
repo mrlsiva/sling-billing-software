@@ -268,7 +268,17 @@ class productController extends Controller
 
         DB::commit();
 
-        return redirect()->back()->with('toast_success', 'Product created successfully.');
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Product created successfully.',
+            'redirect' => route('product.index', ['company' => request()->route('company')]),
+            'data' => [
+                'id'   => $product->id,
+                'name' => $product->name,
+            ]
+        ]);
+
+        //return redirect()->back()->with('toast_success', 'Product created successfully.');
         
     }
 

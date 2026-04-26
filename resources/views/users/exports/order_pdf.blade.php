@@ -42,7 +42,7 @@
                 <td>{{ $i+1 }}</td>
                 <td>{{ $order->branch->user_name ?? '-' }}</td>
                 <td>{{ $order->bill_id }}</td>
-                <td>{{ $order->bill_amount }}</td>
+                <td>{{ $order->bill_amount - ($order->is_refunded ? ($order->total_refund ?? 0) : 0) }}</td>
                 <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}</td>
                 <td>{{ $order->billedBy->name }}</td>
                 <td>{{ $order->customer->phone }} ({{ $order->customer->name }})</td>

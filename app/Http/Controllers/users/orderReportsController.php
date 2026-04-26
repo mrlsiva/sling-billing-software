@@ -38,7 +38,7 @@ class orderReportsController extends Controller
             $query->whereDate('billed_on', '<=', $request->to);
         }
 
-        $orders = $query->orderBy('id', 'desc')->paginate(10);
+        $orders = $query->withSum('refunds as total_refund', 'refund_amount')->orderBy('id', 'desc')->paginate(10);
 
         return view('users.reports.order',compact('orders','branches'));
     }
@@ -59,7 +59,7 @@ class orderReportsController extends Controller
             $query->whereDate('billed_on', '<=', $request->to);
         }
 
-        $orders = $query->orderBy('id', 'desc')->get();
+        $orders = $query->withSum('refunds as total_refund', 'refund_amount')->orderBy('id', 'desc')->get();
 
         return Excel::download(new OrderExport($orders), 'orders_report_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
@@ -80,7 +80,7 @@ class orderReportsController extends Controller
             $query->whereDate('billed_on', '<=', $request->to);
         }
 
-        $orders = $query->orderBy('id', 'desc')->get();
+        $orders = $query->withSum('refunds as total_refund', 'refund_amount')->orderBy('id', 'desc')->get();
 
         $totalOrders = $orders->count();
         $totalSales  = $orders->sum('bill_amount');
