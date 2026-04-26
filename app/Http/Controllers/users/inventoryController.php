@@ -252,9 +252,9 @@ class inventoryController extends Controller
 
         $product = Product::findOrFail($request->product);
 
-        if ($product->quantity == 0) 
+        if ($product->quantity == 0)
         {
-            return redirect()->back()->with('toast_error', 'You cant transfer a product with 0 quantity.');
+            return redirect()->back()->with('toast_error', '"' . $product->name . '" has 0 quantity. Cannot transfer.');
         }
 
         if ($product->quantity < $request->quantity) 
@@ -526,7 +526,9 @@ class inventoryController extends Controller
                     1
                 );
 
-                return back()->with('toast_success', 'Failed to import excel.');
+                return back()
+                    ->with('toast_error', 'Failed to import excel. See errors below.')
+                    ->with('bulk_errors', $errors);
 
                 // return Excel::download(
                 //     new ProductTransferErrorExport($errors),
@@ -636,7 +638,7 @@ class inventoryController extends Controller
         $product = Product::findOrFail($data['product_id']);
 
         if ($product->quantity == 0) {
-            throw new \Exception('You cant transfer a product with 0 quantity.');
+            throw new \Exception('"' . $product->name . '" has 0 quantity. Cannot transfer.');
         }
 
         if ($product->quantity < $data['quantity']) {

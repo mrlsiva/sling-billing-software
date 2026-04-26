@@ -32,6 +32,17 @@
 			        </div>
 			    @endif
 
+			    @if (session('bulk_errors'))
+			        <div class="alert alert-danger mx-3">
+			            <strong>Bulk Transfer Failed</strong> — {{ count(session('bulk_errors')) }} row(s) had errors:
+			            <ul class="mb-0 mt-2">
+			                @foreach (session('bulk_errors') as $err)
+			                    <li>Row {{ $err['row'] }}: {!! $err['error'] !!}</li>
+			                @endforeach
+			            </ul>
+			        </div>
+			    @endif
+
 				<form method="get" action="{{route('inventory.transfer', ['company' => request()->route('company')])}}">
 				    <div class="row mb-3 p-3">
 				    	<div class="col-md-6">
