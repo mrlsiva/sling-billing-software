@@ -206,12 +206,13 @@
 
             <div class="col-md-3">
                 <div class="mb-3">
-                    <label class="form-label text-muted">Product <span class="text-danger">*</span></label>
+                    <label class="form-label text-muted d-flex justify-content-between">
+                        <span>Product <span class="text-danger">*</span></span>
+                        <small class="text-success stock-display fw-semibold"></small>
+                    </label>
                     <select class="form-control product-select" name="products[0][product]" required>
                         <option value=""> Select </option>
                     </select>
-                    <!-- ✅ Stock display -->
-                    <small class="text-success stock-display"></small>
                 </div>
             </div>
 
