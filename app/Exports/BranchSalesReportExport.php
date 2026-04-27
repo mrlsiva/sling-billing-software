@@ -43,12 +43,37 @@ class BranchSalesReportExport implements FromCollection, WithHeadings, ShouldAut
         foreach ($this->orders as $order) {
             foreach ($order->details as $detail) {
 
-                $qty = $detail->quantity;
+                // 🔁 Calculate refunded qty for this product
+                $refundedQty = 0;
 
-                // ✅ Your current logic
+                if ($order->is_refunded && $order->refunds) {
+                    foreach ($order->refunds as $refund) {
+                        foreach ($refund->details as $rDetail) {
+                            if ($rDetail->product_id == $detail->product_id) {
+                                $refundedQty += $rDetail->quantity;
+                            }
+                        }
+                    }
+                }
+
+                // ✅ Final qty after refund
+                $qty = $detail->quantity - $refundedQty;
+
+                //(avoid negative)
+                if ($qty < 0) {
+                    $qty = 0;
+                }
+
+                // ✅ Recalculate amounts based on final qty
                 $gross = $detail->price * $qty;
                 $tax   = $detail->tax_amount * $qty;
                 $net   = ($detail->price - $detail->tax_amount) * $qty;
+
+                // 👉 format like Blade
+                $qtyDisplay = $qty;
+                if ($refundedQty > 0) {
+                    $qtyDisplay .= " (Refunded: {$refundedQty})";
+                }
 
                 $rows[] = [
                     $order->bill_id,
@@ -62,7 +87,7 @@ class BranchSalesReportExport implements FromCollection, WithHeadings, ShouldAut
                     optional($detail->product->sub_category)->name,
                     $detail->name,
                     $detail->product_id,
-                    $qty,
+                    $qtyDisplay,
                     round($gross, 2),
                     round($tax, 2),
                     round($net, 2),

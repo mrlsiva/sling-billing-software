@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\BranchDailyReportExport;
 use App\Models\ProductHistory;
 use Illuminate\Http\Request;
+use App\Models\Refund;
 use App\Models\Order;
 use App\Models\User;
 use App\Traits\Log;
@@ -33,8 +34,18 @@ class dailyReportController extends Controller
             ->where('branch_id', Auth::user()->id)
             ->whereDate('billed_on', $date);
 
-        // ✅ Correct total (before pagination)
+        $refund = $orderQuery->where('is_refunded', 1)->pluck('id');
+
+        $totalRefund = 0;
+
+        if ($refund->isNotEmpty()) {
+            $totalRefund = Refund::whereIn('order_id', $refund)
+                ->sum('refund_amount');
+        }
+
         $totalSales = $orderQuery->sum('bill_amount');
+
+        $totalSales = $totalSales - $totalRefund;
 
         $orders = $orderQuery
             ->with([
@@ -44,6 +55,7 @@ class dailyReportController extends Controller
                 'billedBy',
                 'payments.payment' // ✅ IMPORTANT for mode of payment
             ])
+            ->withSum('refunds as total_refund', 'refund_amount')
             ->orderByDesc('id')
             ->paginate(10);
 
@@ -94,8 +106,28 @@ class dailyReportController extends Controller
         $orders = Order::where('shop_id', Auth::user()->parent_id)
             ->where('branch_id', Auth::user()->id)
             ->whereDate('billed_on', $date)
+            ->withSum('refunds as total_refund', 'refund_amount')
             ->with(['branch','customer','billedBy','payments.payment','shop'])
             ->get();
+
+        $refund = Order::where('shop_id', Auth::user()->parent_id)
+            ->where('branch_id', Auth::user()->id)
+            ->whereDate('billed_on', $date)
+            ->withSum('refunds as total_refund', 'refund_amount')
+            ->with(['branch','customer','billedBy','payments.payment','shop'])->where('is_refunded', 1)->pluck('id');
+
+        $totalRefund = 0;
+
+        if ($refund->isNotEmpty()) {
+            $totalRefund = Refund::whereIn('order_id', $refund)
+                ->sum('refund_amount');
+        }
+
+        $totalSales = $orders->sum('bill_amount');
+
+        $totalSales = $totalSales - $totalRefund;
+
+
 
         /*
         |----------------------------------------
@@ -121,7 +153,9 @@ class dailyReportController extends Controller
                 $productIn,
                 $productOut,
                 $productInAmount,
-                $productOutAmount
+                $productOutAmount,
+                $totalSales
+
             ),
             'daily_report_' . now()->format('d-m-Y_h-i A') . '.xlsx'
         );
@@ -134,10 +168,26 @@ class dailyReportController extends Controller
         $orders = Order::where('shop_id', Auth::user()->parent_id)
             ->where('branch_id', Auth::user()->id)
             ->whereDate('billed_on', $date)
+            ->withSum('refunds as total_refund', 'refund_amount')
             ->with(['branch','customer','billedBy','payments.payment','shop'])
             ->get();
 
+        $refund = Order::where('shop_id', Auth::user()->parent_id)
+            ->where('branch_id', Auth::user()->id)
+            ->whereDate('billed_on', $date)
+            ->withSum('refunds as total_refund', 'refund_amount')
+            ->with(['branch','customer','billedBy','payments.payment','shop'])->where('is_refunded', 1)->pluck('id');
+
+        $totalRefund = 0;
+
+        if ($refund->isNotEmpty()) {
+            $totalRefund = Refund::whereIn('order_id', $refund)
+                ->sum('refund_amount');
+        }
+
         $totalSales = $orders->sum('bill_amount');
+
+        $totalSales = $totalSales - $totalRefund;
 
         $productIn = ProductHistory::with('product')
             ->whereDate('transfer_on', $date)

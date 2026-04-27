@@ -31,6 +31,7 @@ class salesReportsController extends Controller
                     Carbon::parse($to)->endOfDay()
                 ]);
             })
+            ->withSum('refunds as total_refund', 'refund_amount')
 
             ->latest()
             ->paginate(10);
@@ -54,6 +55,7 @@ class salesReportsController extends Controller
                     \Carbon\Carbon::parse($to)->endOfDay()
                 ]);
             })
+            ->withSum('refunds as total_refund', 'refund_amount')
 
             ->get();
 
@@ -76,6 +78,7 @@ class salesReportsController extends Controller
                     \Carbon\Carbon::parse($to)->endOfDay()
                 ]);
             })
+            ->withSum('refunds as total_refund', 'refund_amount')
 
             ->get();
 

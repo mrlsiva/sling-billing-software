@@ -79,10 +79,27 @@
                     @foreach($order->details as $detail)
 
                         @php
-                            $qty   = $detail->quantity;
-                            $net   = ($detail->price - $detail->tax_amount) * $detail->quantity;
-                            $tax   = $detail->tax_amount * $detail->quantity;
-                            $gross = $detail->price * $detail->quantity;
+                            // total refunded qty for this product in this order
+                            $refundedQty = 0;
+
+                            if ($order->is_refunded) {
+                                foreach ($order->refunds as $refund) {
+                                    foreach ($refund->details as $rDetail) {
+                                        if ($rDetail->product_id == $detail->product_id) {
+                                            $refundedQty += $rDetail->quantity;
+                                        }
+                                    }
+                                }
+                            }
+
+                            $finalQty = $detail->quantity - $refundedQty;
+
+                            // avoid negative (safety)
+                            if ($finalQty < 0) $finalQty = 0;
+
+                            $gross = $detail->price * $finalQty;
+                            $tax   = $detail->tax_amount * $finalQty;
+                            $net   = ($detail->price - $detail->tax_amount) * $finalQty;
                         @endphp
 
                         <tr>
@@ -96,11 +113,17 @@
                             <td>{{ $detail->product->category->name ?? '' }}</td>
                             <td>{{ $detail->product->sub_category->name ?? '' }}</td>
                             <td>{{ $detail->name }}</td>
-                            <td>{{ $detail->product_id }}</td>
-                            <td class="text-center">{{ $qty }}</td>
-                            <td class="text-right">{{ number_format($gross, 2) }}</td>
-                            <td class="text-right">{{ number_format($tax, 2) }}</td>
-                            <td class="text-right">{{ number_format($net, 2) }}</td>
+                            <td>{{ $detail->product->code }}</td>
+                            <td>
+                                {{ $finalQty }}
+                                @if($refundedQty > 0)
+                                <small class="text-danger">(Refunded: {{ $refundedQty }})</small>
+                                @endif
+                            </td>
+
+                            <td>{{ $gross }}</td>
+                            <td>{{ $tax }}</td>
+                            <td>{{ $net }}</td>
                         </tr>
 
                     @endforeach
