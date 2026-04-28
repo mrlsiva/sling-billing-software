@@ -28,6 +28,7 @@ use App\Models\User;
 use App\Models\Staff;
 use App\Models\BillSetup;
 use App\Models\ProductImeiNumber;
+use App\Models\Credit;
 use App\Traits\Log;
 use Carbon\Carbon;
 use Session;
@@ -437,7 +438,7 @@ class billingController extends Controller
             $payment_id = Payment::where('name', $payment['method'])->first()->id;
             $extra = $payment['extra'] ?? [];
 
-            OrderPaymentDetail::create([
+            $order_payment = OrderPaymentDetail::create([
                 'order_id'   => $order->id,
                 'payment_id' => $payment_id,
                 'amount'     => $payment['amount'],
@@ -445,6 +446,15 @@ class billingController extends Controller
                 'card'       => $extra['card_name'] ?? null,
                 'finance_id' => $extra['finance_type'] ?? null,
             ]);
+
+            if($payment_id == 6)
+            {
+                Credit::create([
+                    'order_payment_detail_id' => $order_payment->id,
+                    'amount'     => $payment['amount'],
+                    'remaining_amount'     => $payment['amount'],
+                ]);
+            }
         }
 
         // Logs & Notification --------------

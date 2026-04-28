@@ -10,6 +10,11 @@ class OrderPaymentDetail extends Model
         'order_id','payment_id','amount','number','card','finance_id'
     ];
 
+    public function order()
+    {
+        return $this->belongsTo('App\Models\Order');
+    }
+
     public function payment()
     {
         return $this->belongsTo('App\Models\Payment');

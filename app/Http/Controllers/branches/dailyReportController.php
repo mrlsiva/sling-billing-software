@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\BranchDailyReportExport;
 use App\Models\ProductHistory;
+use App\Models\OrderPaymentDetail;
 use Illuminate\Http\Request;
 use App\Models\Refund;
 use App\Models\Order;
@@ -34,7 +35,9 @@ class dailyReportController extends Controller
             ->where('branch_id', Auth::user()->id)
             ->whereDate('billed_on', $date);
 
-        $refund = $orderQuery->where('is_refunded', 1)->pluck('id');
+        $refund = Order::where('shop_id', Auth::user()->parent_id)
+            ->where('branch_id', Auth::user()->id)
+            ->whereDate('billed_on', $date)->where('is_refunded', 1)->pluck('id');
 
         $totalRefund = 0;
 
@@ -89,13 +92,18 @@ class dailyReportController extends Controller
             return ($item->product->price ?? 0) * $item->quantity;
         });
 
+        //Credit 
+        $order_id = Order::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('billed_on', $date)->pluck('id');
+        $credit_amount = OrderPaymentDetail::whereIn('order_id',$order_id)->where('payment_id', 6)->sum('amount');
+
         return view('branches.reports.daily', compact(
             'orders',
             'totalSales',
             'productIn',
             'productOut',
             'productInAmount',
-            'productOutAmount'
+            'productOutAmount',
+            'credit_amount'
         ));
     }
 

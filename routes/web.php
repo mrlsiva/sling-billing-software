@@ -54,6 +54,7 @@ use App\Http\Controllers\branches\gstBillController;
 use App\Http\Controllers\branches\bulkExcelController;
 use App\Http\Controllers\branches\productTransferReportsController;
 use App\Http\Controllers\branches\salesReportsController;
+use App\Http\Controllers\branches\creditController;
 
 Route::get('/clear', function() {
     Artisan::call('cache:clear');
@@ -567,6 +568,11 @@ else
                                     });
                                 });
                             });
+
+                            Route::get('/credits/{date}',[creditController::class, 'credit'])->name('credit');
+                            Route::get('/credits/payments/{id}', [creditController::class, 'getCreditPayments']);
+                            Route::post('/credits/payments/store', [creditController::class, 'store']);
+                            
 
                             Route::prefix('excel')->group(function () {
                                 Route::name('excel.')->group(function () {

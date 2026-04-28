@@ -26,7 +26,7 @@
             			<div class="col-md-11">
             				<div class="mb-2">
             					<label for="date" class="form-label">Date</label>
-            					<input type="date" id="date" name="date" value="{{ request('date') }}" class="form-control">
+            					<input type="date" id="date" name="date" value="{{ request('date', now()->format('Y-m-d')) }}" class="form-control">
             				</div>
             			</div>
 
@@ -86,6 +86,18 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="col-md-3">
+                        <a href="{{ route('branch.credit', ['company' => request()->route('company'),'date' =>  request('date', now()->format('Y-m-d')) ]) }}">
+                            <div class="card border shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Credit Amount</h6>
+                                    <h4 class="text-warning">₹ {{ number_format($credit_amount, 2) }} </h4>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    
 
 
             	</div>
