@@ -86,6 +86,31 @@
                                 <tbody>
                                     @foreach($orders as $order)
                                         @foreach($order->details as $detail)
+
+                                            @php
+                                                // total refunded qty for this product in this order
+                                                $refundedQty = 0;
+
+                                                if ($order->is_refunded) {
+                                                    foreach ($order->refunds as $refund) {
+                                                        foreach ($refund->details as $rDetail) {
+                                                            if ($rDetail->product_id == $detail->product_id) {
+                                                                $refundedQty += $rDetail->quantity;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                $finalQty = $detail->quantity - $refundedQty;
+
+                                                // avoid negative (safety)
+                                                if ($finalQty < 0) $finalQty = 0;
+
+                                                $gross = $detail->price * $finalQty;
+                                                $tax   = $detail->tax_amount * $finalQty;
+                                                $net   = ($detail->price - $detail->tax_amount) * $finalQty;
+                                            @endphp
+                                            
                                             <tr>
                                                 <td>{{ $order->bill_id }}</td>
                                                 <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y H:i') }}</td>
@@ -97,11 +122,17 @@
                                                 <td>{{ $detail->product->category->name ?? '' }}</td>
                                                 <td>{{ $detail->product->sub_category->name ?? '' }}</td>
                                                 <td>{{ $detail->name }}</td>
-                                                <td>{{ $detail->product_id }}</td>
-                                                <td>{{ $detail->quantity }}</td>
-                                                <td>{{ $detail->price * $detail->quantity}}</td>
-                                                <td>{{ $detail->tax_amount * $detail->quantity }}</td>
-                                                <td>{{ ($detail->price - $detail->tax_amount) * $detail->quantity}}</td>
+                                                <td>{{ $detail->product->code }}</td>
+                                                <td>
+                                                    {{ $finalQty }}
+                                                    @if($refundedQty > 0)
+                                                        <small class="text-danger">(Refunded: {{ $refundedQty }})</small>
+                                                    @endif
+                                                </td>
+
+                                                <td>{{ $gross }}</td>
+                                                <td>{{ $tax }}</td>
+                                                <td>{{ $net }}</td>
                                             </tr>
                                         @endforeach
                                     @endforeach

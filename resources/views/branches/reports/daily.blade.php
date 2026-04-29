@@ -26,7 +26,7 @@
             			<div class="col-md-11">
             				<div class="mb-2">
             					<label for="date" class="form-label">Date</label>
-            					<input type="date" id="date" name="date" value="{{ request('date') }}" class="form-control">
+            					<input type="date" id="date" name="date" value="{{ request('date', now()->format('Y-m-d')) }}" class="form-control">
             				</div>
             			</div>
 
@@ -86,6 +86,18 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="col-md-3">
+                        <a href="{{ route('branch.credit', ['company' => request()->route('company'),'date' =>  request('date', now()->format('Y-m-d')) ]) }}">
+                            <div class="card border shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Credit Amount</h6>
+                                    <h4 class="text-warning">₹ {{ number_format($credit_amount, 2) }} </h4>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    
 
 
             	</div>
@@ -123,7 +135,7 @@
             						{{$order->bill_id}}
             					</td>
             					<td>
-            						{{$order->bill_amount}}
+            						{{ $order->bill_amount - ($order->is_refunded ? ($order->total_refund ?? 0) : 0) }}
             					</td>
             					<td>
             						{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}
@@ -132,14 +144,18 @@
             						{{ $order->billedBy->name }}
             					</td>
                                 <td>
-                                    @forelse($order->payments as $payment)
+                                    @foreach($order->payments as $payment)
                                         <span class="badge bg-primary">
                                             {{ $payment->payment->name ?? 'N/A' }} 
                                             ₹ {{ number_format($payment->amount, 2) }}
                                         </span><br>
-                                    @empty
-                                        -
-                                    @endforelse
+                                    @endforeach
+                                    @if($order->is_refunded)
+                                        <span class="badge bg-primary">
+                                            Refund 
+                                            ₹ {{ number_format($order->total_refund, 2) }}
+                                        </span>
+                                    @endif
                                 </td>
             					<td>
             						{{ $order->customer->phone }} ({{ $order->customer->name }})

@@ -83,7 +83,9 @@ class orderReportsController extends Controller
         $orders = $query->withSum('refunds as total_refund', 'refund_amount')->orderBy('id', 'desc')->get();
 
         $totalOrders = $orders->count();
-        $totalSales  = $orders->sum('bill_amount');
+        $totalSales = $orders->sum(function ($order) {
+            return $order->bill_amount - ($order->total_refund ?? 0);
+        });
         $user        = Auth::user();
 
         $pdf = Pdf::loadView('users.exports.order_pdf', compact('orders', 'totalOrders', 'totalSales', 'user'))->setPaper('a4', 'landscape');

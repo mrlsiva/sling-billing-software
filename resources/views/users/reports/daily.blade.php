@@ -323,7 +323,7 @@
                                 	@foreach($orders as $order)
 									<tr>
 										<td>
-											{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
+											{{ $loop->iteration }}
 										</td>
 										<td>
                                             @if($order->branch_id != null)
