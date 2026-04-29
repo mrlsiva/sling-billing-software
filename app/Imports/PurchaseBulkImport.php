@@ -37,23 +37,47 @@ class PurchaseBulkImport implements ToCollection
     {
         $shopId = auth()->user()->owner_id;
 
-        // Load all categories keyed by name (lowercase for case-insensitive match)
-        $this->categories = Category::all()->keyBy(fn($c) => strtolower(trim($c->name)))->toArray();
+        // Categories
+        $this->categories = Category::all()
+            ->keyBy(fn($c) => strtolower(trim($c->name)))
+            ->toArray();
 
-        // Load all sub-categories keyed by name
-        $this->subCategories = SubCategory::all()->keyBy(fn($s) => strtolower(trim($s->name)))->toArray();
+        // SubCategories (category + subcategory)
+        $this->subCategories = SubCategory::with('category')->get()
+            ->keyBy(function ($s) {
+                return strtolower(trim($s->category->name)) . '|' . strtolower(trim($s->name));
+            })
+            ->toArray();
 
-        // Load all products keyed by name
-        $this->products = Product::all()->keyBy(fn($p) => strtolower(trim($p->name)))->toArray();
+        // Products (category + subcategory + product)
+        $this->products = Product::with(['sub_category.category'])->get()
+            ->keyBy(function ($p) {
 
-        // Load all taxes for this shop keyed by name (which is the percentage value)
-        $this->taxes = Tax::where('shop_id', $shopId)->get()->keyBy(fn($t) => strtolower(trim($t->name)))->toArray();
+                if (!$p->sub_category || !$p->sub_category->category) {
+                    return null;
+                }
 
-        // Load all sizes keyed by name
-        $this->sizes = Size::all()->keyBy(fn($s) => strtolower(trim($s->name)))->toArray();
+                return strtolower(trim($p->sub_category->category->name)) . '|'
+                     . strtolower(trim($p->sub_category->name)) . '|'
+                     . strtolower(trim($p->name));
+            })
+            ->filter()
+            ->toArray();
 
-        // Load all colours keyed by name
-        $this->colours = Colour::all()->keyBy(fn($c) => strtolower(trim($c->name)))->toArray();
+        // Taxes
+        $this->taxes = Tax::where('shop_id', $shopId)->get()
+            ->keyBy(fn($t) => strtolower(trim($t->name)))
+            ->toArray();
+
+        // Sizes
+        $this->sizes = Size::all()
+            ->keyBy(fn($s) => strtolower(trim($s->name)))
+            ->toArray();
+
+        // Colours
+        $this->colours = Colour::all()
+            ->keyBy(fn($c) => strtolower(trim($c->name)))
+            ->toArray();
     }
 
     public function collection(Collection $rows)
@@ -82,9 +106,17 @@ class PurchaseBulkImport implements ToCollection
             $imeiRaw         = $row[9];
 
             // ✅ In-memory lookups (no DB queries per row)
-            $category    = $this->categories[strtolower($categoryName)] ?? null;
-            $subCategory = $this->subCategories[strtolower($subCategoryName)] ?? null;
-            $product     = $this->products[strtolower($productName)] ?? null;
+            $categoryKey = strtolower($categoryName);
+
+            $subCategoryKey = $categoryKey . '|' . strtolower($subCategoryName);
+
+            $productKey = $categoryKey . '|'
+                        . strtolower($subCategoryName) . '|'
+                        . strtolower($productName);
+
+            $category    = $this->categories[$categoryKey] ?? null;
+            $subCategory = $this->subCategories[$subCategoryKey] ?? null;
+            $product     = $this->products[$productKey] ?? null;
             $taxModel    = $this->taxes[strtolower((string)$taxInput)] ?? null;
 
             $errors = [];
