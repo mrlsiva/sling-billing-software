@@ -60,7 +60,7 @@ class dailyReportController extends Controller
             ])
             ->withSum('refunds as total_refund', 'refund_amount')
             ->orderByDesc('id')
-            ->paginate(10);
+            ->get();
 
         /*
         |--------------------------------------------------

@@ -70,7 +70,7 @@ class dailyReportsController extends Controller
             ->with(['branch','shop','customer','billedBy','payments.payment'])
             ->withSum('refunds as total_refund', 'refund_amount')
             ->orderByDesc('id')
-            ->paginate(10);
+            ->get();
 
         $refund = $orderQuery->where('is_refunded', 1)->pluck('id');
 
