@@ -26,9 +26,33 @@ class ProductTransferImport implements ToCollection
 
     protected function preload(): void
     {
-        $this->categories    = Category::all()->keyBy(fn($c) => strtolower(trim($c->name)))->toArray();
-        $this->subCategories = SubCategory::all()->keyBy(fn($s) => strtolower(trim($s->name)))->toArray();
-        $this->products      = Product::all()->keyBy(fn($p) => strtolower(trim($p->name)))->toArray();
+        // Categories
+        $this->categories = Category::all()
+            ->keyBy(fn($c) => strtolower(trim($c->name)))
+            ->toArray();
+
+        // SubCategories
+        $this->subCategories = SubCategory::with('category')->get()
+            ->keyBy(function ($s) {
+                return strtolower(trim($s->category->name)) . '|' . strtolower(trim($s->name));
+            })
+            ->toArray();
+
+        // Products
+        $this->products = Product::with(['sub_category.category'])->get()
+            ->keyBy(function ($p) {
+
+                // 🔴 SAFETY CHECK (important)
+                if (!$p->sub_category || !$p->sub_category->category) {
+                    return null; // skip invalid records
+                }
+
+                return strtolower(trim($p->sub_category->category->name)) . '|'
+                     . strtolower(trim($p->sub_category->name)) . '|'
+                     . strtolower(trim($p->name));
+            })
+            ->filter() // removes null keys
+            ->toArray();
     }
 
     public function collection(Collection $rows)
@@ -52,9 +76,17 @@ class ProductTransferImport implements ToCollection
                     $quantity
                 ] = $row;
 
-                $category    = $this->categories[strtolower(trim($categoryName))] ?? null;
-                $subCategory = $this->subCategories[strtolower(trim($subCategoryName))] ?? null;
-                $product     = $this->products[strtolower(trim($productName))] ?? null;
+                $categoryKey = strtolower(trim($categoryName));
+
+                $subCategoryKey = $categoryKey . '|' . strtolower(trim($subCategoryName));
+
+                $productKey = $categoryKey . '|'
+                            . strtolower(trim($subCategoryName)) . '|'
+                            . strtolower(trim($productName));
+
+                $category    = $this->categories[$categoryKey] ?? null;
+                $subCategory = $this->subCategories[$subCategoryKey] ?? null;
+                $product     = $this->products[$productKey] ?? null;
 
                 if (!$category) {
                     throw new \Exception("Category '$categoryName' not found");

@@ -59,6 +59,8 @@ class inventoryController extends Controller
             $query->where('quantity', '>', 0);
         });
 
+        //return $query->sum('quantity');
+
         $stocks = $query->orderBy('category_id')
                         ->orderBy('sub_category_id')
                         ->orderBy('product_id')
