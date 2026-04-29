@@ -27,8 +27,9 @@ class StockExport implements FromCollection, WithHeadings, WithMapping, WithStyl
         return [
             'S.No',
             'Category',
+            'Sub Category',
             'Product',
-            'Metric',
+            'Product Code',
             'Price (₹)',
             'Stock',
             'Total Price (₹)',
@@ -55,9 +56,10 @@ class StockExport implements FromCollection, WithHeadings, WithMapping, WithStyl
 
         return [
             $i++,
-            optional($stock->category)->name . ' - ' . optional($stock->sub_category)->name,
+            optional($stock->category)->name,
+            optional($stock->sub_category)->name,
             optional($stock->product)->name,
-            optional($stock->product->metric)->name ?? '-',
+            optional($stock->product)->code ?? '-',
             $stock->product->price ?? 0,
             $stock->quantity,
             number_format(($stock->product->price ?? 0) * $stock->quantity, 2),

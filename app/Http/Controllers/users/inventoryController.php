@@ -55,7 +55,7 @@ class inventoryController extends Controller
         });
 
         // Show only in-stock items
-        $query->when($request->has('stock_in'), function ($query) {
+        $query->when($request->stock_in == 1, function ($query) {
             $query->where('quantity', '>', 0);
         });
 
@@ -202,7 +202,7 @@ class inventoryController extends Controller
 
     public function get_product_detail(Request $request)
     {
-        $product = Stock::with('product.metric')->where([['shop_id', Auth::user()->owner_id],['product_id', $request->product]])->first();
+        $product = Stock::with('product.metric')->where([['shop_id', Auth::user()->owner_id],['branch_id', null],['product_id', $request->product]])->first();
 
         $imeis = [];
 

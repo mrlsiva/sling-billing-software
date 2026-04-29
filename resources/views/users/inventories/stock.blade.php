@@ -88,12 +88,12 @@
                                 <thead class="bg-light-subtle">
                                     <tr>
                                         <th>S.No</th>
-                                        <th>Image</th>
-                                        <th>Categoy</th>
+                                        <th>Category</th>
+                                        <th>Sub Category</th>
                                         <th>Product</th>
-                                        <th>Matrics</th>
+                                        <th>Product Code</th>
                                         <th>Price (₹)</th>
-                                        <th>Stock at</th>
+                                        <th>Stock</th>
                                         <th>Total Price (₹)</th>
                                         <th>IMEI</th>
                                         <th>Variations</th>
@@ -106,23 +106,17 @@
                                     @endphp
                                     <tr>
                                         <td>{{ ($stocks->currentPage() - 1) * $stocks->perPage() + $loop->iteration }}</td>
+                                        <td>{{$stock->category->name}}</td>
+                                        <td>{{$stock->sub_category->name}}</td>
                                         <td>
-                                            @if($stock->product->image != null)
-                                                <img src="{{ asset('storage/' . $stock->product->image) }}" class="logo-dark me-1" alt="Product" height="30">
-                                            @else
-                                                <img src="{{ asset('assets/images/category.jpg') }}" class="logo-dark me-1" alt="Product" height="30">
-                                            @endif
-                                        </td>
-                                        <td>{{$stock->category->name}} - {{$stock->sub_category->name}}</td>
-                                        <td>
-                                            <a href="javascript:void(0)" class="text-decoration-underline text-decoration-none viewProductTimeline"
+                                            <a href="javascript:void(0)" class="text-decoration-none viewProductTimeline"
                                                 data-id="{{ $stock->product->id }}"
                                                 data-name="{{ $stock->product->name }}"
                                                 data-bs-toggle="modal" data-bs-target="#productTimelineModal">
                                                 {{$stock->product->name}}
                                             </a>
                                         </td>
-                                        <td>{{$stock->product->metric->name ?? '-'}}</td>
+                                        <td>{{$stock->product->code ?? '-'}}</td>
                                         <td>{{$stock->product->price}}</td>
                                         <td>{{$stock->quantity}}</td>
                                         <td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
