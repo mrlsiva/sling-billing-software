@@ -271,6 +271,12 @@
                                     </li>
                                     @endif
 
+                                    @if($user_detail->able_to_edit_bill == 1)
+                                    <li class="sub-menu-item">
+                                        <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/bills/index') ? 'active' : '' }}" href="{{route('setting.bill.index', ['company' => request()->route('company')])}}">Bill Edit</a>
+                                    </li>
+                                    @endif
+
                                     <!-- <li class="sub-menu-item">
                                         <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/settings/general/index') ? 'active' : '' }}" href="{{route('setting.general.index', ['company' => request()->route('company')])}}">General Settings</a>
                                     </li> -->

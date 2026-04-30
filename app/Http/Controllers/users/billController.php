@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\BillSetup;
 use App\Models\UserDetail;
+use App\Models\Order;
 use App\Traits\Log;
 use Carbon\Carbon;
 use DB;
@@ -114,6 +115,39 @@ class billController extends Controller
         }
 
         return redirect()->back()->with('toast_success', $statusText);
+    }
+
+    public function bill(Request $request,$company,$branch = null)
+    {
+        $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
+
+        $query = Order::where('shop_id', Auth::user()->owner_id);
+
+        // Apply branch condition
+        $query->when($branch != 0, function ($q) use ($branch) {
+            $q->where('branch_id', $branch);
+        }, function ($q) {
+            $q->where('branch_id', null);
+        });
+
+        // Search filter
+        $query->when(request('order'), function ($q) {
+            $search = request('order');
+            $q->where('bill_id', 'like', "%{$search}%");
+        });
+
+        // Final result
+        $orders = $query->orderBy('id', 'desc')->paginate(10);
+
+        return view('users.settings.edit_bill',compact('orders','branches'));
+    }
+
+    public function edit(Request $request)
+    {
+        //return $request->bill_id;
+        Order::where('bill_id',$request->bill_id)->update(['billed_on' => $request->billed_on  ]);
+
+        return redirect()->back()->with('toast_success', 'Bill updated successfully!');
     }
 
 

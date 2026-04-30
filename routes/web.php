@@ -360,6 +360,13 @@ else
                                 });
                             });
 
+                            Route::prefix('bills')->group(function () {
+                                Route::name('bill.')->group(function () {
+                                    Route::get('/index/{branch?}',[billController::class, 'bill'])->name('index');
+                                    Route::post('/edit',[billController::class, 'edit'])->name('edit');
+                                });
+                            });
+
                         });
                     });
 

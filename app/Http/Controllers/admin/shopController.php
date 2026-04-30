@@ -198,6 +198,7 @@ class shopController extends Controller
             'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
             'is_size_differentiation_available' => $request->has('is_size_differentiation_available') ? 1 : 0,
             'is_colour_differentiation_available' => $request->has('is_colour_differentiation_available') ? 1 : 0,
+            'able_to_edit_bill' => $request->has('able_to_edit_bill') ? 1 : 0,
         ]);
 
         //Log
@@ -433,6 +434,8 @@ class shopController extends Controller
             'is_bill_enabled' => $request->has('is_bill_enabled') ? 1 : 0,
             'is_size_differentiation_available' => $request->has('is_size_differentiation_available') ? 1 : 0,
             'is_colour_differentiation_available' => $request->has('is_colour_differentiation_available') ? 1 : 0,
+            'able_to_edit_bill' => $request->has('able_to_edit_bill') ? 1 : 0,
+            
         ]);
 
         //Log
