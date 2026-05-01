@@ -562,6 +562,9 @@ class inventoryController extends Controller
                     'quantity'        => $row['quantity'],
                     'imeis'           => $row['imeis'],
                     'invoice'           => $invoice,
+                    'variation_id' => $row['variation_id'],
+                    'size_id'      => $row['size_id'],
+                    'colour_id'    => $row['colour_id'],
                 ]);
             }
 
@@ -714,9 +717,49 @@ class inventoryController extends Controller
             'transfer_on'     => now(),
             'transfer_by'     => Auth::user()->id,
         ]);
+
+        // ---------------------------------------------
+        // VARIATION TRANSFER (IMPORTANT)
+        // ---------------------------------------------
+
+        if (!empty($data['variation_id'])) {
+
+            $mainV = StockVariation::find($data['variation_id']);
+
+            if (!$mainV) {
+                throw new \Exception('Main variation not found');
+            }
+
+            if ($mainV->quantity < $data['quantity']) {
+                throw new \Exception('Not enough variation stock');
+            }
+
+            // Deduct from main
+            $mainV->decrement('quantity', $data['quantity']);
+
+            // Find branch variation
+            $branchV = StockVariation::where([
+                ['stock_id', $branchStock->id],
+                ['product_id', $data['product_id']],
+                ['size_id', $data['size_id']],
+                ['colour_id', $data['colour_id']],
+            ])->first();
+
+            if ($branchV) {
+                $branchV->increment('quantity', $data['quantity']);
+            } else {
+                StockVariation::create([
+                    'stock_id'  => $branchStock->id,
+                    'product_id'=> $data['product_id'],
+                    'size_id'   => $data['size_id'],
+                    'colour_id' => $data['colour_id'],
+                    'quantity'  => $data['quantity'],
+                    'price'     => $mainV->price,
+                ]);
+            }
+        }
+
     }
-
-
 
 
 }

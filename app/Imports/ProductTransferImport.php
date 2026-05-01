@@ -7,6 +7,9 @@ use Illuminate\Support\Collection;
 use App\Models\SubCategory;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Size;
+use App\Models\Colour;
+use App\Models\StockVariation;
 
 class ProductTransferImport implements ToCollection
 {
@@ -18,6 +21,8 @@ class ProductTransferImport implements ToCollection
     protected array $categories    = [];
     protected array $subCategories = [];
     protected array $products      = [];
+    protected array $sizes   = [];
+    protected array $colours = [];
 
     public function __construct($ownerId)
     {
@@ -52,6 +57,16 @@ class ProductTransferImport implements ToCollection
                      . strtolower(trim($p->name));
             })
             ->filter() // removes null keys
+            ->toArray();
+
+        $this->sizes = Size::where('shop_id', $this->ownerId)
+            ->get()
+            ->keyBy(fn($s) => strtolower(trim($s->name)))
+            ->toArray();
+
+        $this->colours = Colour::where('shop_id', $this->ownerId)
+            ->get()
+            ->keyBy(fn($c) => strtolower(trim($c->name)))
             ->toArray();
     }
 
@@ -100,12 +115,53 @@ class ProductTransferImport implements ToCollection
                     throw new \Exception("Product '$productName' not found");
                 }
 
+                $size = null;
+                $colour = null;
+
+                if (!empty($sizeName)) {
+                    $sizeKey = strtolower(trim($sizeName));
+                    $size = $this->sizes[$sizeKey] ?? null;
+
+                    if (!$size) {
+                        throw new \Exception("Size '$sizeName' not found");
+                    }
+                }
+
+                if (!empty($colourName)) {
+                    $colourKey = strtolower(trim($colourName));
+                    $colour = $this->colours[$colourKey] ?? null;
+
+                    if (!$colour) {
+                        throw new \Exception("Colour '$colourName' not found");
+                    }
+                }
+
+                $variation = null;
+
+                if ($size || $colour) {
+
+                    $variation = StockVariation::where([
+                        ['product_id', $product['id']],
+                        ['size_id', $size['id'] ?? null],
+                        ['colour_id', $colour['id'] ?? null],
+                    ])->first();
+
+                    if (!$variation) {
+                        throw new \Exception("Variation not found for Size '{$sizeName}' and Colour '{$colourName}'");
+                    }
+                }
+
                 $this->validRows[] = [
                     'category_id'     => $category['id'],
                     'sub_category_id' => $subCategory['id'],
                     'product_id'      => $product['id'],
                     'quantity'        => (int) $quantity,
                     'imeis'           => $imei ? explode(',', $imei) : [],
+
+                    // ✅ ADD THESE
+                    'variation_id' => $variation->id ?? null,
+                    'size_id'      => $size['id'] ?? null,
+                    'colour_id'    => $colour['id'] ?? null,
                 ];
 
             } catch (\Exception $e) {

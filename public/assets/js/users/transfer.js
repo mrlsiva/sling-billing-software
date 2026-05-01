@@ -89,10 +89,15 @@ jQuery(document).ready(function () {
 
                     $("#variations_section").html("");
 
+                    let hasVariation = false;
+
                     data.variations.forEach(function (v) {
-                        $('input[name="variation_id"]').val(v.id);
+
                         if (v.quantity > 0 && (v.size != null || v.colour != null)) {
-                            document.getElementById('quantity').readOnly = true;
+
+                            hasVariation = true; // ✅ mark true
+
+                            $("#variations_section").html('');
                             $("#variations_section").append(`
                                 <div class="row mb-2 p-2 border rounded">
                                     <div class="col-md-3"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
@@ -105,11 +110,10 @@ jQuery(document).ready(function () {
                                 </div>
                             `);
                         }
-                        else
-                        {
-                            document.getElementById('quantity').readOnly = false;
-                        }
                     });
+
+                    // ✅ Set once AFTER loop
+                    document.getElementById('quantity').readOnly = hasVariation;
 
 
                     // IMEI CHECKBOXES INLINE

@@ -8,6 +8,9 @@ use App\Models\SubCategory;
 use App\Models\Tax;
 use App\Models\Metric;
 use App\Models\Stock;
+use App\Models\Size;
+use App\Models\Colour;
+use App\Models\StockVariation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -32,6 +35,8 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
     private array $subCategoryCache = [];
     private array $taxCache         = [];
     private array $metricCache      = [];
+    private array $sizeCache   = [];
+    private array $colourCache = [];
 
     public function __construct(int $runId)
     {
@@ -86,6 +91,32 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
         return $data;
     }
 
+    private function getSize(int $shopId, string $name): ?object
+    {
+        $key = $shopId . '|' . strtolower(trim($name));
+
+        if (!array_key_exists($key, $this->sizeCache)) {
+            $this->sizeCache[$key] = Size::where('shop_id', $shopId)
+                ->whereRaw('LOWER(name)=?', [strtolower(trim($name))])
+                ->first();
+        }
+
+        return $this->sizeCache[$key];
+    }
+
+    private function getColour(int $shopId, string $name): ?object
+    {
+        $key = $shopId . '|' . strtolower(trim($name));
+
+        if (!array_key_exists($key, $this->colourCache)) {
+            $this->colourCache[$key] = Colour::where('shop_id', $shopId)
+                ->whereRaw('LOWER(name)=?', [strtolower(trim($name))])
+                ->first();
+        }
+
+        return $this->colourCache[$key];
+    }
+
     public function model(array $row)
     {
         $this->rowCount++;
@@ -118,6 +149,28 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
         $price = (float) $row['price'];
         $taxAmount = $tax ? ($price * ((float)$tax->name / 100)) : 0;
 
+        $isSize   = strtolower(trim($row['is_size_differentiation_available'] ?? 'no')) === 'yes' ? 1 : 0;
+        $isColour = strtolower(trim($row['is_colour_differentiation_available'] ?? 'no')) === 'yes' ? 1 : 0;
+
+        $sizeNames   = !empty($row['size']) ? array_map('trim', explode(',', $row['size'])) : [];
+        $colourNames = !empty($row['colour']) ? array_map('trim', explode(',', $row['colour'])) : [];
+
+        $sizeIds = [];
+        foreach ($sizeNames as $name) {
+            $size = $this->getSize($userId, $name);
+            if ($size) {
+                $sizeIds[] = $size->id;
+            }
+        }
+
+        $colourIds = [];
+        foreach ($colourNames as $name) {
+            $colour = $this->getColour($userId, $name);
+            if ($colour) {
+                $colourIds[] = $colour->id;
+            }
+        }
+
         $product = new Product([
             'user_id'        => $userId,
             'category_id'    => $category->id,
@@ -133,6 +186,11 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             'discount_type'  => $discountType,
             'discount'       => $row['discount'] ?? null,
             'quantity'       => $row['quantity'] ?? 0,
+            // ✅ ADD THESE
+            'is_size_differentiation_available'   => $isSize,
+            'is_colour_differentiation_available' => $isColour,
+            'size_id'   => !empty($sizeIds) ? implode(',', $sizeIds) : null,
+            'colour_id' => !empty($colourIds) ? implode(',', $colourIds) : null,
             'is_active'      => 1,
             'is_bulk_upload' => 1,
             'run_id'         => $this->runId,
@@ -140,7 +198,7 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
 
         $product->save();
 
-        Stock::create([
+        $stock = Stock::create([
             'shop_id'        => $userId,
             'category_id'    => $category->id,
             'sub_category_id'=> $subCategory->id,
@@ -148,6 +206,90 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             'quantity'       => $row['quantity'] ?? 0,
             'is_active'      => 1,
         ]);
+
+        // ---------------------------------------------
+        // CREATE STOCK VARIATIONS FROM EXCEL
+        // ---------------------------------------------
+
+        $isSize   = strtolower(trim($row['is_size_differentiation_available'] ?? 'no')) === 'yes';
+        $isColour = strtolower(trim($row['is_colour_differentiation_available'] ?? 'no')) === 'yes';
+
+        // Convert comma-separated values to arrays
+        $sizeNames   = !empty($row['size']) ? array_map('trim', explode(',', $row['size'])) : [];
+        $colourNames = !empty($row['colour']) ? array_map('trim', explode(',', $row['colour'])) : [];
+
+        // Convert to IDs (only valid ones)
+        $sizes = [];
+        foreach ($sizeNames as $name) {
+            $size = $this->getSize($userId, $name);
+            if ($size) {
+                $sizes[] = $size->id;
+            }
+        }
+
+        $colours = [];
+        foreach ($colourNames as $name) {
+            $colour = $this->getColour($userId, $name);
+            if ($colour) {
+                $colours[] = $colour->id;
+            }
+        }
+
+        // CASE 1: Only sizes
+        if ($isSize && !$isColour) {
+
+            foreach ($sizes as $sizeId) {
+                StockVariation::create([
+                    'stock_id'   => $stock->id,
+                    'product_id' => $product->id,
+                    'size_id'    => $sizeId,
+                    'quantity'   => 0,
+                    'price'      => 0,
+                ]);
+            }
+        }
+
+        // CASE 2: Only colours
+        elseif (!$isSize && $isColour) {
+
+            foreach ($colours as $colourId) {
+                StockVariation::create([
+                    'stock_id'   => $stock->id,
+                    'product_id' => $product->id,
+                    'colour_id'  => $colourId,
+                    'quantity'   => 0,
+                    'price'      => 0,
+                ]);
+            }
+        }
+
+        // CASE 3: Both
+        elseif ($isSize && $isColour) {
+
+            foreach ($sizes as $sizeId) {
+                foreach ($colours as $colourId) {
+
+                    StockVariation::create([
+                        'stock_id'   => $stock->id,
+                        'product_id' => $product->id,
+                        'size_id'    => $sizeId,
+                        'colour_id'  => $colourId,
+                        'quantity'   => 0,
+                        'price'      => 0,
+                    ]);
+                }
+            }
+        }
+
+        // CASE 4: None
+        else {
+            StockVariation::create([
+                'stock_id'   => $stock->id,
+                'product_id' => $product->id,
+                'quantity'   => 0,
+                'price'      => 0,
+            ]);
+        }
 
         return $product;
     }
@@ -210,6 +352,31 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             '*.metric' => ['required', function($attr,$val,$fail) use($userId){
                 if (!$this->getMetric($userId, $val)) $fail("Metric '{$val}' is not valid.");
             }],
+
+            '*.size' => [
+                'nullable',
+                function ($attr, $value, $fail) use ($userId) {
+                    $sizes = array_map('trim', explode(',', $value));
+                    foreach ($sizes as $size) {
+                        if (!$this->getSize($userId, $size)) {
+                            $fail("Size '{$size}' not found.");
+                        }
+                    }
+                }
+            ],
+
+            '*.colour' => [
+                'nullable',
+                function ($attr, $value, $fail) use ($userId) {
+                    $colours = array_map('trim', explode(',', $value));
+                    foreach ($colours as $colour) {
+                        if (!$this->getColour($userId, $colour)) {
+                            $fail("Colour '{$colour}' not found.");
+                        }
+                    }
+                }
+            ],
+
         ];
     }
 
