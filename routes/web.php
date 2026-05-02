@@ -38,6 +38,7 @@ use App\Http\Controllers\users\dailyReportsController;
 use App\Http\Controllers\users\purchaseReportController;
 use App\Http\Controllers\users\productTransferReportController;
 use App\Http\Controllers\users\salesReportController;
+use App\Http\Controllers\users\creditsController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -440,6 +441,10 @@ else
                             Route::post('/bulk_upload',[gstBillingController::class, 'bulk_upload'])->name('bulk_upload');
                         });
                     });
+
+                    Route::get('/credits/{date}',[creditsController::class, 'credit'])->name('credit');
+                    Route::get('/credits/payments/{id}', [creditsController::class, 'getCreditPayments']);
+                    Route::post('/credits/payments/store', [creditsController::class, 'store']);
 
                 });
 

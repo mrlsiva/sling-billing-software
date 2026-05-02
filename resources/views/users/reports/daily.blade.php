@@ -139,9 +139,18 @@
 							    </div>
 							</div>
 
+							<div class="col-md-3">
+								<a href="{{ route('credit', ['company' => request()->route('company'),'date' =>  request('date', now()->format('Y-m-d')) ]) }}">
+								    <div class="card border shadow-sm">
+								        <div class="card-body text-center">
+								            <h6 class="text-muted">Credit Amount</h6>
+								            <h4 class="text-warning">₹ {{ number_format($credit_amount, 2) }} </h4>
+								        </div>
+								    </div>
+								</a>
+							</div>
+
 						    @endif
-
-
 						</div>
 
 						@if(request()->route('branch') == 0)

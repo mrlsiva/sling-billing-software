@@ -179,6 +179,10 @@ class dailyReportsController extends Controller
             $profit = $totalSales - $totalPurchase + $totalRefund;
         }
 
+        //Credit 
+        $order_id = Order::where('shop_id', Auth::user()->owner_id)->where('branch_id', null)->whereDate('billed_on', $date)->pluck('id');
+        $credit_amount = OrderPaymentDetail::whereIn('order_id',$order_id)->where('payment_id', 6)->sum('amount');
+
         return view('users.reports.daily', compact(
             'orders',
             'branches',
@@ -196,6 +200,7 @@ class dailyReportsController extends Controller
             'productInAmount',
             'productOutAmount',
             'paymentSummary',
+            'credit_amount'
         ));
     }
 
