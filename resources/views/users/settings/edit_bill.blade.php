@@ -17,7 +17,7 @@
                 <ul class="nav nav-tabs nav-justified">
 
                 	 <li class="nav-item">
-                        <a href="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => 0])}}" class="nav-link {{ request()->route('branch') == 0 ? 'active' : '' }}" id="{{Auth::user()->id}}">
+                        <a href="{{route('setting.order.bill.index', ['company' => request()->route('company'),'branch' => 0])}}" class="nav-link {{ request()->route('branch') == 0 ? 'active' : '' }}" id="{{Auth::user()->id}}">
                             <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
                             <span class="d-none d-sm-block"><i class="ri-store-2-line me-2"></i>{{Auth::user()->user_name}}</span>
                         </a>
@@ -26,7 +26,7 @@
                    
                     @foreach($branches as $branch)
                     	<li class="nav-item">
-	                        <a href="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => $branch->id])}}" class="nav-link {{ request()->route('branch') == $branch->id ? 'active' : '' }}" id="{{$branch->id}}">
+	                        <a href="{{route('setting.order.bill.index', ['company' => request()->route('company'),'branch' => $branch->id])}}" class="nav-link {{ request()->route('branch') == $branch->id ? 'active' : '' }}" id="{{$branch->id}}">
 	                            <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
 	                            <span class="d-none d-sm-block"><i class="ri-store-2-line me-2"></i></i>{{$branch->user_name}}</span>
 	                        </a>
@@ -35,13 +35,13 @@
 
                 </ul>
 
-                <form method="get" action="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}">
+                <form method="get" action="{{route('setting.order.bill.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}">
                     <div class="row mb-2 p-3">
                         <div class="col-md-11">
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Bill No" name="order" value="{{ request('order') }}" id="searchInput">
-                                <span class="input-group-text" id="clearFilter" style="display: {{ request('order') ? 'inline-flex' : 'none' }}"><a href="{{route('setting.bill.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}" class="link-dark"><i class="ri-close-large-line align-middle fs-20"></i></a></span>
+                                <span class="input-group-text" id="clearFilter" style="display: {{ request('order') ? 'inline-flex' : 'none' }}"><a href="{{route('setting.order.bill.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}" class="link-dark"><i class="ri-close-large-line align-middle fs-20"></i></a></span>
                             </div>
                         </div>
 
@@ -113,7 +113,7 @@
                 <h5 class="modal-title">Bill Edit</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form class="row" action="{{route('setting.bill.edit', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+            <form class="row" action="{{route('setting.order.bill.edit', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <input type="hidden" name="bill_id" id="bill_id">

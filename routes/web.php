@@ -361,10 +361,10 @@ else
                                 });
                             });
 
-                            Route::prefix('bills')->group(function () {
-                                Route::name('bill.')->group(function () {
-                                    Route::get('/index/{branch?}',[billController::class, 'bill'])->name('index');
-                                    Route::post('/edit',[billController::class, 'edit'])->name('edit');
+                            Route::prefix('orders')->group(function () {
+                                Route::name('order.')->group(function () {
+                                    Route::get('/bills/index/{branch?}',[billController::class, 'bill'])->name('bill.index');
+                                    Route::post('/bills/edit',[billController::class, 'edit'])->name('bill.edit');
                                 });
                             });
 
