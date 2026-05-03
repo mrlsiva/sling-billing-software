@@ -213,13 +213,17 @@
                 {{-- Company + Title + Invoice meta --}}
                 <table class="hdr-wrap">
                     <tr style="border-bottom: 1px solid #000;">
+                        <td colspan="3" style="text-align:center; padding:4px 0;">
+                            <div style="font-size:17px; font-weight:bold; letter-spacing:1px;">TAX INVOICE</div>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #000;">
                         <td style="width:30%; text-align:center;">
                             @if($user->logo)
                                 <img src="{{ asset('storage/' . $user->logo) }}" class="logo-img" alt="Logo">
                             @endif
                         </td>
                         <td style="width:40%; text-align:center; border-left:1px solid #000; border-right:1px solid #000;">
-                            <div style="font-size:17px; font-weight:bold; letter-spacing:1px;">TAX INVOICE</div>
                             <div style="font-size:12px; font-weight:bold; margin:2px 0;">{{ strtoupper($user->name) }}</div>
                             <div style="font-size:9px; line-height:1.5;">
                                 {{ $user->user_detail->address }}<br>
@@ -441,7 +445,7 @@
 
         {{-- Filler rows — keep vertical column lines, remove horizontal row lines --}}
         @for($i = 0; $i < $emptyRowCount; $i++)
-        <tr style="height:8mm;">
+        <tr style="height:6mm;">
             <td class="c1" style="border-top:none; border-bottom:none;"></td>
             <td class="c2" style="border-top:none; border-bottom:none;"></td>
             <td class="c3" style="border-top:none; border-bottom:none;"></td>
