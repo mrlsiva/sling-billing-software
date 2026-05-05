@@ -70,24 +70,57 @@ class posController extends Controller
         return view('users.orders.index',compact('orders','branches'));
     }
 
-    public function get_bill(Request $request,$company,$id)
+    public function get_bill(Request $request,$company,$branch,$id)
     {
-        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
+        if($branch == 0)
+        {
+            $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
+        }
+        else
+        {
+            $user = User::with('user_detail','bank_detail')->where('id',$branch)->first();
+        }
+        
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
-        $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+        if($branch == 0)
+        {
+            $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+        }
+        else
+        {
+            $user_detail = UserDetail::where('user_id',$branch)->first();
+
+        }
         
         return view('bills.'.$user_detail->billType->blade,compact('user','order','order_details','order_payment_details'));
     }
 
-    public function view_bill(Request $request,$company,$id)
+    public function view_bill(Request $request,$company,$branch,$id)
     {
-        $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
+        if($branch == 0)
+        {
+            $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
+        }
+        else
+        {
+            $user = User::with('user_detail','bank_detail')->where('id',$branch)->first();
+        }
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
-        return view('bills.bill',compact('user','order','order_details','order_payment_details'));
+        if($branch == 0)
+        {
+            $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+        }
+        else
+        {
+            $user_detail = UserDetail::where('user_id',$branch)->first();
+
+        }
+
+        return view('bills.bill',compact('user','order','order_details','order_payment_details', 'user_detail'));
     }
 }

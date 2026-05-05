@@ -150,10 +150,6 @@
 
     $grandTotalTax = $order_details->sum(fn($d) => (float)$d->tax_amount * (int)$d->quantity);
 
-    $user_detail   = App\Models\UserDetail::where('user_id',
-                         $order->branch_id ?? $order->shop_id
-                     )->first();
-
     /* ── Filler rows to push summary to page bottom ──
        A4 content area ≈ 265mm. Header ≈ 54mm, summary ≈ 90mm.
        Each row ≈ 8mm → fill remaining ~121mm → ~15 rows minimum.
@@ -538,7 +534,7 @@
     {{-- Bank details + Declaration | Authorised Signatory --}}
     <tr style="page-break-inside:avoid;">
         <td style="vertical-align:top; padding:8px;">
-            @if($user_detail && $user_detail->show_bank_detail == 1)
+            @if($user->user_detail->show_bank_detail == 1)
                 <strong>Bank Details</strong><br>
                 <span style="font-size:10px; line-height:1.8;">
                     Name &nbsp;&nbsp;: {{ $user->bank_detail->name ?? '-' }}<br>

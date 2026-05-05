@@ -87,9 +87,16 @@
 										</td>
 										<td>
 
-											<a href="{{ route('order.view_bill', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark" target="_blank"><i class="ri-eye-line align-middle fs-20" title="View Bill"></i></a>
+											@if($order->branch_id == null)
+												<a href="{{ route('order.view_bill', ['company' => request()->route('company'), 'branch' => 0, 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-eye-line align-middle fs-20" title="View Bill"></i></a>
+												
+												<a href="{{ route('order.get_bill', ['company' => request()->route('company'), 'branch' => 0, 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
+											@else
+
+												<a href="{{ route('order.view_bill', ['company' => request()->route('company'), 'branch' => $order->branch_id, 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-eye-line align-middle fs-20" title="View Bill"></i></a>
 											
-											<a href="{{ route('order.get_bill', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
+												<a href="{{ route('order.get_bill', ['company' => request()->route('company'), 'branch' => $order->branch_id, 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
+											@endif
 										</td>
 									</tr>
 								@endforeach

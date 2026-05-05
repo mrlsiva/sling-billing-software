@@ -257,8 +257,8 @@ else
                         Route::name('order.')->group(function () {
 
                             Route::get('/{branch}/index',[posController::class, 'index'])->name('index');
-                            Route::get('/{id}/get_bill',[posController::class, 'get_bill'])->name('get_bill');
-                            Route::get('/{id}/view_bill',[posController::class, 'view_bill'])->name('view_bill');
+                            Route::get('/{branch}/{id}/get_bill',[posController::class, 'get_bill'])->name('get_bill');
+                            Route::get('/{branch}/{id}/view_bill',[posController::class, 'view_bill'])->name('view_bill');
                         });
                     });
 
