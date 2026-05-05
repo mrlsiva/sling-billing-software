@@ -567,7 +567,7 @@
 
 </table>
 
-@if(request()->routeIs('billing.get_bill', 'branch.billing.get_bill'))
+@if(request()->routeIs('billing.get_bill', 'branch.billing.get_bill', 'order.get_bill'))
 <script>
     window.onload = function () {
         setTimeout(function () { window.print(); }, 500);

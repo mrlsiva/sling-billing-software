@@ -396,7 +396,7 @@ class inventoryController extends Controller
         }
         else
         {
-            $mainV = StockVariation::find($request->variation_id);
+            $mainV = StockVariation::where([['stock_id',$mainStock->id],['product_id',$request->product]])->first();
             $mainV->update([
                             'quantity' => $mainV->quantity - $request->quantity
                         ]);
