@@ -31,6 +31,26 @@
 	</div>
 </div>
 
+<div class="card mb-3">
+	<div class="card-body py-2">
+		<form method="GET" action="{{ route('branch.dashboard', ['company' => request()->route('company')]) }}" class="d-flex align-items-end gap-3 flex-wrap">
+			<div>
+				<label class="form-label mb-1" style="font-size:12px;">From Date</label>
+				<input type="date" name="from_date" class="form-control form-control-sm" value="{{ request('from_date', today()->format('Y-m-d')) }}">
+			</div>
+			<div>
+				<label class="form-label mb-1" style="font-size:12px;">To Date</label>
+				<input type="date" name="to_date" class="form-control form-control-sm" value="{{ request('to_date', today()->format('Y-m-d')) }}">
+			</div>
+			<div class="d-flex gap-2">
+				<button type="submit" class="btn btn-primary btn-sm"><i class="ri-filter-line me-1"></i>Filter</button>
+				<a href="{{ route('branch.dashboard', ['company' => request()->route('company')]) }}" class="btn btn-outline-secondary btn-sm"><i class="ri-refresh-line me-1"></i>Reset</a>
+				<a href="{{ route('branch.dashboard.pdf', ['company' => request()->route('company'), 'from_date' => request('from_date', today()->format('Y-m-d')), 'to_date' => request('to_date', today()->format('Y-m-d'))]) }}" class="btn btn-success btn-sm"><i class="ri-file-pdf-line me-1"></i>Download PDF</a>
+			</div>
+		</form>
+	</div>
+</div>
+
 <div class="row g-3 mb-4">
 	<div class="col-md-3">
 		<div class="card dash-stat-card h-100">
@@ -39,9 +59,24 @@
 					<i class="ri-shopping-bag-line"></i>
 				</div>
 				<div>
-					<div class="dash-label">Today Orders</div>
-					<div class="dash-value">{{ $today_orders }}</div>
-					<div class="dash-sub">{{ now()->format('d M Y') }}</div>
+					<div class="dash-label">Orders</div>
+					<div class="dash-value">{{ $date_orders }}</div>
+					<div class="dash-sub">{{ $from_date->format('d M Y') }}@if(!$from_date->isSameDay($to_date)) – {{ $to_date->format('d M Y') }}@endif</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-md-3">
+		<div class="card dash-stat-card h-100">
+			<div class="card-body d-flex align-items-center gap-3">
+				<div class="dash-icon" style="background:#fff8e1; color:#f59e0b;">
+					<i class="ri-currency-line"></i>
+				</div>
+				<div>
+					<div class="dash-label">Sales</div>
+					<div class="dash-value">&#x20B9; {{ number_format($date_order_amount, 2) }}</div>
+					<div class="dash-sub">{{ $from_date->format('d M Y') }}@if(!$from_date->isSameDay($to_date)) – {{ $to_date->format('d M Y') }}@endif</div>
 				</div>
 			</div>
 		</div>
@@ -56,20 +91,6 @@
 					<div class="dash-label">Total Orders</div>
 					<div class="dash-value">{{ $total_orders }}</div>
 					<div class="dash-sub">All time</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-md-3">
-		<div class="card dash-stat-card h-100">
-			<div class="card-body d-flex align-items-center gap-3">
-				<div class="dash-icon" style="background:#fff8e1; color:#f59e0b;">
-					<i class="ri-currency-line"></i>
-				</div>
-				<div>
-					<div class="dash-label">Today Sales</div>
-					<div class="dash-value">&#x20B9; {{ number_format($today_order_amount, 2) }}</div>
-					<div class="dash-sub">{{ now()->format('d M Y') }}</div>
 				</div>
 			</div>
 		</div>

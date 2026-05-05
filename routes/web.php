@@ -108,6 +108,7 @@ else
                 Route::group(['middleware' => ['role:HO']], function () {
 
                     Route::get('/dashboard',[dashboardController::class, 'index'])->name('dashboard');
+                    Route::get('/dashboard/pdf',[dashboardController::class, 'pdf'])->name('dashboard.pdf');
 
                     Route::prefix('categories')->group(function () {
                         Route::name('category.')->group(function () {
@@ -454,6 +455,7 @@ else
                         Route::name('branch.')->group(function () {
 
                             Route::get('/dashboard',[branchDashboardController::class, 'index'])->name('dashboard');
+                            Route::get('/dashboard/pdf',[branchDashboardController::class, 'pdf'])->name('dashboard.pdf');
 
                             Route::prefix('customers')->group(function () {
                                 Route::name('customer.')->group(function () {
