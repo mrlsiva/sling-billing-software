@@ -89,4 +89,34 @@ class creditController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function index(Request $request)
+    {
+        $credits = Credit::whereHas('order_payment_detail.order', function ($q) use ( $request) {
+
+            $q->where('shop_id', Auth::user()->parent_id)
+              ->where('branch_id', Auth::user()->id);
+
+            if ($request->filled('customer')) {
+                $search = $request->customer;
+
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('bill_id', 'like', "%{$search}%")
+                       ->orWhereHas('customer', function ($q3) use ($search) {
+                           $q3->where('name', 'like', "%{$search}%")
+                              ->orWhere('phone', 'like', "%{$search}%");
+                       });
+                });
+            }
+
+        })
+        ->with('creditPayments.payment', 'order_payment_detail.order.customer')->where('status','!=',1)
+        ->paginate(10)
+        ->withQueryString();
+
+        $payments = Payment::where([['id','!=',6],['is_active',1]])->get();
+
+        return view('branches.credit.index', compact('credits','payments'));
+
+    }
 }

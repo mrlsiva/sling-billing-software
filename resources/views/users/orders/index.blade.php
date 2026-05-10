@@ -108,6 +108,14 @@
                                             <a href="{{ route('order.view_bill', ['company' => request()->route('company'), 'branch' => request()->route('branch'), 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-eye-line align-middle fs-20" title="View Bill"></i></a>
                                             
 											<a href="{{ route('order.get_bill', ['company' => request()->route('company'), 'branch' => request()->route('branch'), 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
+
+                                            @if($order->branch_id == null && $order->is_refunded == 0)
+                                                <a href="{{ route('order.refund', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark"><i class="ri-p2p-fill align-middle fs-20" title="Refund"></i></a>
+                                            @endif
+
+                                            @if(collect($order->payments)->contains('payment_id', 6))
+                                            @endif
+                                            
 										</td>
 									</tr>
 								@endforeach

@@ -4,18 +4,27 @@ namespace App\Http\Controllers\users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\RefundDetail;
 use App\Models\OrderDetail;
 use App\Models\OrderPaymentDetail;
+use App\Models\ProductImeiNumber;
+use App\Models\StockVariation;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\UserDetail;
+use App\Models\Refund;
 use App\Traits\Log;
+use App\Models\Staff;
+use App\Models\Stock;
+use Carbon\Carbon;
 use DB;
 
 class posController extends Controller
 {
-    use Log;
+    use Log, Notifications;
 
     public function index(Request $request,$company,$branch)
     {
@@ -122,5 +131,104 @@ class posController extends Controller
         }
 
         return view('bills.bill',compact('user','order','order_details','order_payment_details', 'user_detail'));
+    }
+
+    public function refund(Request $request,$company,$id)
+    {
+        $order = Order::where('id',$id)->first();
+        $order_details = OrderDetail::where('order_id',$id)->get();
+        $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
+        $payments = Payment::where('is_active',1)->get();
+        $staffs = Staff::where([['branch_id',null],['shop_id',Auth::user()->owner_id],['is_active',1]])->get();
+        return view('users.orders.refund',compact('order','order_details','order_payment_details','payments','staffs'));
+    }
+
+    public function refunded(Request $request)
+    {
+        //return $request;
+        DB::beginTransaction();
+
+        //$user = User::where('id',Auth::user()->id)->first();
+
+        $refund = Refund::create([
+            'order_id'     => $request->order_id,
+            'refunded_by'   => $request->refunded_by,
+            'refund_amount' => $request->amount,
+            'refund_on'   => Carbon::now(),
+            'reason'   => $request->reason,
+            'payment_id'   => $request->payment,
+            'payment_info'   => $request->detail,
+        ]);
+
+        foreach ($request->orders_details as $orderDetailId) 
+        {
+            $qty = $request->quantity[$orderDetailId] ?? null;
+
+            if ($qty !== null && $qty > 0) {
+                $detail = OrderDetail::find($orderDetailId);
+
+                $selectedImeis = $request->imeis[$detail->id] ?? [];
+                $imeiString    = implode(',', $selectedImeis);
+                $qty           = $request->quantity[$detail->id];
+
+                RefundDetail::create([
+                    'refund_id'   => $refund->id,
+                    'product_id'  => $detail->product_id,
+                    'name'        => $detail->name,
+                    'quantity'    => $qty,
+                    'price'       => $detail->price,
+                    'tax_amount'  => $detail->tax_amount,
+                    'tax_percent' => $detail->tax_percent,
+                    'imei'        => $imeiString,
+                    'size_id'     => $detail->size_id,
+                    'colour_id'   => $detail->colour_id,
+                ]);
+
+
+                $stock = Stock::where([
+                    ['shop_id', Auth::user()->owner_id],
+                    ['branch_id', null],
+                    ['product_id', $detail->product_id]
+                ])->first();
+
+                $existingImeis = !empty($stock->imei) ? explode(',', $stock->imei) : [];
+
+                $newImeiList = array_merge($existingImeis, $selectedImeis);
+
+                $stock->update([
+                    'quantity'      => $stock->quantity + $qty,
+                    'imei'          => implode(',', $newImeiList),
+                ]);
+
+
+                ProductImeiNumber::whereIn('name', $selectedImeis)
+                ->where('product_id', $detail->product_id)
+                ->update(['is_sold' => 0]); 
+
+                $stock_variation = StockVariation::where([
+                    ['stock_id', $stock->id],
+                    ['product_id', $detail->product_id],
+                    ['size_id', $detail->size_id],
+                    ['colour_id', $detail->colour_id],
+                ])->first();
+
+                $stock_variation->update([
+                    'quantity'      => $stock_variation->quantity + $qty,
+                ]);
+
+            }
+        }
+
+        Order::where('id',$request->order_id)->update(['is_refunded' => 1]);
+
+        DB::commit();
+
+        //Log
+        $this->addToLog($this->unique(),Auth::id(),'Refund','App/Models/Refund','refunds',$refund->id,'Insert',null,null,'Success','Refund done Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->parent_id, null,'App/Models/Refund', $refund->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' refunded order '.$refund->order->bill_id.' to customer '.$refund->order->customer->name,null, null,14);
+
+        return redirect()->route('order.index', ['company' => request()->route('company'),'branch' => 0])->with('toast_success', 'Refund done successfully.');
     }
 }

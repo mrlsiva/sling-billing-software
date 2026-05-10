@@ -259,6 +259,8 @@ else
                             Route::get('/{branch}/index',[posController::class, 'index'])->name('index');
                             Route::get('/{branch}/{id}/get_bill',[posController::class, 'get_bill'])->name('get_bill');
                             Route::get('/{branch}/{id}/view_bill',[posController::class, 'view_bill'])->name('view_bill');
+                            Route::get('/{id}/refund',[posController::class, 'refund'])->name('refund');
+                            Route::post('/refund',[posController::class, 'refunded'])->name('refunded');
                         });
                     });
 
@@ -369,6 +371,13 @@ else
                                 });
                             });
 
+                        });
+                    });
+
+                    Route::prefix('credits')->group(function () {
+                        Route::name('credit')->group(function () {
+
+                             Route::get('/index',[creditsController::class, 'index'])->name('.index');
                         });
                     });
 
@@ -583,9 +592,18 @@ else
                                 });
                             });
 
+                            Route::prefix('credits')->group(function () {
+                                Route::name('credit')->group(function () {
+
+                                     Route::get('/index',[creditController::class, 'index'])->name('.index');
+                                });
+                            });
+
                             Route::get('/credits/{date}',[creditController::class, 'credit'])->name('credit');
                             Route::get('/credits/payments/{id}', [creditController::class, 'getCreditPayments']);
                             Route::post('/credits/payments/store', [creditController::class, 'store']);
+
+
                             
 
                             Route::prefix('excel')->group(function () {

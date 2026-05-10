@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderPaymentDetail;
 use App\Models\ProductImeiNumber;
+use App\Models\StockVariation;
 use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use App\Models\RefundDetail;
@@ -113,6 +114,17 @@ class orderController extends Controller
                 ProductImeiNumber::whereIn('name', $selectedImeis)
                 ->where('product_id', $detail->product_id)
                 ->update(['is_sold' => 0]); 
+
+                $stock_variation = StockVariation::where([
+                    ['stock_id', $stock->id],
+                    ['product_id', $detail->product_id],
+                    ['size_id', $detail->size_id],
+                    ['colour_id', $detail->colour_id],
+                ])->first();
+
+                $stock_variation->update([
+                    'quantity'      => $stock_variation->quantity + $qty,
+                ]);
 
             }
         }
