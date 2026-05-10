@@ -13,9 +13,11 @@
 					<div>
 						<p class="card-title">All Credit</p>
 					</div>
+					@if(!request()->is('*credits/index'))
 					<div>
 						<a href="{{route('report.daily', ['company' => request()->route('company'),'branch' => 0])}}" class="btn btn-outline-primary btn-sm fw-semibold">Back</a>
 					</div>
+					@endif
 				</div>
 
 				@if ($errors->any())
@@ -29,13 +31,23 @@
 		            </div>
 		        @endif
 
-		        <form method="get" action="{{ route('credit', ['company' => request()->route('company'),'date' =>  request('date', now()->format('Y-m-d')) ]) }}">
+		        @if(!request()->is('*credits/index'))
+		        	<form method="get" action="{{ route('credit', ['company' => request()->route('company'),'date' =>  request('date', now()->format('Y-m-d')) ]) }}">
+		        @else
+		        	<form method="get" action="{{ route('credit.index', ['company' => request()->route('company') ]) }}">
+		        @endif
                     <div class="row mb-2 p-3">
                         <div class="col-md-11">
                             <div class="input-group">
                                 <span class="input-group-text" id="addon-wrapping"><i class="ri-search-line align-middle fs-20"></i></span>
                                 <input type="text" class="form-control" placeholder="Invoice/Customer Name/ Customer Phone" name="customer" value="{{ request('customer') }}" id="searchInput">
-                                <span class="input-group-text" id="clearFilter" style="display: {{ request('customer') ? 'inline-flex' : 'none' }}"><a href="{{ route('credit', ['company' => request()->route('company'),'date' =>  request('date', now()->format('Y-m-d')) ]) }}" class="link-dark"><i class="ri-close-large-line align-middle fs-20"></i></a></span>
+                                <span class="input-group-text" id="clearFilter" style="display: {{ request('customer') ? 'inline-flex' : 'none' }}">
+                                	@if(!request()->is('*credits/index'))
+                                		<a href="{{ route('credit', ['company' => request()->route('company'),'date' =>  request('date', now()->format('Y-m-d')) ]) }}" class="link-dark"><i class="ri-close-large-line align-middle fs-20"></i></a>
+                                	@else
+                                		<a href="{{ route('credit.index', ['company' => request()->route('company') ]) }}" class="link-dark"><i class="ri-close-large-line align-middle fs-20"></i></a>
+                                	@endif
+                                </span>
                             </div>
                         </div>
 
