@@ -41,15 +41,18 @@ class StockExport implements FromCollection, WithHeadings, WithMapping, WithStyl
     public function map($stock): array
     {
         static $i = 1;
-        $variation = \App\Models\StockVariation::where('stock_id', $stock->id)->first();
-        // ✅ Build variations string
-        if($variation && ($variation->size_id !== null || $variation->colour_id !== null)){
+
+        $hasVariations = $stock->variations->contains(
+            fn($v) => $v->size_id !== null || $v->colour_id !== null
+        );
+
+        if ($hasVariations) {
             $variationText = $stock->variations->map(function ($v, $key) {
                 return ($key + 1) . '. ' .
                     ($v->size->name ?? '-') . ' / ' .
                     ($v->colour->name ?? '-') .
                     ' (Qty: ' . $v->quantity . ')';
-            })->implode("\n"); // line break inside Excel cell
+            })->implode("\n");
         } else {
             $variationText = 'No variations';
         }
