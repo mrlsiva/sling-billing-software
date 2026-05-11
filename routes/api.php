@@ -90,6 +90,126 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/vendors/{vendor}/status', 'App\Http\Controllers\api\vendorController@status');
 	Route::post('/vendors/update', 'App\Http\Controllers\api\vendorController@update');
 
+	//Vendor Ledger
+	Route::get('/vendors/{vendor}/ledger', 'App\Http\Controllers\api\vendorLedgerController@index');
+	Route::get('/vendors/{vendor}/payments', 'App\Http\Controllers\api\vendorLedgerController@get_payments');
+	Route::post('/vendors/payments/store', 'App\Http\Controllers\api\vendorLedgerController@store_payment');
+
+	//Purchase Orders
+	Route::get('/purchase_orders', 'App\Http\Controllers\api\purchaseOrderController@list');
+	Route::get('/purchase_orders/create_data', 'App\Http\Controllers\api\purchaseOrderController@create_data');
+	Route::get('/purchase_orders/get_categories', 'App\Http\Controllers\api\purchaseOrderController@get_categories');
+	Route::get('/purchase_orders/get_product', 'App\Http\Controllers\api\purchaseOrderController@get_product');
+	Route::get('/purchase_orders/get_product_detail', 'App\Http\Controllers\api\purchaseOrderController@get_product_detail');
+	Route::get('/purchase_orders/get_stock_variations', 'App\Http\Controllers\api\purchaseOrderController@get_stock_variations');
+	Route::get('/purchase_orders/get_product_stock', 'App\Http\Controllers\api\purchaseOrderController@get_product_stock');
+	Route::post('/purchase_orders/store', 'App\Http\Controllers\api\purchaseOrderController@store');
+	Route::post('/purchase_orders/update', 'App\Http\Controllers\api\purchaseOrderController@update');
+	Route::get('/purchase_orders/{id}/detail', 'App\Http\Controllers\api\purchaseOrderController@detail');
+	Route::post('/purchase_orders/refund', 'App\Http\Controllers\api\purchaseOrderController@refund');
+
+	//Sizes
+	Route::get('/sizes/list', 'App\Http\Controllers\api\sizeController@list');
+	Route::post('/sizes/store', 'App\Http\Controllers\api\sizeController@store');
+	Route::get('/sizes/{size}/view', 'App\Http\Controllers\api\sizeController@view');
+	Route::get('/sizes/{size}/status', 'App\Http\Controllers\api\sizeController@status');
+	Route::post('/sizes/update', 'App\Http\Controllers\api\sizeController@update');
+
+	//Colours
+	Route::get('/colours/list', 'App\Http\Controllers\api\colourController@list');
+	Route::post('/colours/store', 'App\Http\Controllers\api\colourController@store');
+	Route::get('/colours/{colour}/view', 'App\Http\Controllers\api\colourController@view');
+	Route::get('/colours/{colour}/status', 'App\Http\Controllers\api\colourController@status');
+	Route::post('/colours/update', 'App\Http\Controllers\api\colourController@update');
+
+	//Inventory - HO Stock & Transfer
+	Route::get('/inventory/stock', 'App\Http\Controllers\api\inventoryController@stock');
+	Route::get('/inventory/stock/{stock}/variations', 'App\Http\Controllers\api\inventoryController@get_stock_variation');
+	Route::get('/inventory/transfer', 'App\Http\Controllers\api\inventoryController@transfer');
+	Route::get('/inventory/transfer/{id}/bill', 'App\Http\Controllers\api\inventoryController@get_transfer_bill');
+	Route::get('/inventory/get_sub_category', 'App\Http\Controllers\api\inventoryController@get_sub_category');
+	Route::get('/inventory/get_product', 'App\Http\Controllers\api\inventoryController@get_product');
+	Route::get('/inventory/get_product_detail', 'App\Http\Controllers\api\inventoryController@get_product_detail');
+	Route::post('/inventory/transfer/store', 'App\Http\Controllers\api\inventoryController@store');
+
+	//Branch Stock & Transfer
+	Route::get('/branch/stock', 'App\Http\Controllers\api\branchStockController@index');
+	Route::get('/branch/stock/{stock}/variations', 'App\Http\Controllers\api\branchStockController@get_stock_variation');
+	Route::get('/branch/transfer', 'App\Http\Controllers\api\branchStockController@transfer_list');
+	Route::get('/branch/transfer/{id}/bill', 'App\Http\Controllers\api\branchStockController@get_transfer_bill');
+	Route::get('/branch/get_sub_category', 'App\Http\Controllers\api\branchStockController@get_sub_category');
+	Route::get('/branch/get_product', 'App\Http\Controllers\api\branchStockController@get_product');
+	Route::get('/branch/get_product_detail', 'App\Http\Controllers\api\branchStockController@get_product_detail');
+	Route::post('/branch/transfer/store', 'App\Http\Controllers\api\branchStockController@store');
+
+	//GST Billing - HO
+	Route::get('/gst_bills', 'App\Http\Controllers\api\gstBillingController@index');
+	Route::get('/gst_bills/create_data', 'App\Http\Controllers\api\gstBillingController@create_data');
+	Route::get('/gst_bills/get_sub_category', 'App\Http\Controllers\api\gstBillingController@get_sub_category');
+	Route::get('/gst_bills/get_product', 'App\Http\Controllers\api\gstBillingController@get_product');
+	Route::post('/gst_bills/store', 'App\Http\Controllers\api\gstBillingController@store');
+	Route::get('/gst_bills/{id}/view', 'App\Http\Controllers\api\gstBillingController@view_bill');
+	Route::post('/gst_bills/bulk_upload', 'App\Http\Controllers\api\gstBillingController@bulk_upload');
+
+	//GST Billing - Branch
+	Route::get('/branch/gst_bills', 'App\Http\Controllers\api\branchGstBillController@index');
+	Route::get('/branch/gst_bills/create_data', 'App\Http\Controllers\api\branchGstBillController@create_data');
+	Route::get('/branch/gst_bills/get_sub_category', 'App\Http\Controllers\api\branchGstBillController@get_sub_category');
+	Route::get('/branch/gst_bills/get_product', 'App\Http\Controllers\api\branchGstBillController@get_product');
+	Route::post('/branch/gst_bills/store', 'App\Http\Controllers\api\branchGstBillController@store');
+	Route::get('/branch/gst_bills/{id}/view', 'App\Http\Controllers\api\branchGstBillController@view_bill');
+	Route::post('/branch/gst_bills/bulk_upload', 'App\Http\Controllers\api\branchGstBillController@bulk_upload');
+
+	//Credits - HO
+	Route::get('/ho/credits', 'App\Http\Controllers\api\creditsController@credit');
+	Route::get('/ho/credits/{id}/payments', 'App\Http\Controllers\api\creditsController@getCreditPayments');
+	Route::post('/ho/credits/payments/store', 'App\Http\Controllers\api\creditsController@store');
+
+	//Credits - Branch
+	Route::get('/branch/credits', 'App\Http\Controllers\api\branchCreditController@credit');
+	Route::get('/branch/credits/{id}/payments', 'App\Http\Controllers\api\branchCreditController@getCreditPayments');
+	Route::post('/branch/credits/payments/store', 'App\Http\Controllers\api\branchCreditController@store');
+
+	//Dashboard - HO
+	Route::get('/dashboard', 'App\Http\Controllers\api\dashboardController@index');
+
+	//Dashboard - Branch
+	Route::get('/branch/dashboard', 'App\Http\Controllers\api\branchDashboardController@index');
+
+	//Branch Billing (POS)
+	Route::get('/branch/billing', 'App\Http\Controllers\api\branchBillingController@billing');
+	Route::get('/branch/billing/get_sub_category', 'App\Http\Controllers\api\branchBillingController@get_sub_category');
+	Route::get('/branch/billing/get_imei_product', 'App\Http\Controllers\api\branchBillingController@get_imei_product');
+	Route::get('/branch/billing/get_product', 'App\Http\Controllers\api\branchBillingController@get_product');
+	Route::get('/branch/billing/get_product_detail', 'App\Http\Controllers\api\branchBillingController@get_product_detail');
+	Route::get('/branch/billing/get_variation_detail', 'App\Http\Controllers\api\branchBillingController@get_variation_detail');
+	Route::get('/branch/billing/suggest_phone', 'App\Http\Controllers\api\branchBillingController@suggest_phone');
+	Route::get('/branch/billing/get_customer_detail', 'App\Http\Controllers\api\branchBillingController@get_customer_detail');
+	Route::post('/branch/billing/customer_store', 'App\Http\Controllers\api\branchBillingController@customer_store');
+	Route::post('/branch/billing/store', 'App\Http\Controllers\api\branchBillingController@store');
+	Route::get('/branch/billing/{id}/get_bill', 'App\Http\Controllers\api\branchBillingController@get_bill');
+
+	//Branch Orders & Refunds
+	Route::get('/branch/orders', 'App\Http\Controllers\api\branchOrderController@index');
+	Route::get('/branch/orders/{id}/refund_data', 'App\Http\Controllers\api\branchOrderController@refund_data');
+	Route::post('/branch/orders/refund', 'App\Http\Controllers\api\branchOrderController@refunded');
+
+	//Reports - HO
+	Route::get('/reports/daily', 'App\Http\Controllers\api\reportsController@daily');
+	Route::get('/reports/orders', 'App\Http\Controllers\api\reportsController@orders');
+	Route::get('/reports/sales', 'App\Http\Controllers\api\reportsController@sales');
+	Route::get('/reports/purchase', 'App\Http\Controllers\api\reportsController@purchase');
+	Route::get('/reports/transfer', 'App\Http\Controllers\api\reportsController@transfer');
+
+	//Reports - Branch
+	Route::get('/branch/reports/daily', 'App\Http\Controllers\api\branchReportsController@daily');
+	Route::get('/branch/reports/orders', 'App\Http\Controllers\api\branchReportsController@orders');
+	Route::get('/branch/reports/sales', 'App\Http\Controllers\api\branchReportsController@sales');
+	Route::get('/branch/reports/transfer', 'App\Http\Controllers\api\branchReportsController@transfer');
+
+	//Profile
+	Route::get('/profile', 'App\Http\Controllers\api\profileController@my_profile');
+
 	//Notification
 	Route::get('notifications/{type?}', 'App\Http\Controllers\api\notificationController@notification');
 

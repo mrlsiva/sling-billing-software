@@ -84,6 +84,9 @@ class inventoryController extends Controller
 
     public function download(Request $request, $company, $shop, $branch)
     {
+        set_time_limit(300);
+        ini_set('memory_limit', '512M');
+
         $query = Stock::where('shop_id', $shop);
 
         if ($branch != 0) {
@@ -114,12 +117,18 @@ class inventoryController extends Controller
             $query->where('quantity', '>', 0);
         });
 
-        $stocks = $query->orderBy('category_id')
-                        ->orderBy('sub_category_id')
-                        ->orderBy('product_id')
-                        ->get(); // ❗ use get() for download
+        $stocks = $query->with([
+                        'product',
+                        'category',
+                        'sub_category',
+                        'variations.size',
+                        'variations.colour',
+                    ])
+                    ->orderBy('category_id')
+                    ->orderBy('sub_category_id')
+                    ->orderBy('product_id')
+                    ->get();
 
-        // 👉 your export logic (Excel / CSV / PDF)
         return Excel::download(new StockExport($stocks), 'stocks_' . now()->format('d-m-Y_h-i A') . '.xlsx');
     }
 

@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class StockExport implements FromCollection, WithHeadings, WithMapping, WithStyles
 {
     protected $stocks;
+    protected int $i = 1;
 
     public function __construct($stocks)
     {
@@ -40,29 +41,32 @@ class StockExport implements FromCollection, WithHeadings, WithMapping, WithStyl
 
     public function map($stock): array
     {
-        static $i = 1;
-        $variation = \App\Models\StockVariation::where('stock_id', $stock->id)->first();
-        // ✅ Build variations string
-        if($variation && ($variation->size_id !== null || $variation->colour_id !== null)){
+        $hasVariations = $stock->variations->contains(
+            fn($v) => $v->size_id !== null || $v->colour_id !== null
+        );
+
+        if ($hasVariations) {
             $variationText = $stock->variations->map(function ($v, $key) {
                 return ($key + 1) . '. ' .
-                    ($v->size->name ?? '-') . ' / ' .
-                    ($v->colour->name ?? '-') .
+                    ($v->size?->name ?? '-') . ' / ' .
+                    ($v->colour?->name ?? '-') .
                     ' (Qty: ' . $v->quantity . ')';
-            })->implode("\n"); // line break inside Excel cell
+            })->implode("\n");
         } else {
             $variationText = 'No variations';
         }
 
+        $price = $stock->product?->price ?? 0;
+
         return [
-            $i++,
-            optional($stock->category)->name,
-            optional($stock->sub_category)->name,
-            optional($stock->product)->name,
-            optional($stock->product)->code ?? '-',
-            $stock->product->price ?? 0,
+            $this->i++,
+            optional($stock->category)->name   ?? '-',
+            optional($stock->sub_category)->name ?? '-',
+            optional($stock->product)->name     ?? '-',
+            $stock->product?->code              ?? '-',
+            $price,
             $stock->quantity,
-            number_format(($stock->product->price ?? 0) * $stock->quantity, 2),
+            number_format($price * $stock->quantity, 2),
             $stock->imei ?? '-',
             $variationText,
         ];
