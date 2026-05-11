@@ -506,9 +506,11 @@ function updateCartSummary() {
     $('#sub_total').text('₹' + subTotal.toFixed(2));
     $('#tax').text('₹' + totalTax.toFixed(2));
     $('#order_discount').text('₹' + discount.toFixed(2));
-    $('#amount').text('₹' + totalAmount.toFixed(2));
-    $('#amount_text').text('₹' + totalAmount.toFixed(2));
-    $('#amount_text1').text('Payable Amount: ₹' + totalAmount.toFixed(2));
+    let roundedAmount = Math.round(totalAmount);
+
+    $('#amount').text('₹' + roundedAmount);
+    $('#amount_text').text('₹' + roundedAmount);
+    $('#amount_text1').text('Payable Amount: ₹' + roundedAmount);
 
     if (totalItems == 0) {
         $('#order_detail').addClass('secret');
