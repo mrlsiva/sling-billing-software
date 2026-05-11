@@ -266,6 +266,11 @@
 
             <div class="variation-container mt-2 mb-3"></div>
 
+            @php
+                $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
+            @endphp
+
+            @if($user_detail->is_imei_required == 1)
             <div class="col-md-12">
                 <div class="mb-3">
                     <div class="d-flex align-items-center mb-2">
@@ -277,6 +282,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
         </div>
     </div>
@@ -301,12 +307,21 @@
 
                 <div class="modal-body">
 
+                    @if($user_detail->is_imei_required == 1)
                     <!-- Download Template -->
                     <div class="mb-3">
                         <a href="{{ asset('assets/templates/bulk_purchase_order.xlsx') }}" download="PurchaseOrder.xlsx" class="btn btn-success w-100">
                             Download Template
                         </a>
                     </div>
+                    @else
+                    <!-- Download Template -->
+                    <div class="mb-3">
+                        <a href="{{ asset('assets/templates/bulk_purchase_order_without_imei.xlsx') }}" download="PurchaseOrder.xlsx" class="btn btn-success w-100">
+                            Download Template
+                        </a>
+                    </div>
+                    @endif
 
                     <!-- Upload File -->
                     <div class="mb-3">

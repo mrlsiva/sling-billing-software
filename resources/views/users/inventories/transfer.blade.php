@@ -203,6 +203,12 @@
 	                            </div>
 	                        </div>
 	                    </div>
+
+	                    @php
+		                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
+		                @endphp
+                
+	                    @if($user_detail->is_imei_required == 1)
 	                    <div class="row mt-3" id="imei_section" style="display:none;">
 						    <div class="col-md-12">
 						        <label class="form-label text-muted">Select IMEI Numbers</label>
@@ -213,6 +219,7 @@
 						        </div>
 						    </div>
 						</div>
+						@endif
 
 						<div id="variations_section"></div>
 						<input type="hidden" name="variation_id" id="variation_id">
@@ -253,11 +260,27 @@
 	                        </div>
 	                    </div>
 
+	                    @php
+		                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
+		                @endphp
+                
+	                    @if($user_detail->is_imei_required == 1)
+
 	                    <div class="row">
 		                    <div class="col-md-12 d-flex justify-content-end">
 		                    	<a href="{{ asset('assets/templates/bulk_transfer.xlsx') }}" download="Bulk_Transfer.xlsx">Download Template</a>
 		                    </div>
 		                </div>
+
+		                @else
+
+		                <div class="row">
+		                    <div class="col-md-12 d-flex justify-content-end">
+		                    	<a href="{{ asset('assets/templates/bulk_transfer_without_imei.xlsx') }}" download="Bulk_Transfer.xlsx">Download Template</a>
+		                    </div>
+		                </div>
+		                
+		                @endif
 
 	                	<div class="row">
 		                    <div class="col-md-12">

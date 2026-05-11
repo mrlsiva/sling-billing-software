@@ -81,6 +81,12 @@
                     </div>
                 </div>
 
+                @php
+                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
+                @endphp
+
+            
+
                 <div class="tab-content pt-2 text-muted">
                     <div class="tab-pane show active" id="homeTabsJustified">
                         <div class="table-responsive">
@@ -95,7 +101,9 @@
                                         <th>Price (₹)</th>
                                         <th>Stock</th>
                                         <th>Total Price (₹)</th>
+                                        @if($user_detail->is_imei_required == 1)
                                         <th>IMEI</th>
+                                        @endif
                                         <th>Variations</th>
                                     </tr>
                                 </thead>
@@ -120,6 +128,7 @@
                                         <td>{{$stock->product->price}}</td>
                                         <td>{{$stock->quantity}}</td>
                                         <td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
+                                        @if($user_detail->is_imei_required == 1)
                                         <td>
                                             @if(!empty($stock->imei))
                                                 <a href="javascript:void(0);" onclick="showImei('{{ $stock->imei }}')" title="View IMEI">
@@ -129,6 +138,7 @@
                                                 -
                                             @endif
                                         </td>
+                                        @endif
                                         <td>
                                             @if($variation && ($variation->size_id !== null || $variation->colour_id !== null))
                                                 <a href="#!" class="text-dark view-variations" data-stock-id="{{ $stock->id }}" title="View Variations">
