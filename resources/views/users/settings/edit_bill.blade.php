@@ -51,6 +51,17 @@
                     </div>
                 </form>
 
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="tab-content pt-2 text-muted">
                     <div class="tab-pane show active" id="homeTabsJustified">
                         <div class="table-responsive">
@@ -117,7 +128,25 @@
                 @csrf
                 <div class="modal-body">
                     <input type="hidden" name="bill_id" id="bill_id">
-                    <input type="datetime-local" name="billed_on" id="billed_on" class="form-control">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Billed On</label>
+                                <input type="datetime-local" name="billed_on" id="billed_on" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="choices-single-groups" class="form-label text-muted">Invoice Number</label>
+                                <input type="text" name="invoice" id="invoice" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -162,6 +191,7 @@
 
         $('#bill_id').val(bill);
         $('#billed_on').val(date);
+        $('#invoice').val(bill);
     });
 </script>
 @endsection

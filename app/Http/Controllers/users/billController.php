@@ -144,8 +144,27 @@ class billController extends Controller
 
     public function edit(Request $request)
     {
-        //return $request->bill_id;
-        Order::where('bill_id',$request->bill_id)->update(['billed_on' => $request->billed_on  ]);
+        $order = Order::where('bill_id', $request->bill_id)->firstOrFail();
+
+        $request->validate([
+            'invoice' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('orders', 'bill_id')
+                    ->where(function ($query) use ($order) {
+                        return $query->where('shop_id', $order->shop_id)
+                                     ->where('branch_id', $order->branch_id);
+                    })
+                    ->ignore($order->id), // ignore current order
+            ],
+            'billed_on' => 'required|date',
+        ]);
+
+        $order->update([
+            'billed_on' => $request->billed_on,
+            'bill_id'   => $request->invoice,
+        ]);
 
         return redirect()->back()->with('toast_success', 'Bill updated successfully!');
     }
