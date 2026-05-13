@@ -11,6 +11,7 @@ use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\OrderDetail;
+use App\Models\UserDetail;
 use App\Models\PosSetting;
 use App\Models\BillSetup;
 use App\Models\Customer;
@@ -459,6 +460,46 @@ class posController extends Controller
 
         }
 
+    }
+
+    public function get_bill(Request $request, $order_id)
+    {
+        $order = Order::with(['customer', 'billedBy', 'shop', 'branch'])
+            ->find($order_id);
+
+        if (!$order) {
+            return $this->errorResponse([], 404, 'Order not found.');
+        }
+
+        $order_details         = OrderDetail::where('order_id', $order_id)->get();
+        $order_payment_details = OrderPaymentDetail::with('payment')->where('order_id', $order_id)->get();
+
+        // Resolve the shop owner (HO) to get bill_type
+        $ownerId    = $order->shop_id;
+        $shopOwner  = User::with(['user_detail.billType', 'bank_detail'])->find($ownerId);
+        $userDetail = $shopOwner?->user_detail;
+
+        // bill_type from printer_types table
+        $billType = [
+            'id'   => $userDetail?->bill_type,
+            'name' => $userDetail?->billType?->name   ?? 'Normal',
+            'key'  => $userDetail?->billType?->blade  ?? 'bill',
+        ];
+
+        /*
+         * key values map to Angular templates:
+         *   'bill'              → Normal A4 bill
+         *   'thermal_bill'      → Thermal (80mm) receipt
+         *   'liya_fashion_bill' → Liya Fashion custom bill
+         */
+
+        return $this->successResponse([
+            'order'                 => $order,
+            'order_details'         => $order_details,
+            'order_payment_details' => $order_payment_details,
+            'shop'                  => $shopOwner,
+            'bill_type'             => $billType,
+        ], 200, 'Bill data retrieved successfully.');
     }
 
     public function pagination_setting(Request $request)

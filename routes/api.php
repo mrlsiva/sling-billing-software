@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/pos/{product}/get_product_detail', 'App\Http\Controllers\api\posController@get_product_detail');
 	Route::get('/pos/customer', 'App\Http\Controllers\api\posController@customer');
 	Route::post('/pos/store', 'App\Http\Controllers\api\posController@store');
+	Route::get('/pos/{order_id}/get_bill', 'App\Http\Controllers\api\posController@get_bill');
 	Route::post('/pos/pagination_setting', 'App\Http\Controllers\api\posController@pagination_setting');
 
 	//Customer
