@@ -157,9 +157,6 @@ class customerController extends Controller
 
         if(Auth::user()->role_id == 3)
         {
-
-            $parent = User::where('id',Auth::user()->id)->first();
-
             $rules = [
                 'name' => 'required|string|max:50',
                 'phone' => ['required','digits:10','different:alt_phone',
@@ -292,9 +289,6 @@ class customerController extends Controller
 
         if(Auth::user()->role_id == 3)
         {
-
-            $parent = User::where('id',Auth::user()->id)->first();
-
             $rules = [
                 'name' => 'required|string|max:50',
                 'phone' => [

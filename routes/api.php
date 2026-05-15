@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', 'App\Http\Controllers\api\authController@login');
 
+// Admin Login (separate — does not require slug_name)
+Route::post('admin/login', 'App\Http\Controllers\api\admin\authAdminController@login');
+
 Route::middleware('auth:sanctum')->group(function () {
 
 	//Category
@@ -70,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/pos/{product}/get_product_detail', 'App\Http\Controllers\api\posController@get_product_detail');
 	Route::get('/pos/customer', 'App\Http\Controllers\api\posController@customer');
 	Route::post('/pos/store', 'App\Http\Controllers\api\posController@store');
+	Route::get('/pos/{order_id}/get_bill', 'App\Http\Controllers\api\posController@get_bill');
 	Route::post('/pos/pagination_setting', 'App\Http\Controllers\api\posController@pagination_setting');
 
 	//Customer
@@ -224,5 +228,35 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('branches', 'App\Http\Controllers\api\generalController@branch'); //For HO
 
 	Route::post('logout', 'App\Http\Controllers\api\authController@logout');
+
+});
+
+// ─── ADMIN API (role_id = 1 / Super Admin) ───────────────────────────────────
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+
+	Route::post('logout', 'App\Http\Controllers\api\admin\authAdminController@logout');
+
+	// Dashboard & Profile
+	Route::get('dashboard', 'App\Http\Controllers\api\admin\adminDashboardController@dashboard');
+	Route::get('profile',   'App\Http\Controllers\api\admin\adminDashboardController@profile');
+
+	// Shops
+	Route::get('shops',                  'App\Http\Controllers\api\admin\shopApiController@index');
+	Route::get('shops/create_data',      'App\Http\Controllers\api\admin\shopApiController@create_data');
+	Route::post('shops/store',           'App\Http\Controllers\api\admin\shopApiController@store');
+	Route::get('shops/{id}/view',        'App\Http\Controllers\api\admin\shopApiController@view');
+	Route::get('shops/{id}/edit',        'App\Http\Controllers\api\admin\shopApiController@edit');
+	Route::post('shops/update',          'App\Http\Controllers\api\admin\shopApiController@update');
+	Route::get('shops/{id}/lock',        'App\Http\Controllers\api\admin\shopApiController@lock');
+	Route::get('shops/{id}/delete',      'App\Http\Controllers\api\admin\shopApiController@delete');
+
+	// Branches
+	Route::get('branches/{shop_id}/create_data', 'App\Http\Controllers\api\admin\branchApiController@create_data');
+	Route::post('branches/store',                'App\Http\Controllers\api\admin\branchApiController@store');
+	Route::get('branches/{id}/view',             'App\Http\Controllers\api\admin\branchApiController@view');
+	Route::get('branches/{id}/edit',             'App\Http\Controllers\api\admin\branchApiController@edit');
+	Route::post('branches/update',               'App\Http\Controllers\api\admin\branchApiController@update');
+	Route::get('branches/{id}/lock',             'App\Http\Controllers\api\admin\branchApiController@lock');
+	Route::get('branches/{id}/delete',           'App\Http\Controllers\api\admin\branchApiController@delete');
 
 });
