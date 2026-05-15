@@ -21,9 +21,10 @@ class PrinterTypeSeeder extends Seeder
 
         $types = [
 
-            ['name' => 'Normal', 'blade' => 'bill', 'is_active' => 1],
+            ['name' => 'A4 Vasantham', 'blade' => 'bill', 'is_active' => 1],
             ['name' => 'Thermal', 'blade' => 'thermal_bill', 'is_active' => 1],
             ['name' => 'Liya Fashion', 'blade' => 'liya_fashion_bill', 'is_active' => 1],
+            ['name' => 'A4 AR Printers', 'blade' => 'ar_printer_bill', 'is_active' => 1],
         ];
 
         foreach ($types as $key => $value) {
