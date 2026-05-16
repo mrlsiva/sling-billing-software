@@ -187,12 +187,19 @@ jQuery(document).ready(function () {
         const qty = parseInt($(this).val()) || 0;
         const variationRows = row.find('.variation-row');
 
-        // enforce limit
-        if (qty > 60) {
-            alert('Please enter quantity below 60 at a time. For larger quantities, create multiple purchase orders.');
-            $(this).val('');
-            row.find('.imei-container').empty();
-            return calculateRowCosts(row);
+        let imei = document.getElementById('imei').value;
+
+        if(imei == 1)
+        {
+
+            // enforce limit
+            if (qty > 60) {
+                alert('Please enter quantity below 60 at a time. For larger quantities, create multiple purchase orders.');
+                $(this).val('');
+                row.find('.imei-container').empty();
+                return calculateRowCosts(row);
+            }
+
         }
 
         // If there are variation rows, propagate the main qty (distribute proportionally by current shares or equally)
@@ -378,9 +385,15 @@ jQuery(document).ready(function () {
         container.html('');
         if (qty <= 0) return;
 
-        if (qty > 60) {
-            alert('Max 60 IMEIs allowed');
-            return;
+        let imei = document.getElementById('imei').value;
+
+        if(imei == 1)
+        {
+
+            if (qty > 60) {
+                alert('Max 60 IMEIs allowed');
+                return;
+            }
         }
 
         for (let i = 1; i <= qty; i++) {

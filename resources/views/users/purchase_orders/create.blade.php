@@ -270,6 +270,8 @@
                 $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
             @endphp
 
+            <input type="hidden" name="imei" id="imei" value="{{$user_detail->is_imei_required}}">
+
             @if($user_detail->is_imei_required == 1)
             <div class="col-md-12">
                 <div class="mb-3">
