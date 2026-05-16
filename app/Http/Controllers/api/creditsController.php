@@ -19,17 +19,20 @@ class creditsController extends Controller
     public function credit(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'date' => 'required|date',
+            'date' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
-            return $this->validationFailed($validator->errors(), 'Date is required.');
+            return $this->validationFailed($validator->errors(), 'Validation failed.');
         }
 
         $credits = Credit::whereHas('order_payment_detail.order', function ($q) use ($request) {
             $q->where('shop_id', Auth::user()->owner_id)
-              ->where('branch_id', null)
-              ->whereDate('billed_on', $request->date);
+              ->where('branch_id', null);
+
+            if ($request->filled('date')) {
+                $q->whereDate('billed_on', $request->date);
+            }
 
             if ($request->filled('customer')) {
                 $search = $request->customer;
@@ -39,6 +42,12 @@ class creditsController extends Controller
                            $q3->where('name', 'like', "%{$search}%")
                               ->orWhere('phone', 'like', "%{$search}%");
                        });
+                });
+            }
+
+            if ($request->filled('phone')) {
+                $q->whereHas('customer', function ($q2) use ($request) {
+                    $q2->where('phone', 'like', "%{$request->phone}%");
                 });
             }
         })
