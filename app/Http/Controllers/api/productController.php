@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\Tax;
+use App\Models\User;
 use App\Traits\Log;
 use DB;
 
@@ -31,6 +32,10 @@ class productController extends Controller
                       ->orWhere('code', 'like', "%{$search}%")
                       ->orWhere('hsn_code', 'like', "%{$search}%");
                 });
+            })->when(request('sub_category'), function ($query) {
+                $query->where('sub_category_id', request('sub_category'));
+            })->when(request('category'), function ($query) {
+                $query->where('category_id', request('category'));
             })->orderBy('id','desc')->paginate(10);
 
             // Prepend full URL to images
@@ -155,7 +160,7 @@ class productController extends Controller
                 'metric_id' => $request->metric,
                 'discount_type' => $request->discount_type,
                 'discount' => $request->discount,
-                'quantity' => $request->quantity,
+                'quantity' => $request->quantity ?? 0,
                 'is_active' => 1,
             ]);
 
@@ -172,12 +177,12 @@ class productController extends Controller
                 $product->save();
             }
 
-            $stock = Stock::create([ 
+            $stock = Stock::create([
                 'shop_id' => Auth::user()->id,
                 'category_id' => $request->category,
                 'sub_category_id' => $request->sub_category,
                 'product_id' => $product->id,
-                'quantity' => $request->quantity,
+                'quantity' => $request->quantity ?? 0,
                 'is_active' => 1,
             ]);
 
@@ -194,6 +199,25 @@ class productController extends Controller
 
             return $this->successResponse('Success', 200, 'Product created successfully');
 
+        }
+    }
+
+    public function stockByBranch(Request $request, $product)
+    {
+        if (Auth::user()->role_id == 2) {
+            $stocks = Stock::with('branch')
+                ->where('shop_id', Auth::user()->owner_id)
+                ->where('product_id', $product)
+                ->get();
+
+            $result = $stocks->map(function ($s) {
+                return [
+                    'location' => $s->branch_id ? ($s->branch->name ?? 'Branch #' . $s->branch_id) : 'HO (Main Shop)',
+                    'quantity' => $s->quantity ?? 0,
+                ];
+            })->sortBy('location')->values();
+
+            return $this->successResponse($result, 200, 'Stock by branch returned');
         }
     }
 
@@ -339,7 +363,7 @@ class productController extends Controller
                 'metric_id' => $request->metric,
                 'discount_type' => $request->discount_type,
                 'discount' => $request->discount,
-                'quantity' => $request->quantity,
+                'quantity' => $request->quantity ?? 0,
             ]);
 
             if ($request->hasFile('image')) {
@@ -359,10 +383,10 @@ class productController extends Controller
 
             //$stock = Stock::where([['shop_id', Auth::user()->id],['category_id', $request->category_id],['sub_category_id', $request->sub_category],['product_id', $request->id]])->first();
 
-            $stock->update([ 
+            $stock->update([
                 'category_id' => $request->category,
                 'sub_category_id' => $request->sub_category,
-                'quantity' => $request->quantity,
+                'quantity' => $request->quantity ?? $stock->quantity,
             ]);
 
 

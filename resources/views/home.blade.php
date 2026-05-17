@@ -5,6 +5,7 @@
 @endsection
 
 @section('style')
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
 <style>
   /* ── Shared ── */
   .section-badge {
@@ -66,24 +67,20 @@
     border-radius: 16px;
     padding: 32px 26px;
     text-align: left;
-    transition: transform .3s, box-shadow .3s;
-    position: relative;
-    overflow: hidden;
+    transition: transform .3s, box-shadow .3s, border-color .3s;
   }
-  .about-card::before {
-    content:'';
-    position:absolute;top:0;left:0;right:0;height:4px;
-    background: linear-gradient(90deg,var(--primary-color),var(--secondary-color));
-    border-radius: 16px 16px 0 0;
-  }
-  .about-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(255,69,0,0.1); border-color: rgba(255,69,0,0.15); }
+  .about-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); border-color: rgba(255,69,0,0.2); }
   .about-icon-box {
-    width:52px; height:52px; border-radius:14px;
+    width:56px; height:56px; border-radius:14px;
     display:flex; align-items:center; justify-content:center;
     font-size:1.5rem; margin-bottom:20px;
     background: linear-gradient(135deg,#fff3f0,#ffe8e0);
     border: 1px solid rgba(255,69,0,0.15);
   }
+  .about-icon-box i { font-size:1.75rem; color:var(--primary-color); }
+  .whatwedo-icon i { font-size:1.9rem; color:var(--primary-color); }
+  .why-icon i { font-size:2.2rem; color:rgba(255,180,140,1); }
+  .whofor-icon i { font-size:2rem; color:var(--primary-color); }
   .about-card h3 { color:var(--dark-color); font-size:1.05rem; font-weight:700; margin-bottom:10px; }
   .about-card p { color:var(--gray-color); font-size:0.875rem; line-height:1.75; margin-bottom:16px; }
   .about-stat {
@@ -122,6 +119,11 @@
   .contact-icon3.email { background:#fff0e8; }
   .contact-icon3.phone { background:#e8f8f6; }
   .contact-icon3.loc   { background:#eef2ff; }
+  .contact-icon3.email i { font-size:1.35rem; color:var(--primary-color); }
+  .contact-icon3.phone i { font-size:1.35rem; color:var(--secondary-color); }
+  .contact-icon3.loc i   { font-size:1.35rem; color:#5c6bc0; }
+  .input-icon-wrap .i-icon { display:flex; align-items:center; }
+  .input-icon-wrap .i-icon i { font-size:1rem; color:#bbb; }
   .contact-card-text h4 { color:var(--dark-color); font-size:0.82rem; font-weight:700; margin:0 0 2px; text-transform:uppercase; letter-spacing:0.5px; }
   .contact-card-text p  { color:var(--gray-color); font-size:0.875rem; margin:0; }
   .form-row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -235,7 +237,13 @@
     transition: all .3s;
   }
   .why-card:hover { background:rgba(255,255,255,0.12); transform:translateY(-4px); }
-  .why-icon { font-size:2rem; margin-bottom:12px; }
+  .why-icon {
+    width:56px; height:56px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 16px;
+    background: rgba(255,140,80,0.15);
+    border: 1px solid rgba(255,160,100,0.25);
+  }
   .why-card h3 { color:#fff; font-size:1rem; font-weight:700; margin-bottom:8px; }
   .why-card p { color:rgba(255,255,255,0.6); font-size:0.875rem; line-height:1.7; }
 
@@ -508,19 +516,19 @@
     </div>
     <div class="about-cards">
       <div class="about-card">
-        <div class="about-icon-box">🏪</div>
+        <div class="about-icon-box"><i class="ph-duotone ph-storefront"></i></div>
         <h3>Single Shop to Multi-Branch</h3>
         <p>Start with one location and scale to unlimited branches — same platform, same workflow, zero disruption.</p>
         <span class="about-stat">✓ Unlimited Branch Support</span>
       </div>
       <div class="about-card">
-        <div class="about-icon-box">🧾</div>
+        <div class="about-icon-box"><i class="ph-duotone ph-receipt"></i></div>
         <h3>100% GST Ready</h3>
         <p>CGST/SGST split, HSN codes, tax summaries, and rupee formatting — built in from day one, not bolted on.</p>
         <span class="about-stat">✓ Fully Tax Compliant</span>
       </div>
       <div class="about-card">
-        <div class="about-icon-box">🔌</div>
+        <div class="about-icon-box"><i class="ph-duotone ph-plug"></i></div>
         <h3>API Ready for Growth</h3>
         <p>Connect mobile apps and third-party tools via REST API. Your platform grows as your business evolves.</p>
         <span class="about-stat">✓ REST API Included</span>
@@ -535,32 +543,32 @@
     <p class="section-sub">We cover your entire business cycle — from purchasing goods from vendors to selling products to customers — with full financial visibility at every step.</p>
     <div class="whatwedo-grid">
       <div class="whatwedo-card">
-        <div class="whatwedo-icon">🚀</div>
+        <div class="whatwedo-icon"><i class="ph-duotone ph-rocket-launch"></i></div>
         <h3>Sell Faster</h3>
         <p>Modern POS with instant product lookup, multi-payment support, and automatic GST invoice generation.</p>
       </div>
       <div class="whatwedo-card">
-        <div class="whatwedo-icon">✅</div>
+        <div class="whatwedo-icon"><i class="ph-duotone ph-seal-check"></i></div>
         <h3>Stay Compliant</h3>
         <p>Automatic CGST/SGST calculation, HSN codes, and fully compliant tax invoices — zero manual effort.</p>
       </div>
       <div class="whatwedo-card">
-        <div class="whatwedo-icon">📊</div>
+        <div class="whatwedo-icon"><i class="ph-duotone ph-chart-bar"></i></div>
         <h3>Track Everything</h3>
         <p>Stock, orders, refunds, vendor payments, and staff activity — all tracked with a complete audit trail.</p>
       </div>
       <div class="whatwedo-card">
-        <div class="whatwedo-icon">🏢</div>
+        <div class="whatwedo-icon"><i class="ph-duotone ph-buildings"></i></div>
         <h3>Manage Multiple Branches</h3>
         <p>Each branch gets independent inventory, billing, and staff while you see everything from one dashboard.</p>
       </div>
       <div class="whatwedo-card">
-        <div class="whatwedo-icon">📈</div>
+        <div class="whatwedo-icon"><i class="ph-duotone ph-trend-up"></i></div>
         <h3>Make Smarter Decisions</h3>
         <p>Daily sales, order, and vendor reports — all exportable to PDF and Excel with flexible date filters.</p>
       </div>
       <div class="whatwedo-card">
-        <div class="whatwedo-icon">⚡</div>
+        <div class="whatwedo-icon"><i class="ph-duotone ph-lightning"></i></div>
         <h3>Save Time</h3>
         <p>Bulk import products, customers, and categories via Excel. Automated processes replace hours of manual work.</p>
       </div>
@@ -644,32 +652,32 @@
       <p class="section-sub">Not just software — a complete business backbone built specifically for Indian retail.</p>
       <div class="why-grid">
         <div class="why-card">
-          <div class="why-icon">🇮🇳</div>
+          <div class="why-icon"><i class="ph-duotone ph-flag-banner"></i></div>
           <h3>Made for India</h3>
           <p>GST, rupee formatting, CGST/SGST, HSN codes — the Indian tax system is built in, not an afterthought.</p>
         </div>
         <div class="why-card">
-          <div class="why-icon">🏢</div>
+          <div class="why-icon"><i class="ph-duotone ph-buildings"></i></div>
           <h3>Multi-Branch Ready</h3>
           <p>Scale from one shop to dozens of branches without switching platforms or losing data visibility.</p>
         </div>
         <div class="why-card">
-          <div class="why-icon">🔒</div>
+          <div class="why-icon"><i class="ph-duotone ph-lock-key"></i></div>
           <h3>Role-Based Access</h3>
           <p>Staff see only what they need. Secure, accountable, and fully controlled from the top down.</p>
         </div>
         <div class="why-card">
-          <div class="why-icon">📱</div>
+          <div class="why-icon"><i class="ph-duotone ph-device-mobile"></i></div>
           <h3>API Ready</h3>
           <p>REST API for connecting mobile apps and third-party tools as your tech stack grows.</p>
         </div>
         <div class="why-card">
-          <div class="why-icon">⚡</div>
+          <div class="why-icon"><i class="ph-duotone ph-lightning"></i></div>
           <h3>One Platform</h3>
           <p>Replace 5+ tools with one — billing, inventory, vendors, customers, reports, all in one login.</p>
         </div>
         <div class="why-card">
-          <div class="why-icon">📋</div>
+          <div class="why-icon"><i class="ph-duotone ph-clipboard-text"></i></div>
           <h3>Full Audit Trail</h3>
           <p>Every action logged — who did what, when, and with what data. Complete accountability.</p>
         </div>
@@ -684,32 +692,32 @@
     <p class="section-sub">Whether you sell appliances, furniture, or groceries — Sling adapts to your business.</p>
     <div class="whofor-grid">
       <div class="whofor-card">
-        <div class="whofor-icon">🛒</div>
+        <div class="whofor-icon"><i class="ph-duotone ph-shopping-cart"></i></div>
         <h3>Retail Shops</h3>
         <p>POS billing, inventory tracking, and GST-compliant invoices for everyday retail operations.</p>
       </div>
       <div class="whofor-card">
-        <div class="whofor-icon">📱</div>
+        <div class="whofor-icon"><i class="ph-duotone ph-device-mobile"></i></div>
         <h3>Electronics &amp; Appliance Stores</h3>
         <p>IMEI tracking per product, GST compliance, and multi-payment support for high-value sales.</p>
       </div>
       <div class="whofor-card">
-        <div class="whofor-icon">🛋️</div>
+        <div class="whofor-icon"><i class="ph-duotone ph-house-line"></i></div>
         <h3>Furniture &amp; Lifestyle Stores</h3>
         <p>Product variations (size &amp; colour), bulk billing, detailed reports, and customer management.</p>
       </div>
       <div class="whofor-card">
-        <div class="whofor-icon">🏪</div>
+        <div class="whofor-icon"><i class="ph-duotone ph-storefront"></i></div>
         <h3>Franchise &amp; Multi-Branch</h3>
         <p>Central control with independent branch-level operations, staff, inventory, and billing.</p>
       </div>
       <div class="whofor-card">
-        <div class="whofor-icon">🤝</div>
+        <div class="whofor-icon"><i class="ph-duotone ph-handshake"></i></div>
         <h3>Wholesale / B2B</h3>
         <p>Vendor management, purchase orders, vendor ledger, and outstanding balance tracking.</p>
       </div>
       <div class="whofor-card">
-        <div class="whofor-icon">🧾</div>
+        <div class="whofor-icon"><i class="ph-duotone ph-receipt"></i></div>
         <h3>Any GST-Registered Business</h3>
         <p>Fully compliant CGST/SGST tax invoices with HSN code support — ready from day one.</p>
       </div>
@@ -734,45 +742,68 @@
     <p class="section-sub">No hidden charges. Pick a plan that fits your business size and grow into the next one.</p>
     <div class="pricing-cards">
       <div class="p-card">
-        <div class="p-plan">Starter</div>
-        <div class="p-sub">Best for beginners &amp; startups</div>
+        <div class="p-plan">Trial</div>
+        <div class="p-sub">Test all features free for 1 month</div>
         <div class="p-price">₹0</div>
-        <div class="p-period">/month</div>
+        <div class="p-period">/month (1 month only)</div>
         <a href="#" class="p-btn p-btn-outline" onclick="openShopDetailsModal()">Get Started Free</a>
         <ul class="p-features">
-          <li>Basic invoicing</li>
-          <li>Up to 50 transactions</li>
-          <li>Single location</li>
-          <li>Email support</li>
+          <li>Billing &amp; POS</li>
+          <li>Inventory Management</li>
+          <li>GST Billing &amp; Tax</li>
+          <li>Vendor &amp; Purchase Orders</li>
+          <li>Multi-Branch Management</li>
+          <li>Customer Management</li>
+          <li>Refunds &amp; Returns</li>
+          <li>Reports &amp; Analytics</li>
+          <li>Staff Management</li>
+          <li>Bulk Import / Export</li>
+          <li>Notifications &amp; Audit</li>
+          <li>Settings &amp; Customization</li>
         </ul>
       </div>
       <div class="p-card featured">
         <div class="p-badge">Most Popular</div>
-        <div class="p-plan">Standard</div>
-        <div class="p-sub">Best for small businesses</div>
-        <div class="p-price">₹999</div>
-        <div class="p-period">/month</div>
+        <div class="p-plan">Single HO</div>
+        <div class="p-sub">Best for single locations</div>
+        <div class="p-price">₹6,999</div>
+        <div class="p-period">/year</div>
         <a href="#" class="p-btn p-btn-primary" onclick="openShopDetailsModal()">Get Started Now</a>
         <ul class="p-features">
-          <li>Unlimited invoicing</li>
-          <li>Inventory management</li>
-          <li>GST compliance</li>
-          <li>Priority support</li>
-          <li>Advanced reports</li>
+          <li>Billing &amp; POS</li>
+          <li>Inventory Management</li>
+          <li>GST Billing &amp; Tax</li>
+          <li>Vendor &amp; Purchase Orders</li>
+          <li>Multi-Branch Management</li>
+          <li>Customer Management</li>
+          <li>Refunds &amp; Returns</li>
+          <li>Reports &amp; Analytics</li>
+          <li>Staff Management</li>
+          <li>Bulk Import / Export</li>
+          <li>Notifications &amp; Audit</li>
+          <li>Settings &amp; Customization</li>
         </ul>
       </div>
       <div class="p-card">
-        <div class="p-plan">Pro</div>
-        <div class="p-sub">Best for growing businesses</div>
-        <div class="p-price">₹2499</div>
-        <div class="p-period">/month</div>
+        <div class="p-plan">Single Branch</div>
+        <div class="p-sub">Best for multi-branch operations</div>
+        <div class="p-price">₹9,999</div>
+        <div class="p-period">/year</div>
         <a href="#" class="p-btn p-btn-outline" onclick="openShopDetailsModal()">Get Started Now</a>
         <ul class="p-features">
-          <li>Everything in Standard</li>
-          <li>Multi-branch support</li>
-          <li>API integrations</li>
-          <li>Custom reports</li>
-          <li>Dedicated support</li>
+          <li>Billing &amp; POS</li>
+          <li>Inventory Management</li>
+          <li>GST Billing &amp; Tax</li>
+          <li>Vendor &amp; Purchase Orders</li>
+          <li>Multi-Branch Management</li>
+          <li>Customer Management</li>
+          <li>Refunds &amp; Returns</li>
+          <li>Reports &amp; Analytics</li>
+          <li>Staff Management</li>
+          <li>Bulk Import / Export</li>
+          <li>Notifications &amp; Audit</li>
+          <li>Settings &amp; Customization</li>
+          <li>₹6,999 per additional branch</li>
         </ul>
       </div>
     </div>
@@ -806,21 +837,21 @@
         </ul>
 
         <div class="contact-card">
-          <div class="contact-icon3 email">✉️</div>
+          <div class="contact-icon3 email"><i class="ph-duotone ph-envelope"></i></div>
           <div class="contact-card-text">
             <h4>Email Us</h4>
             <p>support@slingbilling.com</p>
           </div>
         </div>
         <div class="contact-card">
-          <div class="contact-icon3 phone">📞</div>
+          <div class="contact-icon3 phone"><i class="ph-duotone ph-phone"></i></div>
           <div class="contact-card-text">
             <h4>Call Us</h4>
             <p>+91 99940 90424</p>
           </div>
         </div>
         <div class="contact-card">
-          <div class="contact-icon3 loc">📍</div>
+          <div class="contact-icon3 loc"><i class="ph-duotone ph-map-pin"></i></div>
           <div class="contact-card-text">
             <h4>Location</h4>
             <p>Tamil Nadu, India</p>
@@ -833,40 +864,42 @@
         <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:4px;">Request a Free Demo</h3>
         <p style="font-size:0.82rem;color:var(--gray-color);margin-bottom:20px;">Fill in your details and we'll reach out within 24 hours.</p>
         <hr class="form-divider">
-        <form>
+        <form id="demoRequestForm">
+          @csrf
+          <div id="demoFormAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.85rem;font-weight:600;margin-bottom:14px;"></div>
           <div class="form-row2">
             <div class="form-group">
               <label>Your Name <span style="color:var(--primary-color);">*</span></label>
               <div class="input-icon-wrap">
-                <span class="i-icon">👤</span>
-                <input type="text" placeholder="Full name">
+                <span class="i-icon"><i class="ph-duotone ph-user"></i></span>
+                <input type="text" id="demoName" name="name" placeholder="Full name">
               </div>
             </div>
             <div class="form-group">
               <label>Mobile Number <span style="color:var(--primary-color);">*</span></label>
               <div class="input-icon-wrap">
-                <span class="i-icon">📱</span>
-                <input type="tel" placeholder="+91 00000 00000">
+                <span class="i-icon"><i class="ph-duotone ph-device-mobile"></i></span>
+                <input type="tel" id="demoMobile" name="mobile" placeholder="+91 00000 00000">
               </div>
             </div>
           </div>
           <div class="form-group">
             <label>Email Address <span style="color:var(--primary-color);">*</span></label>
             <div class="input-icon-wrap">
-              <span class="i-icon">✉</span>
-              <input type="email" placeholder="you@company.com">
+              <span class="i-icon"><i class="ph-duotone ph-envelope"></i></span>
+              <input type="email" id="demoEmail" name="email" placeholder="you@company.com">
             </div>
           </div>
           <div class="form-group">
             <label>Business / Shop Name <span style="color:var(--primary-color);">*</span></label>
             <div class="input-icon-wrap">
-              <span class="i-icon">🏪</span>
-              <input type="text" placeholder="Your business name">
+              <span class="i-icon"><i class="ph-duotone ph-storefront"></i></span>
+              <input type="text" id="demoShop" name="shop_name" placeholder="Your business name">
             </div>
           </div>
           <div class="form-group">
             <label>Business Type</label>
-            <select style="width:100%;padding:10px 14px;background:#f8f9fa;border:1.5px solid var(--border-color);border-radius:8px;color:var(--dark-color);font-size:0.9rem;outline:none;">
+            <select id="demoBusinessType" name="business_type" style="width:100%;padding:10px 14px;background:#f8f9fa;border:1.5px solid var(--border-color);border-radius:8px;color:var(--dark-color);font-size:0.9rem;outline:none;">
               <option value="">Select your business type</option>
               <option>Retail Shop</option>
               <option>Electronics / Appliance Store</option>
@@ -876,7 +909,7 @@
               <option>Other</option>
             </select>
           </div>
-          <button type="button" class="demo-btn" style="margin-top:8px;">
+          <button type="button" id="demoSubmitBtn" class="demo-btn" style="margin-top:8px;">
             Book My Free Demo &nbsp;→
           </button>
           <p style="text-align:center;font-size:0.75rem;color:#aaa;margin-top:12px;">🔒 Your information is safe with us. No spam, ever.</p>
@@ -957,6 +990,56 @@
   </footer>
 
   <script>
+    // ── Demo Request Form ──
+    document.getElementById('demoSubmitBtn').addEventListener('click', function () {
+      const btn     = this;
+      const name    = document.getElementById('demoName').value.trim();
+      const mobile  = document.getElementById('demoMobile').value.trim();
+      const email   = document.getElementById('demoEmail').value.trim();
+      const shop    = document.getElementById('demoShop').value.trim();
+      const type    = document.getElementById('demoBusinessType').value;
+      const alert   = document.getElementById('demoFormAlert');
+
+      const showAlert = (msg, success) => {
+        alert.textContent = msg;
+        alert.style.display = 'block';
+        alert.style.background  = success ? '#e8f8f5' : '#fff0f0';
+        alert.style.color       = success ? '#0d7a5f' : '#c0392b';
+        alert.style.border      = success ? '1px solid #a3d9cb' : '1px solid #f5c6cb';
+      };
+
+      if (!name || !mobile || !email || !shop) {
+        showAlert('Please fill in all required fields.', false);
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = 'Sending…';
+
+      const form  = document.getElementById('demoRequestForm');
+      const token = form.querySelector('input[name="_token"]').value;
+
+      fetch('{{ route("demo.request") }}', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+        body:    JSON.stringify({ name, mobile, email, shop_name: shop, business_type: type }),
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showAlert('✓ ' + data.message, true);
+          form.reset();
+        } else {
+          showAlert(data.message || 'Something went wrong. Please try again.', false);
+        }
+      })
+      .catch(() => showAlert('Network error. Please try again.', false))
+      .finally(() => {
+        btn.disabled    = false;
+        btn.textContent = 'Book My Free Demo →';
+      });
+    });
+
     function openShopDetailsModal() {
       document.getElementById('shopDetailsModal').style.display = 'block';
       document.body.style.overflow = 'hidden';

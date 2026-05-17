@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/products/{product}/view', 'App\Http\Controllers\api\productController@view');
 	Route::get('/products/{product}/status', 'App\Http\Controllers\api\productController@status');
 	Route::post('/products/update', 'App\Http\Controllers\api\productController@update');
+	Route::get('/products/{product}/stock', 'App\Http\Controllers\api\productController@stockByBranch');
 
 	//Finance
 	Route::get('/finances/list', 'App\Http\Controllers\api\financeController@list');

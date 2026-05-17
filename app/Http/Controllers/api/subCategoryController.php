@@ -24,7 +24,7 @@ class subCategoryController extends Controller
         if(Auth::user()->role_id == 2)
         {
             $categories = Category::where([['user_id',Auth::user()->owner_id],['is_active',1]])->get();
-            $sub_categories = SubCategory::where('user_id',Auth::user()->owner_id)->when(request('name'), function ($query) {
+            $sub_categories = SubCategory::withCount('products')->with('category')->where('user_id',Auth::user()->owner_id)->when(request('name'), function ($query) {
                 $search = request('name');
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%") // match subcategory name

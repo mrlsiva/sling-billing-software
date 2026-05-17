@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\xampp\\\\htdocs\\\\sling-billing-software\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(php artisan *)",
+      "Bash(php -r \"echo php_ini_loaded_file\\(\\);\")",
+      "Bash(php -r \"echo ini_get\\('openssl.cafile'\\); echo '\\\\n'; echo ini_get\\('curl.cainfo'\\);\")",
+      "Bash(php -r ' *)"
+    ]
+  }
+}
