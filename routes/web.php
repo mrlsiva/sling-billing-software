@@ -56,6 +56,7 @@ use App\Http\Controllers\branches\bulkExcelController;
 use App\Http\Controllers\branches\productTransferReportsController;
 use App\Http\Controllers\branches\salesReportsController;
 use App\Http\Controllers\branches\creditController;
+use App\Http\Controllers\DemoRequestController;
 
 Route::get('/clear', function() {
     Artisan::call('cache:clear');
@@ -80,6 +81,7 @@ Route::get('/', function () {
 });
 
 Route::post('/register',[homeController::class, 'register'])->name('register');
+Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo.request');
 
 if (request()->segment(1) === 'admin') 
 {

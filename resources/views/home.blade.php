@@ -841,20 +841,22 @@
         <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:4px;">Request a Free Demo</h3>
         <p style="font-size:0.82rem;color:var(--gray-color);margin-bottom:20px;">Fill in your details and we'll reach out within 24 hours.</p>
         <hr class="form-divider">
-        <form>
+        <form id="demoRequestForm">
+          @csrf
+          <div id="demoFormAlert" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.85rem;font-weight:600;margin-bottom:14px;"></div>
           <div class="form-row2">
             <div class="form-group">
               <label>Your Name <span style="color:var(--primary-color);">*</span></label>
               <div class="input-icon-wrap">
                 <span class="i-icon"><i class="ph-duotone ph-user"></i></span>
-                <input type="text" placeholder="Full name">
+                <input type="text" id="demoName" name="name" placeholder="Full name">
               </div>
             </div>
             <div class="form-group">
               <label>Mobile Number <span style="color:var(--primary-color);">*</span></label>
               <div class="input-icon-wrap">
                 <span class="i-icon"><i class="ph-duotone ph-device-mobile"></i></span>
-                <input type="tel" placeholder="+91 00000 00000">
+                <input type="tel" id="demoMobile" name="mobile" placeholder="+91 00000 00000">
               </div>
             </div>
           </div>
@@ -862,19 +864,19 @@
             <label>Email Address <span style="color:var(--primary-color);">*</span></label>
             <div class="input-icon-wrap">
               <span class="i-icon"><i class="ph-duotone ph-envelope"></i></span>
-              <input type="email" placeholder="you@company.com">
+              <input type="email" id="demoEmail" name="email" placeholder="you@company.com">
             </div>
           </div>
           <div class="form-group">
             <label>Business / Shop Name <span style="color:var(--primary-color);">*</span></label>
             <div class="input-icon-wrap">
               <span class="i-icon"><i class="ph-duotone ph-storefront"></i></span>
-              <input type="text" placeholder="Your business name">
+              <input type="text" id="demoShop" name="shop_name" placeholder="Your business name">
             </div>
           </div>
           <div class="form-group">
             <label>Business Type</label>
-            <select style="width:100%;padding:10px 14px;background:#f8f9fa;border:1.5px solid var(--border-color);border-radius:8px;color:var(--dark-color);font-size:0.9rem;outline:none;">
+            <select id="demoBusinessType" name="business_type" style="width:100%;padding:10px 14px;background:#f8f9fa;border:1.5px solid var(--border-color);border-radius:8px;color:var(--dark-color);font-size:0.9rem;outline:none;">
               <option value="">Select your business type</option>
               <option>Retail Shop</option>
               <option>Electronics / Appliance Store</option>
@@ -884,7 +886,7 @@
               <option>Other</option>
             </select>
           </div>
-          <button type="button" class="demo-btn" style="margin-top:8px;">
+          <button type="button" id="demoSubmitBtn" class="demo-btn" style="margin-top:8px;">
             Book My Free Demo &nbsp;→
           </button>
           <p style="text-align:center;font-size:0.75rem;color:#aaa;margin-top:12px;">🔒 Your information is safe with us. No spam, ever.</p>
@@ -965,6 +967,56 @@
   </footer>
 
   <script>
+    // ── Demo Request Form ──
+    document.getElementById('demoSubmitBtn').addEventListener('click', function () {
+      const btn     = this;
+      const name    = document.getElementById('demoName').value.trim();
+      const mobile  = document.getElementById('demoMobile').value.trim();
+      const email   = document.getElementById('demoEmail').value.trim();
+      const shop    = document.getElementById('demoShop').value.trim();
+      const type    = document.getElementById('demoBusinessType').value;
+      const alert   = document.getElementById('demoFormAlert');
+
+      const showAlert = (msg, success) => {
+        alert.textContent = msg;
+        alert.style.display = 'block';
+        alert.style.background  = success ? '#e8f8f5' : '#fff0f0';
+        alert.style.color       = success ? '#0d7a5f' : '#c0392b';
+        alert.style.border      = success ? '1px solid #a3d9cb' : '1px solid #f5c6cb';
+      };
+
+      if (!name || !mobile || !email || !shop) {
+        showAlert('Please fill in all required fields.', false);
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = 'Sending…';
+
+      const form  = document.getElementById('demoRequestForm');
+      const token = form.querySelector('input[name="_token"]').value;
+
+      fetch('{{ route("demo.request") }}', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+        body:    JSON.stringify({ name, mobile, email, shop_name: shop, business_type: type }),
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showAlert('✓ ' + data.message, true);
+          form.reset();
+        } else {
+          showAlert(data.message || 'Something went wrong. Please try again.', false);
+        }
+      })
+      .catch(() => showAlert('Network error. Please try again.', false))
+      .finally(() => {
+        btn.disabled    = false;
+        btn.textContent = 'Book My Free Demo →';
+      });
+    });
+
     function openShopDetailsModal() {
       document.getElementById('shopDetailsModal').style.display = 'block';
       document.body.style.overflow = 'hidden';
