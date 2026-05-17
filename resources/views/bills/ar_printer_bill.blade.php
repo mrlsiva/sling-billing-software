@@ -214,22 +214,6 @@
                         </td>
                     </tr>
                     <tr style="border-bottom: 1px solid #000;">
-                        <td style="width:30%; text-align:center;">
-                            @if($user->logo)
-                                <img src="{{ asset('storage/' . $user->logo) }}" class="logo-img" alt="Logo">
-                            @endif
-                        </td>
-                        <td style="width:40%; text-align:center; border-left:1px solid #000; border-right:1px solid #000;">
-                            <div style="font-size:12px; font-weight:bold; margin:2px 0;">{{ strtoupper($user->name) }}</div>
-                            <div style="font-size:9px; line-height:1.5;">
-                                {{ $user->user_detail->address }}<br>
-                                CELL: {{ $user->phone }}@if($user->alt_phone != null) / {{ $user->alt_phone }}@endif
-                                @if($user->email != null) &nbsp;|&nbsp; {{ $user->email }}@endif
-                            </div>
-                            @if($user->user_detail->gst != null)
-                                <div style="font-size:9px; margin-top:2px;"><strong>GSTIN: {{ $user->user_detail->gst }}</strong></div>
-                            @endif
-                        </td>
                         <td style="width:30%; vertical-align:middle;">
                             <table class="inner" style="font-size:10px;">
                                 <tr>
@@ -258,6 +242,23 @@
                                 </tr>
                                 @endif
                             </table>
+                        </td>
+                        
+                        <td style="width:40%; text-align:center; border-left:1px solid #000; border-right:1px solid #000;">
+                            <div style="font-size:12px; font-weight:bold; margin:2px 0;">{{ strtoupper($user->name) }}</div>
+                            <div style="font-size:9px; line-height:1.5;">
+                                {{ $user->user_detail->address }}<br>
+                                CELL: {{ $user->phone }}@if($user->alt_phone != null) / {{ $user->alt_phone }}@endif
+                                @if($user->email != null) &nbsp;|&nbsp; {{ $user->email }}@endif
+                            </div>
+                            @if($user->user_detail->gst != null)
+                                <div style="font-size:9px; margin-top:2px;"><strong>GSTIN: {{ $user->user_detail->gst }}</strong></div>
+                            @endif
+                        </td>
+                        <td style="width:30%; text-align:center;">
+                            @if($user->logo)
+                                <img src="{{ asset('storage/' . $user->logo) }}" class="logo-img" alt="Logo">
+                            @endif
                         </td>
                     </tr>
                 </table>
