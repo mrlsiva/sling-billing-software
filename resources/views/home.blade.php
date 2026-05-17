@@ -742,45 +742,68 @@
     <p class="section-sub">No hidden charges. Pick a plan that fits your business size and grow into the next one.</p>
     <div class="pricing-cards">
       <div class="p-card">
-        <div class="p-plan">Starter</div>
-        <div class="p-sub">Best for beginners &amp; startups</div>
+        <div class="p-plan">Trial</div>
+        <div class="p-sub">Test all features free for 1 month</div>
         <div class="p-price">₹0</div>
-        <div class="p-period">/month</div>
+        <div class="p-period">/month (1 month only)</div>
         <a href="#" class="p-btn p-btn-outline" onclick="openShopDetailsModal()">Get Started Free</a>
         <ul class="p-features">
-          <li>Basic invoicing</li>
-          <li>Up to 50 transactions</li>
-          <li>Single location</li>
-          <li>Email support</li>
+          <li>Billing &amp; POS</li>
+          <li>Inventory Management</li>
+          <li>GST Billing &amp; Tax</li>
+          <li>Vendor &amp; Purchase Orders</li>
+          <li>Multi-Branch Management</li>
+          <li>Customer Management</li>
+          <li>Refunds &amp; Returns</li>
+          <li>Reports &amp; Analytics</li>
+          <li>Staff Management</li>
+          <li>Bulk Import / Export</li>
+          <li>Notifications &amp; Audit</li>
+          <li>Settings &amp; Customization</li>
         </ul>
       </div>
       <div class="p-card featured">
         <div class="p-badge">Most Popular</div>
-        <div class="p-plan">Standard</div>
-        <div class="p-sub">Best for small businesses</div>
-        <div class="p-price">₹999</div>
-        <div class="p-period">/month</div>
+        <div class="p-plan">Single HO</div>
+        <div class="p-sub">Best for single locations</div>
+        <div class="p-price">₹6,999</div>
+        <div class="p-period">/year</div>
         <a href="#" class="p-btn p-btn-primary" onclick="openShopDetailsModal()">Get Started Now</a>
         <ul class="p-features">
-          <li>Unlimited invoicing</li>
-          <li>Inventory management</li>
-          <li>GST compliance</li>
-          <li>Priority support</li>
-          <li>Advanced reports</li>
+          <li>Billing &amp; POS</li>
+          <li>Inventory Management</li>
+          <li>GST Billing &amp; Tax</li>
+          <li>Vendor &amp; Purchase Orders</li>
+          <li>Multi-Branch Management</li>
+          <li>Customer Management</li>
+          <li>Refunds &amp; Returns</li>
+          <li>Reports &amp; Analytics</li>
+          <li>Staff Management</li>
+          <li>Bulk Import / Export</li>
+          <li>Notifications &amp; Audit</li>
+          <li>Settings &amp; Customization</li>
         </ul>
       </div>
       <div class="p-card">
-        <div class="p-plan">Pro</div>
-        <div class="p-sub">Best for growing businesses</div>
-        <div class="p-price">₹2499</div>
-        <div class="p-period">/month</div>
+        <div class="p-plan">Single Branch</div>
+        <div class="p-sub">Best for multi-branch operations</div>
+        <div class="p-price">₹9,999</div>
+        <div class="p-period">/year</div>
         <a href="#" class="p-btn p-btn-outline" onclick="openShopDetailsModal()">Get Started Now</a>
         <ul class="p-features">
-          <li>Everything in Standard</li>
-          <li>Multi-branch support</li>
-          <li>API integrations</li>
-          <li>Custom reports</li>
-          <li>Dedicated support</li>
+          <li>Billing &amp; POS</li>
+          <li>Inventory Management</li>
+          <li>GST Billing &amp; Tax</li>
+          <li>Vendor &amp; Purchase Orders</li>
+          <li>Multi-Branch Management</li>
+          <li>Customer Management</li>
+          <li>Refunds &amp; Returns</li>
+          <li>Reports &amp; Analytics</li>
+          <li>Staff Management</li>
+          <li>Bulk Import / Export</li>
+          <li>Notifications &amp; Audit</li>
+          <li>Settings &amp; Customization</li>
+          <li>₹6,999 per additional branch</li>
         </ul>
       </div>
     </div>
