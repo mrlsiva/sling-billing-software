@@ -6,7 +6,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Mail;
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use App\Models\Version;
 
 class AppServiceProvider extends ServiceProvider
@@ -36,31 +35,17 @@ class AppServiceProvider extends ServiceProvider
 
         if (config('mail.mailers.smtp.transport') === 'smtp') {
             Mail::extend('smtp', function (array $config) {
-                $transport = new EsmtpTransport(
+                $scheme = ($config['scheme'] ?? null) === 'smtps' ? 'smtps' : 'smtp';
+                $dsn = sprintf(
+                    '%s://%s:%s@%s:%d?verify_peer=0',
+                    $scheme,
+                    urlencode($config['username'] ?? ''),
+                    urlencode($config['password'] ?? ''),
                     $config['host'] ?? '127.0.0.1',
-                    $config['port'] ?? 587,
-                    ($config['scheme'] ?? null) === 'smtps',
+                    $config['port'] ?? 587
                 );
 
-                if (!empty($config['username'])) {
-                    $transport->setUsername($config['username']);
-                }
-                if (!empty($config['password'])) {
-                    $transport->setPassword($config['password']);
-                }
-                if (!empty($config['timeout'])) {
-                    $transport->setTimeout($config['timeout']);
-                }
-
-                $transport->setStreamOptions([
-                    'ssl' => [
-                        'verify_peer'       => false,
-                        'verify_peer_name'  => false,
-                        'allow_self_signed' => true,
-                    ],
-                ]);
-
-                return $transport;
+                return \Symfony\Component\Mailer\Transport::fromDsn($dsn);
             });
         }
     }
