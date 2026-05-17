@@ -81,6 +81,63 @@ class userController extends Controller
         return redirect()->back()->with('toast_success', 'Customer created successfully.');
     }
 
+    public function edit(Request $request,$customer,$id)
+    {
+        $genders = Gender::where('is_active',1)->get();
+        $user = Customer::where('id',$id)->first();
+        return view('users.customers.edit',compact('user','genders'));
+    }
+
+    public function update(Request $request)
+    {
+
+        $request->validate([
+            'name' => 'required|string|max:50',
+            'phone' => ['required','digits:10','different:alt_phone',
+                Rule::unique('customers', 'phone')->ignore($request->id)->where(function ($query) {
+                    return $query->where('user_id', Auth::user()->owner_id);
+                }),
+            ],
+            'alt_phone' => 'nullable|digits:10|different:phone',
+            'address' => 'required|string|max:200',
+            'pincode' => 'nullable|digits:6|regex:/^[1-9][0-9]{5}$/',
+            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
+        ], 
+        [
+            'name.required' => 'Name is required.',
+            'phone.required' => 'Phone is required.',
+            'address.required' => 'Phone is required.',
+        ]);
+
+        $customer = Customer::where('id',$request->id)->first();
+
+        DB::beginTransaction();
+
+        $customer->update([
+
+            'name' => Str::ucfirst($request->name),
+            'phone' => $request->phone,
+            'alt_phone' => $request->alt_phone,
+            'address' => $request->address,
+            'pincode' => $request->pincode,
+            'gender_id' => $request->gender,
+            'dob' => $request->dob,
+            'gst' => $request->gst,
+
+        ]);
+
+        DB::commit();
+
+        //Log
+        $this->addToLog($this->unique(),Auth::user()->id,'Customer Update','App/Models/Customer','customers',$customer->id,'Update',null,$request,'Success','Customer Updated Successfully');
+
+        //Notifiction
+        $this->notification(Auth::user()->owner_id, null,'App/Models/Customer', $customer->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' updated customer '.Str::ucfirst($request->name),null, null,12);
+
+        return redirect()->back()->with('toast_success', 'Customer updated successfully.');
+
+    }
+
     public function order(Request $request,$company,$id)
     {
 

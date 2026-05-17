@@ -200,6 +200,7 @@ class shopController extends Controller
             'is_colour_differentiation_available' => $request->has('is_colour_differentiation_available') ? 1 : 0,
             'able_to_edit_bill' => $request->has('able_to_edit_bill') ? 1 : 0,
             'is_imei_required' => $request->has('is_imei_required') ? 1 : 0,
+            'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
         ]);
 
         //Log
@@ -437,6 +438,7 @@ class shopController extends Controller
             'is_colour_differentiation_available' => $request->has('is_colour_differentiation_available') ? 1 : 0,
             'able_to_edit_bill' => $request->has('able_to_edit_bill') ? 1 : 0,
             'is_imei_required' => $request->has('is_imei_required') ? 1 : 0,
+            'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
             
         ]);
 

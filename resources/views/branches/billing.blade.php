@@ -8,6 +8,10 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
+@php
+	$user_detail = App\Models\UserDetail::where('user_id', Auth::user()->id)->first();
+@endphp
+
 <div class="row">
 	<div class="col-md-8">
 		<div class="card p-3">
@@ -189,13 +193,14 @@
 
 				<div class="tab-pane show active" id="homeTabsJustified">
 					<div id="order_detail" class="secret">
+						@if($user_detail->is_scan_avaiable == 1)
 						<div class="d-flex justify-content-between align-items-center mb-3">
-						<h5 class="fw-semibold my-3">Order Summery</h5>
-						<button type="button" class="btn btn-sm fw-semibold d-flex align-items-center gap-2">
-							<i class="ri-focus-3-line"></i> Focus
-						</button>
-						
-					</div>
+							<h5 class="fw-semibold my-3">Order Summery</h5>
+							<button type="button" class="btn btn-sm fw-semibold d-flex align-items-center gap-2">
+								<i class="ri-focus-3-line"></i> Focus
+							</button>
+						</div>
+						@endif
 						<div class="" data-simplebar
 							style="max-height: calc(100vh - 466px); min-height: calc(100vh - 466px);">
 							<div id="cart_item">
@@ -248,9 +253,11 @@
 								style="height: calc(100vh - 160px);">
 								<h2 class="mb-0"><i class="ri-shopping-cart-line"></i></h2>
 								<p class="mb-0">Cart is Empty</p>
+								@if($user_detail->is_scan_avaiable == 1)
 								<button type="button" class="btn btn-outline-primary btn-sm fw-semibold d-flex align-items-center gap-2" id="focus_cart">
 									<i class="ri-focus-3-line"></i> Focus
 								</button>
+								@endif
 							</div>
 						</div>
 					</div>

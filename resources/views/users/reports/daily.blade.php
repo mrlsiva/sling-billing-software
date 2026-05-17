@@ -361,11 +361,14 @@
 										        </span><br>
 										    @endforeach
 										    @if($order->is_refunded)
-										    	<span class="badge bg-primary">
-										            Refund 
-										            ₹ {{ number_format($order->total_refund, 2) }}
-										        </span>
-										    @endif
+											    <span class="badge bg-primary">
+											        Refund ₹ {{ number_format($order->total_refund, 2) }}
+
+											        <br>
+
+											        {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d M Y') }}
+											    </span>
+											@endif
 										</td>
 										<td>
 											{{ $order->customer->phone }} ({{ $order->customer->name }})

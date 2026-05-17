@@ -502,20 +502,35 @@
                                     </a>
                                 @endif
                                 @if(Auth::user()->role_id == 2)
+
+                                    @php
+                                        $user_detail = \App\Models\UserDetail::where('user_id', Auth::user()->owner_id)->first();
+                                    @endphp
+
                                     <a class="dropdown-item" href="{{route('excel.history', ['company' => request()->route('company')])}}">
                                         <i class="bx bx-task fs-18 align-middle me-2"></i><span class="align-middle">Bulk Upload History</span>
                                     </a>
-                                    <a class="dropdown-item" href="{{route('gst_bill.index', ['company' => request()->route('company'),'branch' => 0])}}">
-                                        <i class="bx bx-edit fs-18 align-middle me-2"></i><span class="align-middle">GST Bill</span>
-                                    </a>
+                                    @if($user_detail->is_gst_bill_avaiable == 1)
+                                        <a class="dropdown-item" href="{{route('gst_bill.index', ['company' => request()->route('company'),'branch' => 0])}}">
+                                            <i class="bx bx-edit fs-18 align-middle me-2"></i><span class="align-middle">GST Bill</span>
+                                        </a>
+                                    @endif
                                 @endif
                                 @if(Auth::user()->role_id == 3)
+
+                                    @php
+                                        $user_detail = \App\Models\UserDetail::where('user_id', Auth::user()->id)->first();
+                                    @endphp
+
                                     <a class="dropdown-item" href="{{route('branch.excel.history', ['company' => request()->route('company')])}}">
                                         <i class="bx bx-task fs-18 align-middle me-2"></i><span class="align-middle">Bulk Upload History</span>
                                     </a>
+
+                                    @if($user_detail->is_gst_bill_avaiable == 1)
                                     <a class="dropdown-item" href="{{route('branch.gst_bill.index', ['company' => request()->route('company')])}}">
                                         <i class="bx bx-edit fs-18 align-middle me-2"></i><span class="align-middle">GST Bill</span>
                                     </a>
+                                    @endif
                                 @endif
                                 <!-- <a class="dropdown-item" href="#">
                                     <i class="bx bx-help-circle fs-18 align-middle me-2"></i><span class="align-middle">Help</span>

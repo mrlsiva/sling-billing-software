@@ -56,7 +56,7 @@ class dailyReportController extends Controller
                 'shop',
                 'customer',
                 'billedBy',
-                'payments.payment' // ✅ IMPORTANT for mode of payment
+                'payments.payment','refunds' // ✅ IMPORTANT for mode of payment
             ])
             ->withSum('refunds as total_refund', 'refund_amount')
             ->orderByDesc('id')
@@ -115,7 +115,7 @@ class dailyReportController extends Controller
             ->where('branch_id', Auth::user()->id)
             ->whereDate('billed_on', $date)
             ->withSum('refunds as total_refund', 'refund_amount')
-            ->with(['branch','customer','billedBy','payments.payment','shop'])
+            ->with(['branch','customer','billedBy','payments.payment','shop','refunds'])
             ->get();
 
         $refund = Order::where('shop_id', Auth::user()->parent_id)
@@ -162,7 +162,8 @@ class dailyReportController extends Controller
                 $productOut,
                 $productInAmount,
                 $productOutAmount,
-                $totalSales
+                $totalSales,
+                $date
 
             ),
             'daily_report_' . now()->format('d-m-Y_h-i A') . '.xlsx'
@@ -177,7 +178,7 @@ class dailyReportController extends Controller
             ->where('branch_id', Auth::user()->id)
             ->whereDate('billed_on', $date)
             ->withSum('refunds as total_refund', 'refund_amount')
-            ->with(['branch','customer','billedBy','payments.payment','shop'])
+            ->with(['branch','customer','billedBy','payments.payment','shop','refunds'])
             ->get();
 
         $refund = Order::where('shop_id', Auth::user()->parent_id)
@@ -216,7 +217,8 @@ class dailyReportController extends Controller
             'productIn',
             'productOut',
             'productInAmount',
-            'productOutAmount'
+            'productOutAmount',
+            'date'
         ))->setPaper('a4','landscape');
 
         return $pdf->download('daily_report_' . now()->format('d-m-Y_h-i A') . '.pdf');

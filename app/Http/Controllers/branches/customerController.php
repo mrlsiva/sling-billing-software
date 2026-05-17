@@ -111,11 +111,11 @@ class customerController extends Controller
                 Rule::unique('customers', 'phone')->ignore($request->id)->where(function ($query) use ($parent) {
                     return $query->where('user_id', $parent->parent_id);
                 }),
-            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
             ],
             'alt_phone' => 'nullable|digits:10|different:phone',
             'address' => 'required|string|max:200',
             'pincode' => 'nullable|digits:6|regex:/^[1-9][0-9]{5}$/',
+            'gst' => 'nullable|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i',
         ], 
         [
             'name.required' => 'Name is required.',

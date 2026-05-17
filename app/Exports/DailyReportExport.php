@@ -12,7 +12,7 @@ class DailyReportExport implements FromView
     protected $payments;
     protected $refunds;
 
-    public function __construct($orders,$purchases,$payments,$refunds,$productIn,$productOut,$productInAmount,$productOutAmount,$paymentSummary,$totalSales)
+    public function __construct($orders,$purchases,$payments,$refunds,$productIn,$productOut,$productInAmount,$productOutAmount,$paymentSummary,$totalSales,$date)
     {
         $this->orders = $orders;
         $this->purchases = $purchases;
@@ -24,6 +24,7 @@ class DailyReportExport implements FromView
         $this->productOutAmount = $productOutAmount;
         $this->paymentSummary = $paymentSummary;
         $this->totalSales = $totalSales;
+        $this->date = $date;
     }
 
     public function view(): View
@@ -48,7 +49,8 @@ class DailyReportExport implements FromView
             'totalPurchase'=>$totalPurchase,
             'totalVendorPaid'=>$totalVendorPaid,
             'totalRefund'=>$totalRefund,
-            'profit'=>$profit
+            'profit'=>$profit,
+            'date' => $this->date
         ]);
     }
 }
