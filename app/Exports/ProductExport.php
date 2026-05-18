@@ -2,37 +2,46 @@
 
 namespace App\Exports;
 
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class ProductExport implements FromCollection, WithHeadings
+class ProductExport implements FromQuery, WithHeadings, WithChunkReading, WithMapping
 {
-    protected $products;
+    protected $query;
 
-    public function __construct($products)
+    public function __construct($query)
     {
-        $this->products = $products;
+        $this->query = $query;
     }
 
-    public function collection()
+    public function query()
     {
-        return $this->products->map(function ($product) {
-            return [
-                'Name'            => $product->name,
-                'Code'            => $product->code,
-                'HSN Code'        => $product->hsn_code,
-                'Category'        => $product->category->name ?? '-',
-                'Sub Category'    => $product->sub_category->name ?? '-',
-                'Description'     => $product->description,
-                'Metric'          => $product->metric->name ?? '-',
-                //'Quanity'         => $product->quantity ?? '-',
-                'Price'           => number_format($product->price, 2),
-                'Discount Type'   => $product->discount_type == 1 ? 'Flat' : ($product->discount_type == 2 ? 'Percentage' : '-'),
-                'Discount'        => $product->discount !== null ? number_format($product->discount, 2) : '-',
-                'Tax' => $product->tax ? $product->tax->name . '%' : '-',
-                'Status'          => $product->is_active == 1 ? 'Active' : 'Inactive',
-            ];
-        });
+        return $this->query;
+    }
+
+    public function chunkSize(): int
+    {
+        return 200;
+    }
+
+    public function map($product): array
+    {
+        return [
+            $product->name,
+            $product->code,
+            $product->hsn_code,
+            $product->category->name ?? '-',
+            $product->sub_category->name ?? '-',
+            $product->description,
+            $product->metric->name ?? '-',
+            number_format($product->price, 2),
+            $product->discount_type == 1 ? 'Flat' : ($product->discount_type == 2 ? 'Percentage' : '-'),
+            $product->discount !== null ? number_format($product->discount, 2) : '-',
+            $product->tax ? $product->tax->name . '%' : '-',
+            $product->is_active == 1 ? 'Active' : 'Inactive',
+        ];
     }
 
     public function headings(): array
@@ -45,7 +54,6 @@ class ProductExport implements FromCollection, WithHeadings
             'SubCategory',
             'Description',
             'Metric',
-            //'Quanity',
             'Price',
             'Discount Type',
             'Discount',
