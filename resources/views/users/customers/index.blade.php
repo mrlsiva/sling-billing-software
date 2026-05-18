@@ -58,6 +58,7 @@
 									<th>Gender</th>
 									<th>DOB</th>
 									<th>Order History</th>
+									<th>Action</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -104,6 +105,9 @@
 											<div class="d-flex gap-3">
 												<a href="{{ route('customer.order', ['company' => request()->route('company'),'id' => $user->id ]) }}" class="text-muted" title="Order History"><i class="ri-eye-line align-middle fs-20"></i></a>
 											</div>
+										</td>
+										<td>
+											<a href="{{ route('customer.edit', ['company' => request()->route('company'),'id' => $user->id ]) }}" class="link-dark"><i class="ri-edit-line align-middle fs-20"></i></a>
 										</td>
 									</tr>
 									@endforeach

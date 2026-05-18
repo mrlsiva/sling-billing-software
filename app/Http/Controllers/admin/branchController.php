@@ -253,6 +253,7 @@ class branchController extends Controller
             'plan_end' => $nextPaymentDate,
             'bill_type' => $request->bill_type,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
+            'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
         ]);
 
         //Log
@@ -469,6 +470,7 @@ class branchController extends Controller
             'plan_end' => $nextPaymentDate,
             'bill_type' => $request->bill_type,
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
+            'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
         ]);
 
         //Log

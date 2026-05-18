@@ -17,7 +17,7 @@
             </div>
         @endif
         <div class="col-xl-12 col-md-12">
-            <form class="row" action="{{route('branch.customer.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+            <form class="row" action="{{route('customer.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="card">
                     <div class="card-header pb-0">
@@ -85,12 +85,13 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="gst" class="form-label text-muted">GST</label>
-                                    <input type="text" id="gst" name="gst" class="form-control" value="{{$user->gst}}">
-                                </div>
-                            </div>
+		                	<div class="col-md-4">
+		                		<div class="mb-3">
+		                			<label for="gst" class="form-label text-muted">GST</label>
+		                			<input type="text" id="gst" name="gst" class="form-control" value="{{$user->gst}}">
+		                		</div>
+		                	</div>
+
 
                         </div>
                     </div>
@@ -101,7 +102,7 @@
                             <button type="submit" class="btn btn-primary w-100"><i class="ri-save-line"></i> Save Change</button>
                         </div>
                         <div class="col-md-2">
-                            <a href="{{route('branch.customer.index', ['company' => request()->route('company')])}}" class="btn btn-outline-secondary w-100"><i class="ri-close-circle-line"></i> Cancel</a>
+                            <a href="{{route('customer.index', ['company' => request()->route('company')])}}" class="btn btn-outline-secondary w-100"><i class="ri-close-circle-line"></i> Cancel</a>
                         </div>
                     </div>
                 </div>

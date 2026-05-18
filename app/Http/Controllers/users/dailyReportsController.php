@@ -67,7 +67,7 @@ class dailyReportsController extends Controller
         $orderQuery->whereDate('billed_on', $date);
 
         $orders = $orderQuery
-            ->with(['branch','shop','customer','billedBy','payments.payment'])
+            ->with(['branch','shop','customer','billedBy','payments.payment','refunds'])
             ->withSum('refunds as total_refund', 'refund_amount')
             ->orderByDesc('id')
             ->get();
@@ -227,7 +227,7 @@ class dailyReportsController extends Controller
         $orders = $orderQuery
             ->whereDate('billed_on', $date)
             ->withSum('refunds as total_refund', 'refund_amount')
-            ->with(['branch','customer','billedBy','payments.payment'])
+            ->with(['branch','customer','billedBy','payments.payment','refunds'])
             ->get();
 
     
@@ -337,7 +337,8 @@ class dailyReportsController extends Controller
                 $productInAmount,
                 $productOutAmount,
                 $paymentSummary,
-                $totalSales
+                $totalSales,
+                $date
             ),
             'daily_report_' . now()->format('d-m-Y_h-i A') . '.xlsx'
         );
@@ -377,7 +378,7 @@ class dailyReportsController extends Controller
         $orders = $orderQuery
         ->whereDate('billed_on', $date)
         ->withSum('refunds as total_refund', 'refund_amount')
-        ->with(['branch','customer','billedBy','payments.payment','shop'])
+        ->with(['branch','customer','billedBy','payments.payment','shop','refunds'])
         ->get();
 
         $refund = $orderQuery->where('is_refunded', 1)->pluck('id');
@@ -491,7 +492,8 @@ class dailyReportsController extends Controller
             'productIn',
             'productOut',
             'productInAmount',
-            'productOutAmount'
+            'productOutAmount',
+            'date'
         ))->setPaper('a4','landscape');
 
         return $pdf->download('daily_report_' . now()->format('d-m-Y_h-i A') . '.pdf');

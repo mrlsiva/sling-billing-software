@@ -271,6 +271,8 @@ else
 
                             Route::get('/index',[userController::class, 'index'])->name('index');
                             Route::post('/store',[userController::class, 'store'])->name('store');
+                            Route::get('/{id}/edit',[userController::class, 'edit'])->name('edit');
+                            Route::post('/update',[userController::class, 'update'])->name('update');
                             Route::get('/{id}/order',[userController::class, 'order'])->name('order');
                             Route::get('/download',[userController::class, 'download'])->name('download');
                         });

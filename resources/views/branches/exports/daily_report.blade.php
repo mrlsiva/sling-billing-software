@@ -1,6 +1,6 @@
 <table>
     <tr>
-        <th colspan="2"><b>Daily Report Summary</b></th>
+        <th colspan="2"><b>Daily Report Summary - {{$date}}</b></th>
     </tr>
 
     <tr>
@@ -62,6 +62,14 @@
                     @foreach($order->payments as $pay)
                         {{ $pay->payment->name ?? '-' }} (₹{{ $pay->amount }})<br>
                     @endforeach
+                    @if($order->is_refunded)
+                        <span class="badge bg-primary">
+                            Refund 
+                            ₹ {{ number_format($order->total_refund, 2) }}
+                            <br>
+                            {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d M Y') }}
+                        </span>
+                    @endif
                 @else
                     -
                 @endif
