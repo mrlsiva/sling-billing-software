@@ -10,7 +10,7 @@ class BranchDailyReportExport implements FromView
     protected $orders, $productIn, $productOut;
     protected $productInAmount, $productOutAmount;
 
-    public function __construct($orders,$productIn,$productOut,$productInAmount,$productOutAmount,$totalSales,$date)
+    public function __construct($orders,$productIn,$productOut,$productInAmount,$productOutAmount,$totalSales,$date,$credit_amount)
     {
         $this->orders = $orders;
         $this->productIn = $productIn;
@@ -19,6 +19,7 @@ class BranchDailyReportExport implements FromView
         $this->productOutAmount = $productOutAmount;
         $this->totalSales = $totalSales;
         $this->date = $date;
+        $this->credit_amount = $credit_amount;
     }
 
     public function view(): View
@@ -33,6 +34,7 @@ class BranchDailyReportExport implements FromView
             'productInAmount'=>$this->productInAmount,
             'productOutAmount'=>$this->productOutAmount,
             'date'=> $this->date,
+            'credit_amount'=> $this->credit_amount,
         ]);
     }
 }

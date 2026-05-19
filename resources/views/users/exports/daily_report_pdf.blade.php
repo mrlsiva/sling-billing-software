@@ -57,7 +57,9 @@
                 <th>Today Purchase</th>
                 <th>Today Vendor Payment</th>
                 <th>Today Vendor Refund Amount</th>
+                <th>Credit Amount</th>
                 @endif
+                <th>Discount Amount</th>
             </tr>
 
             <tr>
@@ -68,7 +70,9 @@
                 <td>₹ {{ number_format($totalPurchase,2) }}</td>
                 <td>₹ {{ number_format($totalVendorPaid,2) }}</td>
                 <td>₹ {{ number_format($totalRefund,2) }}</td>
+                <td>₹ {{ number_format($credit_amount,2) }}</td>
                 @endif
+                <td>₹ {{ number_format($orders->sum('order_discount'), 2) }}</td>
             </tr>
 
         </table>
@@ -209,10 +213,16 @@
                             {{ $pay->payment->name ?? '-' }} 
                             (₹{{ number_format($pay->amount,2) }})<br>
                         @endforeach
+                        @if($order->order_discount != 0)
+                            <span class="badge bg-primary">
+                                Discount 
+                                (₹ {{ number_format($order->order_discount, 2) }})
+                            </span><br>
+                        @endif
                         @if($order->is_refunded)
                             <span class="badge bg-primary">
                                 Refund 
-                                ₹ {{ number_format($order->total_refund, 2) }}
+                                (₹ {{ number_format($order->total_refund, 2) }})
                                 <br>
                                 {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d M Y') }}
                             </span>

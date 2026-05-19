@@ -64,6 +64,16 @@
                 <td>₹ {{ number_format($productOutAmount,2) }}</td>
             </tr>
 
+            <tr>
+                <td>Credit Amount</td>
+                <td>₹ {{ number_format($credit_amount, 2) }}</td>
+            </tr>
+
+            <tr>
+                <td>Discount Amount</td>
+                <td>₹ {{ number_format($orders->sum('order_discount'), 2) }}</td>
+            </tr>
+
         </table>
 
 
@@ -103,6 +113,12 @@
                         @foreach($order->payments as $pay)
                             {{ $pay->payment->name ?? '-' }} (₹{{ number_format($pay->amount,2) }})<br>
                         @endforeach
+                        @if($order->order_discount != 0)
+                            <span class="badge bg-primary">
+                                Discount 
+                                (₹ {{ number_format($order->order_discount, 2) }})
+                            </span><br>
+                        @endif
                         @if($order->is_refunded)
                             <span class="badge bg-primary">
                                 Refund 

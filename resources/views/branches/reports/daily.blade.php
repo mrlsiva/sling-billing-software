@@ -97,6 +97,17 @@
                             </div>
                         </a>
                     </div>
+
+                    <div class="col-md-3">
+
+                        <div class="card border shadow-sm">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Discount Amount</h6>
+                                <h4 class="text-warning">₹ {{ number_format($orders->sum('order_discount'), 2) }} </h4>
+                            </div>
+                        </div>
+
+                    </div>
                     
 
 
@@ -150,6 +161,12 @@
                                             ₹ {{ number_format($payment->amount, 2) }}
                                         </span><br>
                                     @endforeach
+                                    @if($order->order_discount != 0)
+                                        <span class="badge bg-primary">
+                                            Discount 
+                                            ₹ {{ number_format($order->order_discount, 2) }}
+                                        </span><br>
+                                    @endif
                                     @if($order->is_refunded)
                                         <span class="badge bg-primary">
                                             Refund 

@@ -303,6 +303,8 @@ class dailyReportsController extends Controller
         |----------------------------------------
         */
 
+        $credit_amount = 0;
+
         if ($branch == 0) {
 
             $purchases = PurchaseOrder::where('shop_id', Auth::user()->owner_id)
@@ -324,6 +326,10 @@ class dailyReportsController extends Controller
                 ])
                 ->whereDate('refund_on', $date)
                 ->get();
+
+            //Credit 
+            $order_id = Order::where('shop_id', Auth::user()->owner_id)->where('branch_id', null)->whereDate('billed_on', $date)->pluck('id');
+            $credit_amount = OrderPaymentDetail::whereIn('order_id',$order_id)->where('payment_id', 6)->sum('amount');
         }
 
         return Excel::download(
@@ -338,7 +344,8 @@ class dailyReportsController extends Controller
                 $productOutAmount,
                 $paymentSummary,
                 $totalSales,
-                $date
+                $date,
+                $credit_amount
             ),
             'daily_report_' . now()->format('d-m-Y_h-i A') . '.xlsx'
         );
@@ -446,6 +453,8 @@ class dailyReportsController extends Controller
         |----------------------------------------
         */
 
+        $credit_amount = 0;
+
         if ($branch == 0) {
 
             $purchases = PurchaseOrder::where('shop_id', Auth::user()->owner_id)
@@ -473,6 +482,10 @@ class dailyReportsController extends Controller
             $totalRefund = $refunds->sum('refund_amount');
 
             $profit = $totalSales - $totalPurchase + $totalRefund;
+
+            //Credit 
+            $order_id = Order::where('shop_id', Auth::user()->owner_id)->where('branch_id', null)->whereDate('billed_on', $date)->pluck('id');
+            $credit_amount = OrderPaymentDetail::whereIn('order_id',$order_id)->where('payment_id', 6)->sum('amount');
         }
 
         $user = Auth::user();
@@ -493,7 +506,8 @@ class dailyReportsController extends Controller
             'productOut',
             'productInAmount',
             'productOutAmount',
-            'date'
+            'date',
+            'credit_amount'
         ))->setPaper('a4','landscape');
 
         return $pdf->download('daily_report_' . now()->format('d-m-Y_h-i A') . '.pdf');

@@ -155,6 +155,10 @@ class dailyReportController extends Controller
         $productInAmount = $productIn->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
         $productOutAmount = $productOut->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
 
+        //Credit 
+        $order_id = Order::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('billed_on', $date)->pluck('id');
+        $credit_amount = OrderPaymentDetail::whereIn('order_id',$order_id)->where('payment_id', 6)->sum('amount');
+
         return Excel::download(
             new BranchDailyReportExport(
                 $orders,
@@ -163,7 +167,8 @@ class dailyReportController extends Controller
                 $productInAmount,
                 $productOutAmount,
                 $totalSales,
-                $date
+                $date,
+                $credit_amount
 
             ),
             'daily_report_' . now()->format('d-m-Y_h-i A') . '.xlsx'
@@ -211,6 +216,10 @@ class dailyReportController extends Controller
         $productInAmount = $productIn->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
         $productOutAmount = $productOut->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
 
+        //Credit 
+        $order_id = Order::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('billed_on', $date)->pluck('id');
+        $credit_amount = OrderPaymentDetail::whereIn('order_id',$order_id)->where('payment_id', 6)->sum('amount');
+
         $pdf = Pdf::loadView('branches.exports.daily_report_pdf', compact(
             'orders',
             'totalSales',
@@ -218,7 +227,7 @@ class dailyReportController extends Controller
             'productOut',
             'productInAmount',
             'productOutAmount',
-            'date'
+            'date','credit_amount'
         ))->setPaper('a4','landscape');
 
         return $pdf->download('daily_report_' . now()->format('d-m-Y_h-i A') . '.pdf');
