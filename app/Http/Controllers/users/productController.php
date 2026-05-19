@@ -660,20 +660,21 @@ class productController extends Controller
 
     public function download(Request $request)
     {
-        $products = Product::with(['category', 'sub_category', 'metric', 'tax'])
+        ini_set('memory_limit', '256M');
+
+        $query = Product::with(['category', 'sub_category', 'metric', 'tax'])
             ->where('user_id', Auth::user()->owner_id)
-            ->when($request->product, function ($query) use ($request) {
+            ->when($request->product, function ($q) use ($request) {
                 $search = $request->product;
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%")
-                      ->orWhere('hsn_code', 'like', "%{$search}%");
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%")
+                       ->orWhere('code', 'like', "%{$search}%")
+                       ->orWhere('hsn_code', 'like', "%{$search}%");
                 });
             })
-            ->orderBy('id', 'desc')
-            ->get();
+            ->orderBy('id', 'desc');
 
-        return Excel::download(new ProductExport($products), 'Products_' . now()->format('d-m-Y_h-i A') . '.xlsx'); // ✅ pass $products
+        return Excel::download(new ProductExport($query), 'Products_' . now()->format('d-m-Y_h-i_A') . '.xlsx');
     }
 
     public function detail(Request $request, $company, Product $product)
