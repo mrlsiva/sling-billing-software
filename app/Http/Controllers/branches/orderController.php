@@ -122,9 +122,11 @@ class orderController extends Controller
                     ['colour_id', $detail->colour_id],
                 ])->first();
 
-                $stock_variation->update([
-                    'quantity'      => $stock_variation->quantity + $qty,
-                ]);
+                if ($stock_variation) {
+                    $stock_variation->update([
+                        'quantity' => $stock_variation->quantity + $qty,
+                    ]);
+                }
 
             }
         }
