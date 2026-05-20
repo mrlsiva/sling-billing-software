@@ -113,6 +113,7 @@
 
             	</div>
 
+                @if(!$orders->isEmpty())
             	<h5 class="mt-4">Order Report</h5>
 
             	<div class="table-responsive">
@@ -187,7 +188,9 @@
             		  @include('no-data')
             		@endif
             	</div>
+                @endif
 
+                @if(!$productIn->isEmpty())
                 <h5 class="mt-4">Product In</h5>
 
                 <div class="table-responsive">
@@ -219,7 +222,9 @@
                         @include('no-data')
                     @endif
                 </div>
+                @endif
 
+                @if(!$productOut->isEmpty())
                 <h5 class="mt-4">Product Out</h5>
 
                 <div class="table-responsive">
@@ -251,6 +256,7 @@
                         @include('no-data')
                     @endif
                 </div>
+                @endif
 
             </div>
         </div>

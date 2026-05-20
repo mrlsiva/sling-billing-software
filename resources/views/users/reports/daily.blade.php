@@ -165,8 +165,8 @@
 
 						@if(request()->route('branch') == 0)
 
+							@if(!$purchases->isEmpty())
 	                        <h5 class="mt-4">Purchase Report</h5>
-
 	                        <div class="table-responsive">
 								<table class="table table-bordered">
 
@@ -211,7 +211,9 @@
 		                            @include('no-data')
 		                        @endif
 		                    </div>
+		                    @endif
 
+		                    @if(!$payments->isEmpty())
 							<h5 class="mt-4">Vendor Payment Report</h5>
 
 							<div class="table-responsive">
@@ -267,7 +269,9 @@
 	                                @include('no-data')
 	                            @endif
 							</div>
+							@endif
 
+							@if(!$refunds->isEmpty())
 							<h5 class="mt-4">Purchase Refund Report</h5>
 
 							<div class="table-responsive">
@@ -319,9 +323,11 @@
 	                                @include('no-data')
 	                            @endif
 							</div>
+							@endif
 
 						@endif
 
+						@if(!$orders->isEmpty())
 						<h5 class="mt-4">Order Report</h5>
 
                         <div class="table-responsive">
@@ -397,7 +403,9 @@
                                 @include('no-data')
                             @endif
                         </div>
+                        @endif
 
+                        @if(!$productIn->isEmpty())
                         <h5 class="mt-4">Product In</h5>
 
 						<div class="table-responsive">
@@ -429,7 +437,9 @@
 						        @include('no-data')
 						    @endif
 						</div>
+						@endif
 
+						@if(!$productOut->isEmpty())
 						<h5 class="mt-4">Product Out</h5>
 
 						<div class="table-responsive">
@@ -461,6 +471,8 @@
 						        @include('no-data')
 						    @endif
 						</div>
+						@endif
+						
                     </div>
                 </div>
             </div>

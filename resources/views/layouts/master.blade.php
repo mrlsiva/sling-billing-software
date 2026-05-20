@@ -233,6 +233,15 @@
                             </a>
                         </li>
 
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('discount.index', ['company' => request()->route('company'),'branch' => 0])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-money-rupee-circle-line"></i>
+                                </span>
+                                <span class="nav-text"> Discount </span>
+                            </a>
+                        </li>
+
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/settings/*') ? 'active' : '' }}">
                             <a class="menu-link menu-arrow" href="#sidebarSetting" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSetting">
                                 <span class="nav-icon">
@@ -381,6 +390,15 @@
                                     <i class="ri-money-rupee-circle-line"></i>
                                 </span>
                                 <span class="nav-text"> Credit </span>
+                            </a>
+                        </li>
+
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{route('branch.discount.index', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-money-rupee-circle-line"></i>
+                                </span>
+                                <span class="nav-text"> Discount </span>
                             </a>
                         </li>
 

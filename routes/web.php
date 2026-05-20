@@ -39,6 +39,7 @@ use App\Http\Controllers\users\purchaseReportController;
 use App\Http\Controllers\users\productTransferReportController;
 use App\Http\Controllers\users\salesReportController;
 use App\Http\Controllers\users\creditsController;
+use App\Http\Controllers\users\discountController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -56,6 +57,7 @@ use App\Http\Controllers\branches\bulkExcelController;
 use App\Http\Controllers\branches\productTransferReportsController;
 use App\Http\Controllers\branches\salesReportsController;
 use App\Http\Controllers\branches\creditController;
+use App\Http\Controllers\branches\orderDiscountController;
 use App\Http\Controllers\DemoRequestController;
 
 Route::get('/clear', function() {
@@ -385,6 +387,13 @@ else
                         });
                     });
 
+                    Route::prefix('discounts')->group(function () {
+                        Route::name('discount')->group(function () {
+
+                             Route::get('/{branch}/index',[discountController::class, 'index'])->name('.index');
+                        });
+                    });
+
                     Route::prefix('reports')->group(function () {
                         Route::name('report')->group(function () {
 
@@ -606,6 +615,13 @@ else
                             Route::get('/credits/{date}',[creditController::class, 'credit'])->name('credit');
                             Route::get('/credits/payments/{id}', [creditController::class, 'getCreditPayments']);
                             Route::post('/credits/payments/store', [creditController::class, 'store']);
+
+                            Route::prefix('discounts')->group(function () {
+                                Route::name('discount')->group(function () {
+
+                                     Route::get('/index',[orderdiscountController::class, 'index'])->name('.index');
+                                });
+                            });
 
 
                             
