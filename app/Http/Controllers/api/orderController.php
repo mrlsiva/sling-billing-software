@@ -25,7 +25,7 @@ class orderController extends Controller
 
             if($branch == 0)
             {
-                $orders = Order::where('shop_id',Auth::user()->owner_id)
+                $orders = Order::with('branch')->where('shop_id',Auth::user()->owner_id)
                 ->when(request('order'), function ($query) {
                     $search = request('order');
                     $query->where(function ($q) use ($search) {
@@ -48,7 +48,7 @@ class orderController extends Controller
             }
             else
             {
-                $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->owner_id]])
+                $orders = Order::with('branch')->where([['branch_id',$branch],['shop_id',Auth::user()->owner_id]])
                 ->when(request('order'), function ($query) {
                     $search = request('order');
                     $query->where(function ($q) use ($search) {

@@ -40,7 +40,7 @@ class inventoryController extends Controller
         $query->when($request->product, function ($q) use ($request) {
             $search = $request->product;
             $q->where(function ($q2) use ($search) {
-                $q2->whereHas('product', fn($q3) => $q3->where('name', 'like', "%{$search}%"))
+                $q2->whereHas('product', fn($q3) => $q3->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
                    ->orWhereHas('product.category', fn($q3) => $q3->where('name', 'like', "%{$search}%"))
                    ->orWhereHas('product.sub_category', fn($q3) => $q3->where('name', 'like', "%{$search}%"));
             });
@@ -143,7 +143,7 @@ class inventoryController extends Controller
             return $this->errorResponse([], 404, 'Transfer not found.');
         }
 
-        $transfer_products = ProductHistory::where([
+        $transfer_products = ProductHistory::with('product')->where([
             ['shop_id', Auth::user()->owner_id],
             ['invoice', $transfer_detail->invoice],
         ])->get();
