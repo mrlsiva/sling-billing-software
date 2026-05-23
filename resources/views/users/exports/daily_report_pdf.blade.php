@@ -78,100 +78,106 @@
         </table>
 
          @if(request()->route('branch') == 0)
-        <table>
 
-            <tr class="section">
-                <th colspan="7">Purchase Report</th>
-            </tr>
+            @if(!$purchases->isEmpty())
+            <table>
 
-            <tr>
-                <th>S.No</th>
-                <th>Vendor</th>
-                <th>Invoice No</th>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Amount (In ₹)</th>
-                <th>Date</th>
-            </tr>
+                <tr class="section">
+                    <th colspan="7">Purchase Report</th>
+                </tr>
 
-            @foreach($purchases as $purchase)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $purchase->vendor->name }}</td>
-                <td>{{ $purchase->invoice_no }}</td>
-                <td>{{ $purchase->product->name }}</td>
-                <td>{{ $purchase->quantity }}</td>
-                <td>{{ $purchase->gross_cost }}</td>
-                <td>{{ \Carbon\Carbon::parse($purchase->invoice_date)->format('d M Y') }}</td>
-            </tr>
-            @endforeach
+                <tr>
+                    <th>S.No</th>
+                    <th>Vendor</th>
+                    <th>Invoice No</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Amount (In ₹)</th>
+                    <th>Date</th>
+                </tr>
 
-        </table>
+                @foreach($purchases as $purchase)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $purchase->vendor->name }}</td>
+                    <td>{{ $purchase->invoice_no }}</td>
+                    <td>{{ $purchase->product->name }}</td>
+                    <td>{{ $purchase->quantity }}</td>
+                    <td>{{ $purchase->gross_cost }}</td>
+                    <td>{{ \Carbon\Carbon::parse($purchase->invoice_date)->format('d M Y') }}</td>
+                </tr>
+                @endforeach
 
+            </table>
+            @endif
 
-        <table>
+            @if(!$payments->isEmpty())
+            <table>
 
-            <tr class="section">
-                <th colspan="6">Vendor Payment Report</th>
-            </tr>
+                <tr class="section">
+                    <th colspan="6">Vendor Payment Report</th>
+                </tr>
 
-            <tr>
-                <th>S.No</th>
-                <th>Vendor</th>
-                <th>Purchase Invoice</th>
-                <th>Amount (In ₹)</th>
-                <th>Paid On</th>
-                <th>Comment</th>
-            </tr>
+                <tr>
+                    <th>S.No</th>
+                    <th>Vendor</th>
+                    <th>Purchase Invoice</th>
+                    <th>Amount (In ₹)</th>
+                    <th>Paid On</th>
+                    <th>Comment</th>
+                </tr>
 
-            @foreach($payments as $payment)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $payment->purchaseOrder->vendor->name ?? '-' }}</td>
-                <td>{{ $payment->purchaseOrder->invoice_no ?? '-' }}</td>
-                <td>{{ number_format($payment->amount,2) }}</td>
-                <td>{{ \Carbon\Carbon::parse($payment->paid_on)->format('d M Y') }}</td>
-                <td>{{ $payment->comment ?? '-' }}</td>
-            </tr>
-            @endforeach
+                @foreach($payments as $payment)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $payment->purchaseOrder->vendor->name ?? '-' }}</td>
+                    <td>{{ $payment->purchaseOrder->invoice_no ?? '-' }}</td>
+                    <td>{{ number_format($payment->amount,2) }}</td>
+                    <td>{{ \Carbon\Carbon::parse($payment->paid_on)->format('d M Y') }}</td>
+                    <td>{{ $payment->comment ?? '-' }}</td>
+                </tr>
+                @endforeach
 
-        </table>
+            </table>
+            @endif
 
+            @if(!$refunds->isEmpty())
+            <table>
 
-        <table>
+                <tr class="section">
+                    <th colspan="8">Purchase Refund Report</th>
+                </tr>
 
-            <tr class="section">
-                <th colspan="8">Purchase Refund Report</th>
-            </tr>
+                <tr>
+                    <th>S.No</th>
+                    <th>Vendor</th>
+                    <th>Invoice</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Refund Amount (In ₹)</th>
+                    <th>Refund On</th>
+                    <th>Refunded By</th>
+                </tr>
 
-            <tr>
-                <th>S.No</th>
-                <th>Vendor</th>
-                <th>Invoice</th>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Refund Amount (In ₹)</th>
-                <th>Refund On</th>
-                <th>Refunded By</th>
-            </tr>
+                @foreach($refunds as $refund)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $refund->vendor->name }}</td>
+                    <td>{{ $refund->purchase_order->invoice_no }}</td>
+                    <td>{{ $refund->purchase_order->product->name }}</td>
+                    <td>{{ $refund->quantity }}</td>
+                    <td>{{ number_format($refund->refund_amount,2) }}</td>
+                    <td>{{ \Carbon\Carbon::parse($refund->refund_on)->format('d M Y') }}</td>
+                    <td>{{ $refund->refundedBy->name }}</td>
+                </tr>
+                @endforeach
 
-            @foreach($refunds as $refund)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $refund->vendor->name }}</td>
-                <td>{{ $refund->purchase_order->invoice_no }}</td>
-                <td>{{ $refund->purchase_order->product->name }}</td>
-                <td>{{ $refund->quantity }}</td>
-                <td>{{ number_format($refund->refund_amount,2) }}</td>
-                <td>{{ \Carbon\Carbon::parse($refund->refund_on)->format('d M Y') }}</td>
-                <td>{{ $refund->refundedBy->name }}</td>
-            </tr>
-            @endforeach
+            </table>
+            @endif
 
-        </table>
         @endif
 
-
+        @if(!$orders->isEmpty())
         <table>
 
             <tr class="section">
@@ -235,8 +241,9 @@
             @endforeach
 
         </table>
+        @endif
 
-
+        @if(!$productIn->isEmpty())
         <table>
             <tr class="section">
                 <th colspan="4">Product IN</th>
@@ -267,7 +274,9 @@
                 <td><b>₹ {{ number_format($productInAmount,2) }}</b></td>
             </tr>
         </table>
+        @endif
 
+        @if(!$productOut->isEmpty())
         <table>
             <tr class="section">
                 <th colspan="4">Product OUT</th>
@@ -298,6 +307,7 @@
                 <td><b>₹ {{ number_format($productOutAmount,2) }}</b></td>
             </tr>
         </table>
+        @endif
 
 
     </body>

@@ -52,6 +52,8 @@
 <br><br>
 
 @if(request()->route('branch') == 0)
+
+@if(!$purchases->isEmpty())
 <table>
     <thead>
         <tr>
@@ -86,8 +88,9 @@
 
 
 <br><br>
+@endif
 
-
+@if(!$payments->isEmpty())
 <table>
     <thead>
         <tr>
@@ -120,8 +123,9 @@
 
 
 <br><br>
+@endif
 
-
+@if(!$refunds->isEmpty())
 <table>
     <thead>
         <tr>
@@ -158,9 +162,11 @@
 
 
 <br><br>
+@endif
 
 @endif
 
+@if(!$productIn->isEmpty())
 <h5>Product IN</h5>
 <table class="table table-bordered">
     <thead>
@@ -186,7 +192,9 @@
         @endforeach
     </tbody>
 </table>
+@endif
 
+@if(!$productOut->isEmpty())
 <h5>Product OUT</h5>
 <table class="table table-bordered">
     <thead>
@@ -212,7 +220,9 @@
         @endforeach
     </tbody>
 </table>
+@endif
 
+@if(!$orders->isEmpty())
 <table>
     <thead>
         <tr>
@@ -275,3 +285,4 @@
         @endforeach
     </tbody>
 </table>
+@endif

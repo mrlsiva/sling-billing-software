@@ -76,7 +76,7 @@
 
         </table>
 
-
+        @if(!$orders->isEmpty())
         <table>
 
             <tr class="section">
@@ -136,7 +136,9 @@
             @endforeach
 
         </table>
+        @endif
 
+        @if(!$productIn->isEmpty())
         <h5>Product IN</h5>
         <table>
             <tr>
@@ -164,7 +166,9 @@
                 <td><b>{{ $productInAmount }}</b></td>
             </tr>
         </table>
+        @endif
 
+        @if(!$productOut->isEmpty())
         <h5>Product OUT</h5>
         <table>
             <tr>
@@ -192,6 +196,7 @@
                 <td><b>{{ $productOutAmount }}</b></td>
             </tr>
         </table>
+        @endif
 
     </body>
 </html>
