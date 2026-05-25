@@ -30,6 +30,7 @@ class AdminSeeder extends Seeder
                 'is_active' => 1,
                 'is_lock' => 0,
                 'is_delete' => 0,
+                'able_to_login' => 1,
             ]);
 
             $user->update([

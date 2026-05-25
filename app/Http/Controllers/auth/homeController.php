@@ -190,18 +190,18 @@ class homeController extends Controller
         DB::commit();
 
         //Email
-        // $emailsetting = EmailTemplate::where([['id',1],['is_active',1]])->first(); 
-        // if($emailsetting)
-        // {
-            //$email_template = $emailsetting->template;
+        $emailsetting = EmailTemplate::where([['id',1],['is_active',1]])->first(); 
+        if($emailsetting)
+        {
+            $email_template = $emailsetting->template;
             $route =  preg_replace('#^(http(s)?://)?w{3}\.#', '$1', URL::to('')).'/'.$name;
-            //$emailContentReplace=['##name##'=>$name, '##user_name##'=>$name, '##route##'=>$route, '##password##'=>$request->password];
-            $txt = "HAI";
+            $emailContentReplace=['##name##'=>$name, '##user_name##'=>$name, '##route##'=>$route, '##password##'=>$request->password];
+            $txt = strtr($email_template,$emailContentReplace);
             $emailId = $request->email;
-            $cc ="hai@yopmail.com";
-            $subject = "Test";
+            $subject = $emailsetting->subject;
+            $cc = $emailsetting->cc_to;
             $mailstatus = SMTPController::sendMail($emailId,$cc,$subject,$txt,null);
-        //}
+        }
 
         return redirect()->back()->with('success_alert', 'Registered successfully. Please check your email for further details.');
     }

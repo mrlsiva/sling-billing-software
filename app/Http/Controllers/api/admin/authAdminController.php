@@ -40,6 +40,10 @@ class authAdminController extends Controller
             return $this->errorResponse([], 400, 'This account has been deleted.');
         }
 
+        if ($user->able_to_login == 0) {
+            return $this->errorResponse([], 400, 'No access to login.');
+        }
+
         $token = $user->createToken('adminToken')->plainTextToken;
 
         return $this->successResponse([

@@ -26,6 +26,14 @@ class loginController extends Controller
 
         if (Auth::attempt(['user_name' => $request->user_name, 'password' => $request->password, 'slug_name' => $request->slug_name]))
         {
+
+            //Login Check
+            $user = User::where([['id',auth()->user()->id],['able_to_login',0]])->first();
+            if($user)
+            {
+                return redirect()->back()->with('error_alert', 'No access to login.');    
+            }
+
             //Active/Inactive
             $user = User::where([['id',auth()->user()->id],['is_active',0]])->first();
             if($user)

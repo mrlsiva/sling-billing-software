@@ -50,6 +50,10 @@ class authController extends Controller
             {
                 return $this->errorResponse("This account has been deleted.",400,"Failed to Login");
             }
+            elseif($user->able_to_login == 0)
+            {
+                return $this->errorResponse("No access to login.",400,"Failed to Login");
+            }
             else
             {
                 $user->auth_token = $user->createToken('authToken')->plainTextToken;

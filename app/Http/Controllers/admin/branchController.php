@@ -153,6 +153,7 @@ class branchController extends Controller
             'is_active' => 1,
             'is_lock' => 0,
             'is_delete' => 0,
+            'able_to_login' => $request->has('able_to_login') ? 1 : 0,
         ]);
 
         $user->update([
@@ -395,6 +396,7 @@ class branchController extends Controller
             'user_name' => $request->user_name,
             'phone' => $request->phone,
             'alt_phone' => $request->phone1,
+            'able_to_login' => $request->has('able_to_login') ? 1 : 0,
         ]);
 
         if ($request->hasFile('logo')) {

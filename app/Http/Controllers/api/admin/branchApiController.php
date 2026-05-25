@@ -89,6 +89,7 @@ class branchApiController extends Controller
             'is_lock'   => 0,
             'is_delete' => 0,
             'created_by'=> Auth::user()->id,
+            'able_to_login' => $request->has('able_to_login') ? 1 : 0,
         ]);
 
         // Logo — upload or inherit from parent shop
@@ -224,6 +225,7 @@ class branchApiController extends Controller
             'user_name' => $request->user_name,
             'phone'     => $request->phone,
             'alt_phone' => $request->phone1,
+            'able_to_login' => $request->has('able_to_login') ? 1 : 0,
         ]);
 
         if ($request->hasFile('logo')) {
