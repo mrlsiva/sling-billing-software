@@ -117,10 +117,7 @@
                                         <td>{{$stock->category->name}}</td>
                                         <td>{{$stock->sub_category->name}}</td>
                                         <td>
-                                            <a href="javascript:void(0)" class="text-decoration-none viewProductTimeline"
-                                                data-id="{{ $stock->product->id }}"
-                                                data-name="{{ $stock->product->name }}"
-                                                data-bs-toggle="modal" data-bs-target="#productTimelineModal">
+                                            <a href="{{ route('product.detail', ['company' => request()->route('company'), 'product' => $stock->product->id]) }}">
                                                 {{$stock->product->name}}
                                             </a>
                                         </td>

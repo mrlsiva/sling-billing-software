@@ -19,4 +19,9 @@ class RefundDetail extends Model
     {
         return $this->belongsTo(Colour::class);
     }
+
+    public function refund()
+    {
+        return $this->belongsTo(Refund::class);
+    }
 }

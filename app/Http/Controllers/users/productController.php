@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use App\Models\BulkUploadLog;
 use App\Models\SubCategory;
 use App\Models\OrderDetail;
+use App\Models\RefundDetail;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Metric;
@@ -679,98 +680,210 @@ class productController extends Controller
 
     public function detail(Request $request, $company, Product $product)
     {
+        $ledger = collect();
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUCT CREATED
+        |--------------------------------------------------------------------------
+        */
+
+        $ledger->push([
+            'date'          => $product->created_at,
+            'particulars'   => $product->name,
+            'voucher_type'  => 'Create',
+            'voucher_no'    => $product->code,
+
+            'in_qty'        => 0,
+            'in_value'      => 0,
+
+            'out_qty'       => 0,
+            'out_value'     => 0,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | PURCHASE ORDER (INWARD)
+        |--------------------------------------------------------------------------
+        */
+
         $purchaseOrders = PurchaseOrder::with('vendor')
             ->where('product_id', $product->id)
             ->get();
 
-        $transferHistories = ProductHistory::with(['transfer_from','transfer_to'])
-            ->where('product_id', $product->id)
-            ->get();
+        foreach ($purchaseOrders as $po) {
 
-        $orderDetails = OrderDetail::with('order.customer')
-            ->where('product_id', $product->id)
-            ->get();
+            $amount = $po->quantity * $po->purchase_price;
 
-        // ✅ Refund / Tracking
-        $trackings = PurchaseOrderRefund::with(['vendor','purchase_order'])
+            $ledger->push([
+                'date'          => $po->created_at,
+                'particulars'   => $po->vendor->name ?? '-',
+                'voucher_type'  => 'Purchase',
+                'voucher_no'    => $po->invoice_no,
+
+                'in_qty'        => $po->quantity,
+                'in_value'      => $amount,
+
+                'out_qty'       => 0,
+                'out_value'     => 0,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PURCHASE ORDER REFUND (OUTWARD)
+        |--------------------------------------------------------------------------
+        */
+
+        $purchaseRefunds = PurchaseOrderRefund::with([
+                'vendor',
+                'purchase_order'
+            ])
             ->whereHas('purchase_order', function ($q) use ($product) {
                 $q->where('product_id', $product->id);
             })
             ->get();
 
-        $timeline = collect();
+        foreach ($purchaseRefunds as $refund) {
 
-        // Product Created
-        $timeline->push([
-            'message' => 'Product created in the system',
-            'date'    => $product->created_at,
-            'type'    => 'Created',
-            'qty'     => null,
-            'amount'  => null
+            $ledger->push([
+                'date'          => $refund->refund_on ?? $refund->created_at,
+                'particulars'   => $refund->vendor->name ?? '-',
+                'voucher_type'  => 'Purchase Refund',
+                'voucher_no'    => $refund->purchase_order->invoice_no,
+
+                'in_qty'        => 0,
+                'in_value'      => 0,
+
+                'out_qty'       => $refund->quantity,
+                'out_value'     => $refund->refund_amount,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SALES ORDER (OUTWARD)
+        |--------------------------------------------------------------------------
+        */
+
+        $orderDetails = OrderDetail::with([
+                'order.customer'
+            ])
+            ->where('product_id', $product->id)
+            ->get();
+
+        foreach ($orderDetails as $detail) {
+
+            $amount = ($detail->price * $detail->quantity)
+                        + ($detail->tax_amount ?? 0);
+
+            $ledger->push([
+                'date'          => $detail->created_at,
+                'particulars'   => $detail->order->customer->name ?? 'Walk-in Customer',
+                'voucher_type'  => 'Sales',
+                'voucher_no'    => $detail->order->bill_id,
+
+                'in_qty'        => 0,
+                'in_value'      => 0,
+
+                'out_qty'       => $detail->quantity,
+                'out_value'     => $amount,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SALES REFUND (INWARD)
+        |--------------------------------------------------------------------------
+        */
+
+        $refundDetails = RefundDetail::with([
+                'refund.order.customer'
+            ])
+            ->where('product_id', $product->id)
+            ->get();
+
+        foreach ($refundDetails as $refundDetail) {
+
+            $refund = $refundDetail->refund;
+
+            $amount = ($refundDetail->price * $refundDetail->quantity)
+                        + ($refundDetail->tax_amount ?? 0);
+
+            $ledger->push([
+                'date'          => $refund->refund_on ?? $refund->created_at,
+                'particulars'   => $refund->order->customer->name ?? 'Walk-in Customer',
+                'voucher_type'  => 'Sales Refund',
+                'voucher_no'    => $refund->order->bill_id,
+
+                'in_qty'        => $refundDetail->quantity,
+                'in_value'      => $amount,
+
+                'out_qty'       => 0,
+                'out_value'     => 0,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SORT ASCENDING
+        |--------------------------------------------------------------------------
+        */
+
+        $ledger = $ledger->sortBy('date')->values();
+
+        /*
+        |--------------------------------------------------------------------------
+        | RUNNING BALANCE
+        |--------------------------------------------------------------------------
+        */
+
+        $closingQty   = 0;
+        $closingValue = 0;
+
+        $ledger = $ledger->map(function ($row) use (&$closingQty, &$closingValue) {
+
+            $closingQty += $row['in_qty'];
+            $closingQty -= $row['out_qty'];
+
+            $closingValue += $row['in_value'];
+            $closingValue -= $row['out_value'];
+
+            $row['closing_qty']   = $closingQty;
+            $row['closing_value'] = $closingValue;
+
+            return $row;
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | DESC ORDER FOR DISPLAY
+        |--------------------------------------------------------------------------
+        */
+
+        $ledger = $ledger->sortByDesc('date')->values();
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTALS
+        |--------------------------------------------------------------------------
+        */
+
+        $totals = [
+            'total_in_qty'      => $ledger->sum('in_qty'),
+            'total_in_value'    => $ledger->sum('in_value'),
+
+            'total_out_qty'     => $ledger->sum('out_qty'),
+            'total_out_value'   => $ledger->sum('out_value'),
+
+            'closing_qty'       => $closingQty,
+            'closing_value'     => $closingValue,
+        ];
+
+        return view('users.products.detail', [
+            'product' => $product,
+            'ledger'  => $ledger,
+            'totals'  => $totals,
         ]);
-
-        // Stock In
-        foreach ($purchaseOrders as $po) {
-            $timeline->push([
-                'message' => 'Purchased from ' . $po->vendor->name .
-                            ' (Invoice: ' . $po->invoice_no . ')',
-                'date' => $po->created_at,
-                'type' => 'Stock In',
-                'qty'  => $po->quantity,
-                'amount' => null
-            ]);
-        }
-
-        // Transfer
-        foreach ($transferHistories as $history) {
-            $timeline->push([
-                'message' => 'Transferred from ' . $history->transfer_from->name .
-                            ' to ' . $history->transfer_to->name,
-                'date' => $history->created_at,
-                'type' => 'Transfer',
-                'qty'  => $history->quantity,
-                'amount' => null
-            ]);
-        }
-
-        // Stock Out
-        foreach ($orderDetails as $orderDetail) {
-            $timeline->push([
-                'message' => 'Sold to ' . $orderDetail->order->customer->name .
-                            ' (Order No: ' . $orderDetail->order->bill_id . ')',
-                'date' => $orderDetail->created_at,
-                'type' => 'Stock Out',
-                'qty'  => $orderDetail->quantity,
-                'amount' => null
-            ]);
-        }
-
-        // Refund Tracking
-        foreach ($trackings as $tracking) {
-            $timeline->push([
-                'message' => 'Refund processed to vendor ' . $tracking->vendor->name .
-                            ($tracking->reason ? ' (Reason: ' . $tracking->reason . ')' : ''),
-                'date' => $tracking->refund_on ?? $tracking->created_at,
-                'type' => 'Refund',
-                'qty'  => $tracking->quantity,
-                'amount' => $tracking->refund_amount
-            ]);
-        }
-
-        $timeline = $timeline->sortByDesc('date')->values();
-
-        // Pagination
-        $page = $request->get('page', 1);
-        $perPage = 10;
-
-        $paginated = new LengthAwarePaginator(
-            $timeline->forPage($page, $perPage),
-            $timeline->count(),
-            $perPage,
-            $page,
-            ['path' => url()->current()]
-        );
-
-        return response()->json($paginated);
     }
 }
