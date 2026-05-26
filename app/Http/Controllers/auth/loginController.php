@@ -103,6 +103,34 @@ class loginController extends Controller
         
     }
 
+    public function change_password(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|min:6|max:20|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/',
+        ]);
+
+        $user = auth()->user();
+
+        if (!\Hash::check($request->current_password, $user->password)) {
+
+            return redirect()->back()->with('error_alert', 'Current password is incorrect.');
+        }
+
+        $user->update([
+            'password' => \Hash::make($request->password)
+        ]);
+
+        return redirect()->back()->with('toast_success', 'Password updated successfully.');
+    }
+
+    public function changePassword($password)
+{
+    $this->update([
+        'password' => Hash::make($password)
+    ]);
+}
+
     public function logout(Request $request)
     {
         

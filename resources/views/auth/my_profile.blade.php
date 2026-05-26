@@ -54,6 +54,75 @@
 
     </div>
 </div>
+
+<div class="row mb-3">
+    <div class="col-lg-12 d-flex justify-content-end">
+        <button type="button" class="btn btn-primary" id="showPasswordSection">
+            Change Password
+        </button>
+    </div>
+</div>
+
+@if(session('error_alert'))
+<div class="alert alert-danger">
+  <strong>Warning! </strong>{{ session('error_alert') }}<br>
+</div>
+@endif
+
+<div class="row mb-4" id="passwordSection" style="display: none;">
+    <div class="col-lg-12 mx-auto">
+        <div class="card border">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Change Password</h4>
+            </div>
+
+            <div class="card-body">
+
+                <form action="{{route('my_profile.change_password', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="mb-3">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" name="current_password"
+                            class="form-control @error('current_password') is-invalid @enderror">
+
+                        @error('current_password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="password"
+                            class="form-control @error('password') is-invalid @enderror">
+
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" name="password_confirmation"
+                            class="form-control">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            Update Password
+                        </button>
+
+                        <button type="button" class="btn btn-secondary" id="hidePasswordSectionBtn">
+                            Cancel
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-xl-4 col-lg-6">
         <div class="card">
@@ -258,4 +327,16 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+    $('#showPasswordSection').on('click', function () {
+        $('#passwordSection').slideDown();
+    });
+
+    $('#hidePasswordSection, #hidePasswordSectionBtn').on('click', function () {
+        $('#passwordSection').slideUp();
+    });
+</script>
 @endsection

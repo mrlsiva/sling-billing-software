@@ -106,6 +106,7 @@ else
             Route::group(['middleware' => ['auth']], function () {
 
                 Route::get('/my_profile',[loginController::class, 'my_profile'])->name('my_profile');
+                Route::post('/my_profile/change_password',[loginController::class, 'change_password'])->name('my_profile.change_password');
 
                 Route::get('/notifications',[notificationController::class, 'notification'])->name('notification');
                 
