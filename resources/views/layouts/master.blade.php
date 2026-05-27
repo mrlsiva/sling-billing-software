@@ -225,15 +225,6 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('credit.index', ['company' => request()->route('company')])}}">
-                                <span class="nav-icon">
-                                    <i class="ri-money-rupee-circle-line"></i>
-                                </span>
-                                <span class="nav-text"> Credit </span>
-                            </a>
-                        </li>
-
-                        <li class="menu-item">
                             <a class="menu-link" href="{{route('discount.index', ['company' => request()->route('company'),'branch' => 0])}}">
                                 <span class="nav-icon">
                                     <i class="ri-money-rupee-circle-line"></i>
@@ -385,15 +376,6 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('branch.credit.index', ['company' => request()->route('company')])}}">
-                                <span class="nav-icon">
-                                    <i class="ri-money-rupee-circle-line"></i>
-                                </span>
-                                <span class="nav-text"> Credit </span>
-                            </a>
-                        </li>
-
-                        <li class="menu-item">
                             <a class="menu-link" href="{{route('branch.discount.index', ['company' => request()->route('company')])}}">
                                 <span class="nav-icon">
                                     <i class="ri-money-rupee-circle-line"></i>
@@ -533,6 +515,11 @@
                                             <i class="bx bx-edit fs-18 align-middle me-2"></i><span class="align-middle">GST Bill</span>
                                         </a>
                                     @endif
+
+                                    <a class="dropdown-item" href="{{route('credit.index', ['company' => request()->route('company')])}}">
+                                        <i class="bx bx-rupee fs-18 align-middle me-2"></i><span class="align-middle">Credit</span>
+                                    </a>
+                                    
                                 @endif
                                 @if(Auth::user()->role_id == 3)
 
@@ -549,6 +536,11 @@
                                         <i class="bx bx-edit fs-18 align-middle me-2"></i><span class="align-middle">GST Bill</span>
                                     </a>
                                     @endif
+
+                                    <a class="dropdown-item" href="{{route('branch.credit.index', ['company' => request()->route('company')])}}">
+                                        <i class="bx bx-rupee fs-18 align-middle me-2"></i><span class="align-middle">Credit</span>
+                                    </a>
+
                                 @endif
                                 <!-- <a class="dropdown-item" href="#">
                                     <i class="bx bx-help-circle fs-18 align-middle me-2"></i><span class="align-middle">Help</span>

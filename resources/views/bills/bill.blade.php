@@ -108,9 +108,30 @@
         .bold   { font-weight: bold;  }
         .no-border { border: none !important; }
         .logo-img  { width: 240px; height: auto; }
+
+        /* ── Refund Watermark ── */
+        .refund-watermark {
+            position: fixed;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 90px;
+            font-weight: bold;
+            color: rgba(255, 0, 0, 0.10);
+            z-index: 9999;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
     </style>
 </head>
 <body>
+
+    @if($order->is_refunded == 1)
+        <div class="refund-watermark">
+            REFUNDED
+        </div>
+    @endif
 
 @php
     /* ── Number to Words (Indian system) ── */
