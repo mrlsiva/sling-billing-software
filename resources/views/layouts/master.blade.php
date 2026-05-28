@@ -85,6 +85,14 @@
                                 <span class="nav-text"> Shop </span>
                             </a>
                         </li>
+                        <li class="menu-item {{(request()->is('admin/error_logs*')) ? 'active':''}}">
+                            <a class="menu-link {{(request()->is('admin/error_logs*')) ? 'ative':''}}" href="{{route('admin.error_log.index')}}">
+                                <span class="nav-icon">
+                                    <i class="ri-bug-line"></i>
+                                </span>
+                                <span class="nav-text"> Error Log </span>
+                            </a>
+                        </li>
                         
                     </ul>
                 @endif

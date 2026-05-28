@@ -19,6 +19,7 @@ use App\Models\Payment;
 use App\Models\Finance;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\BillingAddress;
 use App\Models\OrderPaymentDetail;
 use App\Models\ShopPayment;
 use App\Models\PosSetting;
@@ -364,6 +365,21 @@ class billingController extends Controller
             'bill_amount'            => round($billAmount),
             'billed_on'              => now(),
         ]);
+
+        $billingData = $request->input('billing_customer');
+        if($billingData['billing_phone'] != null)
+        {
+            $billing_customer = BillingAddress::create(
+                [
+                    'user_id'  => $user->id,
+                    'order_id' => $order->id,
+                    'phone'    => $billingData['billing_phone'] ?? null,
+                    'name'     => $billingData['billing_name'],
+                    'address'   => $billingData['billing_address'],
+                    'pincode'   => $billingData['billing_pincode'] ?? null,
+                ]
+            );
+        }
 
         // ---------------------------------------
         // Order Details + Variation Save

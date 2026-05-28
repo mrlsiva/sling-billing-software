@@ -9,6 +9,7 @@ use App\Http\Controllers\admin\notificationsController;
 
 use App\Http\Controllers\admin\shopController;
 use App\Http\Controllers\admin\branchController;
+use App\Http\Controllers\admin\ErrorLogController;
 
 Route::get('/', function () {
 	return view('auth.login');
@@ -51,6 +52,16 @@ Route::group(['middleware' => ['auth','role:Super Admin']], function () {
 	    	Route::get('/{id}/delete',[branchController::class, 'delete'])->name('delete');
 
 	    });
+	});
+
+	Route::prefix('error_logs')->group(function () {
+
+		Route::name('error_log.')->group(function () {
+
+			Route::get('/',[ErrorLogController::class, 'index'])->name('index');
+
+		});
+
 	});
 
 	Route::get('/logout',[loginController::class, 'logout'])->name('logout');

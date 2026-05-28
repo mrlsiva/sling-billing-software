@@ -654,6 +654,106 @@ $(document).ready(function () {
     });
 });
 
+$('#phone').on('keyup', function () {
+
+    let phone = $(this).val();
+
+    if (phone.length == 10) {
+
+        $.ajax({
+            url: 'get_customer_detail',
+            type: 'GET',
+            dataType: 'json',
+            data: { phone: phone },
+
+            success: function (data) {
+
+                console.log(data);
+
+                if (data) {
+
+                    $("#customer").val(data.id);
+
+                    $("#alt_phone")
+                    .val(data.alt_phone)
+                    .prop('disabled', true);
+
+                    $("#name")
+                    .val(data.name)
+                    .prop('disabled', true);
+
+                    $("#address")
+                    .val(data.address)
+                    .prop('disabled', true);
+
+                    $("#pincode")
+                    .val(data.pincode)
+                    .prop('disabled', true);
+
+                    $('select[name="gender"]').empty();
+                    $('select[name="gender"]').append('<option value="">Select</option>');
+
+                    if (data.gender_id == 1) {
+
+                        $('select[name="gender"]').append('<option value="1" selected>Female</option>');
+                        $('select[name="gender"]').append('<option value="2">Male</option>');
+
+                    } else if (data.gender_id == 2) {
+
+                        $('select[name="gender"]').append('<option value="1">Female</option>');
+                        $('select[name="gender"]').append('<option value="2" selected>Male</option>');
+                    }
+
+                    $('select[name="gender"]').prop('disabled', true);
+
+                    $("#dob")
+                    .val(data.dob)
+                    .prop('disabled', true);
+
+                    $("#gst")
+                    .val(data.gst)
+                    .prop('disabled', true);
+
+                }
+
+            },
+
+            error: function () {
+
+                $("#customer").val('');
+
+                $("#alt_phone")
+                .val('')
+                .prop('disabled', false);
+
+                $("#name")
+                .val('')
+                .prop('disabled', false);
+
+                $("#address")
+                .val('')
+                .prop('disabled', false);
+
+                $("#pincode")
+                .val('')
+                .prop('disabled', false);
+
+                $('select[name="gender"]').prop('disabled', false);
+
+                $("#dob")
+                .val('')
+                .prop('disabled', false);
+
+                $("#gst")
+                .val('')
+                .prop('disabled', false);
+            }
+        });
+
+    }
+
+});
+
 document.getElementById('next_tab_user_info').addEventListener('click', function (e) {
     e.preventDefault();
     let nextTab = document.querySelector('a[href="#messagesTabsJustified"]');
@@ -1406,6 +1506,11 @@ function submit() {
     let billed_by = $("#billed_by").val();
     let discount = parseFloat($('#discount').val()) || 0;
 
+    let billing_phone = $("#billing_phone").val().trim();
+    let billing_name = $("#billing_name").val().trim();
+    let billing_address = $("#billing_address").val().trim();
+    let billing_pincode = $("#billing_pincode").val().trim();
+
     // --- Customer validation ---
     if (!/^[0-9]{10}$/.test(phone)) {
 
@@ -1507,6 +1612,78 @@ function submit() {
         return;
     }
 
+    //Billing Validation
+
+    if (billing_phone != "") {
+
+        if (!/^[0-9]{10}$/.test(billing_phone)) {
+
+            const event = new CustomEvent("toast", {
+                detail: {
+                    text: "Please enter a valid 10-digit Billing Phone number.",
+                    gravity: "top",
+                    position: "right",
+                    className: "success",
+                    duration: 5000,
+                    close: true,
+                }
+            });
+
+            document.dispatchEvent(event);
+            return;
+        }
+
+        if (billing_name === "") {
+
+            const event = new CustomEvent("toast", {
+                detail: {
+                    text: "Billing Name is required.",
+                    gravity: "top",
+                    position: "right",
+                    className: "success",
+                    duration: 5000,
+                    close: true,
+                }
+            });
+
+            document.dispatchEvent(event);
+            return;
+        }
+
+        if (billing_address === "") {
+            const event = new CustomEvent("toast", {
+                detail: {
+                    text: "Billing Address is required.",
+                    gravity: "top",
+                    position: "right",
+                    className: "success",
+                    duration: 5000,
+                    close: true,
+                }
+            });
+
+            document.dispatchEvent(event);
+            return;
+        }
+
+    }
+
+    if (billed_by === "") {
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: "Billed by is required.",
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+        return;
+    }
+
     // Get payable and received amounts
     let payable = parseFloat($("#amount_text1").text().replace(/[^\d.-]/g, "")) || 0;
     let received = parseFloat($("#received_cash").text().replace(/[^\d.-]/g, "")) || 0;
@@ -1576,7 +1753,16 @@ function submit() {
 
     };
 
+    // collect billing info
+    let billing_customer = {
+        billing_phone: $("#billing_phone").val().trim(),
+        billing_name: $("#billing_name").val().trim(),
+        billing_address: $("#billing_address").val().trim(),
+        billing_pincode: $("#billing_pincode").val().trim(),
+    };
+
     console.log(customer);
+    console.log(billing_customer);
     console.log(cartData);
     console.log(paymentData);
 
@@ -1589,6 +1775,7 @@ function submit() {
             cart: cartData,
             payments: paymentData,
             customer: customer,
+            billing_customer: billing_customer,
             billed_by: billed_by,
             discount: discount
         },

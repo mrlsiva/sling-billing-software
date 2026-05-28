@@ -287,6 +287,10 @@
                 <table class="buyer-wrap">
                     <tr>
                         <td style="width:50%; border-left:1px solid #000; border-right:1px solid #000;">
+                            @php
+                                $billing_address = App\Models\BillingAddress::where('order_id',$order->id)->first();
+                            @endphp
+                            @if($billing_address == null)
                             <table class="inner">
                                 <tr>
                                     <td style="width:30%;"><strong>Buyer</strong></td>
@@ -307,6 +311,22 @@
                                 </tr>
                                 @endif
                             </table>
+                            @else
+                            <table class="inner">
+                                <tr>
+                                    <td style="width:30%;"><strong>Buyer</strong></td>
+                                    <td>: <strong>{{ strtoupper($billing_address->name) }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Address</strong></td>
+                                    <td>: {{ strtoupper($billing_address->address) }}@if($billing_address->pincode != null), {{ $billing_address->pincode }}@endif</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mobile</strong></td>
+                                    <td>: {{ $billing_address->phone }}</td>
+                                </tr>
+                            </table>
+                            @endif
                         </td>
                         <td style="width:50%; border-right:1px solid #000;">
                             <table class="inner">

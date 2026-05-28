@@ -1391,6 +1391,11 @@ function submit() {
     let billed_by = $("#billed_by").val();
     let discount = parseFloat($('#discount').val()) || 0;
 
+    let billing_phone = $("#billing_phone").val().trim();
+    let billing_name = $("#billing_name").val().trim();
+    let billing_address = $("#billing_address").val().trim();
+    let billing_pincode = $("#billing_pincode").val().trim();
+
     // --- Customer validation ---
     if (!/^[0-9]{10}$/.test(phone)) {
 
@@ -1479,6 +1484,62 @@ function submit() {
         document.dispatchEvent(event);
 
         return;
+    }
+
+    //Billing Validation
+
+    if (billing_phone != "") {
+
+        if (!/^[0-9]{10}$/.test(billing_phone)) {
+
+            const event = new CustomEvent("toast", {
+                detail: {
+                    text: "Please enter a valid 10-digit Billing Phone number.",
+                    gravity: "top",
+                    position: "right",
+                    className: "success",
+                    duration: 5000,
+                    close: true,
+                }
+            });
+
+            document.dispatchEvent(event);
+            return;
+        }
+
+        if (billing_name === "") {
+
+            const event = new CustomEvent("toast", {
+                detail: {
+                    text: "Billing Name is required.",
+                    gravity: "top",
+                    position: "right",
+                    className: "success",
+                    duration: 5000,
+                    close: true,
+                }
+            });
+
+            document.dispatchEvent(event);
+            return;
+        }
+
+        if (billing_address === "") {
+            const event = new CustomEvent("toast", {
+                detail: {
+                    text: "Billing Address is required.",
+                    gravity: "top",
+                    position: "right",
+                    className: "success",
+                    duration: 5000,
+                    close: true,
+                }
+            });
+
+            document.dispatchEvent(event);
+            return;
+        }
+
     }
 
     if (billed_by === "") {
@@ -1572,7 +1633,16 @@ function submit() {
 
     };
 
+    // collect billing info
+    let billing_customer = {
+        billing_phone: $("#billing_phone").val().trim(),
+        billing_name: $("#billing_name").val().trim(),
+        billing_address: $("#billing_address").val().trim(),
+        billing_pincode: $("#billing_pincode").val().trim(),
+    };
+
     console.log(customer);
+    console.log(billing_customer);
     console.log(cartData);
     console.log(paymentData);
 
@@ -1585,6 +1655,7 @@ function submit() {
             cart: cartData,
             payments: paymentData,
             customer: customer,
+            billing_customer: billing_customer,
             billed_by: billed_by,
             discount: discount
         },
