@@ -35,7 +35,13 @@
 										<td>
 											{{ ($error_reports->currentPage() - 1) * $error_reports->perPage() + $loop->iteration }}
 										</td>
-										<td>{{$error_report->user->name}}</td>
+										<td>
+											@if($error_report->user_id != null)
+												{{$error_report->user->name}}
+											@else
+												-
+											@endif
+										</td>
 										<td>{{$error_report->error}}</td>
 										<td>{{$error_report->code}}</td>
 										<td>{{$error_report->url}}</td>
