@@ -69,7 +69,14 @@
 </div>
 @endif
 
-<div class="row mb-4" id="passwordSection" style="display: none;">
+@if(session('toast_success'))
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong>Success! </strong>{{ session('toast_success') }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+
+<div class="row mb-4" id="passwordSection" style="{{ $errors->hasAny(['current_password', 'password']) ? '' : 'display: none;' }}">
     <div class="col-lg-12 mx-auto">
         <div class="card border">
             <div class="card-header d-flex justify-content-between align-items-center">
