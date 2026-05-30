@@ -27,6 +27,7 @@ use App\Models\Staff;
 use App\Models\Stock;
 use App\Models\Credit;
 use App\Models\User;
+use App\Models\BillingAddress;
 use App\Traits\Log;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -371,6 +372,19 @@ class branchBillingController extends Controller
             }
         }
 
+        $billingAddressData = $request->billing_address;
+        if ($billingAddressData) {
+            BillingAddress::create([
+                'user_id' => $user->parent_id,
+                'order_id' => $order->id,
+                'name'    => $billingAddressData['name'] ?? $customer->name,
+                'phone'   => $billingAddressData['phone'] ?? $customer->phone,
+                'address' => $billingAddressData['address'] ?? null,
+                'city'    => $billingAddressData['city'] ?? null,
+                'pincode' => $billingAddressData['pincode'] ?? null,
+            ]);
+        }
+
         $this->addToLog($this->unique(), Auth::id(), 'Order', 'App/Models/Order', 'orders', $order->id, 'Insert', null, null, 'Success', 'Order Created Successfully');
         $this->notification(Auth::user()->parent_id, null, 'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch ' . Auth::user()->name . ' placed one order for customer ' . $customer->name . ' with an amount of ' . $billAmount . '.', null, null, 14);
 
@@ -381,7 +395,7 @@ class branchBillingController extends Controller
 
     public function get_bill(Request $request, $id)
     {
-        $order                 = Order::with(['shop', 'branch', 'customer', 'billedBy'])->find($id);
+        $order                 = Order::with(['shop', 'branch', 'customer', 'billedBy', 'billingAddress'])->find($id);
         $order_details         = OrderDetail::where('order_id', $id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id', $id)->get();
 

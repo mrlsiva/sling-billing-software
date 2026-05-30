@@ -11,6 +11,7 @@ use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\BillSetup;
+use App\Models\UserDetail;
 use App\Models\User;
 use App\Traits\Log;
 use DB;
@@ -96,5 +97,47 @@ class billController extends Controller
 
             return $this->successResponse($bill, 200, 'Bill setup done successfully');
         }
+    }
+
+    public function set_bank_status(Request $request)
+    {
+        if (Auth::user()->role_id !== 2) {
+            return $this->errorResponse([], 403, 'Only HO accounts can update this setting.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+        ], [
+            'user_id.required' => 'User ID is required.',
+            'user_id.exists'   => 'User not found.',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationFailed($validator->errors(), 'Validation failed.');
+        }
+
+        $detail = UserDetail::where('user_id', $request->user_id)->first();
+
+        if (!$detail) {
+            return $this->errorResponse([], 404, 'User detail not found.');
+        }
+
+        $detail->show_bank_detail = $detail->show_bank_detail == 1 ? 0 : 1;
+        $detail->save();
+
+        $statusText = $detail->show_bank_detail == 1
+            ? 'Bank detail display enabled in bill'
+            : 'Bank detail display disabled in bill';
+
+        $this->addToLog($this->unique(), Auth::id(), 'Bank Detail Visibility Update', 'App/Models/UserDetail', 'user_details', $detail->id, 'Update', null, $request, 'Success', $statusText);
+
+        $targetUser = User::find($request->user_id);
+        $label = $targetUser->role_id == 2 ? 'HO ' : 'Branch ';
+        $this->notification(Auth::user()->owner_id, null, 'App/Models/UserDetail', $detail->id, null, json_encode($request->all()), now(), Auth::id(), $statusText . ' for ' . $label . $targetUser->user_name, null, null, 11);
+
+        return $this->successResponse([
+            'user_id'          => $request->user_id,
+            'show_bank_detail' => (bool) $detail->show_bank_detail,
+        ], 200, $statusText);
     }
 }

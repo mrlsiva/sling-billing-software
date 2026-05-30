@@ -67,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	//Bill Setting
 	Route::get('/bills/{branch}/list', 'App\Http\Controllers\api\billController@list');
 	Route::post('/bills/store', 'App\Http\Controllers\api\billController@store');
+	Route::post('/bills/set_bank_status', 'App\Http\Controllers\api\billController@set_bank_status');
 
 
 	//POS
@@ -87,6 +88,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	//Order
 	Route::get('/orders', 'App\Http\Controllers\api\orderController@order');
 	Route::get('/orders/{order}/view', 'App\Http\Controllers\api\orderController@view');
+
+	//Billing Address
+	Route::get('/billing_address/{order_id}/view', 'App\Http\Controllers\api\billingAddressController@view');
+	Route::post('/billing_address/store', 'App\Http\Controllers\api\billingAddressController@store');
+	Route::post('/billing_address/update', 'App\Http\Controllers\api\billingAddressController@update');
 
 	//Vendor
 	Route::get('/vendors/list', 'App\Http\Controllers\api\vendorController@list');
@@ -214,6 +220,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	//Profile
 	Route::get('/profile', 'App\Http\Controllers\api\profileController@my_profile');
+	Route::post('/profile/change_password', 'App\Http\Controllers\api\profileController@change_password');
+	Route::get('/profile/settings', 'App\Http\Controllers\api\profileController@settings');
+	Route::post('/profile/settings/update', 'App\Http\Controllers\api\profileController@update_settings');
 
 	//Notification
 	Route::get('notifications/{type?}', 'App\Http\Controllers\api\notificationController@notification');

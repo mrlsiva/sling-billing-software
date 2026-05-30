@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class BillingAddress extends Model
 {
     protected $fillable = [
-        'user_id','order_id','name','phone', 'address', 'pincode'
+        'user_id','order_id','name','phone', 'address', 'city', 'pincode'
     ];
 
     public function order()

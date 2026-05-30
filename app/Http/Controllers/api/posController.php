@@ -20,6 +20,7 @@ use App\Models\Payment;
 use App\Models\Stock;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\BillingAddress;
 use App\Traits\Log;
 use Carbon\Carbon;
 use DB;
@@ -306,7 +307,18 @@ class posController extends Controller
                 ]);
             }
 
-        
+            $billingAddressData = $request->input('billing_address');
+            if ($billingAddressData) {
+                BillingAddress::create([
+                    'user_id' => $user->id,
+                    'order_id' => $order->id,
+                    'name'    => $billingAddressData['name'] ?? $customer->name,
+                    'phone'   => $billingAddressData['phone'] ?? $customer->phone,
+                    'address' => $billingAddressData['address'] ?? null,
+                    'city'    => $billingAddressData['city'] ?? null,
+                    'pincode' => $billingAddressData['pincode'] ?? null,
+                ]);
+            }
 
             //Log
             $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
@@ -315,7 +327,7 @@ class posController extends Controller
             $this->notification(Auth::user()->owner_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null,14);
 
             DB::commit();
-        
+
             return $this->successResponse($order->id, 200, 'Order Placed Successfully');
         }
 
@@ -448,6 +460,19 @@ class posController extends Controller
                 ]);
             }
 
+            $billingAddressData = $request->input('billing_address');
+            if ($billingAddressData) {
+                BillingAddress::create([
+                    'user_id' => $user->parent_id,
+                    'order_id' => $order->id,
+                    'name'    => $billingAddressData['name'] ?? $customer->name,
+                    'phone'   => $billingAddressData['phone'] ?? $customer->phone,
+                    'address' => $billingAddressData['address'] ?? null,
+                    'city'    => $billingAddressData['city'] ?? null,
+                    'pincode' => $billingAddressData['pincode'] ?? null,
+                ]);
+            }
+
             //Log
             $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
 
@@ -455,7 +480,7 @@ class posController extends Controller
             $this->notification(Auth::user()->parent_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'Branch '.Auth::user()->name. ' placed one order for cutomer '.$customer->name,null, null,14);
 
             DB::commit();
-        
+
             return $this->successResponse($order->id, 200, 'Order Placed Successfully');
 
         }
@@ -464,7 +489,7 @@ class posController extends Controller
 
     public function get_bill(Request $request, $order_id)
     {
-        $order = Order::with(['customer', 'billedBy', 'shop', 'branch'])
+        $order = Order::with(['customer', 'billedBy', 'shop', 'branch', 'billingAddress'])
             ->find($order_id);
 
         if (!$order) {
