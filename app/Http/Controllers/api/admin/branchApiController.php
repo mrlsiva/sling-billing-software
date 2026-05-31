@@ -75,7 +75,12 @@ class branchApiController extends Controller
 
         DB::beginTransaction();
 
+        $lastUser = User::whereNotNull('unique_id')->orderBy('id', 'desc')->first();
+        $nextId   = $lastUser ? intval(substr($lastUser->unique_id, 2)) + 1 : 1;
+        $uniqueId = 'U-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
+
         $user = User::create([
+            'unique_id' => $uniqueId,
             'role_id'   => 3,
             'parent_id' => $ownerId,
             'name'      => Str::ucfirst($request->name),

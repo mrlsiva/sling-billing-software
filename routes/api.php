@@ -2,11 +2,24 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 Route::post('login', 'App\Http\Controllers\api\authController@login');
 
 // Admin Login (separate — does not require slug_name)
 Route::post('admin/login', 'App\Http\Controllers\api\admin\authAdminController@login');
+
+// Maintenance
+Route::get('clear', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('config:cache');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+    return response()->json(['success' => true, 'message' => 'Cache cleared successfully.']);
+});
+
+Route::get('version_update', 'App\Http\Controllers\versionController@api_update');
 
 Route::middleware('auth:sanctum')->group(function () {
 
