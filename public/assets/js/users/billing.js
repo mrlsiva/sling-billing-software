@@ -658,6 +658,42 @@ $('#phone').on('keyup', function () {
 
     let phone = $(this).val();
 
+    // If phone is cleared
+    if (phone.length === 0) {
+
+        $("#customer").val('');
+
+        $("#alt_phone")
+            .val('')
+            .prop('disabled', false);
+
+        $("#name")
+            .val('')
+            .prop('disabled', false);
+
+        $("#address")
+            .val('')
+            .prop('disabled', false);
+
+        $("#pincode")
+            .val('')
+            .prop('disabled', false);
+
+        $('select[name="gender"]')
+            .val('')
+            .prop('disabled', false);
+
+        $("#dob")
+            .val('')
+            .prop('disabled', false);
+
+        $("#gst")
+            .val('')
+            .prop('disabled', false);
+
+        return;
+    }
+
     if (phone.length == 10) {
 
         $.ajax({
@@ -668,38 +704,33 @@ $('#phone').on('keyup', function () {
 
             success: function (data) {
 
-                console.log(data);
-
                 if (data) {
 
                     $("#customer").val(data.id);
 
                     $("#alt_phone")
-                    .val(data.alt_phone)
-                    .prop('disabled', true);
+                        .val(data.alt_phone)
+                        .prop('disabled', true);
 
                     $("#name")
-                    .val(data.name)
-                    .prop('disabled', true);
+                        .val(data.name)
+                        .prop('disabled', true);
 
                     $("#address")
-                    .val(data.address)
-                    .prop('disabled', true);
+                        .val(data.address)
+                        .prop('disabled', true);
 
                     $("#pincode")
-                    .val(data.pincode)
-                    .prop('disabled', true);
+                        .val(data.pincode)
+                        .prop('disabled', true);
 
                     $('select[name="gender"]').empty();
                     $('select[name="gender"]').append('<option value="">Select</option>');
 
                     if (data.gender_id == 1) {
-
                         $('select[name="gender"]').append('<option value="1" selected>Female</option>');
                         $('select[name="gender"]').append('<option value="2">Male</option>');
-
                     } else if (data.gender_id == 2) {
-
                         $('select[name="gender"]').append('<option value="1">Female</option>');
                         $('select[name="gender"]').append('<option value="2" selected>Male</option>');
                     }
@@ -707,51 +738,29 @@ $('#phone').on('keyup', function () {
                     $('select[name="gender"]').prop('disabled', true);
 
                     $("#dob")
-                    .val(data.dob)
-                    .prop('disabled', true);
+                        .val(data.dob)
+                        .prop('disabled', true);
 
                     $("#gst")
-                    .val(data.gst)
-                    .prop('disabled', true);
-
+                        .val(data.gst)
+                        .prop('disabled', true);
                 }
-
             },
 
             error: function () {
 
                 $("#customer").val('');
 
-                $("#alt_phone")
-                .val('')
-                .prop('disabled', false);
-
-                $("#name")
-                .val('')
-                .prop('disabled', false);
-
-                $("#address")
-                .val('')
-                .prop('disabled', false);
-
-                $("#pincode")
-                .val('')
-                .prop('disabled', false);
-
-                $('select[name="gender"]').prop('disabled', false);
-
-                $("#dob")
-                .val('')
-                .prop('disabled', false);
-
-                $("#gst")
-                .val('')
-                .prop('disabled', false);
+                $("#alt_phone").val('').prop('disabled', false);
+                $("#name").val('').prop('disabled', false);
+                $("#address").val('').prop('disabled', false);
+                $("#pincode").val('').prop('disabled', false);
+                $('select[name="gender"]').val('').prop('disabled', false);
+                $("#dob").val('').prop('disabled', false);
+                $("#gst").val('').prop('disabled', false);
             }
         });
-
     }
-
 });
 
 document.getElementById('next_tab_user_info').addEventListener('click', function (e) {
