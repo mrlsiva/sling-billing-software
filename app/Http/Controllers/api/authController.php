@@ -63,7 +63,11 @@ class authController extends Controller
                     $user->branch = User::where([['parent_id',$user->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
                 }
 
-
+                if($user->role_id == 3)
+                {
+                    $hoDetail = \App\Models\UserDetail::where('user_id', $user->parent_id)->first();
+                    $user->is_bill_enabled = $hoDetail ? (bool) $hoDetail->is_bill_enabled : false;
+                }
 
                 return $this->successResponse($user, 200, 'Successfully Logged in');
             }

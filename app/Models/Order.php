@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\BillingAddress;
 
 class Order extends Model
 {
@@ -43,5 +44,10 @@ class Order extends Model
     public function refunds()
     {
         return $this->hasMany(Refund::class, 'order_id');
+    }
+
+    public function billingAddress()
+    {
+        return $this->hasOne(BillingAddress::class, 'order_id');
     }
 }

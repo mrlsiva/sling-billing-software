@@ -18,4 +18,19 @@ class versionController extends Controller
 
         return "Success";
     }
+
+    public function api_update(Request $request)
+    {
+        $version = Version::where('status', 1)->first();
+
+        if (!$version) {
+            return response()->json(['success' => false, 'message' => 'No active version found.'], 404);
+        }
+
+        $version->update([
+            'updated_at' => Carbon::now()
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Version updated successfully.', 'data' => $version]);
+    }
 }

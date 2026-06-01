@@ -790,12 +790,12 @@
                 const event = new CustomEvent("toast", {
                     detail: {
                         text: "{{ session('toast_success') }}",
-                        gravity: "top",      // top / bottom
-                        position: "right",   // left / center / right
-                        className: "success", // success, error, info, etc. depending on your toast lib
+                        gravity: "top",
+                        position: "right",
+                        className: "success",
                         duration: 10000,
-                        close: "close",
-                        style: "style"
+                        close: true,
+                        style: { background: "#28a745" }
                     }
                 });
                 document.dispatchEvent(event);
@@ -809,12 +809,12 @@
                 const event = new CustomEvent("toast", {
                     detail: {
                         text: "{{ session('toast_error') }}",
-                        gravity: "top",      // top / bottom
-                        position: "right",   // left / center / right
-                        className: "success", // success, error, info, etc. depending on your toast lib
+                        gravity: "top",
+                        position: "right",
+                        className: "error",
                         duration: 10000,
-                        close: "close",
-                        style: "style"
+                        close: true,
+                        style: { background: "#dc3545" }
                     }
                 });
                 document.dispatchEvent(event);

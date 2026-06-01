@@ -2,11 +2,24 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 Route::post('login', 'App\Http\Controllers\api\authController@login');
 
 // Admin Login (separate — does not require slug_name)
 Route::post('admin/login', 'App\Http\Controllers\api\admin\authAdminController@login');
+
+// Maintenance
+Route::get('clear', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('config:cache');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+    return response()->json(['success' => true, 'message' => 'Cache cleared successfully.']);
+});
+
+Route::get('version_update', 'App\Http\Controllers\versionController@api_update');
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -67,6 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	//Bill Setting
 	Route::get('/bills/{branch}/list', 'App\Http\Controllers\api\billController@list');
 	Route::post('/bills/store', 'App\Http\Controllers\api\billController@store');
+	Route::post('/bills/set_bank_status', 'App\Http\Controllers\api\billController@set_bank_status');
 
 
 	//POS
@@ -87,6 +101,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	//Order
 	Route::get('/orders', 'App\Http\Controllers\api\orderController@order');
 	Route::get('/orders/{order}/view', 'App\Http\Controllers\api\orderController@view');
+
+	//Billing Address
+	Route::get('/billing_address/{order_id}/view', 'App\Http\Controllers\api\billingAddressController@view');
+	Route::post('/billing_address/store', 'App\Http\Controllers\api\billingAddressController@store');
+	Route::post('/billing_address/update', 'App\Http\Controllers\api\billingAddressController@update');
 
 	//Vendor
 	Route::get('/vendors/list', 'App\Http\Controllers\api\vendorController@list');
@@ -214,6 +233,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	//Profile
 	Route::get('/profile', 'App\Http\Controllers\api\profileController@my_profile');
+	Route::post('/profile/change_password', 'App\Http\Controllers\api\profileController@change_password');
+	Route::get('/profile/settings', 'App\Http\Controllers\api\profileController@settings');
+	Route::post('/profile/settings/update', 'App\Http\Controllers\api\profileController@update_settings');
 
 	//Notification
 	Route::get('notifications/{type?}', 'App\Http\Controllers\api\notificationController@notification');
