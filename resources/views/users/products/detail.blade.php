@@ -53,13 +53,72 @@
                             <span class="badge bg-primary p-2">
                                 Closing Stock :
                                 {{ $totals['closing_qty'] }}
+
+
                             </span>
+
+                            @php
+                                $hasVariations = $product->stockVariations
+                                    ->whereNotNull('size_id')
+                                    ->whereNotNull('colour_id')
+                                    ->count() > 0;
+                            @endphp
+                            
+                            @if($hasVariations)
+                            <a href="javascript:void(0)"
+                               data-bs-toggle="collapse"
+                               data-bs-target="#stockVariationTable"
+                               aria-expanded="false">
+                                <i class="bx bx-chevron-down fs-4" id="variationIcon"></i>
+                            </a>
+                            @endif
+
                         </div>
 
                     </div>
                 </div>
 
-                <div class="card-body p-0">
+                <div class="collapse" id="stockVariationTable">
+
+                    <div class="card-body p-3">
+
+                        <table class="table table-bordered mb-0">
+
+                            <thead>
+                                <tr>
+                                    <th>Size</th>
+                                    <th>Colour</th>
+                                    <th class="text-end">Stock</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach($product->stockVariations as $variation)
+
+                                    <tr>
+
+                                        <td>{{ $variation->size->name ?? '-' }}</td>
+
+                                        <td>{{ $variation->colour->name ?? '-' }}</td>
+
+                                        <td class="text-end">
+                                            {{ $variation->quantity }}
+                                        </td>
+
+                                    </tr>
+
+                                @endforeach
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+                <div class="card-body p-3">
 
                     <div class="table-responsive">
 
@@ -214,4 +273,25 @@
         </div> 
     </div> 
 </div> 
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const collapseElement = document.getElementById('stockVariationTable');
+    const icon = document.getElementById('variationIcon');
+
+    collapseElement.addEventListener('show.bs.collapse', function () {
+        icon.classList.remove('bx-chevron-down');
+        icon.classList.add('bx-chevron-up');
+    });
+
+    collapseElement.addEventListener('hide.bs.collapse', function () {
+        icon.classList.remove('bx-chevron-up');
+        icon.classList.add('bx-chevron-down');
+    });
+
+});
+</script>
 @endsection

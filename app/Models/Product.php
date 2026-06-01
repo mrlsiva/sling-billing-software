@@ -48,4 +48,9 @@ class Product extends Model
             ->where('shop_id', Auth::user()->parent_id)
             ->where('branch_id', Auth::user()->id);
     }
+
+    public function stockVariations()
+    {
+        return $this->hasMany(StockVariation::class);
+    }
 }

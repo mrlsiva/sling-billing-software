@@ -678,86 +678,91 @@ class productController extends Controller
         return Excel::download(new ProductExport($query), 'Products_' . now()->format('d-m-Y_h-i_A') . '.xlsx');
     }
 
-    public function detail(Request $request, $company, Product $product)
+    public function detail(Request $request, $company, Product $product, $branch)
     {
         $ledger = collect();
 
-        /*
-        |--------------------------------------------------------------------------
-        | PRODUCT CREATED
-        |--------------------------------------------------------------------------
-        */
+        if($branch == 0)
+        {
 
-        $ledger->push([
-            'date'          => $product->created_at,
-            'particulars'   => $product->name,
-            'voucher_type'  => 'Create',
-            'voucher_no'    => $product->code,
-
-            'in_qty'        => 0,
-            'in_value'      => 0,
-
-            'out_qty'       => 0,
-            'out_value'     => 0,
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | PURCHASE ORDER (INWARD)
-        |--------------------------------------------------------------------------
-        */
-
-        $purchaseOrders = PurchaseOrder::with('vendor')
-            ->where('product_id', $product->id)
-            ->get();
-
-        foreach ($purchaseOrders as $po) {
-
-            $amount = $po->quantity * $po->purchase_price;
+            /*
+            |--------------------------------------------------------------------------
+            | PRODUCT CREATED
+            |--------------------------------------------------------------------------
+            */
 
             $ledger->push([
-                'date'          => $po->created_at,
-                'particulars'   => $po->vendor->name ?? '-',
-                'voucher_type'  => 'Purchase',
-                'voucher_no'    => $po->invoice_no,
-
-                'in_qty'        => $po->quantity,
-                'in_value'      => $amount,
-
-                'out_qty'       => 0,
-                'out_value'     => 0,
-            ]);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | PURCHASE ORDER REFUND (OUTWARD)
-        |--------------------------------------------------------------------------
-        */
-
-        $purchaseRefunds = PurchaseOrderRefund::with([
-                'vendor',
-                'purchase_order'
-            ])
-            ->whereHas('purchase_order', function ($q) use ($product) {
-                $q->where('product_id', $product->id);
-            })
-            ->get();
-
-        foreach ($purchaseRefunds as $refund) {
-
-            $ledger->push([
-                'date'          => $refund->created_at,
-                'particulars'   => $refund->vendor->name ?? '-',
-                'voucher_type'  => 'Purchase Refund',
-                'voucher_no'    => $refund->purchase_order->invoice_no,
+                'date'          => $product->created_at,
+                'particulars'   => $product->name,
+                'voucher_type'  => 'Create',
+                'voucher_no'    => $product->code,
 
                 'in_qty'        => 0,
                 'in_value'      => 0,
 
-                'out_qty'       => $refund->quantity,
-                'out_value'     => $refund->refund_amount,
+                'out_qty'       => 0,
+                'out_value'     => 0,
             ]);
+        
+
+            /*
+            |--------------------------------------------------------------------------
+            | PURCHASE ORDER (INWARD)
+            |--------------------------------------------------------------------------
+            */
+
+            $purchaseOrders = PurchaseOrder::with('vendor')
+                ->where('product_id', $product->id)
+                ->get();
+
+            foreach ($purchaseOrders as $po) {
+
+                $amount = $po->quantity * $po->purchase_price;
+
+                $ledger->push([
+                    'date'          => $po->created_at,
+                    'particulars'   => $po->vendor->name ?? '-',
+                    'voucher_type'  => 'Purchase',
+                    'voucher_no'    => $po->invoice_no,
+
+                    'in_qty'        => $po->quantity,
+                    'in_value'      => $amount,
+
+                    'out_qty'       => 0,
+                    'out_value'     => 0,
+                ]);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | PURCHASE ORDER REFUND (OUTWARD)
+            |--------------------------------------------------------------------------
+            */
+
+            $purchaseRefunds = PurchaseOrderRefund::with([
+                    'vendor',
+                    'purchase_order'
+                ])
+                ->whereHas('purchase_order', function ($q) use ($product) {
+                    $q->where('product_id', $product->id);
+                })
+                ->get();
+
+            foreach ($purchaseRefunds as $refund) {
+
+                $ledger->push([
+                    'date'          => $refund->created_at,
+                    'particulars'   => $refund->vendor->name ?? '-',
+                    'voucher_type'  => 'Purchase Refund',
+                    'voucher_no'    => $refund->purchase_order->invoice_no,
+
+                    'in_qty'        => 0,
+                    'in_value'      => 0,
+
+                    'out_qty'       => $refund->quantity,
+                    'out_value'     => $refund->refund_amount,
+                ]);
+            }
         }
 
         /*
@@ -767,10 +772,19 @@ class productController extends Controller
         */
 
         $orderDetails = OrderDetail::with([
-                'order.customer'
-            ])
-            ->where('product_id', $product->id)
-            ->get();
+        'order.customer'
+        ])
+        ->where('product_id', $product->id)
+        ->whereHas('order', function ($q) use ($branch) {
+
+            if ($branch == 0) {
+                $q->whereNull('branch_id');
+            } else {
+                $q->where('branch_id', $branch);
+            }
+
+        })
+        ->get();
 
         foreach ($orderDetails as $detail) {
 
@@ -798,10 +812,19 @@ class productController extends Controller
         */
 
         $refundDetails = RefundDetail::with([
-                'refund.order.customer'
-            ])
-            ->where('product_id', $product->id)
-            ->get();
+        'refund.order.customer'
+        ])
+        ->where('product_id', $product->id)
+        ->whereHas('refund.order', function ($q) use ($branch) {
+
+            if ($branch == 0) {
+                $q->whereNull('branch_id');
+            } else {
+                $q->where('branch_id', $branch);
+            }
+
+        })
+        ->get();
 
         foreach ($refundDetails as $refundDetail) {
 
@@ -831,43 +854,75 @@ class productController extends Controller
         */
 
         $transfers = ProductHistory::where('product_id', $product->id)
-            ->orderBy('transfer_on')
-            ->get();
+        ->orderBy('transfer_on')
+        ->get();
 
         foreach ($transfers as $transfer) {
 
-            // Transfer Out
-            if ($transfer->from == $transfer->shop_id) {
+            /*
+            |--------------------------------------------------------------------------
+            | SHOP / HEAD OFFICE VIEW
+            |--------------------------------------------------------------------------
+            */
 
-                $ledger->push([
-                    'date'          => $transfer->created_at,
-                    'particulars'   => 'Transferred To Shop ' . $transfer->to,
-                    'voucher_type'  => 'Transfer Out',
-                    'voucher_no'    => $transfer->invoice,
+            if ($branch == 0) {
 
-                    'in_qty'        => 0,
-                    'in_value'      => 0,
+                if ($transfer->from == $transfer->shop_id) {
 
-                    'out_qty'       => $transfer->quantity,
-                    'out_value'     => 0,
-                ]);
+                    $ledger->push([
+                        'date'          => $transfer->created_at,
+                        'particulars'   => 'Transferred To Branch ' . $transfer->to,
+                        'voucher_type'  => 'Transfer Out',
+                        'voucher_no'    => $transfer->invoice,
+
+                        'in_qty'        => 0,
+                        'in_value'      => 0,
+
+                        'out_qty'       => $transfer->quantity,
+                        'out_value'     => 0,
+                    ]);
+                }
             }
 
-            // Transfer In
-            if ($transfer->to == $transfer->shop_id) {
+            /*
+            |--------------------------------------------------------------------------
+            | BRANCH VIEW
+            |--------------------------------------------------------------------------
+            */
 
-                $ledger->push([
-                    'date'          => $transfer->created_at,
-                    'particulars'   => 'Received From Shop ' . $transfer->from,
-                    'voucher_type'  => 'Transfer In',
-                    'voucher_no'    => $transfer->invoice,
+            else {
 
-                    'in_qty'        => $transfer->quantity,
-                    'in_value'      => 0,
+                if ($transfer->to == $branch) {
 
-                    'out_qty'       => 0,
-                    'out_value'     => 0,
-                ]);
+                    $ledger->push([
+                        'date'          => $transfer->created_at,
+                        'particulars'   => 'Received From Shop',
+                        'voucher_type'  => 'Transfer In',
+                        'voucher_no'    => $transfer->invoice,
+
+                        'in_qty'        => $transfer->quantity,
+                        'in_value'      => 0,
+
+                        'out_qty'       => 0,
+                        'out_value'     => 0,
+                    ]);
+                }
+
+                if ($transfer->from == $branch) {
+
+                    $ledger->push([
+                        'date'          => $transfer->created_at,
+                        'particulars'   => 'Transferred To Branch ' . $transfer->to,
+                        'voucher_type'  => 'Transfer Out',
+                        'voucher_no'    => $transfer->invoice,
+
+                        'in_qty'        => 0,
+                        'in_value'      => 0,
+
+                        'out_qty'       => $transfer->quantity,
+                        'out_value'     => 0,
+                    ]);
+                }
             }
         }
 
@@ -927,10 +982,14 @@ class productController extends Controller
             'closing_value'     => $closingValue,
         ];
 
+        $variationQty = StockVariation::where('product_id', $product->id)->first();
+
+
         return view('users.products.detail', [
             'product' => $product,
             'ledger'  => $ledger,
             'totals'  => $totals,
+            'variationQty' => $variationQty,
         ]);
     }
 }

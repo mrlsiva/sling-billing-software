@@ -158,7 +158,7 @@ else
                             Route::get('/download',[productController::class, 'download'])->name('download');
                             Route::post('/bulk_upload',[productController::class, 'bulk_upload'])->name('bulk_upload');
                             Route::get('/bulk_upload', fn() => redirect()->route('product.index', ['company' => request()->route('company')]))->name('bulk_upload.get');
-                            Route::get('{product}/detail',[productController::class, 'detail'])->name('detail');
+                            Route::get('{product}/{branch}/detail',[productController::class, 'detail'])->name('detail');
                             
                         });
                     });

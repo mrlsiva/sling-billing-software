@@ -117,7 +117,7 @@
                                         <td>{{$stock->category->name}}</td>
                                         <td>{{$stock->sub_category->name}}</td>
                                         <td>
-                                            <a href="{{ route('product.detail', ['company' => request()->route('company'), 'product' => $stock->product->id]) }}">
+                                            <a href="{{ route('product.detail', ['company' => request()->route('company'), 'product' => $stock->product->id,'branch' => request()->route('branch')]) }}">
                                                 {{$stock->product->name}}
                                             </a>
                                         </td>

@@ -907,11 +907,13 @@
 
             let productId = $(this).data('id');
             let productName = $(this).data('name');
+            let branchId    = $(this).data('branch');
 
             $('#productTitle').text(productName);
 
-            let url = "{{ route('product.detail', ['company' => request()->route('company'), 'product' => ':id']) }}"
-                        .replace(':id', productId);
+            let url = "{{ route('product.detail', ['company' => request()->route('company'), 'product' => ':id', 'branch' => ':branchId']) }}"
+                        .replace(':id', productId)
+                        .replace(':branch', branchId);
 
             loadTimeline(url);
         });
