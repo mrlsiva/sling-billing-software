@@ -69,38 +69,25 @@
 
                                 <tr class="text-center">
 
-                                    <th rowspan="2" width="110">Date</th>
+                                    <th width="130">Date</th>
 
-                                    <th rowspan="2">Particulars</th>
+                                    <th>Particulars</th>
 
-                                    <th rowspan="2" width="120">Vch Type</th>
+                                    <th width="120">Vch Type</th>
 
-                                    <th rowspan="2" width="120">Vch No</th>
+                                    <th width="120">Vch No</th>
 
-                                    <th colspan="2" class="bg-success text-white">
-                                        Inwards
+                                    <th width="100" class="bg-success text-white">
+                                        Inward Qty
                                     </th>
 
-                                    <th colspan="2" class="bg-danger text-white">
-                                        Outwards
+                                    <th width="100" class="bg-danger text-white">
+                                        Outward Qty
                                     </th>
 
-                                    <th colspan="2" class="bg-primary text-white">
-                                        Closing
+                                    <th width="100" class="bg-primary text-white">
+                                        Closing Qty
                                     </th>
-
-                                </tr>
-
-                                <tr class="text-center">
-
-                                    <th width="90">Qty</th>
-                                    <th width="120">Value</th>
-
-                                    <th width="90">Qty</th>
-                                    <th width="120">Value</th>
-
-                                    <th width="90">Qty</th>
-                                    <th width="120">Value</th>
 
                                 </tr>
 
@@ -162,28 +149,12 @@
 
                                         </td>
 
-                                        <td class="text-end">
-
-                                            @if($row['in_value'] > 0)
-                                                ₹ {{ number_format($row['in_value'], 2) }}
-                                            @endif
-
-                                        </td>
-
                                         {{-- OUTWARD --}}
 
                                         <td class="text-end">
 
                                             @if($row['out_qty'] > 0)
                                                 {{ number_format($row['out_qty']) }}
-                                            @endif
-
-                                        </td>
-
-                                        <td class="text-end text-danger">
-
-                                            @if($row['out_value'] > 0)
-                                                ₹ {{ number_format($row['out_value'], 2) }}
                                             @endif
 
                                         </td>
@@ -196,18 +167,12 @@
 
                                         </td>
 
-                                        <td class="text-end fw-bold text-primary">
-
-                                            ₹ {{ number_format($row['closing_value'], 2) }}
-
-                                        </td>
-
                                     </tr>
 
                                 @empty
 
                                     <tr>
-                                        <td colspan="10" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             No Ledger Found
                                         </td>
                                     </tr>
@@ -228,24 +193,12 @@
                                         {{ number_format($totals['total_in_qty']) }}
                                     </td>
 
-                                    <td class="text-end text-success">
-                                        ₹ {{ number_format($totals['total_in_value'], 2) }}
-                                    </td>
-
                                     <td class="text-end">
                                         {{ number_format($totals['total_out_qty']) }}
                                     </td>
 
-                                    <td class="text-end text-danger">
-                                        ₹ {{ number_format($totals['total_out_value'], 2) }}
-                                    </td>
-
                                     <td class="text-end">
                                         {{ number_format($totals['closing_qty']) }}
-                                    </td>
-
-                                    <td class="text-end text-primary">
-                                        ₹ {{ number_format($totals['closing_value'], 2) }}
                                     </td>
 
                                 </tr>

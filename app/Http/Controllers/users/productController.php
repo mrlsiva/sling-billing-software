@@ -747,7 +747,7 @@ class productController extends Controller
         foreach ($purchaseRefunds as $refund) {
 
             $ledger->push([
-                'date'          => $refund->refund_on ?? $refund->created_at,
+                'date'          => $refund->created_at,
                 'particulars'   => $refund->vendor->name ?? '-',
                 'voucher_type'  => 'Purchase Refund',
                 'voucher_no'    => $refund->purchase_order->invoice_no,
@@ -811,7 +811,7 @@ class productController extends Controller
                         + ($refundDetail->tax_amount ?? 0);
 
             $ledger->push([
-                'date'          => $refund->refund_on ?? $refund->created_at,
+                'date'          => $refund->created_at,
                 'particulars'   => $refund->order->customer->name ?? 'Walk-in Customer',
                 'voucher_type'  => 'Sales Refund',
                 'voucher_no'    => $refund->order->bill_id,
@@ -822,6 +822,53 @@ class productController extends Controller
                 'out_qty'       => 0,
                 'out_value'     => 0,
             ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | STOCK TRANSFER
+        |--------------------------------------------------------------------------
+        */
+
+        $transfers = ProductHistory::where('product_id', $product->id)
+            ->orderBy('transfer_on')
+            ->get();
+
+        foreach ($transfers as $transfer) {
+
+            // Transfer Out
+            if ($transfer->from == $transfer->shop_id) {
+
+                $ledger->push([
+                    'date'          => $transfer->created_at,
+                    'particulars'   => 'Transferred To Shop ' . $transfer->to,
+                    'voucher_type'  => 'Transfer Out',
+                    'voucher_no'    => $transfer->invoice,
+
+                    'in_qty'        => 0,
+                    'in_value'      => 0,
+
+                    'out_qty'       => $transfer->quantity,
+                    'out_value'     => 0,
+                ]);
+            }
+
+            // Transfer In
+            if ($transfer->to == $transfer->shop_id) {
+
+                $ledger->push([
+                    'date'          => $transfer->created_at,
+                    'particulars'   => 'Received From Shop ' . $transfer->from,
+                    'voucher_type'  => 'Transfer In',
+                    'voucher_no'    => $transfer->invoice,
+
+                    'in_qty'        => $transfer->quantity,
+                    'in_value'      => 0,
+
+                    'out_qty'       => 0,
+                    'out_value'     => 0,
+                ]);
+            }
         }
 
         /*
