@@ -345,6 +345,12 @@ class billingsController extends Controller
                 $variation->quantity -= $item['qty'];
                 $variation->save();
             }
+            else
+            {
+                $variation = StockVariation::where('stock_id',$stock->id)->first();
+                $variation->quantity -= $item['qty'];
+                $variation->save();
+            }
 
             // Reduce Quantity
             $stock->quantity = $stock->quantity - $item['qty'];

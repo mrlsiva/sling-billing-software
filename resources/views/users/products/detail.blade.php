@@ -52,7 +52,7 @@
                         <div>
                             <span class="badge bg-primary p-2">
                                 Closing Stock :
-                                {{ $totals['closing_qty'] }}
+                                {{ $closing_stock }}
 
 
                             </span>
@@ -64,14 +64,14 @@
                                     ->count() > 0;
                             @endphp
                             
-                            @if($hasVariations)
+
                             <a href="javascript:void(0)"
                                data-bs-toggle="collapse"
                                data-bs-target="#stockVariationTable"
                                aria-expanded="false">
                                 <i class="bx bx-chevron-down fs-4" id="variationIcon"></i>
                             </a>
-                            @endif
+                            
 
                         </div>
 
@@ -86,8 +86,11 @@
 
                             <thead>
                                 <tr>
+                                    <th>Shop</th>
+                                    @if($hasVariations)
                                     <th>Size</th>
                                     <th>Colour</th>
+                                    @endif
                                     <th class="text-end">Stock</th>
                                 </tr>
                             </thead>
@@ -98,9 +101,18 @@
 
                                     <tr>
 
+                                        <td>
+                                            @if($variation->stock->branch_id == null)
+                                                {{$variation->stock->shop->user_name}}
+                                            @else
+                                                {{$variation->stock->branch->user_name}}
+                                            @endif
+                                        </td>
+                                        @if($hasVariations)
                                         <td>{{ $variation->size->name ?? '-' }}</td>
 
                                         <td>{{ $variation->colour->name ?? '-' }}</td>
+                                        @endif
 
                                         <td class="text-end">
                                             {{ $variation->quantity }}
@@ -244,20 +256,14 @@
 
                                 <tr>
 
-                                    <td colspan="4" class="text-end">
+                                    <td colspan="6" class="text-end">
                                         Totals :
                                     </td>
 
-                                    <td class="text-end">
-                                        {{ number_format($totals['total_in_qty']) }}
-                                    </td>
+                                    
 
                                     <td class="text-end">
-                                        {{ number_format($totals['total_out_qty']) }}
-                                    </td>
-
-                                    <td class="text-end">
-                                        {{ number_format($totals['closing_qty']) }}
+                                        {{ $closing_stock }}
                                     </td>
 
                                 </tr>

@@ -99,8 +99,9 @@ jQuery(document).ready(function () {
                             document.getElementById('quantity').readOnly = true;
                             $("#variations_section").append(`
                                 <div class="row mb-2 p-2 border rounded">
-                                    <div class="col-md-5"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
-                                    <div class="col-md-7">
+                                    <div class="col-md-3"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
+                                    <div class="col-md-3"><strong>Colour:</strong> ${v.colour?.name ?? "-"}</div>
+                                    <div class="col-md-6">
                                         <input type="number" class="form-control variation-qty"
                                             data-max="${v.quantity}"
                                             max="${v.quantity}" min="0"

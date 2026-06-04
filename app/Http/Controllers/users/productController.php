@@ -682,9 +682,6 @@ class productController extends Controller
     {
         $ledger = collect();
 
-        if($branch == 0)
-        {
-
             /*
             |--------------------------------------------------------------------------
             | PRODUCT CREATED
@@ -698,9 +695,11 @@ class productController extends Controller
                 'voucher_no'    => $product->code,
 
                 'in_qty'        => 0,
+                'in_quantity'   => 0,
                 'in_value'      => 0,
 
                 'out_qty'       => 0,
+                'out_quantity'  => 0,
                 'out_value'     => 0,
             ]);
         
@@ -726,9 +725,11 @@ class productController extends Controller
                     'voucher_no'    => $po->invoice_no,
 
                     'in_qty'        => $po->quantity,
+                    'in_quantity'   => $po->quantity,
                     'in_value'      => $amount,
 
                     'out_qty'       => 0,
+                    'out_quantity'  => 0,
                     'out_value'     => 0,
                 ]);
             }
@@ -757,13 +758,14 @@ class productController extends Controller
                     'voucher_no'    => $refund->purchase_order->invoice_no,
 
                     'in_qty'        => 0,
+                    'in_quantity'   => 0,
                     'in_value'      => 0,
 
                     'out_qty'       => $refund->quantity,
+                    'out_quantity'  => 0,
                     'out_value'     => $refund->refund_amount,
                 ]);
             }
-        }
 
         /*
         |--------------------------------------------------------------------------
@@ -772,36 +774,43 @@ class productController extends Controller
         */
 
         $orderDetails = OrderDetail::with([
-        'order.customer'
-        ])
-        ->where('product_id', $product->id)
-        ->whereHas('order', function ($q) use ($branch) {
+                'order.customer',
+                'order.shop',
+                'order.branch'
+            ])
+            ->where('product_id', $product->id)
+            ->get()
+            ->groupBy('order_id');
 
-            if ($branch == 0) {
-                $q->whereNull('branch_id');
+        foreach ($orderDetails as $orderId => $details) {
+
+            $firstDetail = $details->first();
+
+            $totalQty = $details->sum('quantity');
+
+            $totalAmount = $details->sum(function ($detail) {
+                return ($detail->price * $detail->quantity) + ($detail->tax_amount ?? 0);
+            });
+
+            if ($firstDetail->order->branch_id == null) {
+                $particular = "Order placed in " . ($firstDetail->order->shop->user_name ?? '');
             } else {
-                $q->where('branch_id', $branch);
+                $particular = "Order placed in " . ($firstDetail->order->branch->user_name ?? '');
             }
 
-        })
-        ->get();
-
-        foreach ($orderDetails as $detail) {
-
-            $amount = ($detail->price * $detail->quantity)
-                        + ($detail->tax_amount ?? 0);
-
             $ledger->push([
-                'date'          => $detail->created_at,
-                'particulars'   => $detail->order->customer->name ?? 'Walk-in Customer',
+                'date'          => $firstDetail->created_at,
+                'particulars'   => $particular,
                 'voucher_type'  => 'Sales',
-                'voucher_no'    => $detail->order->bill_id,
+                'voucher_no'    => $firstDetail->order->bill_id,
 
                 'in_qty'        => 0,
+                'in_quantity'   => 0,
                 'in_value'      => 0,
 
-                'out_qty'       => $detail->quantity,
-                'out_value'     => $amount,
+                'out_qty'       => $totalQty,
+                'out_quantity'  => $totalQty,
+                'out_value'     => $totalAmount,
             ]);
         }
 
@@ -815,15 +824,7 @@ class productController extends Controller
         'refund.order.customer'
         ])
         ->where('product_id', $product->id)
-        ->whereHas('refund.order', function ($q) use ($branch) {
-
-            if ($branch == 0) {
-                $q->whereNull('branch_id');
-            } else {
-                $q->where('branch_id', $branch);
-            }
-
-        })
+        
         ->get();
 
         foreach ($refundDetails as $refundDetail) {
@@ -840,9 +841,11 @@ class productController extends Controller
                 'voucher_no'    => $refund->order->bill_id,
 
                 'in_qty'        => $refundDetail->quantity,
+                'in_quantity'  => $refundDetail->quantity,
                 'in_value'      => $amount,
 
                 'out_qty'       => 0,
+                'out_quantity'  => 0,
                 'out_value'     => 0,
             ]);
         }
@@ -871,14 +874,34 @@ class productController extends Controller
 
                     $ledger->push([
                         'date'          => $transfer->created_at,
-                        'particulars'   => 'Transferred To Branch ' . $transfer->to,
+                        'particulars'   => 'Transferred to ' . $transfer->transfer_to->user_name,
                         'voucher_type'  => 'Transfer Out',
                         'voucher_no'    => $transfer->invoice,
 
                         'in_qty'        => 0,
+                        'in_quantity'  => 0,
                         'in_value'      => 0,
 
                         'out_qty'       => $transfer->quantity,
+                        'out_quantity'  => 0,
+                        'out_value'     => 0,
+                    ]);
+                }
+
+                if ($transfer->to == $transfer->shop_id) {
+
+                    $ledger->push([
+                        'date'          => $transfer->created_at,
+                        'particulars'   => 'Received from ' . $transfer->transfer_from->user_name,
+                        'voucher_type'  => 'Transfer In',
+                        'voucher_no'    => $transfer->invoice,
+
+                        'in_qty'        => $transfer->quantity,
+                        'in_quantity'  => 0,
+                        'in_value'      => 0,
+
+                        'out_qty'       => 0,
+                        'out_quantity'  => 0,
                         'out_value'     => 0,
                     ]);
                 }
@@ -896,14 +919,16 @@ class productController extends Controller
 
                     $ledger->push([
                         'date'          => $transfer->created_at,
-                        'particulars'   => 'Received From Shop',
+                        'particulars'   => 'Received from ' . $transfer->transfer_from->user_name,
                         'voucher_type'  => 'Transfer In',
                         'voucher_no'    => $transfer->invoice,
 
                         'in_qty'        => $transfer->quantity,
+                        'in_quantity'  => 0,
                         'in_value'      => 0,
 
                         'out_qty'       => 0,
+                        'out_quantity'  => 0,
                         'out_value'     => 0,
                     ]);
                 }
@@ -912,14 +937,16 @@ class productController extends Controller
 
                     $ledger->push([
                         'date'          => $transfer->created_at,
-                        'particulars'   => 'Transferred To Branch ' . $transfer->to,
+                        'particulars'   => 'Transferred to ' . $transfer->transfer_to->user_name,
                         'voucher_type'  => 'Transfer Out',
                         'voucher_no'    => $transfer->invoice,
 
                         'in_qty'        => 0,
+                        'in_quantity'  => 0,
                         'in_value'      => 0,
 
                         'out_qty'       => $transfer->quantity,
+                        'out_quantity'  => 0,
                         'out_value'     => 0,
                     ]);
                 }
@@ -945,8 +972,11 @@ class productController extends Controller
 
         $ledger = $ledger->map(function ($row) use (&$closingQty, &$closingValue) {
 
-            $closingQty += $row['in_qty'];
-            $closingQty -= $row['out_qty'];
+            // $closingQty += $row['in_qty'];
+            // $closingQty -= $row['out_qty'];
+
+            $closingQty += $row['in_quantity'];
+            $closingQty -= $row['out_quantity'];
 
             $closingValue += $row['in_value'];
             $closingValue -= $row['out_value'];
@@ -982,14 +1012,14 @@ class productController extends Controller
             'closing_value'     => $closingValue,
         ];
 
-        $variationQty = StockVariation::where('product_id', $product->id)->first();
+        $closing_stock = Stock::where('product_id', $product->id)->sum('quantity');
 
 
         return view('users.products.detail', [
             'product' => $product,
             'ledger'  => $ledger,
             'totals'  => $totals,
-            'variationQty' => $variationQty,
+            'closing_stock' => $closing_stock,
         ]);
     }
 }

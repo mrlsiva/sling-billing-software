@@ -91,13 +91,14 @@ jQuery(document).ready(function () {
 
                     let hasVariation = false;
 
+                    console.log(data.variations);
+                    $("#variations_section").html('');
                     data.variations.forEach(function (v) {
 
                         if (v.quantity > 0 && (v.size != null || v.colour != null)) {
-
                             hasVariation = true; // ✅ mark true
 
-                            $("#variations_section").html('');
+                            
                             $("#variations_section").append(`
                                 <div class="row mb-2 p-2 border rounded">
                                     <div class="col-md-3"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
