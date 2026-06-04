@@ -89,6 +89,10 @@ if (request()->segment(1) === 'admin')
 {
     require __DIR__.'/admin.php';
 }
+elseif (request()->segment(1) === 'users') {
+
+    require __DIR__.'/user.php';
+}
 else 
 {
     Route::middleware(['is_company_valid'])->group(function () {
