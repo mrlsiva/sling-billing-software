@@ -103,31 +103,35 @@ $('#addSubCategory').on('submit', function (e) {
                 else {
                     let subCategory = response.data;
 
-                    /* 1. Select parent category */
-                    $('#category').val(subCategory.category_id).trigger('change');
-
-                    /* 2. Append sub category if not exists */
-                    let subSelect = $('#sub_category');
-
-                    if (subSelect.find('option[value="' + subCategory.id + '"]').length === 0) {
-                        subSelect.append(
-                            `<option value="${subCategory.id}">${subCategory.name}</option>`
-                        );
+                    /* For other pages with #category / #sub_category selects */
+                    if ($('#category').length) {
+                        $('#category').val(subCategory.category_id).trigger('change');
+                        let subSelect = $('#sub_category');
+                        if (subSelect.find('option[value="' + subCategory.id + '"]').length === 0) {
+                            subSelect.append(`<option value="${subCategory.id}">${subCategory.name}</option>`);
+                        }
+                        subSelect.val(subCategory.id).trigger('change');
                     }
 
-                    /* 3. Select new sub category */
-                    subSelect.val(subCategory.id).trigger('change');
+                    /* Append to purchase-order rows whose category matches */
+                    $('#productsContainer .product-row').each(function () {
+                        var row = $(this);
+                        if (row.find('.category-select').val() == subCategory.category_id) {
+                            var subSel = row.find('.sub-category-select');
+                            if (subSel.find('option[value="' + subCategory.id + '"]').length === 0) {
+                                subSel.append('<option value="' + subCategory.id + '">' + subCategory.name + '</option>');
+                                if (subSel.data('select2')) { subSel.select2('destroy'); subSel.select2({ width: '100%', placeholder: 'Select Sub Category' }); }
+                            }
+                        }
+                    });
 
-                    /* 4. Close modal */
+                    /* Close modal */
                     $('#subCategoryAdd').modal('hide');
 
-                    /* 5. Reset form */
+                    /* Reset form */
                     $('#addSubCategory')[0].reset();
 
                     $('#subCategorySubmit').prop('disabled', false).html('<i class="ri-save-line"></i> Submit');
-
-                    /* 6. Feedback */
-                    //alert(response.message);
                 }
             }
             else

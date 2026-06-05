@@ -33,12 +33,15 @@ jQuery(document).ready(function () {
         sub.html('<option value=""> Select </option>');
         prod.html('<option value=""> Select </option>');
         clearVariations(row);
+        reinitSelect2(sub, 'Select Sub Category');
+        reinitSelect2(prod, 'Select Product');
 
         if (!category) return;
 
         $.getJSON('../../products/get_sub_category', { id: category })
             .done(function (data) {
                 data.forEach(v => sub.append(`<option value="${v.id}">${v.name}</option>`));
+                reinitSelect2(sub, 'Select Sub Category');
             })
             .fail(function (xhr) { console.error('get_sub_category failed', xhr); });
     });
@@ -52,12 +55,14 @@ jQuery(document).ready(function () {
 
         prod.html('<option value=""> Select </option>');
         clearVariations(row);
+        reinitSelect2(prod, 'Select Product');
 
         if (!category || !subCategory) return;
 
         $.getJSON('get_product', { category: category, sub_category: subCategory })
             .done(function (data) {
                 data.forEach(v => prod.append(`<option value="${v.id}">${v.name}</option>`));
+                reinitSelect2(prod, 'Select Product');
             })
             .fail(function (xhr) { console.error('get_product failed', xhr); });
     });
@@ -292,6 +297,12 @@ jQuery(document).ready(function () {
     // -----------------------
     // Helper functions
     // -----------------------
+
+    function reinitSelect2(el, placeholder) {
+        if (el.data('select2')) el.select2('destroy');
+        el.select2({ width: '100%', placeholder: placeholder });
+    }
+
     function addProductRow(oldData = null) {
         const template = $('#productRowTemplate').html();
         const newRow = $(template).clone();
@@ -320,19 +331,31 @@ jQuery(document).ready(function () {
 
         $('#productsContainer').append(newRow);
 
+        // Init Select2 on sub-category and product immediately (empty)
+        reinitSelect2(newRow.find('.sub-category-select'), 'Select Sub Category');
+        reinitSelect2(newRow.find('.product-select'), 'Select Product');
+
+        // Load categories, populate select, then init Select2
+        $.getJSON('get-categories').done(function (data) {
+            const catSel = newRow.find('.category-select');
+            data.forEach(c => catSel.append(`<option value="${c.id}">${c.name}</option>`));
+            reinitSelect2(catSel, 'Select Category');
+
+            if (oldData && oldData.category) {
+                catSel.val(oldData.category).trigger('change');
+            }
+        }).fail(function (xhr) { console.error('get-categories failed', xhr); });
+
         // If oldData is provided, populate values (we trigger change events to load dependent data)
         if (oldData) {
             try {
-                if (oldData.category) {
-                    newRow.find('.category-select').val(oldData.category).trigger('change');
-                }
-                // small delays to allow AJAX to populate subcategory/product
+                // delays allow category AJAX + dependent AJAX to finish before restoring values
                 setTimeout(() => {
                     if (oldData.sub_category) newRow.find('.sub-category-select').val(oldData.sub_category).trigger('change');
-                }, 300);
+                }, 800);
                 setTimeout(() => {
                     if (oldData.product) newRow.find('.product-select').val(oldData.product).trigger('change');
-                }, 700);
+                }, 1500);
 
                 if (oldData.quantity) newRow.find('.quantity-input').val(oldData.quantity);
                 if (oldData.price_per_unit) newRow.find('.price-input').val(oldData.price_per_unit);
