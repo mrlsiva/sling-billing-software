@@ -122,7 +122,15 @@
                                             </a>
                                         </td>
                                         <td>{{$stock->product->code ?? '-'}}</td>
-                                        <td>{{$stock->product->price}}</td>
+                                        <td>
+                                            @if($stock->product->discounted_price < $stock->product->price)
+                                                <del>{{ number_format($stock->product->price, 2) }}</del>
+                                                <br>
+                                                <strong>{{ number_format($stock->product->discounted_price, 2) }}</strong>
+                                            @else
+                                                {{ number_format($stock->product->price, 2) }}
+                                            @endif
+                                        </td>
                                         <td>{{$stock->quantity}}</td>
                                         <td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
                                         @if($user_detail->is_imei_required == 1)

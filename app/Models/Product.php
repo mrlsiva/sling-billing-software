@@ -11,6 +11,8 @@ class Product extends Model
         'user_id','name','category_id','sub_category_id','code','description','hsn_code','price','quantity','tax_id','metric_id','discount_type','discount','image','is_active','tax_amount','is_bulk_upload','run_id','is_size_differentiation_available','is_colour_differentiation_available','size_id','colour_id'
     ];
 
+    protected $appends = ['discounted_price'];
+
     public function sub_category()
     {
         return $this->belongsTo('App\Models\SubCategory');
@@ -52,5 +54,18 @@ class Product extends Model
     public function stockVariations()
     {
         return $this->hasMany(StockVariation::class);
+    }
+
+    public function getDiscountedPriceAttribute()
+    {
+        if ($this->discount_type == 1) {
+            return max(0, $this->price - $this->discount);
+        }
+
+        if ($this->discount_type == 2) {
+            return max(0, $this->price - (($this->price * $this->discount) / 100));
+        }
+
+        return $this->price;
     }
 }

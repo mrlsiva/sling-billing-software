@@ -84,7 +84,20 @@ function loadProducts(page = 1) {
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between mt-2">
                                     <div>
-                                        <p class="text-dark fw-semibold fs-12 mb-0">Rs ${stock.product.price}</p>
+                                        ${stock.product.discounted_price < stock.product.price
+                                            ? `
+                                            <p class="mb-0 d-flex align-items-center gap-2">
+                                                <del class="text-muted">Rs ${stock.product.price}</del>
+                                                <span class="text-success fw-bold">
+                                                    Rs ${stock.product.discounted_price}
+                                                </span>
+                                            </p>`
+                                            : `
+                                            <p class="text-dark fw-semibold fs-12 mb-0">
+                                                Rs ${stock.product.price}
+                                            </p>
+                                            `
+                                        }
                                     </div>
                                     <div class="d-flex align-content-center gap-1">
                                         <p class="mb-0 fs-12">${stock.quantity}</p>
@@ -249,7 +262,7 @@ function add_to_cart(element) {
                 $("#cart_item").append(`
                     <div class="border border-light mt-3 p-2 rounded" 
                         data-product-id="${data.id}" 
-                        data-price="${data.price}"
+                        data-price="${data.discount_price}"
                         data-tax_amount="${data.tax_amount}" 
                         data-tax-id="${data.tax_id}" 
                         data-tax="${data.tax.name}"
@@ -271,7 +284,22 @@ function add_to_cart(element) {
 
                         <div class="d-flex align-items-center justify-content-between px-1">
                             <div>
-                                <p class="text-dark fw-semibold fs-16 mb-0">₹${data.price} <span class="fs-10">(${data.tax.name}%)</span></p>
+                                ${
+                                    parseFloat(data.discount_price) < parseFloat(data.price)
+                                    ? `
+                                        <p class="fw-semibold fs-16 mb-0 d-flex align-items-center gap-2">
+                                            <del class="text-muted fs-12">₹${data.price}</del>
+                                            <span class="text-success">₹${data.discount_price}</span>
+                                            <span class="fs-10">(${data.tax.name}%)</span>
+                                        </p>
+                                      `
+                                    : `
+                                        <p class="text-dark fw-semibold fs-16 mb-0">
+                                            ₹${data.price}
+                                            <span class="fs-10">(${data.tax.name}%)</span>
+                                        </p>
+                                      `
+                                }
                             </div>
                             <div class="d-flex align-content-center gap-1">
                                 ${hasImei ?
@@ -359,7 +387,7 @@ function addVariationToCart(productId, variationId) {
                     <div class="border border-light mt-3 p-2 rounded" 
                         data-product-id="${productId}" 
                         data-variation-id="${variationId}"
-                        data-price="${v.price}"
+                        data-price="${v.discount_price}"
                         data-tax_amount="${v.tax_amount}" 
                         data-tax-id="${v.tax_id}" 
                         data-tax="${v.tax}"
@@ -382,7 +410,22 @@ function addVariationToCart(productId, variationId) {
 
                         <div class="d-flex align-items-center justify-content-between px-1">
                             <div>
-                                <p class="text-dark fw-semibold fs-16 mb-0">₹${v.price} <span class="fs-10">(${v.tax}%)</span></p>
+                                ${
+                                    parseFloat(v.discount_price) < parseFloat(v.price)
+                                    ? `
+                                        <p class="fw-semibold fs-16 mb-0 d-flex align-items-center gap-2">
+                                            <del class="text-muted fs-12">₹${v.price}</del>
+                                            <span class="text-success">₹${v.discount_price}</span>
+                                            <span class="fs-10">(${v.tax}%)</span>
+                                        </p>
+                                      `
+                                    : `
+                                        <p class="text-dark fw-semibold fs-16 mb-0">
+                                            ₹${v.price}
+                                            <span class="fs-10">(${v.tax}%)</span>
+                                        </p>
+                                      `
+                                }
                             </div>
                             <div class="d-flex align-content-center gap-1">
                                 ${hasImei ?
