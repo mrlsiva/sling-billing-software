@@ -270,6 +270,7 @@ else
                             Route::get('/{branch}/{id}/view_bill',[posController::class, 'view_bill'])->name('view_bill');
                             Route::get('/{id}/refund',[posController::class, 'refund'])->name('refund');
                             Route::post('/refund',[posController::class, 'refunded'])->name('refunded');
+                            Route::get('/{order}/destroy',[posController::class, 'delete'])->name('destroy');
                         });
                     });
 

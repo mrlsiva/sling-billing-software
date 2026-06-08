@@ -113,6 +113,14 @@
                                                 <a href="{{ route('order.refund', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark"><i class="ri-p2p-fill align-middle fs-20" title="Refund"></i></a>
                                             @endif
 
+                                            @php
+                                                $auth = App\Models\UserDetail::where('user_id', Auth::user()->owner_id)->first();
+                                            @endphp
+
+                                            @if($order->is_refunded == 0 && $auth->able_to_delete_order == 1)
+                                                <a href="{{ route('order.destroy', ['company' => request()->route('company'), 'order' => $order->id]) }}" class="link-dark delete-order"> <i class="ri-close-circle-line align-middle fs-20" title="Delete"></i> </a>
+                                            @endif
+
                                             @if(collect($order->payments)->contains('payment_id', 6))
                                             @endif
                                             
@@ -158,6 +166,27 @@
 
         // Run on typing
         searchInput.addEventListener("input", toggleClear);
+    });
+</script>
+
+<script>
+    $(document).on('click', '.delete-order', function(e) {
+        e.preventDefault();
+
+        let url = $(this).attr('href');
+
+        Swal.fire({
+            title: 'Delete Order?',
+            text: 'This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
     });
 </script>
 @endsection

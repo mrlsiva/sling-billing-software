@@ -231,4 +231,67 @@ class posController extends Controller
 
         return redirect()->route('order.index', ['company' => request()->route('company'),'branch' => 0])->with('toast_success', 'Refund done successfully.');
     }
+
+    public function delete(Request $request, $company, Order $order)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            $orderDetails = OrderDetail::where('order_id', $order->id)->get();
+
+            foreach ($orderDetails as $orderDetail) {
+
+                $stock = Stock::where([
+                    ['shop_id', Auth::user()->owner_id],
+                    ['branch_id', $order->branch_id],
+                    ['product_id', $orderDetail->product_id]
+                ])->first();
+
+                if (!$stock) {
+                    throw new \Exception('Stock not found.');
+                }
+
+                $existingImeis = !empty($stock->imei) ? explode(',', $stock->imei) : [];
+                $orderImeis = !empty($orderDetail->imei) ? explode(',', $orderDetail->imei) : [];
+
+                $newImeiList = array_unique(array_merge($existingImeis, $orderImeis));
+
+                $stock->update([
+                    'quantity' => $stock->quantity + $orderDetail->quantity,
+                    'imei' => implode(',', $newImeiList),
+                ]);
+
+                ProductImeiNumber::whereIn('name', $orderImeis)
+                    ->where('product_id', $orderDetail->product_id)
+                    ->update(['is_sold' => 0]);
+
+                $stockVariation = StockVariation::where([
+                    ['stock_id', $stock->id],
+                    ['product_id', $orderDetail->product_id],
+                    ['size_id', $orderDetail->size_id],
+                    ['colour_id', $orderDetail->colour_id]
+                ])->first();
+
+                if ($stockVariation) {
+                    $stockVariation->increment('quantity', $orderDetail->quantity);
+                }
+            }
+
+            OrderDetail::where('order_id', $order->id)->delete();
+            OrderPaymentDetail::where('order_id', $order->id)->delete();
+
+            $order->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('toast_success', 'Order deleted successfully.');
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return redirect()->back()->with('toast_error', $e->getMessage());
+        }
+    }
 }
