@@ -274,8 +274,10 @@ class productController extends Controller
             'message'  => 'Product created successfully.',
             'redirect' => route('product.index', ['company' => request()->route('company')]),
             'data' => [
-                'id'   => $product->id,
-                'name' => $product->name,
+                'id'            => $product->id,
+                'name'          => $product->name,
+                'category_id'   => $product->category_id,
+                'sub_category_id' => $product->sub_category_id,
             ]
         ]);
 

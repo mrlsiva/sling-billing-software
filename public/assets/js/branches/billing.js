@@ -683,6 +683,52 @@ $(document).ready(function () {
             $("#gst").val("").prop('disabled', false);
         }
     });
+
+    $(document).on('keyup', '#phone', function () {
+        let phone = $(this).val();
+        console.log('phone keyup:', phone);
+
+        if (phone.length == 10) {
+            $.ajax({
+                url: 'get_customer_detail',
+                type: 'GET',
+                dataType: 'json',
+                data: { phone: phone },
+                success: function (data) {
+                    if (data) {
+                        $("#customer").val(data.id);
+                        $("#alt_phone").val(data.alt_phone).prop('disabled', true);
+                        $("#name").val(data.name).prop('disabled', true);
+                        $("#address").val(data.address).prop('disabled', true);
+                        $("#pincode").val(data.pincode).prop('disabled', true);
+
+                        $('select[name="gender"]').empty();
+                        $('select[name="gender"]').append('<option value="">Select</option>');
+                        if (data.gender_id == 1) {
+                            $('select[name="gender"]').append('<option value="1" selected>Female</option>');
+                            $('select[name="gender"]').append('<option value="2">Male</option>');
+                        } else if (data.gender_id == 2) {
+                            $('select[name="gender"]').append('<option value="1">Female</option>');
+                            $('select[name="gender"]').append('<option value="2" selected>Male</option>');
+                        }
+                        $('select[name="gender"]').prop('disabled', true);
+                        $("#dob").val(data.dob).prop('disabled', true);
+                        $("#gst").val(data.gst).prop('disabled', true);
+                    }
+                },
+                error: function () {
+                    $("#customer").val('');
+                    $("#alt_phone").val('').prop('disabled', false);
+                    $("#name").val('').prop('disabled', false);
+                    $("#address").val('').prop('disabled', false);
+                    $("#pincode").val('').prop('disabled', false);
+                    $('select[name="gender"]').val('').prop('disabled', false);
+                    $("#dob").val('').prop('disabled', false);
+                    $("#gst").val('').prop('disabled', false);
+                }
+            });
+        }
+    });
 });
 
 document.getElementById('next_tab_user_info').addEventListener('click', function (e) {

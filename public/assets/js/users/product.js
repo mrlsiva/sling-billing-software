@@ -466,6 +466,22 @@ $('#productCreate').on('submit', function (e) {
                 }
                 else
                 {
+                    let product = response.data;
+
+                    /* Append to purchase-order rows where category + sub-category match */
+                    $('#productsContainer .product-row').each(function () {
+                        var row = $(this);
+                        var catVal = row.find('.category-select').val();
+                        var subVal = row.find('.sub-category-select').val();
+                        if (catVal == product.category_id && subVal == product.sub_category_id) {
+                            var prodSel = row.find('.product-select');
+                            if (prodSel.find('option[value="' + product.id + '"]').length === 0) {
+                                prodSel.append('<option value="' + product.id + '">' + product.name + '</option>');
+                                if (prodSel.data('select2')) { prodSel.select2('destroy'); prodSel.select2({ width: '100%', placeholder: 'Select Product' }); }
+                            }
+                        }
+                    });
+
                     /* Close modal */
                     $('#productAdd').modal('hide');
 

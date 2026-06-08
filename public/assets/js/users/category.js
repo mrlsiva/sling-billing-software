@@ -65,19 +65,20 @@ $('#addCategory').on('submit', function (e) {
 
                     let categorySelect = $('#category');
 
-                    /* Append category if not exists */
-                    if (categorySelect.find('option[value="' + category.id + '"]').length === 0) {
-                        categorySelect.append(
-                            `<option value="${category.id}">
-                                ${category.name}
-                            </option>`
-                        );
+                    /* Append category if not exists (for other pages with #category select) */
+                    if (categorySelect.length && categorySelect.find('option[value="' + category.id + '"]').length === 0) {
+                        categorySelect.append(`<option value="${category.id}">${category.name}</option>`);
+                        categorySelect.val(category.id).trigger('change');
                     }
 
-                    /* Select newly created category */
-                    categorySelect
-                        .val(category.id)
-                        .trigger('change');
+                    /* Append to all purchase-order product row category selects */
+                    $('#productsContainer .category-select').each(function () {
+                        var sel = $(this);
+                        if (sel.find('option[value="' + category.id + '"]').length === 0) {
+                            sel.append('<option value="' + category.id + '">' + category.name + '</option>');
+                            if (sel.data('select2')) { sel.select2('destroy'); sel.select2({ width: '100%', placeholder: 'Select Category' }); }
+                        }
+                    });
 
                     /* Close modal */
                     $('#categoryAdd').modal('hide');

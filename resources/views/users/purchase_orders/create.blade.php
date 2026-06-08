@@ -4,6 +4,15 @@
     <title>{{ config('app.name')}} | Purchase Order</title>
 @endsection
 
+@section('style')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+</style>
+@endsection
+
 @section('body')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="vendor-store-url" content="{{ route('vendor.store', ['company' => request()->route('company')]) }}">
@@ -344,6 +353,7 @@
 @endsection
 
 @section('script')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{{asset('assets/js/users/purchase.js?' . $version)}}"></script>
 <script src="{{asset('assets/js/users/vendor.js?' . $version)}}"></script>
 <script src="{{asset('assets/js/users/category.js?' . $version)}}"></script>
@@ -406,26 +416,5 @@ $(document).ready(function () {
 });
 </script>
 
-<script>
-$(document).on('focus', '.category-select', function () {
-
-    let select = $(this);
-    $.ajax({
-        url: 'get-categories', // Laravel route
-        type: 'GET',
-        success: function(response){
-
-            // Clear everything and add fresh default option
-            select.empty().append('<option value="">Select</option>');
-            $.each(response, function(index, category){
-                select.append(
-                    '<option value="'+category.id+'">'+category.name+'</option>'
-                );
-            });
-        }
-    });
-
-});
-</script>
 
 @endsection
