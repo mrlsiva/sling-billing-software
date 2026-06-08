@@ -81,16 +81,31 @@ class ProductTransferImport implements ToCollection
 
             try {
 
-                [
-                    $categoryName,
-                    $subCategoryName,
-                    $productName,
-                    $imei,
-                    $sizeName,
-                    $colourName,
-                    $quantity
-                ] = $row;
+                $row = $row->toArray();
 
+                // Excel WITH IMEI column
+                if (count($row) >= 7) {
+
+                    $categoryName    = $row[0] ?? null;
+                    $subCategoryName = $row[1] ?? null;
+                    $productName     = $row[2] ?? null;
+                    $imei            = $row[3] ?? null;
+                    $sizeName        = $row[4] ?? null;
+                    $colourName      = $row[5] ?? null;
+                    $quantity        = $row[6] ?? null;
+
+                }
+                // Excel WITHOUT IMEI column
+                else {
+
+                    $categoryName    = $row[0] ?? null;
+                    $subCategoryName = $row[1] ?? null;
+                    $productName     = $row[2] ?? null;
+                    $imei            = null;
+                    $sizeName        = $row[3] ?? null;
+                    $colourName      = $row[4] ?? null;
+                    $quantity        = $row[5] ?? null;
+                }
                 $categoryKey = strtolower(trim($categoryName));
 
                 $subCategoryKey = $categoryKey . '|' . strtolower(trim($subCategoryName));
