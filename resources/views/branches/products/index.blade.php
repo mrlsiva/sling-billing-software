@@ -95,9 +95,23 @@
                                     <td>{{ $stock->category->name }} - {{ $stock->sub_category->name }}</td>
                                     <td>{{ $stock->product->name }}</td>
                                     <td>{{ $stock->product->metric->name ?? '-' }}</td>
-                                    <td>{{ $stock->product->price }}</td>
+                                    <td>
+                                        @if($stock->product->discounted_price < $stock->product->price)
+                                        <del>{{ number_format($stock->product->price, 2) }}</del>
+                                        <br>
+                                        <strong>{{ number_format($stock->product->discounted_price, 2) }}</strong>
+                                        @else
+                                        {{ number_format($stock->product->price, 2) }}
+                                        @endif
+                                    </td>
                                     <td>{{ $stock->quantity }}</td>
-                                    <td>{{ number_format($stock->product->price * $stock->quantity, 2) }}</td>
+                                    @php
+                                        $unitPrice = $stock->product->discounted_price < $stock->product->price
+                                            ? $stock->product->discounted_price
+                                            : $stock->product->price;
+                                    @endphp
+
+                                    <td>{{ number_format($unitPrice * $stock->quantity, 2) }}</td>
 
                                     <td>
                                         @if($variation && ($variation->size_id !== null || $variation->colour_id !== null))

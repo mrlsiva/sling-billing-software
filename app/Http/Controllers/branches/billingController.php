@@ -161,15 +161,16 @@ class billingController extends Controller
         ->first();
 
         return response()->json([
-            'id'            => $product->id,
-            'name'          => $product->name,
-            'price'         => $product->price,
-            'tax_amount'    => $product->tax_amount,
-            'tax'           => $product->tax,
-            'category'      => $product->category,
-            'sub_category'  => $product->sub_category,
-            'stock'         => $product->stock,
-            'variations'    => $product->stock ? $product->stock->variations->map(function ($v) {
+            'id'             => $product->id,
+            'name'           => $product->name,
+            'price'          => $product->price,
+            'discount_price' => $product->discounted_price,
+            'tax_amount'     => $product->tax_amount,
+            'tax'            => $product->tax,
+            'category'       => $product->category,
+            'sub_category'   => $product->sub_category,
+            'stock'          => $product->stock,
+            'variations'     => $product->stock ? $product->stock->variations->map(function ($v) {
                 return [
                     'id'          => $v->id,
                     'size_name'   => optional($v->size)->name,
@@ -214,10 +215,11 @@ class billingController extends Controller
             'quantity'      => $variation->quantity,
 
             // MANDATORY FOR JS
-            'base_price'    => (float) $product->price,
-            'price'         => (float) $product->price,
-            'tax_amount'    => (float) $product->tax_amount,
-            'tax'           => $product->tax->name ?? '0'
+            'base_price'     => (float) $product->price,
+            'price'          => (float) $product->price,
+            'discount_price' => (float) $product->discounted_price,
+            'tax_amount'     => (float) $product->tax_amount,
+            'tax'            => $product->tax->name ?? '0'
         ]);
     }
 
