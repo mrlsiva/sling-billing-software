@@ -256,6 +256,7 @@ class branchController extends Controller
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
             'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
             'able_to_delete_order' => $request->has('able_to_delete_order') ? 1 : 0,
+            'able_to_round_price' => $request->has('able_to_round_price') ? 1 : 0,
         ]);
 
         //Log
@@ -475,6 +476,7 @@ class branchController extends Controller
             'is_scan_avaiable' => $request->has('is_scan_avaiable') ? 1 : 0,
             'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
             'able_to_delete_order' => $request->has('able_to_delete_order') ? 1 : 0,
+            'able_to_round_price' => $request->has('able_to_round_price') ? 1 : 0,
         ]);
 
         //Log

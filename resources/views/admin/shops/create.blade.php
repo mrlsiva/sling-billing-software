@@ -262,6 +262,16 @@
                                 </div>
                             </div>
 
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mt-5">
+                                        <input class="form-check-input" type="checkbox" id="able_to_round_price" name="able_to_round_price">
+                                        <label class="form-check-label" for="able_to_round_price">Able to Round Price</label>
+                                        <span class="text-danger">*</span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

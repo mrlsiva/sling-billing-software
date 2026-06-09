@@ -16,6 +16,7 @@ use App\Models\ProductImeiNumber;
 use App\Models\PurchaseOrder;
 use App\Models\ShopPayment;
 use App\Models\StockVariation;
+use App\Models\UserDetail;
 use App\Models\Category;
 use App\Models\Payment;
 use App\Models\Product;
@@ -286,6 +287,8 @@ class purchaseOrderController extends Controller
      */
     public function processOrderStorage($vendorId, $paymentId, $invoiceNo, $invoiceDate, $dueDate, array $products)
     {
+        $auth = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+
         $vendor     = Vendor::findOrFail($vendorId);
         $totalGross = 0;
         $purchaseOrder = null;
@@ -316,6 +319,12 @@ class purchaseOrderController extends Controller
             $colourList = array_unique($colourList);
             $imeiList   = array_filter(array_map('trim', $imeiList));
 
+            $pricePerUnit = $auth->able_to_round_price == 1 ? round($item['price_per_unit']) : $item['price_per_unit'];
+
+            $netCost = $auth->able_to_round_price == 1 ? round($item['net_cost']) : $item['net_cost'];
+
+            $grossCost = $auth->able_to_round_price == 1 ? round($item['gross_cost']) : $item['gross_cost'];
+
             $purchaseOrder = PurchaseOrder::create([
                 'shop_id'         => Auth::user()->owner_id,
                 'vendor_id'       => $vendorId,
@@ -328,11 +337,11 @@ class purchaseOrderController extends Controller
                 'product_id'      => $item['product'],
                 'metric_id'       => $item['unit'],
                 'quantity'        => $item['quantity'],
-                'price_per_unit'  => round($item['price_per_unit']),
+                'price_per_unit'  => $pricePerUnit,
                 'tax'             => $item['tax'] ?? 0,
                 'discount'        => $item['discount'] ?? 0,
-                'net_cost'        => round($item['net_cost']),
-                'gross_cost'      => round($item['gross_cost']),
+                'net_cost'        => $netCost,
+                'gross_cost'      => $grossCost,
                 'imei'            => !empty($imeiList) ? implode(',', $imeiList) : null,
                 'size'            => !empty($sizeList) ? implode(',', $sizeList) : null,
                 'colour'          => !empty($colourList) ? implode(',', $colourList) : null,

@@ -26,6 +26,7 @@ use App\Models\Metric;
 use App\Models\Stock;
 use App\Models\Colour;
 use App\Models\Size;
+use App\Models\UserDetail;
 use App\Traits\common;
 use App\Traits\Log;
 use App\Models\Tax;
@@ -125,6 +126,9 @@ class productController extends Controller
         ]);
 
         DB::beginTransaction();
+
+        $auth = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+
         $tax = Tax::where('id',$request->tax)->first();
         $price = $request->price; // base price
 
@@ -138,13 +142,23 @@ class productController extends Controller
         if ($tax && $tax->name != 0)
         {            
             $taxRate   = (float) $tax->name;
-            $taxAmount   = round($price / (1 + ($taxRate / 100)),2);
+            if($auth->able_to_round_price == 1)
+            {
+                $taxAmount   = round($price / (1 + ($taxRate / 100)),2);
+            }
+            else
+            {
+                $taxAmount   = $price / (1 + ($taxRate / 100));
+            }
+            
             $taxAmount   = $request->price - $taxAmount;
             //$taxAmount = $price * ((float) $tax->name / 100); 
             //$finalPrice = $price + $taxAmount; // if you want price including tax
         }
 
         //return $taxAmount;
+
+        $price = $auth->able_to_round_price == 1 ? round($request->price) : $request->price;
 
         $product = Product::create([ 
             'user_id' => Auth::user()->owner_id,
@@ -154,7 +168,7 @@ class productController extends Controller
             'description' => $request->description,
             'code' => $request->code,
             'hsn_code' => $request->hsn_code,
-            'price' => round($request->price),
+            'price' => $price,
             'tax_amount' => round($taxAmount),
             'tax_id' => $request->tax,
             'metric_id' => $request->metric,
@@ -354,6 +368,8 @@ class productController extends Controller
 
         DB::beginTransaction();
 
+        $auth = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+
         $product = Product::find($request->id);
 
         $stock = Stock::where([['shop_id', Auth::user()->owner_id],['category_id', $product->category_id],['sub_category_id', $product->sub_category_id],['product_id', $request->id]])->first();
@@ -372,9 +388,19 @@ class productController extends Controller
         if ($tax && $tax->name != 0)
         {            
             $taxRate   = (float) $tax->name;
-            $taxAmount   = round($price / (1 + ($taxRate / 100)),2);
+            if($auth->able_to_round_price == 1)
+            {
+                $taxAmount   = round($price / (1 + ($taxRate / 100)),2);
+            }
+            else
+            {
+                $taxAmount   = $price / (1 + ($taxRate / 100));
+            }
             $taxAmount   = $request->price - $taxAmount;
         }
+
+        $price = $auth->able_to_round_price == 1 ? round($request->price) : $request->price;
+        $taxAmount = $auth->able_to_round_price == 1 ? round($taxAmount) : $taxAmount;
 
         $product->update([ 
             'category_id' => $request->category_id,
@@ -383,8 +409,8 @@ class productController extends Controller
             'description' => $request->description,
             'code' => $request->code,
             'hsn_code' => $request->hsn_code,
-            'price' => round($request->price),
-            'tax_amount' => round($taxAmount),
+            'price' => $price,
+            'tax_amount' => $taxAmount,
             'tax_id' => $request->tax,
             'metric_id' => $request->metric,
             'discount_type' => $request->discount_type,

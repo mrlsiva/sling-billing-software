@@ -171,6 +171,11 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             }
         }
 
+        $auth = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+
+        $price = $auth->able_to_round_price == 1 ? round($price) : $price;
+        $taxAmount = $auth->able_to_round_price == 1 ? round($taxAmount) : $taxAmount;
+
         $product = new Product([
             'user_id'        => $userId,
             'category_id'    => $category->id,
@@ -179,8 +184,8 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             'description'    => $row['description'] ?? null,
             'code'           => $row['code'],
             'hsn_code'       => $row['hsn_code'] ?? null,
-            'price'          => round($price),
-            'tax_amount'     => round($taxAmount),
+            'price'          => $price,
+            'tax_amount'     => $taxAmount,
             'tax_id'         => $tax->id,
             'metric_id'      => $metric->id,
             'discount_type'  => $discountType,

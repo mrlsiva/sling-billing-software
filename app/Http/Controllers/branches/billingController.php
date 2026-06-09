@@ -356,6 +356,10 @@ class billingController extends Controller
             return 0;
         });
 
+        $auth = UserDetail::where('user_id',Auth::user()->parent_id)->first();
+
+        $billAmount = $auth->able_to_round_price == 1 ? round($billAmount) : $billAmount;
+
         $order = Order::create([
             'shop_id'                => $user->parent_id,
             'branch_id'              => Auth::user()->id,
@@ -364,7 +368,7 @@ class billingController extends Controller
             'customer_id'            => $customer->id,
             'order_discount'         => $request->discount,
             'total_product_discount' => $totalProductDiscount,
-            'bill_amount'            => round($billAmount),
+            'bill_amount'            => $billAmount,
             'billed_on'              => now(),
         ]);
 

@@ -291,6 +291,9 @@ class billingsController extends Controller
             return $discount;
         });
 
+        $auth = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+        $billAmount = $auth->able_to_round_price == 1 ? round($billAmount) : $billAmount;
+
         $order = Order::create([
             'shop_id'                   => $user->id,
             'branch_id'                 => null,
@@ -299,7 +302,7 @@ class billingsController extends Controller
             'customer_id'               => $customer->id,
             'order_discount'            => $request->discount,
             'total_product_discount'    => $totalProductDiscount,
-            'bill_amount'               => round($billAmount),
+            'bill_amount'               => $billAmount,
             'billed_on'                 => Carbon::now(),
         ]);
 
