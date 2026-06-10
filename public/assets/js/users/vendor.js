@@ -59,7 +59,7 @@ $('#addVendor').on('submit', function (e) {
 		},
 
 		success: function (response) {
-			console.log(response);
+			//console.log(response);
 
 			if (response.status === true) 
 			{

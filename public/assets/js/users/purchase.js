@@ -85,7 +85,7 @@ jQuery(document).ready(function () {
         // product details
         $.getJSON('get_product_detail', { product: product })
             .done(function (data) {
-                console.log('product_detail', data);
+                //console.log('product_detail', data);
                 if (data.metric) unitInput.val(data.metric.id);
                 if (data.metric && data.metric.name) metricDisplay.text("(" + data.metric.name + ")");
                 if (data.price) row.find('.price-input').val(parseFloat(data.price).toFixed(2));
@@ -98,7 +98,7 @@ jQuery(document).ready(function () {
         // variations
         $.getJSON('get_stock_variations', { product_id: product })
             .done(function (response) {
-                console.log('stock_variations', response);
+                //console.log('stock_variations', response);
                 variationContainer.html('');
 
                 if (!response || !Array.isArray(response.variations) || response.variations.length === 0) {
@@ -465,7 +465,7 @@ jQuery(document).ready(function () {
             const tax = parseFloat(row.find('.tax-input').val()) || 0;
             const discount = parseFloat(row.find('.discount-input').val()) || 0;
 
-            console.log(tax);
+            //console.log(tax);
             const net = qty * price;
             const taxAmount = net * tax / 100;
 
@@ -562,7 +562,7 @@ $('#purchaseOrderCreate').on('submit', function (e) {
         },
 
         success: function (response) {
-            console.log(response);
+            //console.log(response);
 
             if (response.status === true) {
                 const event = new CustomEvent("toast", {

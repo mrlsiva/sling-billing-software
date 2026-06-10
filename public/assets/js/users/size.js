@@ -24,7 +24,7 @@ $('#addSize').on('submit', function (e) {
         },
 
         success: function (response) {
-            console.log(response);
+            //console.log(response);
 
             if (response.status === true) 
             {
@@ -138,7 +138,7 @@ $('#addSize').on('submit', function (e) {
 
 function size_edit(element) {
     var system_id = $(element).data("system_id");
-    console.log(system_id);
+    //console.log(system_id);
     jQuery.ajax({
         url : 'edit',
         type: 'GET',
@@ -146,14 +146,14 @@ function size_edit(element) {
         data: {id:system_id},
 
         success: function (data) {
-            console.log(data);
+            //console.log(data);
             document.getElementById("size").value = data.name;
             document.getElementById("size_id").value = system_id;
             $('#sizeEdit').modal('show');
         },
         error: function (xhr) {
             alert("Failed to load size.");
-            console.log(xhr.responseText);
+            //console.log(xhr.responseText);
         }
     });
 }

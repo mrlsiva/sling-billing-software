@@ -24,7 +24,7 @@ $('#addMetric').on('submit', function (e) {
         },
 
         success: function (response) {
-            console.log(response);
+            //console.log(response);
 
             if (response.status === true) 
             {
@@ -125,7 +125,7 @@ $('#addMetric').on('submit', function (e) {
 
 function metric_edit(element) {
     var system_id = $(element).data("system_id");
-    console.log(system_id);
+    //console.log(system_id);
     jQuery.ajax({
         url : 'edit',
         type: 'GET',
@@ -133,14 +133,14 @@ function metric_edit(element) {
         data: {id:system_id},
 
         success: function (data) {
-            console.log(data);
+            //console.log(data);
             document.getElementById("metric").value = data.name;
             document.getElementById("metric_id").value = system_id;
             $('#metricEdit').modal('show');
         },
         error: function (xhr) {
             alert("Failed to load metric.");
-            console.log(xhr.responseText);
+            //console.log(xhr.responseText);
         }
     });
 }

@@ -23,12 +23,12 @@ jQuery(document).ready(function ()
             dataType: 'json',
             success:function(data)
             {
-                console.log(data);
+                //console.log(data);
 
                 jQuery('select[name="category"]').empty();
                 $('select[name="category"]').append('<option value="">'+ "Select" +'</option>');
                 jQuery.each(data, function(key,value){
-                    console.log(value.name)
+                    //console.log(value.name)
                     $('select[name="category"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
                 });                 
 
@@ -74,7 +74,7 @@ $('#addSubCategory').on('submit', function (e) {
         },
 
         success: function (response) {
-            console.log(response);
+            //console.log(response);
 
             if (response.status === true) 
             {
@@ -181,7 +181,7 @@ $('#addSubCategory').on('submit', function (e) {
 
 function sub_category_edit(element) {
     var system_id = $(element).data("system_id");
-    console.log(system_id);
+    //console.log(system_id);
     jQuery.ajax({
         url : 'edit',
         type: 'GET',
@@ -189,7 +189,7 @@ function sub_category_edit(element) {
         data: {id:system_id},
 
         success: function (data) {
-            console.log(data.sub_category.category_id);
+            //console.log(data.sub_category.category_id);
             document.getElementById("sub_category_name").value = data.sub_category.name;
             document.getElementById("sub_category_id").value = data.sub_category.id;
             
@@ -199,7 +199,7 @@ function sub_category_edit(element) {
         },
         error: function (xhr) {
             alert("Failed to load category.");
-            console.log(xhr.responseText);
+            //console.log(xhr.responseText);
         }
     });
 } 

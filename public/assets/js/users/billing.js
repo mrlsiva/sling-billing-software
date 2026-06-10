@@ -8,12 +8,12 @@ jQuery(document).ready(function () {
                 dataType: 'json',
                 data: { id: category },
                 success: function (data) {
-                    console.log(data);
+                    //console.log(data);
 
                     jQuery('select[name="sub_category"]').empty();
                     $('select[name="sub_category"]').append('<option value="">' + "Select" + '</option>');
                     jQuery.each(data, function (key, value) {
-                        console.log(value.name)
+                        //console.log(value.name)
                         $('select[name="sub_category"]').append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
 
@@ -35,10 +35,10 @@ function loadProducts(page = 1) {
     let product = jQuery('input[name="product"]').val();
     let filter = jQuery("#filterInput").val();
 
-    console.log(sub_category);
-    console.log(category);
-    console.log(filter);
-    console.log(product);
+    // console.log(sub_category);
+    // console.log(category);
+    // console.log(filter);
+    // console.log(product);
 
     jQuery.ajax({
         url: 'get_product',
@@ -53,7 +53,7 @@ function loadProducts(page = 1) {
         },
         success: function (response) {
 
-            console.log(response);
+            //console.log(response);
 
             let html = '<div class="row">';
             response.data.forEach(function (stock) {
@@ -175,7 +175,7 @@ function add_to_cart(element) {
         data: { id: system_id },
         success: function (data) {
 
-            console.log(data);
+            //console.log(data);
 
             if(data.stock.quantity == 0)
             {
@@ -332,7 +332,7 @@ function addVariationToCart(productId, variationId) {
         data: { id: variationId },
         success: function (v) {
 
-            console.log(v);
+            //console.log(v);
 
             if(v.quantity == 0 )
             {
@@ -532,7 +532,7 @@ function updateCartSummary() {
         var qty = parseInt($(this).find('.qty-input').val());
         var price = parseFloat($(this).data('price'));        // total price WITH tax (per item)
         var tax_amount = parseFloat($(this).data('tax_amount')); // tax portion (per item)
-        console.log(tax_amount);
+        //console.log(tax_amount);
         totalItems += qty;
         subTotal += (price - tax_amount) * qty;  // only base price part
         totalTax += tax_amount * qty;           // tax part
@@ -540,7 +540,7 @@ function updateCartSummary() {
 
     var discount = parseFloat($('#discount').val()) || 0;
 
-    console.log(discount);
+    //console.log(discount);
 
     var totalAmount = subTotal + totalTax; // OR just sum(price * qty)
     totalAmount = totalAmount - discount;
@@ -635,7 +635,7 @@ $(document).ready(function () {
                 type: 'get',
                 data: { phone: request.term },
                 success: function (data) {
-                    console.log(data);
+                    //console.log(data);
                     response(data.phones); // expects an array
                 }
             });
@@ -669,7 +669,7 @@ $(document).ready(function () {
                 data: { phone: phone },
                 success: function (data) {
 
-                    console.log(data);
+                    //console.log(data);
 
                     $("#customer").val(data.id);
                     $("#alt_phone").val(data.alt_phone).prop('disabled', true);
@@ -1813,10 +1813,10 @@ function submit() {
         billing_pincode: $("#billing_pincode").val().trim(),
     };
 
-    console.log(customer);
-    console.log(billing_customer);
-    console.log(cartData);
-    console.log(paymentData);
+    // console.log(customer);
+    // console.log(billing_customer);
+    // console.log(cartData);
+    // console.log(paymentData);
 
     // ajax submit
     $.ajax({
@@ -1832,7 +1832,7 @@ function submit() {
             discount: discount
         },
         success: function (data) {
-            console.log("Order stored:", data);
+            //console.log("Order stored:", data);
 
             if(data.status == 'success')
             {
@@ -1903,7 +1903,7 @@ function openImeiModal(productId,productName) {
         ? cartItem.attr('data-imei').split(',') 
         : [];
 
-    console.log(productId);
+    //console.log(productId);
 
     $.ajax({
         url: 'get_imei_product',
@@ -1911,7 +1911,7 @@ function openImeiModal(productId,productName) {
         dataType: 'json',
         data: { product: productId },
         success: function (imeiNumbers) {
-            console.log(imeiNumbers);
+            //console.log(imeiNumbers);
             let imeiHtml = `
                 <div class="mb-3">
                     <div class="input-group">

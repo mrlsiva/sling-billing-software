@@ -24,7 +24,7 @@ $('#addColour').on('submit', function (e) {
         },
 
         success: function (response) {
-            console.log(response);
+            //console.log(response);
 
             if (response.status === true) 
             {
@@ -140,7 +140,7 @@ $('#addColour').on('submit', function (e) {
 
 function colour_edit(element) {
     var system_id = $(element).data("system_id");
-    console.log(system_id);
+    //console.log(system_id);
     jQuery.ajax({
         url : 'edit',
         type: 'GET',
@@ -148,14 +148,14 @@ function colour_edit(element) {
         data: {id:system_id},
 
         success: function (data) {
-            console.log(data);
+            //console.log(data);
             document.getElementById("colour").value = data.name;
             document.getElementById("colour_id").value = system_id;
             $('#colourEdit').modal('show');
         },
         error: function (xhr) {
             alert("Failed to load colour.");
-            console.log(xhr.responseText);
+            //console.log(xhr.responseText);
         }
     });
 }

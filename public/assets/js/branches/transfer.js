@@ -11,12 +11,12 @@ jQuery(document).ready(function ()
 				data: { id: category },
 				success:function(data)
 				{
-					console.log(data);
+					//console.log(data);
 
 					jQuery('select[name="sub_category"]').empty();
 					$('select[name="sub_category"]').append('<option value="">'+ "Select" +'</option>');
 					jQuery.each(data, function(key,value){
-						console.log(value.name)
+						//console.log(value.name)
 						$('select[name="sub_category"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
 					});					
 					
@@ -40,12 +40,12 @@ jQuery(document).ready(function ()
 				data: { sub_category: sub_category, category: category },
 				success:function(data)
 				{
-					console.log(data);
+					//console.log(data);
 
 					jQuery('select[name="product"]').empty();
 					$('select[name="product"]').append('<option value="">'+ "Select" +'</option>');
 					jQuery.each(data, function(key,value){
-						console.log(value.name)
+						//console.log(value.name)
 						$('select[name="product"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
 					});					
 					

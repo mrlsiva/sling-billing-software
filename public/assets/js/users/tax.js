@@ -24,7 +24,7 @@ $('#addTax').on('submit', function (e) {
         },
 
         success: function (response) {
-            console.log(response);
+            //console.log(response);
 
             if (response.status === true) 
             {
@@ -124,7 +124,7 @@ $('#addTax').on('submit', function (e) {
 
 function tax_edit(element) {
     var system_id = $(element).data("system_id");
-    console.log(system_id);
+    //console.log(system_id);
     jQuery.ajax({
         url : 'edit',
         type: 'GET',
@@ -132,14 +132,14 @@ function tax_edit(element) {
         data: {id:system_id},
 
         success: function (data) {
-            console.log(data);
+            //console.log(data);
             document.getElementById("tax").value = data.name;
             document.getElementById("tax_id").value = system_id;
             $('#taxEdit').modal('show');
         },
         error: function (xhr) {
             alert("Failed to load category.");
-            console.log(xhr.responseText);
+            //console.log(xhr.responseText);
         }
     });
 }
