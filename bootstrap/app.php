@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\EnsureCompanyIsValid;
+use App\Http\Middleware\EnsureEcommerceUrl;
 use App\Models\ErrorReport;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'is_company_valid' => EnsureCompanyIsValid::class,
+            'is_url_valid' => EnsureEcommerceUrl::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class
         ]);
     })
