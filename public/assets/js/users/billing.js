@@ -87,10 +87,7 @@ function loadProducts(page = 1) {
                                         ${stock.product.discounted_price < stock.product.price
                                             ? `
                                             <p class="mb-0 d-flex align-items-center gap-2">
-                                                <del class="text-muted">Rs ${stock.product.price}</del>
-                                                <span class="text-success fw-bold">
-                                                    Rs ${stock.product.discounted_price}
-                                                </span>
+                                                Rs ${stock.product.discounted_price}
                                             </p>`
                                             : `
                                             <p class="text-dark fw-semibold fs-12 mb-0">
@@ -288,8 +285,8 @@ function add_to_cart(element) {
                                     parseFloat(data.discount_price) < parseFloat(data.price)
                                     ? `
                                         <p class="fw-semibold fs-16 mb-0 d-flex align-items-center gap-2">
-                                            <del class="text-muted fs-12">₹${data.price}</del>
-                                            <span class="text-success">₹${data.discount_price}</span>
+                                            
+                                            ₹${data.discount_price}
                                             <span class="fs-10">(${data.tax.name}%)</span>
                                         </p>
                                       `
@@ -414,8 +411,8 @@ function addVariationToCart(productId, variationId) {
                                     parseFloat(v.discount_price) < parseFloat(v.price)
                                     ? `
                                         <p class="fw-semibold fs-16 mb-0 d-flex align-items-center gap-2">
-                                            <del class="text-muted fs-12">₹${v.price}</del>
-                                            <span class="text-success">₹${v.discount_price}</span>
+                                            
+                                            ₹${v.discount_price}
                                             <span class="fs-10">(${v.tax}%)</span>
                                         </p>
                                       `

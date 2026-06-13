@@ -124,9 +124,7 @@
                                         <td>{{$stock->product->code ?? '-'}}</td>
                                         <td>
                                             @if($stock->product->discounted_price < $stock->product->price)
-                                                <del>{{ number_format($stock->product->price, 2) }}</del>
-                                                <br>
-                                                <strong>{{ number_format($stock->product->discounted_price, 2) }}</strong>
+                                                {{ number_format($stock->product->discounted_price, 2) }}
                                             @else
                                                 {{ number_format($stock->product->price, 2) }}
                                             @endif

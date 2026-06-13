@@ -85,7 +85,13 @@
 
 										<td>{{$product->name}}</td>
 										<!-- <td>{{$product->hsn_code}}</td> -->
-										<td>{{$product->price}}</td>
+										<td>
+                                            @if($product->discounted_price < $product->price)
+                                                {{ number_format($product->discounted_price, 2) }}
+                                            @else
+                                                {{ number_format($product->price, 2) }}
+                                            @endif
+                                        </td>
 										<td>{{ $product->tax->name ?? '-' }}%</td>
 
 										<td>{{$product->quantity}}({{$product->metric->name ?? '-'}})</td>
