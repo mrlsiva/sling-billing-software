@@ -23,6 +23,10 @@ $(document).ready(function () {
                 });
 
                 $('#sub_category').html(option);
+
+                var subCategorySelect = $('#sub_category');
+                if (subCategorySelect.data('select2')) subCategorySelect.select2('destroy');
+                subCategorySelect.select2({ width: '100%', placeholder: 'Select' });
             }
         });
     }
@@ -70,8 +74,11 @@ jQuery(document).ready(function ()
 					jQuery.each(data, function(key,value){
 						//console.log(value.name)
 						$('select[name="sub_category"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
-					});					
-					
+					});
+
+					var subCategorySelect2 = $('select[name="sub_category"]');
+					if (subCategorySelect2.data('select2')) subCategorySelect2.select2('destroy');
+					subCategorySelect2.select2({ width: '100%', placeholder: 'Select' });
 				}
 			});
 		}
@@ -98,8 +105,11 @@ jQuery(document).ready(function ()
 					jQuery.each(data, function(key,value){
 						//console.log(value.name)
 						$('select[name="sub_category"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
-					});					
-					
+					});
+
+					var subCategorySelect3 = $('select[name="sub_category"]');
+					if (subCategorySelect3.data('select2')) subCategorySelect3.select2('destroy');
+					subCategorySelect3.select2({ width: '100%', placeholder: 'Select' });
 				}
 			});
 		}

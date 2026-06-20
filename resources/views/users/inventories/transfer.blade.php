@@ -4,6 +4,15 @@
 <title>{{ config('app.name')}} | Product Transfer</title>
 @endsection
 
+@section('style')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+</style>
+@endsection
+
 @section('body')
 	<div class="row">
 		<div class="col-xl-12">
@@ -53,7 +62,7 @@
 				    		</div>
 				    	</div>
 				    	<div class="col-md-5">
-				    		<select class="form-control" name="branch" id="branch">
+				    		<select class="form-control filter-branch-select" name="branch" id="branch">
 				    			<option value=""> Select Branch </option>
 				    			@foreach($branches as $branch)
 				    			<option value="{{$branch->id}}" {{ request('branch') == $branch->id ? 'selected' : '' }}>{{$branch->user_name}}</option>
@@ -137,7 +146,7 @@
 	                        <div class="col-md-12">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Branch</label>
-	                                <select class="form-control" data-choices name="branch" id="branch">
+                                <select class="form-control transfer-branch-select" name="branch" id="branch">
 	                                    <option value=""> Select </option>
 	                                    @foreach($branches as $branch)
 	                                    <option value="{{$branch->id}}">{{$branch->user_name}}</option>
@@ -150,7 +159,7 @@
 	                        <div class="col-md-12">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Category</label>
-	                                <select class="form-control" data-choices name="category" id="category">
+	                                <select class="form-control" name="category" id="category">
 	                                    <option value=""> Select </option>
 	                                    @foreach($categories as $category)
 	                                    <option value="{{$category->id}}">{{$category->name}}</option>
@@ -250,7 +259,7 @@
 	                        <div class="col-md-12">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Branch</label>
-	                                <select class="form-control" data-choices name="branch" id="branch">
+                                <select class="form-control bulk-branch-select" name="branch" id="branch">
 	                                    <option value=""> Select </option>
 	                                    @foreach($branches as $branch)
 	                                    <option value="{{$branch->id}}">{{$branch->user_name}}</option>
@@ -263,7 +272,7 @@
 	                    @php
 		                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
 		                @endphp
-                
+
 	                    @if($user_detail->is_imei_required == 1)
 
 	                    <div class="row">
@@ -305,5 +314,16 @@
 @endsection
 
 @section('script')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{{asset('assets/js/users/transfer.js?' . $version)}}"></script>
+<script>
+$(document).ready(function () {
+    $('.filter-branch-select').select2({ width: '100%', placeholder: 'Select Branch' });
+    $('.transfer-branch-select').select2({ width: '100%', placeholder: 'Select' });
+    $('.bulk-branch-select').select2({ width: '100%', placeholder: 'Select' });
+    $('#category').select2({ width: '100%', placeholder: 'Select' });
+    $('#sub_category').select2({ width: '100%', placeholder: 'Select' });
+    $('#product').select2({ width: '100%', placeholder: 'Select' });
+});
+</script>
 @endsection

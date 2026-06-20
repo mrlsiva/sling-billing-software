@@ -2,6 +2,9 @@ jQuery(document).ready(function () {
 
     let rowIndex = 0;
 
+    // Vendor searchable dropdown
+    $('#vendor').select2({ width: '100%', placeholder: 'Select Vendor' });
+
     // If server provided old products (blade will inject `window._OLD_PRODUCTS = ...`), restore them
     const oldProducts = window._OLD_PRODUCTS || null;
 
@@ -90,7 +93,7 @@ jQuery(document).ready(function () {
                 if (data.metric && data.metric.name) metricDisplay.text("(" + data.metric.name + ")");
                 if (data.price) row.find('.price-input').val(parseFloat(data.price).toFixed(2));
                 qtyInput.val(1);
-                if (data.tax.name) taxInput.val(data.tax.name).change(); else taxInput.val('0');
+                if (data.tax.name) taxInput.val(data.tax.name).trigger('change'); else taxInput.val('0').trigger('change');
                 calculateRowCosts(row);
             })
             .fail(function (xhr) { console.error('get_product_detail failed', xhr); });
@@ -334,6 +337,7 @@ jQuery(document).ready(function () {
         // Init Select2 on sub-category and product immediately (empty)
         reinitSelect2(newRow.find('.sub-category-select'), 'Select Sub Category');
         reinitSelect2(newRow.find('.product-select'), 'Select Product');
+        reinitSelect2(newRow.find('.tax-input'), 'Select Tax');
 
         // Load categories, populate select, then init Select2
         $.getJSON('get-categories').done(function (data) {
@@ -360,7 +364,7 @@ jQuery(document).ready(function () {
                 if (oldData.quantity) newRow.find('.quantity-input').val(oldData.quantity);
                 if (oldData.price_per_unit) newRow.find('.price-input').val(oldData.price_per_unit);
                 if (oldData.discount) newRow.find('.discount-input').val(oldData.discount);
-                if (oldData.tax) newRow.find('.tax-input').val(oldData.tax);
+                if (oldData.tax) newRow.find('.tax-input').val(oldData.tax).trigger('change');
 
                 // IMEIs
                 if (oldData.imei && Array.isArray(oldData.imei) && oldData.imei.length > 0) {

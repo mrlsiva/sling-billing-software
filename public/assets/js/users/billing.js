@@ -17,6 +17,9 @@ jQuery(document).ready(function () {
                         $('select[name="sub_category"]').append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
 
+                    var subCategorySelect = $('select[name="sub_category"]');
+                    if (subCategorySelect.data('select2')) subCategorySelect.select2('destroy');
+                    subCategorySelect.select2({ width: '100%', placeholder: 'Select' });
                 }
             });
         }

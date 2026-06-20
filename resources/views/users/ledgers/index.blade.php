@@ -6,6 +6,15 @@
     rel="stylesheet" />
 @endsection
 
+@section('style')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+</style>
+@endsection
+
 @section('body')
 <div class="row">
     @if ($errors->any())
@@ -536,6 +545,13 @@
 
 <!-- Bootstrap Bundle JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function () {
+    $('#payment').select2({ width: '100%', placeholder: 'Select' });
+});
+</script>
 
 <!-- Bootstrap Datepicker JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
