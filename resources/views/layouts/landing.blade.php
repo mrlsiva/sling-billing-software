@@ -14,6 +14,25 @@
 		<meta name="author" content="FoxPixel" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta charset="utf-8">
+
+		@php
+			$shareTitle = $user ? $user->name . ' | Sling Billing Software' : 'Sling Billing Software | Smart Billing for Indian Businesses';
+			$shareDescription = $user ? 'Visit ' . $user->name . ', powered by Sling Billing Software.' : 'Smart, simple billing software built for Indian businesses. Manage sales, inventory, GST billing and more.';
+		@endphp
+
+		<meta property="og:type" content="website">
+		<meta property="og:site_name" content="Sling Billing Software">
+		<meta property="og:title" content="{{ $shareTitle }}">
+		<meta property="og:description" content="{{ $shareDescription }}">
+		<meta property="og:url" content="{{ request()->url() }}">
+		<meta property="og:image" content="{{ asset('assets/images/share.png') }}">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" content="{{ $shareTitle }}">
+		<meta name="twitter:description" content="{{ $shareDescription }}">
+		<meta name="twitter:image" content="{{ asset('assets/images/share.png') }}">
 		<!-- Bootstrap 5 CSS -->
 		@if($user)
 			<link rel="icon" type="image/png" href="{{ $user->fav_icon ? asset('storage/' . $user->fav_icon) : asset('assets/images/favicon.png') }}">
