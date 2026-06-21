@@ -10,6 +10,7 @@
     .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
     .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+    .select2-dropdown { z-index: 1056; }
 </style>
 @endsection
 
