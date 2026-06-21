@@ -19,10 +19,10 @@
 	<meta name="author" content="FoxPixel" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="shortcut icon" href="assets/images/favicon.ico">
-	<link rel="stylesheet" href="{{ asset('assets/css/vendor.min.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/css/icons.min.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/vendor.min.css?' . $version) }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/icons.min.css?' . $version) }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/app.min.css?' . $version) }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/app.css?' . $version) }}">
     <script src="{{ asset('assets/js/config.min.js?' . $version) }}"></script>
     <link rel="icon" type="image/png" href="{{ $user->fav_icon ? asset('storage/' . $user->fav_icon) : asset('assets/images/favicon.png') }}">
 
