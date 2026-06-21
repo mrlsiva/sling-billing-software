@@ -21747,3 +21747,11 @@ min-height: 18px;
 .notification-dot-small {
     margin: 0 4px;
 }
+
+/* Keep select2 dropdowns above Bootstrap 5 modals (modal z-index: 1055) */
+.select2-container {
+    z-index: 1056;
+}
+.select2-dropdown {
+    z-index: 1056;
+}
