@@ -154,8 +154,9 @@ html[data-bs-theme="dark"].topbar-light {
     --bs-white-rgb: 255, 255, 255;
     --bs-black-rgb: 0, 0, 0;
     --bs-font-sans-serif: "Plus Jakarta Sans", serif;
-    --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
-        "Liberation Mono", "Courier New", monospace;
+    --bs-font-monospace:
+        SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
     --bs-gradient: linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.15),
@@ -2962,12 +2963,18 @@ progress {
     background-clip: padding-box;
     border: var(--bs-border-width) solid var(--bs-input-border-color);
     border-radius: 0.25rem;
-    -webkit-transition: border-color 0.15s ease-in-out,
+    -webkit-transition:
+        border-color 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
-    transition: border-color 0.15s ease-in-out,
+    transition:
+        border-color 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    transition:
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    transition:
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3036,15 +3043,26 @@ progress {
     border-width: 0;
     border-inline-end-width: var(--bs-border-width);
     border-radius: 0;
-    -webkit-transition: color 0.15s ease-in-out,
-        background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    -webkit-transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        -webkit-box-shadow 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
 }
 .form-control::file-selector-button {
@@ -3060,15 +3078,26 @@ progress {
     border-width: 0;
     border-inline-end-width: var(--bs-border-width);
     border-radius: 0;
-    -webkit-transition: color 0.15s ease-in-out,
-        background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    -webkit-transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        -webkit-box-shadow 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3192,19 +3221,25 @@ textarea.form-control-lg {
     -moz-appearance: none;
     appearance: none;
     background-color: var(--bs-secondary-bg);
-    background-image: var(--bs-form-select-bg-img),
-        var(--bs-form-select-bg-icon, none);
+    background-image:
+        var(--bs-form-select-bg-img), var(--bs-form-select-bg-icon, none);
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 14px 10px;
     border: var(--bs-border-width) solid var(--bs-input-border-color);
     border-radius: 0.25rem;
-    -webkit-transition: border-color 0.15s ease-in-out,
+    -webkit-transition:
+        border-color 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
-    transition: border-color 0.15s ease-in-out,
+    transition:
+        border-color 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    transition:
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    transition:
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3409,11 +3444,17 @@ textarea.form-control-lg {
     outline: 0;
 }
 .form-range:focus::-webkit-slider-thumb {
-    -webkit-box-shadow: 0 0 0 1px #f3f3f3, none;
-    box-shadow: 0 0 0 1px #f3f3f3, none;
+    -webkit-box-shadow:
+        0 0 0 1px #f3f3f3,
+        none;
+    box-shadow:
+        0 0 0 1px #f3f3f3,
+        none;
 }
 .form-range:focus::-moz-range-thumb {
-    box-shadow: 0 0 0 1px #f3f3f3, none;
+    box-shadow:
+        0 0 0 1px #f3f3f3,
+        none;
 }
 .form-range::-moz-focus-outer {
     border: 0;
@@ -3427,14 +3468,22 @@ textarea.form-control-lg {
     background-color: #1b1e2c;
     border: 0;
     border-radius: 0.5rem;
-    -webkit-transition: background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-    transition: background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-    transition: background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    transition: background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    -webkit-transition:
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        -webkit-box-shadow 0.15s ease-in-out;
+    transition:
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        -webkit-box-shadow 0.15s ease-in-out;
+    transition:
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    transition:
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3463,10 +3512,14 @@ textarea.form-control-lg {
     background-color: #1b1e2c;
     border: 0;
     border-radius: 0.5rem;
-    -moz-transition: background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    transition: background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    -moz-transition:
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    transition:
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
     .form-range::-moz-range-thumb {
@@ -3521,11 +3574,18 @@ textarea.form-control-lg {
     border: var(--bs-border-width) solid transparent;
     -webkit-transform-origin: 0 0;
     transform-origin: 0 0;
-    -webkit-transition: opacity 0.1s ease-in-out,
+    -webkit-transition:
+        opacity 0.1s ease-in-out,
         -webkit-transform 0.1s ease-in-out;
-    transition: opacity 0.1s ease-in-out, -webkit-transform 0.1s ease-in-out;
-    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
-    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out,
+    transition:
+        opacity 0.1s ease-in-out,
+        -webkit-transform 0.1s ease-in-out;
+    transition:
+        opacity 0.1s ease-in-out,
+        transform 0.1s ease-in-out;
+    transition:
+        opacity 0.1s ease-in-out,
+        transform 0.1s ease-in-out,
         -webkit-transform 0.1s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3829,8 +3889,12 @@ textarea.form-control.is-valid {
 .form-select.is-valid:not([multiple])[size="1"] {
     --bs-form-select-bg-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%231bb394' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
     padding-right: 5.5rem;
-    background-position: right 1rem center, center right 3rem;
-    background-size: 14px 10px, calc(0.75em + 0.5rem) calc(0.75em + 0.5rem);
+    background-position:
+        right 1rem center,
+        center right 3rem;
+    background-size:
+        14px 10px,
+        calc(0.75em + 0.5rem) calc(0.75em + 0.5rem);
 }
 .was-validated .form-select:valid:focus,
 .form-select.is-valid:focus {
@@ -3938,8 +4002,12 @@ textarea.form-control.is-invalid {
 .form-select.is-invalid:not([multiple])[size="1"] {
     --bs-form-select-bg-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ed5565'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ed5565' stroke='none'/%3e%3c/svg%3e");
     padding-right: 5.5rem;
-    background-position: right 1rem center, center right 3rem;
-    background-size: 14px 10px, calc(0.75em + 0.5rem) calc(0.75em + 0.5rem);
+    background-position:
+        right 1rem center,
+        center right 3rem;
+    background-size:
+        14px 10px,
+        calc(0.75em + 0.5rem) calc(0.75em + 0.5rem);
 }
 .was-validated .form-select:invalid:focus,
 .form-select.is-invalid:focus {
@@ -4018,15 +4086,26 @@ textarea.form-control.is-invalid {
     border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
     border-radius: var(--bs-btn-border-radius);
     background-color: var(--bs-btn-bg);
-    -webkit-transition: color 0.15s ease-in-out,
-        background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    -webkit-transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        -webkit-box-shadow 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -5022,9 +5101,13 @@ fieldset:disabled .btn {
     color: var(--bs-nav-link-color);
     background: none;
     border: 0;
-    -webkit-transition: color 0.15s ease-in-out,
-        background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    -webkit-transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
         border-color 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -5916,9 +5999,10 @@ fieldset:disabled .btn {
 .accordion {
     --bs-accordion-color: var(--bs-body-color);
     --bs-accordion-bg: var(--bs-secondary-bg);
-    --bs-accordion-transition: color 0.15s ease-in-out,
-        background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
-        box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
+    --bs-accordion-transition:
+        color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+        border-radius 0.15s ease;
     --bs-accordion-border-color: var(--bs-border-color);
     --bs-accordion-border-width: var(--bs-border-width);
     --bs-accordion-border-radius: var(--bs-border-radius);
@@ -6148,15 +6232,26 @@ fieldset:disabled .btn {
     background-color: var(--bs-pagination-bg);
     border: var(--bs-pagination-border-width) solid
         var(--bs-pagination-border-color);
-    -webkit-transition: color 0.15s ease-in-out,
-        background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    -webkit-transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        -webkit-box-shadow 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out,
         -webkit-box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -7077,7 +7172,9 @@ fieldset:disabled .btn {
     -webkit-transition: -webkit-transform 0.3s ease-out;
     transition: -webkit-transform 0.3s ease-out;
     transition: transform 0.3s ease-out;
-    transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out;
+    transition:
+        transform 0.3s ease-out,
+        -webkit-transform 0.3s ease-out;
     -webkit-transform: translate(0, -50px);
     transform: translate(0, -50px);
 }
@@ -7706,7 +7803,9 @@ fieldset:disabled .btn {
     -webkit-transition: -webkit-transform 0.6s ease-in-out;
     transition: -webkit-transform 0.6s ease-in-out;
     transition: transform 0.6s ease-in-out;
-    transition: transform 0.6s ease-in-out, -webkit-transform 0.6s ease-in-out;
+    transition:
+        transform 0.6s ease-in-out,
+        -webkit-transform 0.6s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
     .carousel-item {
@@ -16152,7 +16251,9 @@ fieldset:disabled .btn {
     -webkit-transition: -webkit-transform 0.2s;
     transition: -webkit-transform 0.2s;
     transition: transform 0.2s;
-    transition: transform 0.2s, -webkit-transform 0.2s;
+    transition:
+        transform 0.2s,
+        -webkit-transform 0.2s;
     color: var(--bs-main-menu-item-color);
     font-size: calc(var(--bs-main-menu-item-font-size) * 1.25);
     opacity: 0.6;
@@ -17349,8 +17450,12 @@ html[data-bs-theme="dark"] .btn-dark {
     color: #1b1e2c;
     text-decoration: none;
     opacity: 0;
-    -webkit-transition: color 0.15s ease-in-out, opacity 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, opacity 0.15s ease-in-out;
+    -webkit-transition:
+        color 0.15s ease-in-out,
+        opacity 0.15s ease-in-out;
+    transition:
+        color 0.15s ease-in-out,
+        opacity 0.15s ease-in-out;
 }
 .anchor:hover .anchor-link,
 .anchor:focus .anchor-link {
@@ -18249,10 +18354,8 @@ iconify-icon {
 }
 
 .bg-faq {
-    background-image: linear-gradient(
-            rgba(0, 0, 255, 0.02) 2px,
-            transparent 2px
-        ),
+    background-image:
+        linear-gradient(rgba(0, 0, 255, 0.02) 2px, transparent 2px),
         linear-gradient(to right, rgba(0, 0, 255, 0.02) 2px, transparent 2px);
     background-size: 78px 78px;
     background-color: rgba(210, 230, 243, 0);
@@ -19520,7 +19623,9 @@ th.fc-day-header {
     -webkit-transition: -webkit-transform 0.2s ease-in-out;
     transition: -webkit-transform 0.2s ease-in-out;
     transition: transform 0.2s ease-in-out;
-    transition: transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;
+    transition:
+        transform 0.2s ease-in-out,
+        -webkit-transform 0.2s ease-in-out;
     pointer-events: none;
 }
 .choices[data-type*="select-one"].is-open:after {
@@ -20498,9 +20603,11 @@ span.flatpickr-weekday,
 }
 
 .flatpickr-day.inRange {
-    -webkit-box-shadow: -5px 0 0 rgba(var(--bs-primary-rgb), 0.1),
+    -webkit-box-shadow:
+        -5px 0 0 rgba(var(--bs-primary-rgb), 0.1),
         5px 0 0 rgba(var(--bs-primary-rgb), 0.1);
-    box-shadow: -5px 0 0 rgba(var(--bs-primary-rgb), 0.1),
+    box-shadow:
+        -5px 0 0 rgba(var(--bs-primary-rgb), 0.1),
         5px 0 0 rgba(var(--bs-primary-rgb), 0.1);
 }
 
@@ -21203,9 +21310,11 @@ pre[class*="language-"] {
     padding: 12px 20px;
     color: #ffffff;
     display: inline-block;
-    -webkit-box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12),
+    -webkit-box-shadow:
+        0 3px 6px -1px rgba(0, 0, 0, 0.12),
         0 10px 36px -4px rgba(77, 96, 232, 0.3);
-    box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12),
+    box-shadow:
+        0 3px 6px -1px rgba(0, 0, 0, 0.12),
         0 10px 36px -4px rgba(77, 96, 232, 0.3);
     background: #1bb394;
     position: fixed;
@@ -21727,16 +21836,16 @@ p.no-span::after {
 }
 .notification-line {
     width: 3px;
-  background-color: #0d6efd;
-  border-radius: 3px;
-  flex-shrink: 0;
-  margin-top: 0.25rem;
-  height: auto;
-min-height: 18px;
+    background-color: #0d6efd;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+    height: auto;
+    min-height: 18px;
     margin-right: 12px;
 }
 .date-label {
-        font-weight: 500;
+    font-weight: 500;
     color: #000;
     font-size: 18px;
 }
@@ -21747,11 +21856,10 @@ min-height: 18px;
 .notification-dot-small {
     margin: 0 4px;
 }
-
 /* Keep select2 dropdowns above Bootstrap 5 modals (modal z-index: 1055) */
-.select2-container {
+/* .select2-container {
     z-index: 1056;
 }
 .select2-dropdown {
     z-index: 1056;
-}
+} */
