@@ -11,6 +11,7 @@ use App\Models\Stock;
 use App\Models\Size;
 use App\Models\Colour;
 use App\Models\StockVariation;
+use App\Models\UserDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToModel;
