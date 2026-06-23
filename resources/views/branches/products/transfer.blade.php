@@ -39,7 +39,7 @@
 				    		@php
 						        $user = App\Models\User::where('id', Auth::user()->parent_id)->first();
 						    @endphp
-				    		<select class="form-control" name="branch" id="branch">
+				    		<select class="form-control branch" name="branch" id="branch">
 				    			<option value=""> Select Branch </option>
 				    			<option value="{{$user->id}}" {{ request('branch') == $user->id ? 'selected' : '' }}> {{$user->user_name}} </option>
 				    			@foreach($branches as $branch)
@@ -137,7 +137,7 @@
 						    <div class="col-md-12">
 						        <div class="mb-3">
 						            <label for="transfer_to" class="form-label text-muted">Transfer to</label>
-						            <select class="form-control" id="transfer_to" name="transfer_to">
+						            <select class="form-control transfer-to-select" id="transfer_to" name="transfer_to">
 						                <option value="">Select</option>
 						                <option value="1">Branch</option>
 						                <option value="2">HO</option>
@@ -150,7 +150,7 @@
 						    <div class="col-md-12">
 						        <div class="mb-3">
 						            <label for="branch_select" class="form-label text-muted">To</label>
-						            <select class="form-control" id="branch_select" name="branch">
+						            <select class="form-control branch_select" id="branch_select" name="branch">
 						                <option value="">Select</option>
 						                @foreach($branches as $branch)
 						                    <option value="{{ $branch->id }}">{{ $branch->user_name }}</option>
@@ -165,7 +165,7 @@
 	                        <div class="col-md-6">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Category</label>
-	                                <select class="form-control" name="category" id="category">
+	                                <select class="form-control category-select" name="category" id="category">
 	                                    <option value=""> Select </option>
 	                                    @foreach($categories as $category)
 	                                    <option value="{{$category->id}}">{{$category->name}}</option>
@@ -177,7 +177,7 @@
 	                        <div class="col-md-6">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Sub Category</label>
-	                                <select class="form-control" name="sub_category" id="sub_category">
+	                                <select class="form-control sub_category-select" name="sub_category" id="sub_category">
 	                                    <option value=""> Select </option>
 	                                </select>
 	                            </div>
@@ -186,7 +186,7 @@
 	                        <div class="col-md-6">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Product</label>
-	                                <select class="form-control" name="product" id="product">
+	                                <select class="form-control product-select" name="product" id="product">
 	                                    <option value=""> Select </option>
 	                                </select>
 	                            </div>
@@ -244,12 +244,30 @@
 <script src="{{asset('assets/js/branches/transfer.js?' . $version)}}"></script>
 <script>
 $(document).ready(function () {
-    $('#branch').select2({ width: '100%', placeholder: 'Select Branch' });
-    $('#transfer_to').select2({ width: '100%', placeholder: 'Select' });
-    $('#branch_select').select2({ width: '100%', placeholder: 'Select' });
-    $('#category').select2({ width: '100%', placeholder: 'Select' });
-    $('#sub_category').select2({ width: '100%', placeholder: 'Select' });
-    $('#product').select2({ width: '100%', placeholder: 'Select' });
+    $('.branch').select2({
+	    width: '100%',
+	    placeholder: 'Select'
+	});
+   	$('.transfer-to-select').select2({
+	    width: '100%',
+	    placeholder: 'Select'
+	});
+    $('.branch-select').select2({
+	    width: '100%',
+	    placeholder: 'Select'
+	});
+	$('.category-select').select2({
+	    width: '100%',
+	    placeholder: 'Select'
+	});
+    $('.sub_category-select').select2({
+	    width: '100%',
+	    placeholder: 'Select'
+	});
+    $('.product-select').select2({
+	    width: '100%',
+	    placeholder: 'Select'
+	});
 });
 </script>
 @endsection
