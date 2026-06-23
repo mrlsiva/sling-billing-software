@@ -242,32 +242,5 @@
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{{asset('assets/js/branches/transfer.js?' . $version)}}"></script>
-<script>
-$(document).ready(function () {
-    $('.branch').select2({
-	    width: '100%',
-	    placeholder: 'Select'
-	});
-   	$('.transfer-to-select').select2({
-	    width: '100%',
-	    placeholder: 'Select'
-	});
-    $('.branch-select').select2({
-	    width: '100%',
-	    placeholder: 'Select'
-	});
-	$('.category-select').select2({
-	    width: '100%',
-	    placeholder: 'Select'
-	});
-    $('.sub_category-select').select2({
-	    width: '100%',
-	    placeholder: 'Select'
-	});
-    $('.product-select').select2({
-	    width: '100%',
-	    placeholder: 'Select'
-	});
-});
-</script>
+
 @endsection

@@ -1,3 +1,46 @@
+$(document).ready(function () {
+    $('.branch').select2({
+        width: '100%',
+        placeholder: 'Select'
+    });
+
+    $('.transfer-to-select').select2({
+        width: '100%',
+        placeholder: 'Select'
+    });
+
+    $('.branch-select').select2({
+        width: '100%',
+        placeholder: 'Select'
+    });
+
+    $('.category-select').select2({
+        width: '100%',
+        placeholder: 'Select'
+    });
+
+    $('.sub_category-select').select2({
+        width: '100%',
+        placeholder: 'Select'
+    });
+    
+    $('.product-select').select2({
+        width: '100%',
+        placeholder: 'Select'
+    });
+
+    $('#transfer_to').on('change', function () {
+        if ($(this).val() == '1') {
+            $('#branch_field').show();
+        } else {
+            $('#branch_field').hide();
+        }
+    });
+
+    // Trigger on page load
+    $('#transfer_to').trigger('change');
+});
+
 jQuery(document).ready(function ()
 {
 	jQuery('select[name="category"]').on('change',function(){
@@ -272,18 +315,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Run on typing
     searchInput.addEventListener("input", toggleClear);
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    const transferTo = document.getElementById('transfer_to');
-    const branchField = document.getElementById('branch_field');
-
-    transferTo.addEventListener('change', function() {
-        if (this.value === '1') {
-            branchField.style.display = 'block'; // show when "Branch" is selected
-        } else {
-            branchField.style.display = 'none'; // hide otherwise
-        }
-    });
 });
