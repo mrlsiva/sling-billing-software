@@ -246,7 +246,9 @@ class stockController extends Controller
         // Selected IMEIs
         $selectedImeis = $request->imeis ?? [];
 
-        $product = Product::findOrFail($request->product);
+        $product = Stock::with('product.metric')->where([['shop_id', Auth::user()->parent_id],['branch_id', Auth::user()->id],['product_id', $request->product]])->first();
+
+        //$product = Product::findOrFail($request->product);
 
         if ($product->quantity == 0) 
         {

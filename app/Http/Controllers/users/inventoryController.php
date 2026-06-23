@@ -261,7 +261,9 @@ class inventoryController extends Controller
         // IMEIs selected by user
         $selectedImeis = $request->imeis ?? [];
 
-        $product = Product::findOrFail($request->product);
+        //$product = Product::findOrFail($request->product);
+
+        $product = Stock::with('product.metric')->where([['shop_id', Auth::user()->owner_id],['branch_id', null],['product_id', $request->product]])->first();
 
         if ($product->quantity == 0)
         {
