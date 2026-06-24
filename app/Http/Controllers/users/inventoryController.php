@@ -678,6 +678,18 @@ class inventoryController extends Controller
                 'imei'     => implode(',', array_merge($branchImeis, $selectedImeis)),
             ]);
 
+            if (empty($data['variation_id'])) 
+            {
+                $branchStockVariation = StockVariation::where([
+                    ['stock_id', $branchStock->id],
+                    ['product_id', $data['product_id']]
+                ])->first();
+
+                $branchStockVariation->update([
+                    'quantity' => $branchStockVariation->quantity + $data['quantity'],
+                ]);
+            }
+
         } else {
 
             $branchStock = Stock::create([
@@ -709,6 +721,18 @@ class inventoryController extends Controller
                 'quantity' => $mainStock->quantity - $data['quantity'],
                 'imei'     => implode(',', array_diff($mainImeis, $selectedImeis)),
             ]);
+
+            if (empty($data['variation_id'])) 
+            {
+                $mainStockVariation = StockVariation::where([
+                    ['stock_id', $mainStock->id],
+                    ['product_id', $data['product_id']]
+                ])->first();
+
+                $mainStockVariation->update([
+                    'quantity' => $mainStockVariation->quantity - $data['quantity'],
+                ]);
+            }
         }
 
         // Update product quantity
