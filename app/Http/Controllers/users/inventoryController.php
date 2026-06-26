@@ -685,9 +685,22 @@ class inventoryController extends Controller
                     ['product_id', $data['product_id']]
                 ])->first();
 
-                $branchStockVariation->update([
-                    'quantity' => $branchStockVariation->quantity + $data['quantity'],
-                ]);
+
+                if($branchStockVariation)
+                {
+                    $branchStockVariation->update([
+                        'quantity' => $branchStockVariation->quantity + $data['quantity'],
+                    ]);
+                }
+                else
+                {
+                    StockVariation::create([
+                        'stock_id'   => $branchStock->id,
+                        'product_id' => $data['product_id'],
+                        'quantity'   => $data['quantity'],
+                        'price'      => $product->price,
+                    ]);
+                }
             }
 
         } else {
@@ -702,6 +715,17 @@ class inventoryController extends Controller
                 'is_active'      => 1,
                 'imei'           => implode(',', $selectedImeis),
             ]);
+
+            if (empty($data['variation_id'])) 
+            {
+
+                StockVariation::create([
+                    'stock_id'   => $branchStock->id,
+                    'product_id' => $data['product_id'],
+                    'quantity'   => $data['quantity'],
+                    'price'      => $product->price,
+                ]);
+            }
         }
 
         // Deduct from main stock
