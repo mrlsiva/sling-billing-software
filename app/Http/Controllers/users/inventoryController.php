@@ -409,31 +409,32 @@ class inventoryController extends Controller
         {
             $mainV = StockVariation::where([['stock_id',$mainStock->id],['product_id',$request->product]])->first();
             $mainV->update([
-                            'quantity' => $mainV->quantity - $request->quantity
-                        ]);
+                'quantity' => $mainV->quantity - $request->quantity
+            ]);
 
-                    // Find if variation already exists for this branch
-                    $branchV = StockVariation::where([
-                        ['stock_id', $branchStock->id],
-                        ['size_id', $mainV->size_id],
-                        ['colour_id', $mainV->colour_id],
-                        ['product_id', $request->product],
-                    ])->first();
+            // Find if variation already exists for this branch
+            $branchV = StockVariation::where([
+                ['stock_id', $branchStock->id],
+                ['size_id', null],
+                ['colour_id', null],
+                ['product_id', $request->product],
+            ])->first();
 
-                    if ($branchV) {
-                        $branchV->update([
-                            'quantity' => $branchV->quantity + $request->quantity
-                        ]);
-                    } else {
-                        StockVariation::create([
-                            'stock_id'  => $branchStock->id,
-                            'product_id'=> $request->product,
-                            'size_id'   => $mainV->size_id,
-                            'colour_id' => $mainV->colour_id,
-                            'quantity'  => $request->quantity,
-                            'price'     => $mainV->price
-                        ]);
-                    }
+            if ($branchV) {
+                $branchV->update([
+                    'quantity' => $branchV->quantity + $request->quantity
+                ]);
+            } 
+            else {
+                StockVariation::create([
+                    'stock_id'  => $branchStock->id,
+                    'product_id'=> $request->product,
+                    'size_id'   => null,
+                    'colour_id' => null,
+                    'quantity'  => $request->quantity,
+                    'price'     => $mainV->price
+                ]);
+            }
         }
 
 

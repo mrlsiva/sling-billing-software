@@ -357,6 +357,26 @@ class stockController extends Controller
                 }
             }
 
+            else
+            {
+                $product = Product::where('id', $request->product)->first();
+                $branchStockVariation = StockVariation::where([['stock_id',$mainStock->id],['product_id',$request->product],['size_id',null],['colour_id',null]])->first();
+                if($branchStockVariation)
+                {
+                    $branchStockVariation->update([
+                        'quantity' => $branchStockVariation->quantity - $request->quantity
+                    ]);
+                }
+
+                $hoStockTransferVariation = StockVariation::where([['stock_id',$hoStock->id],['product_id',$request->product],['size_id',null],['colour_id',null]])->first();
+                if($hoStockTransferVariation)
+                {
+                    $hoStockTransferVariation->update([
+                        'quantity' => $hoStockTransferVariation->quantity + $request->quantity
+                    ]);
+                }
+            }
+
             $lastInvoice = ProductHistory::where('shop_id',Auth::user()->parent_id)->lockForUpdate()->max('invoice');
 
             $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
@@ -492,6 +512,38 @@ class stockController extends Controller
                         ]);
                     }
                 }
+            }
+            else
+            {
+                $product = Product::where('id', $request->product)->first();
+                $branchStockVariation = StockVariation::where([['stock_id',$mainStock->id],['product_id',$request->product],['size_id',null],['colour_id',null]])->first();
+                if($branchStockVariation)
+                {
+                    $branchStockVariation->update([
+                        'quantity' => $branchStockVariation->quantity - $request->quantity
+                    ]);
+                }
+
+                $branchTransferStockVariation = StockVariation::where([['stock_id',$branchStock->id],['product_id',$request->product],['size_id',null],['colour_id',null]])->first();
+                if($branchTransferStockVariation)
+                {
+                    $branchTransferStockVariation->update([
+                        'quantity' => $branchTransferStockVariation->quantity + $request->quantity
+                    ]);
+                }
+                else
+                {
+                    StockVariation::create([
+                        'stock_id'  => $branchStock->id,
+                        'product_id'=> $request->product,
+                        'size_id'   => null,
+                        'colour_id' => null,
+                        'quantity'  => $request->quantity,
+                        'price'     => $product->price
+                    ]);
+                }
+
+
             }
 
             $lastInvoice = ProductHistory::where('shop_id',Auth::user()->parent_id)->lockForUpdate()->max('invoice');
