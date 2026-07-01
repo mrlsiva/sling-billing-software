@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->string('email')->after('alt_phone')->nullable();
-            $table->string('password')->after('gst')->nullable();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->boolean('is_online_order')->after('is_refunded')->default(false);
         });
     }
 
@@ -22,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
+        Schema::table('orders', function (Blueprint $table) {
             //
         });
     }

@@ -26,6 +26,10 @@ class loginController extends Controller
 
         if (Auth::attempt(['user_name' => $request->user_name, 'password' => $request->password, 'slug_name' => $request->slug_name]))
         {
+            if (auth()->user()->role_id == 4)
+            {
+                return redirect()->back()->with('error_alert', 'Invalid login. Customer cant able to login.');
+            }
 
             //Active/Inactive
             $user = User::where([['id',auth()->user()->id],['is_active',0]])->first();

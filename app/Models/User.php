@@ -20,7 +20,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name','email','email_verified_at','password','user_name','slug_name','role_id','unique_id','phone','alt_phone','logo','is_active','is_lock','is_delete','created_by','parent_id','owner_id','fav_icon','able_to_login'
+        'name','email','email_verified_at','password','user_name','slug_name','role_id','unique_id','phone','alt_phone','logo','is_active','is_lock','is_delete','created_by','parent_id','owner_id','fav_icon','able_to_login','customer_id'
     ];
 
     /**
@@ -54,5 +54,10 @@ class User extends Authenticatable
     public function bank_detail()
     {
         return $this->hasOne(BankDetail::class, 'user_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
     }
 }

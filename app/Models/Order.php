@@ -8,7 +8,7 @@ use App\Models\BillingAddress;
 class Order extends Model
 {
     protected $fillable = [
-        'shop_id','branch_id','bill_id','billed_by','customer_id','bill_amount','billed_on','is_refunded','total_product_discount','order_discount'
+        'shop_id','branch_id','bill_id','billed_by','customer_id','bill_amount','billed_on','is_refunded','total_product_discount','order_discount','is_online_order'
     ];
 
     public function shop()

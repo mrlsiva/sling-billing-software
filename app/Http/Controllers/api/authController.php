@@ -38,6 +38,10 @@ class authController extends Controller
             {
                 return $this->errorResponse("Admin cant Login",400,"Failed to Login");
             }
+            elseif($user->role_id == 4)
+            {
+                return $this->errorResponse("Customer cant Login",400,"Failed to Login");
+            }
             elseif($user->is_active == 0)
             {
                 return $this->errorResponse("Please verify your email.",400,"Failed to Login");
