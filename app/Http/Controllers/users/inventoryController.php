@@ -247,6 +247,7 @@ class inventoryController extends Controller
             'sub_category'  => 'required',
             'product'       => 'required',
             'quantity'      => 'required|numeric|min:0',
+            'price'       => 'required',
         ], 
         [
             'branch.required'       => 'Branch is required.',
@@ -256,6 +257,7 @@ class inventoryController extends Controller
             'quantity.required'     => 'Quantity is required.',
             'quantity.numeric'      => 'Quantity must be a number.',
             'quantity.min'          => 'Quantity cannot be negative.',
+            'price.required'        => 'Price is required.',
         ]);
 
         // IMEIs selected by user
@@ -365,6 +367,7 @@ class inventoryController extends Controller
             'sub_category_id'=> $request->sub_category,
             'product_id'     => $request->product,
             'quantity'       => $request->quantity,
+            'price'          => $request->price,
             'transfer_on'    => now(),
             'transfer_by'    => Auth::user()->id,
         ]);
@@ -572,6 +575,7 @@ class inventoryController extends Controller
                     'sub_category_id' => $row['sub_category_id'],
                     'product_id'      => $row['product_id'],
                     'quantity'        => $row['quantity'],
+                    'price'        => $row['price'],
                     'imeis'           => $row['imeis'],
                     'invoice'           => $invoice,
                     'variation_id' => $row['variation_id'],
@@ -774,6 +778,7 @@ class inventoryController extends Controller
             'sub_category_id' => $data['sub_category_id'],
             'product_id'      => $data['product_id'],
             'quantity'        => $data['quantity'],
+            'price'        => $data['price'],
             'transfer_on'     => now(),
             'transfer_by'     => Auth::user()->id,
         ]);

@@ -139,4 +139,25 @@
     searchInput.addEventListener("input", toggleClear);
 });
 </script>
+
+<script>
+	$(document).on('click', '.view-detail', function (e) {
+        e.preventDefault();
+
+        let id = $(this).data('id');
+
+        $.ajax({
+            url: id + "/get_detail",
+            type: "GET",
+            success: function (html) {
+                $("#purchaseDetail .modal-body").html(html);
+                $("#purchaseDetail").modal("show");
+            },
+            error: function (xhr) {
+                alert("Failed to load details");
+                console.error(xhr.responseText);
+            }
+        });
+    });
+</script>
 @endsection

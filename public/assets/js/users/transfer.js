@@ -49,7 +49,7 @@ jQuery(document).ready(function ()
 					$('select[name="product"]').append('<option value="">'+ "Select" +'</option>');
 					jQuery.each(data, function(key,value){
 						//console.log(value.name)
-						$('select[name="product"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+						$('select[name="product"]').append('<option value="'+ value.id +'">'+ value.name +' - '+ value.code +'</option>');
 					});
 
 					var productSelect = $('select[name="product"]');

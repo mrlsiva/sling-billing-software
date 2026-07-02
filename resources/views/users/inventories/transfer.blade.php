@@ -214,6 +214,15 @@
 	                        </div>
 	                    </div>
 
+	                    <div class="row">
+	                        <div class="col-md-12">
+	                            <div class="mb-3">
+	                                <label for="choices-single-groups" class="form-label text-muted">Enter Price (Per Quantity)</label>
+	                                <input type="number" id="price" name="price" class="form-control" min="1" required>
+	                            </div>
+	                        </div>
+	                    </div>
+
 	                    @php
 		                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
 		                @endphp
@@ -326,5 +335,14 @@ $(document).ready(function () {
     $('#sub_category').select2({ width: '100%', placeholder: 'Select' });
     $('#product').select2({ width: '100%', placeholder: 'Select' });
 });
+</script>
+<script>
+	$(document).on('input', '#price', function () {
+	    let value = parseFloat($(this).val());
+
+	    if (!isNaN(value) && value <= 0) {
+	        $(this).val(1);
+	    }
+	});
 </script>
 @endsection

@@ -124,9 +124,9 @@
                 <td class="left">{{$transfer_product->product->name}}</td>
                 <td>{{$transfer_product->product->hsn_code ?? '-'}}</td>
                 <td>{{$transfer_product->quantity}}</td>
-                <td>{{number_format($transfer_product->product->price,2)}}</td>
+                <td>{{number_format($transfer_product->price,2)}}</td>
                 <td>{{$transfer_product->product->metric->name}}</td>
-                <td class="right">{{number_format($transfer_product->product->price * $transfer_product->quantity,2)}}</td>
+                <td class="right">{{number_format($transfer_product->price * $transfer_product->quantity,2)}}</td>
             </tr>
             @endforeach
         </tbody>

@@ -83,8 +83,12 @@ class ProductTransferImport implements ToCollection
 
                 $row = $row->toArray();
 
+                $headers = array_map(fn($h) => strtolower(trim($h)), $rows[0]->toArray());
+
+                $hasImei = in_array('IMEI', $headers);
+
                 // Excel WITH IMEI column
-                if (count($row) >= 7) {
+                if ($hasImei) {
 
                     $categoryName    = $row[0] ?? null;
                     $subCategoryName = $row[1] ?? null;
@@ -93,6 +97,7 @@ class ProductTransferImport implements ToCollection
                     $sizeName        = $row[4] ?? null;
                     $colourName      = $row[5] ?? null;
                     $quantity        = $row[6] ?? null;
+                    $price        = $row[7] ?? null;
 
                 }
                 // Excel WITHOUT IMEI column
@@ -105,6 +110,7 @@ class ProductTransferImport implements ToCollection
                     $sizeName        = $row[3] ?? null;
                     $colourName      = $row[4] ?? null;
                     $quantity        = $row[5] ?? null;
+                    $price        = $row[6] ?? null;
                 }
                 $categoryKey = strtolower(trim($categoryName));
 
@@ -171,6 +177,7 @@ class ProductTransferImport implements ToCollection
                     'sub_category_id' => $subCategory['id'],
                     'product_id'      => $product['id'],
                     'quantity'        => (int) $quantity,
+                    'price'        => (float) $price,
                     'imeis'           => $imei ? explode(',', $imei) : [],
 
                     // ✅ ADD THESE

@@ -64,7 +64,7 @@ jQuery(document).ready(function () {
 
         $.getJSON('get_product', { category: category, sub_category: subCategory })
             .done(function (data) {
-                data.forEach(v => prod.append(`<option value="${v.id}">${v.name}</option>`));
+                data.forEach(v => prod.append(`<option value="${v.id}">${v.name} - ${v.code}</option>`));
                 reinitSelect2(prod, 'Select Product');
             })
             .fail(function (xhr) { console.error('get_product failed', xhr); });

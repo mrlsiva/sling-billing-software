@@ -520,6 +520,7 @@ else
                                     Route::get('/get_product_detail',[stockController::class, 'get_product_detail'])->name('get_product_detail');
                                     Route::post('/store',[stockController::class, 'store'])->name('store');
                                     Route::get('/{id}/get_bill',[stockController::class, 'get_bill'])->name('get_bill');
+                                    Route::post('/bulk_transfer',[stockController::class, 'bulk'])->name('bulk_transfer');
                                 });
                             });
 
