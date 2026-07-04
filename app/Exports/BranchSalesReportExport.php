@@ -86,7 +86,7 @@ class BranchSalesReportExport implements FromCollection, WithHeadings, ShouldAut
                     optional($detail->product->category)->name,
                     optional($detail->product->sub_category)->name,
                     $detail->name,
-                    $detail->product_id,
+                    optional($detail->product)->code,
                     $qtyDisplay,
                     round($gross, 2),
                     round($tax, 2),
