@@ -113,7 +113,7 @@
                             <td>{{ $detail->product->category->name ?? '' }}</td>
                             <td>{{ $detail->product->sub_category->name ?? '' }}</td>
                             <td>{{ $detail->name }}</td>
-                            <td>{{ $detail->product->code }}</td>
+                            <td>{{ $detail->product->code ?? '' }}</td>
                             <td>
                                 {{ $finalQty }}
                                 @if($refundedQty > 0)
