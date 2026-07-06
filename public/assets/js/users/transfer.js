@@ -82,6 +82,7 @@ jQuery(document).ready(function () {
 
                     $("#unit").val(data.product.product.metric.name);
                     $("#available").val(data.quantity);
+                    $("#price").val(data.product.product.discounted_price);
 
                     if (data.quantity == 0) {
                         $('#transfer').prop('disabled', true)

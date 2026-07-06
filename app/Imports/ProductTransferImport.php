@@ -85,7 +85,7 @@ class ProductTransferImport implements ToCollection
 
                 $headers = array_map(fn($h) => strtolower(trim($h)), $rows[0]->toArray());
 
-                $hasImei = in_array('IMEI', $headers);
+                $hasImei = in_array('imei', $headers);
 
                 // Excel WITH IMEI column
                 if ($hasImei) {

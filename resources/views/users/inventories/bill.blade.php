@@ -124,9 +124,20 @@
                 <td class="left">{{$transfer_product->product->name}}</td>
                 <td>{{$transfer_product->product->hsn_code ?? '-'}}</td>
                 <td>{{$transfer_product->quantity}}</td>
-                <td>{{number_format($transfer_product->price,2)}}</td>
+
+                @if($transfer_product->price != null)
+                    <td>{{number_format($transfer_product->price,2)}}</td>
+                @else
+                    <td>{{number_format($transfer_product->product->price,2)}}</td>
+                @endif
+
                 <td>{{$transfer_product->product->metric->name}}</td>
-                <td class="right">{{number_format($transfer_product->price * $transfer_product->quantity,2)}}</td>
+
+                 @if($transfer_product->price != null)
+                    <td class="right">{{number_format($transfer_product->price * $transfer_product->quantity,2)}}</td>
+                @else
+                    <td class="right">{{number_format($transfer_product->product->price * $transfer_product->quantity,2)}}</td>
+                @endif
             </tr>
             @endforeach
         </tbody>
@@ -136,11 +147,19 @@
                 <th>{{ $transfer_products->sum('quantity') }}</th>
                 <th colspan="2"></th>
                 <th class="right">
+                    @if($transfer_product->price == null)
                     {{number_format($transfer_products->sum(function ($item) 
                         {
                             return $item->product->price * $item->quantity;
                         }), 2)
                     }}
+                    @else
+                    {{number_format($transfer_products->sum(function ($item) 
+                        {
+                            return $item->price * $item->quantity;
+                        }), 2)
+                    }}
+                    @endif
                 </th>
             </tr>
         </tfoot>

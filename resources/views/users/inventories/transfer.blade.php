@@ -205,14 +205,6 @@
 	                            </div>
 	                        </div>
 	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
-	                            <div class="mb-3">
-	                                <label for="choices-single-groups" class="form-label text-muted">Enter Quantity</label>
-	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1" readonly="">
-	                            </div>
-	                        </div>
-	                    </div>
 
 	                    <div class="row">
 	                        <div class="col-md-12">
@@ -222,6 +214,17 @@
 	                            </div>
 	                        </div>
 	                    </div>
+	                    
+	                    <div class="row">
+	                        <div class="col-md-12">
+	                            <div class="mb-3">
+	                                <label for="choices-single-groups" class="form-label text-muted">Enter Quantity</label>
+	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1" readonly="">
+	                            </div>
+	                        </div>
+	                    </div>
+
+	                    
 
 	                    @php
 		                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();

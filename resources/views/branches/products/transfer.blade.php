@@ -213,17 +213,19 @@
 
 	                        <div class="col-md-6">
 	                            <div class="mb-3">
-	                                <label for="choices-single-groups" class="form-label text-muted">Enter Quantity</label>
-	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1">
+	                                <label for="choices-single-groups" class="form-label text-muted">Enter Price</label>
+	                                <input type="number" id="price" name="price" class="form-control" min="1">
 	                            </div>
 	                        </div>
 
 	                        <div class="col-md-6">
 	                            <div class="mb-3">
-	                                <label for="choices-single-groups" class="form-label text-muted">Enter Price</label>
-	                                <input type="number" id="price" name="price" class="form-control" min="1">
+	                                <label for="choices-single-groups" class="form-label text-muted">Enter Quantity</label>
+	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1">
 	                            </div>
 	                        </div>
+
+	                        
 
 	                    </div>
 	                </div>

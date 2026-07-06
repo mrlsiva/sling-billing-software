@@ -125,6 +125,7 @@ jQuery(document).ready(function () {
 
                     $("#unit").val(data.product.product.metric.name);
                     $("#available").val(data.quantity);
+                    $("#price").val(data.product.product.discounted_price);
 
                     // ENABLE / DISABLE TRANSFER BUTTON
                     if (data.quantity == 0) {

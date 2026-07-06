@@ -226,6 +226,7 @@ class stockController extends Controller
             'category'      => 'required',
             'sub_category'  => 'required',
             'product'       => 'required',
+            'price'         => 'required',
             'quantity'      => 'required|numeric|min:0',
         ], [
             'category.required'     => 'Category is required.',
@@ -566,6 +567,7 @@ class stockController extends Controller
                 'sub_category_id'=> $request->sub_category,
                 'product_id'     => $request->product,
                 'quantity'       => $request->quantity,
+                'price'          => $request->price,
                 'transfer_on'    => now(),
                 'transfer_by'    => Auth::user()->id,
             ]);
