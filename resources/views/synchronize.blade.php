@@ -97,7 +97,13 @@
 								            @endif
 								        </td>
 
-								        <td>-</td>
+								        <td>
+								        	<a href="{{ route('synchronize_stock.view', ['company' => request()->route('company'), 'id' => $stock->id ]) }}" class="link-dark" target="_blank"><i class="ri-eye-fill align-middle fs-20" title="View"></i></a>
+
+								        	<a href="" class="link-dark" target="_blank"><i class="ri-check-double-line align-middle fs-20" title="Accept"></i></a>
+
+								        	<a href="" class="link-dark" target="_blank"><i class="ri-close-line align-middle fs-20" title="Reject"></i></a>
+								        </td>
 								    </tr>
 								@endforeach
 							</tbody>

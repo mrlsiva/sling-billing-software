@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('queue_stocks', function (Blueprint $table) {
             $table->id();
             $table->string('unique_id');
+            $table->string('type');
             $table->unsignedBigInteger('from');
             $table->foreign('from')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('to');
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('quantity');
             $table->string('price');
+            $table->string('imei')->nullable();
             $table->datetime('initiated_on')->nullable();
             $table->unsignedBigInteger('initiated_by');
             $table->foreign('initiated_by')->references('id')->on('users')->onDelete('cascade');

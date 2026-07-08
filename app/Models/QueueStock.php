@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class QueueStock extends Model
 {
     protected $fillable = [
-        'from','to','product_id','quantity','initiated_on','initiated_by','updated_on','updated_by','status','price','unique_id'
+        'type','from','to','product_id','quantity','initiated_on','initiated_by','updated_on','updated_by','status','price','unique_id'
     ];
 
     public function From()
@@ -28,5 +28,10 @@ class QueueStock extends Model
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }

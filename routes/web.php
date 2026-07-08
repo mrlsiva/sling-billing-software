@@ -116,6 +116,9 @@ else
                 Route::get('/notifications',[notificationController::class, 'notification'])->name('notification');
 
                 Route::get('/synchronize_stock',[synchronizeController::class, 'synchronize_stock'])->name('synchronize_stock');
+                Route::get('/synchronize_stock/{id}/view',[synchronizeController::class, 'synchronize_view_stock'])->name('synchronize_stock.view');
+                Route::get('/synchronize_stock/{id}/approve',[synchronizeController::class, 'approve'])->name('synchronize_stock.approve');
+                Route::get('/synchronize_stock/{id}/reject',[synchronizeController::class, 'reject'])->name('synchronize_stock.reject');
                 
                 Route::group(['middleware' => ['role:HO']], function () {
 

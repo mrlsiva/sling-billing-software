@@ -489,6 +489,9 @@ class inventoryController extends Controller
 
         DB::beginTransaction();
 
+        // IMEIs selected by user
+        $imeis = $request->imeis ?? [];
+
         $uniqueId = QueueStock::where('from',Auth::user()->owner_id)->lockForUpdate()->max('unique_id');
 
         $next = $uniqueId ? ((int) ltrim($uniqueId, '0') + 1) : 1;
@@ -497,11 +500,13 @@ class inventoryController extends Controller
 
         $queue_stock = QueueStock::create([
             'unique_id'     => $unique_id,
+            'type'          => 1,
             'from'          => Auth::user()->owner_id,
             'to'            => $request->branch,
             'product_id'       => $request->product,
             'quantity'      => $request->quantity,
             'price'         => $request->price,
+            'imei'          => implode(',', $imeis),
             'initiated_on'  => Carbon::now(),
             'initiated_by'  => auth()->id(),
             'status'        => 0,
