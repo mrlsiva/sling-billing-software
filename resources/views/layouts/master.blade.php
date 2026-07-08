@@ -459,6 +459,14 @@
                             </button>
                         </div>
 
+                        <div class="topbar-item">
+                            <a href="{{route('synchronize_stock', ['company' => request()->route('company')])}}">
+                            <button type="button" class="topbar-button" >
+                                <i class="ri-p2p-fill fs-20 align-middle" title="Synchronize Stock"></i>
+                            </button>
+                            </a>
+                        </div>
+
                         <!-- Notification -->
                         <!-- <div class="dropdown topbar-item">
                             <button type="button" class="topbar-button" id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

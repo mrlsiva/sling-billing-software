@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\notificationController;
+use App\Http\Controllers\synchronizeController;
 
 //Version
 use App\Http\Controllers\versionController;
@@ -113,6 +114,8 @@ else
                 Route::post('/my_profile/change_password',[loginController::class, 'change_password'])->name('my_profile.change_password');
 
                 Route::get('/notifications',[notificationController::class, 'notification'])->name('notification');
+
+                Route::get('/synchronize_stock',[synchronizeController::class, 'synchronize_stock'])->name('synchronize_stock');
                 
                 Route::group(['middleware' => ['role:HO']], function () {
 
