@@ -77,7 +77,7 @@ jQuery(document).ready(function () {
 
                 success: function (data) {
 
-                    console.log(data);
+                    // console.log(data);
                     //console.log(data.imeis.length);
 
                     $("#unit").val(data.product.product.metric.name);

@@ -123,9 +123,12 @@ jQuery(document).ready(function () {
 
                 success: function (data) {
 
+                    console.log(data);
+                    
                     $("#unit").val(data.product.product.metric.name);
                     $("#available").val(data.quantity);
                     $("#price").val(data.product.product.discounted_price);
+                    $("#queue_stock").val(data.totalQueueQuantity);
 
                     // ENABLE / DISABLE TRANSFER BUTTON
                     if (data.quantity == 0) {
@@ -277,26 +280,39 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('transfer_submit');
 
     form.addEventListener('submit', function (e) {
-        const available = parseInt(document.getElementById('available').value, 10) || 0;
-        const quantity  = parseInt(document.getElementById('quantity').value, 10) || 0;
+        const available      = parseInt(document.getElementById('available').value, 10) || 0;
+        const quantity       = parseInt(document.getElementById('quantity').value, 10) || 0;
+        const queue_quantity = parseInt(document.getElementById('queue_stock').value, 10) || 0;
+
+        const remainingStock = available - queue_quantity;
 
         if (quantity > available) {
             e.preventDefault();
-            const event = new CustomEvent("toast", {
-                detail: {
-                    text: "Quantity can’t be greater than stock.",
-                    gravity: "top",
-                    position: "right",
-                    className: "success",
-                    duration: 5000,
-                    close: true,
-                }
-            });
-
-            document.dispatchEvent(event);
+            showToast("Quantity can't be greater than available stock.");
+            return;
         }
-        // else { no need to call form.submit() because the form will submit naturally }
+
+        if (quantity > remainingStock) {
+            e.preventDefault();
+            showToast(`Only ${remainingStock} items are available after considering queued stock.`);
+            return;
+        }
     });
+
+    function showToast(message) {
+        const event = new CustomEvent("toast", {
+            detail: {
+                text: message,
+                gravity: "top",
+                position: "right",
+                className: "success",
+                duration: 5000,
+                close: true,
+            }
+        });
+
+        document.dispatchEvent(event);
+    }
 });
 
 document.addEventListener("DOMContentLoaded", function () {

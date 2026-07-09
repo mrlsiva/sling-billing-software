@@ -743,179 +743,179 @@ class inventoryController extends Controller
         }
     }
 
-    private function transferProduct(array $data)
-    {
-        $selectedImeis = $data['imeis'] ?? [];
+    // private function transferProduct(array $data)
+    // {
+    //     $selectedImeis = $data['imeis'] ?? [];
 
-        $product = Product::findOrFail($data['product_id']);
+    //     $product = Product::findOrFail($data['product_id']);
 
-        if ($product->quantity == 0) {
-            throw new \Exception('"' . $product->name . '" has 0 quantity. Cannot transfer.');
-        }
+    //     if ($product->quantity == 0) {
+    //         throw new \Exception('"' . $product->name . '" has 0 quantity. Cannot transfer.');
+    //     }
 
-        if ($product->quantity < $data['quantity']) {
-            throw new \Exception('Quantity can’t be greater than stock.');
-        }
+    //     if ($product->quantity < $data['quantity']) {
+    //         throw new \Exception('Quantity can’t be greater than stock.');
+    //     }
 
-        // Branch stock
-        $branchStock = Stock::where([
-            ['branch_id', $data['branch_id']],
-            ['product_id', $data['product_id']]
-        ])->first();
+    //     // Branch stock
+    //     $branchStock = Stock::where([
+    //         ['branch_id', $data['branch_id']],
+    //         ['product_id', $data['product_id']]
+    //     ])->first();
 
-        if ($branchStock) {
+    //     if ($branchStock) {
 
-            $branchImeis = $branchStock->imei
-                ? explode(',', $branchStock->imei)
-                : [];
+    //         $branchImeis = $branchStock->imei
+    //             ? explode(',', $branchStock->imei)
+    //             : [];
 
-            $branchStock->update([
-                'quantity' => $branchStock->quantity + $data['quantity'],
-                'imei'     => implode(',', array_merge($branchImeis, $selectedImeis)),
-            ]);
+    //         $branchStock->update([
+    //             'quantity' => $branchStock->quantity + $data['quantity'],
+    //             'imei'     => implode(',', array_merge($branchImeis, $selectedImeis)),
+    //         ]);
 
-            if (empty($data['variation_id'])) 
-            {
-                $branchStockVariation = StockVariation::where([
-                    ['stock_id', $branchStock->id],
-                    ['product_id', $data['product_id']]
-                ])->first();
-
-
-                if($branchStockVariation)
-                {
-                    $branchStockVariation->update([
-                        'quantity' => $branchStockVariation->quantity + $data['quantity'],
-                    ]);
-                }
-                else
-                {
-                    StockVariation::create([
-                        'stock_id'   => $branchStock->id,
-                        'product_id' => $data['product_id'],
-                        'quantity'   => $data['quantity'],
-                        'price'      => $product->price,
-                    ]);
-                }
-            }
-
-        } else {
-
-            $branchStock = Stock::create([
-                'shop_id'        => Auth::user()->owner_id,
-                'branch_id'      => $data['branch_id'],
-                'category_id'    => $data['category_id'],
-                'sub_category_id'=> $data['sub_category_id'],
-                'product_id'     => $data['product_id'],
-                'quantity'       => $data['quantity'],
-                'is_active'      => 1,
-                'imei'           => implode(',', $selectedImeis),
-            ]);
-
-            if (empty($data['variation_id'])) 
-            {
-
-                StockVariation::create([
-                    'stock_id'   => $branchStock->id,
-                    'product_id' => $data['product_id'],
-                    'quantity'   => $data['quantity'],
-                    'price'      => $product->price,
-                ]);
-            }
-        }
-
-        // Deduct from main stock
-        $mainStock = Stock::where([
-            ['shop_id', Auth::user()->owner_id],
-            ['branch_id', null],
-            ['product_id', $data['product_id']]
-        ])->first();
-
-        if ($mainStock) {
-
-            $mainImeis = $mainStock->imei
-                ? explode(',', $mainStock->imei)
-                : [];
-
-            $mainStock->update([
-                'quantity' => $mainStock->quantity - $data['quantity'],
-                'imei'     => implode(',', array_diff($mainImeis, $selectedImeis)),
-            ]);
-
-            if (empty($data['variation_id'])) 
-            {
-                $mainStockVariation = StockVariation::where([
-                    ['stock_id', $mainStock->id],
-                    ['product_id', $data['product_id']]
-                ])->first();
-
-                $mainStockVariation->update([
-                    'quantity' => $mainStockVariation->quantity - $data['quantity'],
-                ]);
-            }
-        }
-
-        // Update product quantity
-        $product->decrement('quantity', $data['quantity']);
+    //         if (empty($data['variation_id'])) 
+    //         {
+    //             $branchStockVariation = StockVariation::where([
+    //                 ['stock_id', $branchStock->id],
+    //                 ['product_id', $data['product_id']]
+    //             ])->first();
 
 
-        // History
-        ProductHistory::create([
-            'shop_id'         => Auth::user()->owner_id,
-            'invoice'         => $data['invoice'],
-            'from'            => Auth::user()->id,
-            'to'              => $data['branch_id'],
-            'category_id'     => $data['category_id'],
-            'sub_category_id' => $data['sub_category_id'],
-            'product_id'      => $data['product_id'],
-            'quantity'        => $data['quantity'],
-            'price'        => $data['price'],
-            'transfer_on'     => now(),
-            'transfer_by'     => Auth::user()->id,
-        ]);
+    //             if($branchStockVariation)
+    //             {
+    //                 $branchStockVariation->update([
+    //                     'quantity' => $branchStockVariation->quantity + $data['quantity'],
+    //                 ]);
+    //             }
+    //             else
+    //             {
+    //                 StockVariation::create([
+    //                     'stock_id'   => $branchStock->id,
+    //                     'product_id' => $data['product_id'],
+    //                     'quantity'   => $data['quantity'],
+    //                     'price'      => $product->price,
+    //                 ]);
+    //             }
+    //         }
 
-        // ---------------------------------------------
-        // VARIATION TRANSFER (IMPORTANT)
-        // ---------------------------------------------
+    //     } else {
 
-        if (!empty($data['variation_id'])) {
+    //         $branchStock = Stock::create([
+    //             'shop_id'        => Auth::user()->owner_id,
+    //             'branch_id'      => $data['branch_id'],
+    //             'category_id'    => $data['category_id'],
+    //             'sub_category_id'=> $data['sub_category_id'],
+    //             'product_id'     => $data['product_id'],
+    //             'quantity'       => $data['quantity'],
+    //             'is_active'      => 1,
+    //             'imei'           => implode(',', $selectedImeis),
+    //         ]);
 
-            $mainV = StockVariation::find($data['variation_id']);
+    //         if (empty($data['variation_id'])) 
+    //         {
 
-            if (!$mainV) {
-                throw new \Exception('Main variation not found');
-            }
+    //             StockVariation::create([
+    //                 'stock_id'   => $branchStock->id,
+    //                 'product_id' => $data['product_id'],
+    //                 'quantity'   => $data['quantity'],
+    //                 'price'      => $product->price,
+    //             ]);
+    //         }
+    //     }
 
-            if ($mainV->quantity < $data['quantity']) {
-                throw new \Exception('Not enough variation stock');
-            }
+    //     // Deduct from main stock
+    //     $mainStock = Stock::where([
+    //         ['shop_id', Auth::user()->owner_id],
+    //         ['branch_id', null],
+    //         ['product_id', $data['product_id']]
+    //     ])->first();
 
-            // Deduct from main
-            $mainV->decrement('quantity', $data['quantity']);
+    //     if ($mainStock) {
 
-            // Find branch variation
-            $branchV = StockVariation::where([
-                ['stock_id', $branchStock->id],
-                ['product_id', $data['product_id']],
-                ['size_id', $data['size_id']],
-                ['colour_id', $data['colour_id']],
-            ])->first();
+    //         $mainImeis = $mainStock->imei
+    //             ? explode(',', $mainStock->imei)
+    //             : [];
 
-            if ($branchV) {
-                $branchV->increment('quantity', $data['quantity']);
-            } else {
-                StockVariation::create([
-                    'stock_id'  => $branchStock->id,
-                    'product_id'=> $data['product_id'],
-                    'size_id'   => $data['size_id'],
-                    'colour_id' => $data['colour_id'],
-                    'quantity'  => $data['quantity'],
-                    'price'     => $mainV->price,
-                ]);
-            }
-        }
+    //         $mainStock->update([
+    //             'quantity' => $mainStock->quantity - $data['quantity'],
+    //             'imei'     => implode(',', array_diff($mainImeis, $selectedImeis)),
+    //         ]);
 
-    }
+    //         if (empty($data['variation_id'])) 
+    //         {
+    //             $mainStockVariation = StockVariation::where([
+    //                 ['stock_id', $mainStock->id],
+    //                 ['product_id', $data['product_id']]
+    //             ])->first();
+
+    //             $mainStockVariation->update([
+    //                 'quantity' => $mainStockVariation->quantity - $data['quantity'],
+    //             ]);
+    //         }
+    //     }
+
+    //     // Update product quantity
+    //     $product->decrement('quantity', $data['quantity']);
+
+
+    //     // History
+    //     ProductHistory::create([
+    //         'shop_id'         => Auth::user()->owner_id,
+    //         'invoice'         => $data['invoice'],
+    //         'from'            => Auth::user()->id,
+    //         'to'              => $data['branch_id'],
+    //         'category_id'     => $data['category_id'],
+    //         'sub_category_id' => $data['sub_category_id'],
+    //         'product_id'      => $data['product_id'],
+    //         'quantity'        => $data['quantity'],
+    //         'price'        => $data['price'],
+    //         'transfer_on'     => now(),
+    //         'transfer_by'     => Auth::user()->id,
+    //     ]);
+
+    //     // ---------------------------------------------
+    //     // VARIATION TRANSFER (IMPORTANT)
+    //     // ---------------------------------------------
+
+    //     if (!empty($data['variation_id'])) {
+
+    //         $mainV = StockVariation::find($data['variation_id']);
+
+    //         if (!$mainV) {
+    //             throw new \Exception('Main variation not found');
+    //         }
+
+    //         if ($mainV->quantity < $data['quantity']) {
+    //             throw new \Exception('Not enough variation stock');
+    //         }
+
+    //         // Deduct from main
+    //         $mainV->decrement('quantity', $data['quantity']);
+
+    //         // Find branch variation
+    //         $branchV = StockVariation::where([
+    //             ['stock_id', $branchStock->id],
+    //             ['product_id', $data['product_id']],
+    //             ['size_id', $data['size_id']],
+    //             ['colour_id', $data['colour_id']],
+    //         ])->first();
+
+    //         if ($branchV) {
+    //             $branchV->increment('quantity', $data['quantity']);
+    //         } else {
+    //             StockVariation::create([
+    //                 'stock_id'  => $branchStock->id,
+    //                 'product_id'=> $data['product_id'],
+    //                 'size_id'   => $data['size_id'],
+    //                 'colour_id' => $data['colour_id'],
+    //                 'quantity'  => $data['quantity'],
+    //                 'price'     => $mainV->price,
+    //             ]);
+    //         }
+    //     }
+
+    // }
 
 
 }

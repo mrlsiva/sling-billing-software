@@ -100,7 +100,7 @@
 								        <td>
 								        	<a href="{{ route('synchronize_stock.view', ['company' => request()->route('company'), 'id' => $stock->id ]) }}" class="link-dark" target="_blank"><i class="ri-eye-fill align-middle fs-20" title="View"></i></a>
 
-								        	@if($stock->status == 0)
+								        	@if($stock->status == 0 && request('filter', 'received') == 'received')
 								        	<a href="{{ route('synchronize_stock.approve', ['company' => request()->route('company'), 'id' => $stock->id ]) }}" class="link-dark"><i class="ri-check-double-line align-middle fs-20" title="Accept"></i></a>
 
 								        	<a href="{{ route('synchronize_stock.reject', ['company' => request()->route('company'), 'id' => $stock->id ]) }}" class="link-dark"><i class="ri-close-line align-middle fs-20" title="Reject"></i></a>

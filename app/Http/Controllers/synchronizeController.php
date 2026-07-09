@@ -49,7 +49,7 @@ class synchronizeController extends Controller
     {
 
         $transfer_detail = QueueStock::where('id',$id)->first();
-        $transfer_details = QueueStock::where('unique_id',$transfer_detail->unique_id)->get();
+        $transfer_details = QueueStock::where([['unique_id',$transfer_detail->unique_id],['from',$transfer_detail->from]])->get();
 
         if($transfer_detail->type == 1)
         {
@@ -189,7 +189,6 @@ class synchronizeController extends Controller
 
         if($transfer_detail->type == 2)
         {
-            return "hi";
             $lastInvoice = ProductHistory::where('shop_id',$transfer_detail->to)->lockForUpdate()->max('invoice');
 
             $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
@@ -199,7 +198,7 @@ class synchronizeController extends Controller
             foreach ($transfer_details as $transfer_detail) 
             {
                 DB::beginTransaction();
-
+                
                 // Update Ho stock
                 $HoStock = Stock::where([['shop_id',$transfer_detail->to],['branch_id', null],['product_id', $transfer_detail->product_id]])->first();
 
@@ -213,7 +212,7 @@ class synchronizeController extends Controller
                     }
 
                     // Merge existing + new IMEIs
-                    $updatedHoImeis = array_merge($HoImeis, $transfer_detail->imei);
+                    $updatedHoImeis = array_merge($HoImeis, explode(',', $transfer_detail->imei));
 
                     $HoStock->update([
                         'quantity'       => $HoStock->quantity + $transfer_detail->quantity,
@@ -238,7 +237,7 @@ class synchronizeController extends Controller
                     }
 
                     // Remove transferred IMEIs from main shop IMEI list
-                    $remainingImeis = array_diff($branchImeis, $transfer_detail->imei);
+                    $remainingImeis = array_diff($branchImeis, explode(',', $transfer_detail->imei));
 
                     $branchStock->update([
                         'quantity' => $branchStock->quantity - $transfer_detail->quantity,
@@ -295,7 +294,6 @@ class synchronizeController extends Controller
 
         if($transfer_detail->type == 3)
         {
-            return "hello";
             $lastInvoice = ProductHistory::where('shop_id',Auth::user()->parent_id)->lockForUpdate()->max('invoice');
 
             $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
@@ -319,7 +317,7 @@ class synchronizeController extends Controller
                     }
 
                     // Merge existing + new IMEIs
-                    $updatedtransferBranchImeis = array_merge($transferBranchImeis, $transfer_detail->imei);
+                    $updatedtransferBranchImeis = array_merge($transferBranchImeis,  explode(',', $transfer_detail->imei));
 
                     $transferBranchStock->update([
                         'quantity'       => $transferBranchStock->quantity + $transfer_detail->quantity,
@@ -344,7 +342,7 @@ class synchronizeController extends Controller
                     }
 
                     // Remove transferred IMEIs from main shop IMEI list
-                    $remainingImeis = array_diff($branchImeis, $transfer_detail->imei);
+                    $remainingImeis = array_diff($branchImeis,  explode(',', $transfer_detail->imei));
 
                     $branchStock->update([
                         'quantity' => $branchStock->quantity - $transfer_detail->quantity,

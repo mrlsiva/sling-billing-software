@@ -225,7 +225,7 @@
 	                            </div>
 	                        </div>
 
-	                        
+	                        <input type="hidden" name="queue_stock" id="queue_stock" >
 
 	                    </div>
 	                </div>

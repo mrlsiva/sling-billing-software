@@ -29,6 +29,7 @@ use App\Models\User;
 use App\Models\Staff;
 use App\Models\BillSetup;
 use App\Models\ProductImeiNumber;
+use App\Models\QueueStock;
 use App\Models\Credit;
 use App\Traits\Log;
 use Carbon\Carbon;
@@ -132,6 +133,15 @@ class billingController extends Controller
                 });
             })
             ->paginate($pagination);
+
+        foreach ($stocks as $stock) {
+            $queueQuantity = QueueStock::where('product_id', $stock->product_id)
+                ->where('from', Auth::id())
+                ->where('status', 0)
+                ->sum('quantity');
+
+            $stock->quantity = $stock->quantity - $queueQuantity;
+        }
 
         // If AJAX request → return JSON
         return response()->json([
