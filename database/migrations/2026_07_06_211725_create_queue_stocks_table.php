@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('quantity');
             $table->string('price');
             $table->string('imei')->nullable();
+            $table->longText('variation')->nullable();
             $table->datetime('initiated_on')->nullable();
             $table->unsignedBigInteger('initiated_by');
             $table->foreign('initiated_by')->references('id')->on('users')->onDelete('cascade');
