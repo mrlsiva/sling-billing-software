@@ -229,7 +229,7 @@ class inventoryController extends Controller
         ->where('stock_id', $product->id)
         ->get();
 
-        $queue_stocks = QueueStock::where([['from',Auth::user()->owner_id],['product_id'],['status', 0]])->get();
+        $queue_stocks = QueueStock::where([['from',Auth::user()->owner_id],['product_id',$request->product],['status', 0]])->get();
 
         $totalQueueQuantity = $queue_stocks->sum('quantity');
 
@@ -625,28 +625,51 @@ class inventoryController extends Controller
              |--------------------------------------------------------------------------
              */
 
-             $lastInvoice = ProductHistory::where('shop_id',Auth::user()->owner_id)->lockForUpdate()->max('invoice');
+            // $lastInvoice = ProductHistory::where('shop_id',Auth::user()->owner_id)->lockForUpdate()->max('invoice');
 
-            $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
+            // $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
 
-            $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
+            // $invoice = str_pad($next, 5, '0', STR_PAD_LEFT);
 
 
-            // AFTER validation success
+            // // AFTER validation success
+            // foreach ($import->validRows as $row) {
+
+            //     $this->transferProduct([
+            //         'branch_id'       => $request->branch,
+            //         'category_id'     => $row['category_id'],
+            //         'sub_category_id' => $row['sub_category_id'],
+            //         'product_id'      => $row['product_id'],
+            //         'quantity'        => $row['quantity'],
+            //         'price'           => $row['price'],
+            //         'imeis'           => $row['imeis'],
+            //         'invoice'         => $invoice,
+            //         'variation_id' => $row['variation_id'],
+            //         'size_id'      => $row['size_id'],
+            //         'colour_id'    => $row['colour_id'],
+            //     ]);
+            // }
+
+            $uniqueId = QueueStock::where('from',Auth::user()->owner_id)->lockForUpdate()->max('unique_id');
+
+            $next = $uniqueId ? ((int) ltrim($uniqueId, '0') + 1) : 1;
+
+            $unique_id = str_pad($next, 5, '0', STR_PAD_LEFT);
+
             foreach ($import->validRows as $row) {
 
-                $this->transferProduct([
-                    'branch_id'       => $request->branch,
-                    'category_id'     => $row['category_id'],
-                    'sub_category_id' => $row['sub_category_id'],
-                    'product_id'      => $row['product_id'],
-                    'quantity'        => $row['quantity'],
-                    'price'        => $row['price'],
-                    'imeis'           => $row['imeis'],
-                    'invoice'           => $invoice,
-                    'variation_id' => $row['variation_id'],
-                    'size_id'      => $row['size_id'],
-                    'colour_id'    => $row['colour_id'],
+                $queue_stock = QueueStock::create([
+                    'unique_id'     => $unique_id,
+                    'type'          => 1,
+                    'from'          => Auth::user()->owner_id,
+                    'to'            => $request->branch,
+                    'product_id'    => $row['product_id'],
+                    'quantity'      => $row['quantity'],
+                    'price'         => $row['price'],
+                    'imei'          => implode(',', $row['imeis']),
+                    'initiated_on'  => Carbon::now(),
+                    'initiated_by'  => auth()->id(),
+                    'status'        => 0,
                 ]);
             }
 
@@ -709,7 +732,9 @@ class inventoryController extends Controller
                 1
             );
 
-            return back()->with('toast_success', 'Bulk transfer completed successfully.');
+            // return back()->with('toast_success', 'Bulk transfer completed successfully.');
+
+            return redirect()->route('synchronize_stock', ['company' => request()->route('company'),])->with('toast_success', 'Bulk Product Transferred Successfully.');
 
         } catch (\Exception $e) {
 

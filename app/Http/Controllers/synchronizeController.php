@@ -4,10 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ProductHistory;
+use App\Models\StockVariation;
+use App\Traits\Notifications;
 use App\Models\QueueStock;
+use App\Models\Stock;
+use App\Traits\Log;
+use Carbon\Carbon;
+use DB;
 
 class synchronizeController extends Controller
 {
+    use Log, Notifications;
+
     public function synchronize_stock(Request $request)
     {
         $filter = request()->get('filter', 'received');
@@ -31,7 +40,7 @@ class synchronizeController extends Controller
     {
 
         $transfer_detail = QueueStock::where('id',$id)->first();
-        $transfer_products = QueueStock::where('id',$id)->get();
+        $transfer_products = QueueStock::where('unique_id',$transfer_detail->unique_id)->get();
 
          return view('synchronize_bill',compact('transfer_detail','transfer_products'));
     }
@@ -67,7 +76,7 @@ class synchronizeController extends Controller
                     }
 
                     // Merge existing + new IMEIs
-                    $updatedBranchImeis = array_merge($branchImeis, $transfer_detail->imei);
+                    $updatedBranchImeis = array_merge($branchImeis,  explode(',', $transfer_detail->imei));
 
                     $branchStock->update([
                         'quantity'       => $branchStock->quantity + $transfer_detail->quantity,
@@ -109,11 +118,11 @@ class synchronizeController extends Controller
                     }
 
                     // Remove transferred IMEIs from main shop IMEI list
-                    $remainingImeis = array_diff($HoImeis, $selectedImeis);
+                    $remainingImeis = array_diff($HoImeis, explode(',', $transfer_detail->imei));
 
                     $HoStock->update([
                         'quantity' => $HoStock->quantity - $transfer_detail->quantity,
-                        'imei' => implode(',', $transfer_detail->imei)
+                        'imei' => implode(',', explode(',', $transfer_detail->imei))
                     ]);
                 }
 
@@ -180,6 +189,7 @@ class synchronizeController extends Controller
 
         if($transfer_detail->type == 2)
         {
+            return "hi";
             $lastInvoice = ProductHistory::where('shop_id',$transfer_detail->to)->lockForUpdate()->max('invoice');
 
             $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
@@ -285,6 +295,7 @@ class synchronizeController extends Controller
 
         if($transfer_detail->type == 3)
         {
+            return "hello";
             $lastInvoice = ProductHistory::where('shop_id',Auth::user()->parent_id)->lockForUpdate()->max('invoice');
 
             $next = $lastInvoice ? ((int) ltrim($lastInvoice, '0') + 1) : 1;
