@@ -789,14 +789,6 @@ class stockController extends Controller
 
         $product = Product::findOrFail($data['product_id']);
 
-        if ($product->quantity == 0) {
-            throw new \Exception('"' . $product->name . '" has 0 quantity. Cannot transfer.');
-        }
-
-        if ($product->quantity < $data['quantity']) {
-            throw new \Exception('Quantity can’t be greater than stock.');
-        }
-
         if($data['branch_id'] != 0)
         {
             // Branch stock
