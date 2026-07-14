@@ -507,6 +507,7 @@ class inventoryController extends Controller
             'quantity'      => $request->quantity,
             'price'         => $request->price,
             'imei'          => implode(',', $imeis),
+            'variation'     => json_encode($request->variation_qty),
             'initiated_on'  => Carbon::now(),
             'initiated_by'  => auth()->id(),
             'status'        => 0,
@@ -656,18 +657,39 @@ class inventoryController extends Controller
 
             $unique_id = str_pad($next, 5, '0', STR_PAD_LEFT);
 
+            $grouped = [];
+
             foreach ($import->validRows as $row) {
 
-                $queue_stock = QueueStock::create([
+                $productId = $row['product_id'];
+
+                if (!isset($grouped[$productId])) {
+                    $grouped[$productId] = [
+                        'product_id' => $row['product_id'],
+                        'quantity'   => 0,
+                        'price'      => $row['price'],
+                        'imeis'      => [],
+                        'variation'  => [],
+                    ];
+                }
+
+                $grouped[$productId]['quantity'] += $row['quantity'];
+                $grouped[$productId]['variation'][$row['variation_id']] = $row['quantity'];
+                $grouped[$productId]['imeis'] = array_merge($grouped[$productId]['imeis'], $row['imeis']);
+            }
+
+            foreach ($grouped as $item) {
+                QueueStock::create([
                     'unique_id'     => $unique_id,
                     'type'          => 1,
                     'from'          => Auth::user()->owner_id,
                     'to'            => $request->branch,
-                    'product_id'    => $row['product_id'],
-                    'quantity'      => $row['quantity'],
-                    'price'         => $row['price'],
-                    'imei'          => implode(',', $row['imeis']),
-                    'initiated_on'  => Carbon::now(),
+                    'product_id'    => $item['product_id'],
+                    'quantity'      => $item['quantity'],
+                    'price'         => $item['price'],
+                    'imei'          => implode(',', $item['imeis']),
+                    'variation'     => json_encode($item['variation']),
+                    'initiated_on'  => now(),
                     'initiated_by'  => auth()->id(),
                     'status'        => 0,
                 ]);

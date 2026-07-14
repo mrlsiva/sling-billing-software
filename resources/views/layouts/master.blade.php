@@ -459,6 +459,7 @@
                             </button>
                         </div>
 
+                        @if(request()->segment(1) != 'admin')
                         <div class="topbar-item">
                             <a href="{{route('synchronize_stock', ['company' => request()->route('company')])}}">
                             <button type="button" class="topbar-button" >
@@ -466,6 +467,7 @@
                             </button>
                             </a>
                         </div>
+                        @endif
 
                         <!-- Notification -->
                         <!-- <div class="dropdown topbar-item">

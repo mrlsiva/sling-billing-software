@@ -655,6 +655,7 @@ class stockController extends Controller
             'quantity'      => $request->quantity,
             'price'         => $request->price,
             'imei'          => implode(',', $imeis),
+            'variation'     => json_encode($request->variation_qty),
             'initiated_on'  => Carbon::now(),
             'initiated_by'  => auth()->id(),
             'status'        => 0,
@@ -811,21 +812,25 @@ class stockController extends Controller
                 $to = $request->branch;
             }
 
+            $grouped = [];
+
             foreach ($import->validRows as $row) {
 
-                $queue_stock = QueueStock::create([
-                    'unique_id'     => $unique_id,
-                    'type'          => $type,
-                    'from'          => Auth::user()->id,
-                    'to'            => $to,
-                    'product_id'    => $row['product_id'],
-                    'quantity'      => $row['quantity'],
-                    'price'         => $row['price'],
-                    'imei'          => implode(',', $row['imeis']),
-                    'initiated_on'  => Carbon::now(),
-                    'initiated_by'  => auth()->id(),
-                    'status'        => 0,
-                ]);
+                $productId = $row['product_id'];
+
+                if (!isset($grouped[$productId])) {
+                    $grouped[$productId] = [
+                        'product_id' => $row['product_id'],
+                        'quantity'   => 0,
+                        'price'      => $row['price'],
+                        'imeis'      => [],
+                        'variation'  => [],
+                    ];
+                }
+
+                $grouped[$productId]['quantity'] += $row['quantity'];
+                $grouped[$productId]['variation'][$row['variation_id']] = $row['quantity'];
+                $grouped[$productId]['imeis'] = array_merge($grouped[$productId]['imeis'], $row['imeis']);
             }
 
 

@@ -97,7 +97,7 @@ class synchronizeController extends Controller
                         'product_id'     => $transfer_detail->product->id,
                         'quantity'       => $transfer_detail->quantity,
                         'is_active'      => 1,
-                        'imei'           => implode(',', $transfer_detail->imei)
+                        'imei'           => implode(',', explode(',', $transfer_detail->imei))
                     ]);
 
                     //Log
@@ -155,6 +155,47 @@ class synchronizeController extends Controller
                             'quantity'  => $transfer_detail->quantity,
                             'price'     => $transfer_detail->price
                         ]);
+                    }
+                }
+                else
+                {
+                    $variations = json_decode($transfer_detail->variation, true);
+
+                    foreach ($variations as $variation_id => $qty) 
+                    {
+                        if ($qty > 0) {
+
+                            $hoV = StockVariation::find($variation_id);
+                            $hoV->update([
+                                'quantity' => $hoV->quantity - $qty
+                            ]);
+
+                            // Find if variation already exists for this branch
+                            $branchV = StockVariation::where([
+                                ['stock_id', $branchStock->id],
+                                ['size_id', $hoV->size_id],
+                                ['colour_id', $hoV->colour_id],
+                                ['product_id', $transfer_detail->product_id],
+                            ])->first();
+
+                            if ($branchV) 
+                            {
+                                $branchV->update([
+                                    'quantity' => $branchV->quantity + $qty
+                                ]);
+                            } 
+                            else 
+                            {
+                                StockVariation::create([
+                                    'stock_id'  => $branchStock->id,
+                                    'product_id'=> $transfer_detail->product_id,
+                                    'size_id'   => $mainV->size_id,
+                                    'colour_id' => $mainV->colour_id,
+                                    'quantity'  => $qty,
+                                    'price'     => $mainV->price
+                                ]);
+                            }
+                        }
                     }
                 }
 
@@ -277,6 +318,36 @@ class synchronizeController extends Controller
                         ]);
                     }
                 }
+                else
+                {
+                    $variations = json_decode($transfer_detail->variation, true);
+
+                    foreach ($variations as $variation_id => $qty) 
+                    {
+                        if ($qty > 0) {
+
+                            $branchV = StockVariation::find($variation_id);
+                            $branchV->update([
+                                'quantity' => $branchV->quantity - $qty
+                            ]);
+
+                            // Find if variation already exists for this branch
+                            $hoV = StockVariation::where([
+                                ['stock_id', $HoStock->id],
+                                ['size_id', $branchV->size_id],
+                                ['colour_id', $branchV->colour_id],
+                                ['product_id', $transfer_detail->product_id],
+                            ])->first();
+
+                            if ($hoV) 
+                            {
+                                $hoV->update([
+                                    'quantity' => $hoV->quantity + $qty
+                                ]);
+                            }
+                        }
+                    }
+                }
 
 
                 //Log
@@ -328,6 +399,23 @@ class synchronizeController extends Controller
                     //Log
                     $this->addToLog($this->unique(),Auth::user()->id,'Stock Updated','App/Models/Stock','stocks',$transferBranchStock->id,'Update',null,json_encode($transfer_detail),'Success','Stock Updated for this product');
                 } 
+                else 
+                {
+                    $transferBranchStock = Stock::create([
+                        'shop_id'        => Auth::user()->parent_id,
+                        'branch_id'      => $transfer_detail->to,
+                        'category_id'    => $transfer_detail->product->category_id,
+                        'sub_category_id'=> $transfer_detail->product->sub_category_id,
+                        'product_id'     => $transfer_detail->product->id,
+                        'quantity'       => $transfer_detail->quantity,
+                        'is_active'      => 1,
+                        'imei'           => implode(',', explode(',', $transfer_detail->imei))
+                    ]);
+
+                    //Log
+                    $this->addToLog($this->unique(),Auth::user()->id,'Stock Added','App/Models/Stock','stocks',$transferBranchStock->id,'Insert',null,json_encode($transfer_detail),'Success','Stock Added for this product');
+
+                }
 
                 // Deduct from branch stock
                 $branchStock = Stock::where([['shop_id', Auth::user()->parent_id],['branch_id', $transfer_detail->from],['product_id', $transfer_detail->product_id]])->first();
@@ -390,6 +478,47 @@ class synchronizeController extends Controller
                         $branchStockTransferVariation->update([
                             'quantity' => $branchStockTransferVariation->quantity - $transfer_detail->quantity
                         ]);
+                    }
+                }
+                else
+                {
+                    $variations = json_decode($transfer_detail->variation, true);
+
+                    foreach ($variations as $variation_id => $qty) 
+                    {
+                        if ($qty > 0) {
+
+                            $branchV = StockVariation::find($variation_id);
+                            $branchV->update([
+                                'quantity' => $branchV->quantity - $qty
+                            ]);
+
+                            // Find if variation already exists for this branch
+                            $transferBranchV = StockVariation::where([
+                                ['stock_id', $transferBranchStock->id],
+                                ['size_id', $branchV->size_id],
+                                ['colour_id', $branchV->colour_id],
+                                ['product_id', $transfer_detail->product_id],
+                            ])->first();
+
+                            if ($transferBranchV) 
+                            {
+                                $transferBranchV->update([
+                                    'quantity' => $transferBranchV->quantity + $qty
+                                ]);
+                            }
+                            else
+                            {
+                                StockVariation::create([
+                                    'stock_id'  => $transferBranchStock->id,
+                                    'product_id'=> $transfer_detail->product->id,
+                                    'size_id'   => $branchV->size_id,
+                                    'colour_id' => $branchV->colour_id,
+                                    'quantity'  => $qty,
+                                    'price'     => $transfer_detail->price
+                                ]);
+                            }
+                        }
                     }
                 }
 
