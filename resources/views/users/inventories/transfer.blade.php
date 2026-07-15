@@ -202,6 +202,7 @@
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Available</label>
 	                                <input disabled="" type="text" id="available" name="available" class="form-control" placeholder="0">
+	                                <small id="queueQtyText" class="text-danger d-none"></small>
 	                            </div>
 	                        </div>
 	                    </div>

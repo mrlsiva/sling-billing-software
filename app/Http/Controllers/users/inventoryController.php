@@ -231,6 +231,28 @@ class inventoryController extends Controller
 
         $queue_stocks = QueueStock::where([['from',Auth::user()->owner_id],['product_id',$request->product],['status', 0]])->get();
 
+        // Collect queued quantities by variation_id
+        $queuedVariations = [];
+
+        foreach ($queue_stocks as $queueStock) {
+            $variationData = json_decode($queueStock->variation, true) ?? [];
+
+            foreach ($variationData as $variationId => $qty) {
+                $queuedVariations[$variationId] = ($queuedVariations[$variationId] ?? 0) + $qty;
+            }
+        }
+
+        // Add available quantity after deducting queued quantity
+        $variations->transform(function ($variation) use ($queuedVariations) {
+            $queuedQty = $queuedVariations[$variation->id] ?? 0;
+
+            $variation->queue_qty = $queuedQty;
+            $variation->available_qty = $variation->quantity - $queuedQty;
+
+            return $variation;
+        });
+
+
         $totalQueueQuantity = $queue_stocks->sum('quantity');
 
         if ($queue_stocks->isEmpty()) {

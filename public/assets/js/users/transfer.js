@@ -77,13 +77,24 @@ jQuery(document).ready(function () {
 
                 success: function (data) {
 
-                    // console.log(data);
+                    //console.log(data);
                     //console.log(data.imeis.length);
 
                     $("#unit").val(data.product.product.metric.name);
                     $("#available").val(data.quantity);
                     $("#price").val(data.product.product.discounted_price);
                     $("#queue_stock").val(data.totalQueueQuantity);
+
+                    if (data.totalQueueQuantity > 0) {
+                        $("#queueQtyText")
+                            .removeClass("d-none")
+                            .text("Queued Quantity: " + data.totalQueueQuantity);
+                    } else {
+                        $("#queueQtyText")
+                            .addClass("d-none")
+                            .text("");
+                    }
+
 
                     if (data.quantity == 0) {
                         $('#transfer').prop('disabled', true)
@@ -105,16 +116,22 @@ jQuery(document).ready(function () {
 
                         if (v.quantity > 0 && (v.size != null || v.colour != null)) {
                             hasVariation = true; // ✅ mark true
-
+                            //console.log(v.queue_qty);
                             
                             $("#variations_section").append(`
                                 <div class="row mb-2 p-2 border rounded">
                                     <div class="col-md-3"><strong>Size:</strong> ${v.size?.name ?? "-"}</div>
                                     <div class="col-md-3"><strong>Colour:</strong> ${v.colour?.name ?? "-"}</div>
                                     <div class="col-md-6">
-                                        <input type="number" class="form-control variation-qty"
-                                            max="${v.quantity}" min="0" name="variation_qty[${v.id}]"
-                                            placeholder="Available: ${v.quantity}">
+                                        <input type="number" class="form-control variation-qty" max="${v.quantity - v.queue_qty}" min="0" name="variation_qty[${v.id}]" placeholder="Available: ${v.quantity}">
+                                        <small class="text-muted">
+                                            Stock: ${v.quantity}
+                                            ${v.queue_qty > 0
+                                                ? ` | <span class="text-danger">Queued: ${v.queue_qty}</span>`
+                                                : ''
+                                            }
+                                        </small>
+
                                     </div>
                                 </div>
                             `);
@@ -152,6 +169,15 @@ jQuery(document).ready(function () {
             });
         }
     });
+
+    $(document).on('input', '.variation-qty', function () {
+    let max = parseInt($(this).attr('max')) || 0;
+    let value = parseInt($(this).val()) || 0;
+
+    if (value > max) {
+        $(this).val(max);
+    }
+});
 
     // Limit IMEI selection by quantity
     $(document).on('change', '.imei-checkbox', function () {
