@@ -171,13 +171,13 @@ jQuery(document).ready(function () {
     });
 
     $(document).on('input', '.variation-qty', function () {
-    let max = parseInt($(this).attr('max')) || 0;
-    let value = parseInt($(this).val()) || 0;
+        let max = parseInt($(this).attr('max')) || 0;
+        let value = parseInt($(this).val()) || 0;
 
-    if (value > max) {
-        $(this).val(max);
-    }
-});
+        if (value > max) {
+            $(this).val(max);
+        }
+    });
 
     // Limit IMEI selection by quantity
     $(document).on('change', '.imei-checkbox', function () {
