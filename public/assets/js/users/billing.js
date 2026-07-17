@@ -1565,6 +1565,7 @@ function submit() {
     let billing_name = $("#billing_name").val().trim();
     let billing_address = $("#billing_address").val().trim();
     let billing_pincode = $("#billing_pincode").val().trim();
+    let billing_gst = $("#billing_gst").val().trim();
 
     // --- Customer validation ---
     if (!/^[0-9]{10}$/.test(phone)) {
@@ -1814,6 +1815,7 @@ function submit() {
         billing_name: $("#billing_name").val().trim(),
         billing_address: $("#billing_address").val().trim(),
         billing_pincode: $("#billing_pincode").val().trim(),
+        billing_gst: $("#billing_gst").val().trim(),
     };
 
     // console.log(customer);

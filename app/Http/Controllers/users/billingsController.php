@@ -261,6 +261,7 @@ class billingsController extends Controller
                 'pincode'   => $customerData['pincode'] ?? null,
                 'gender_id' => $customerData['gender'] ?? null,
                 'dob'       => $customerData['dob'] ?? null,
+                'gst'       => $customerData['gst'] ?? null,
             ]
         );
 
@@ -311,12 +312,13 @@ class billingsController extends Controller
         {
             $billing_customer = BillingAddress::create(
                 [
-                    'user_id'  => $user->id,
-                    'order_id' => $order->id,
-                    'phone'    => $billingData['billing_phone'] ?? null,
-                    'name'     => $billingData['billing_name'],
+                    'user_id'   => $user->id,
+                    'order_id'  => $order->id,
+                    'phone'     => $billingData['billing_phone'] ?? null,
+                    'name'      => $billingData['billing_name'],
                     'address'   => $billingData['billing_address'],
                     'pincode'   => $billingData['billing_pincode'] ?? null,
+                    'gst'       => $billingData['billing_gst'] ?? null,
                 ]
             );
         }
