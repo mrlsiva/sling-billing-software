@@ -413,6 +413,13 @@
 							</div>
 						</div>
 
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="billing_gst" class="form-label">GST</label>
+								<input type="text" id="billing_gst" name="billing_gst" class="form-control" min="1" placeholder="GST">
+							</div>
+						</div>
+
 					</div>
 
 					<div class=" gap-1 hstack mt-3">
@@ -962,6 +969,7 @@ $(document).ready(function () {
             $('#billing_name').val($('#name').val());
             $('#billing_address').val($('#address').val());
             $('#billing_pincode').val($('#pincode').val());
+            $('#billing_gst').val($('#gst').val());
 
         } else {
 
@@ -969,6 +977,7 @@ $(document).ready(function () {
             $('#billing_name').val('');
             $('#billing_address').val('');
             $('#billing_pincode').val('');
+            $('#billing_gst').val('');
 
         }
 

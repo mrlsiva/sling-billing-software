@@ -325,6 +325,12 @@
                                     <td><strong>Mobile</strong></td>
                                     <td>: {{ $billing_address->phone }}</td>
                                 </tr>
+                                @if($billing_address->gst != null)
+                                <tr>
+                                    <td><strong>GSTIN</strong></td>
+                                    <td>: {{ $billing_address->gst }}</td>
+                                </tr>
+                                @endif
                             </table>
                             @endif
                         </td>

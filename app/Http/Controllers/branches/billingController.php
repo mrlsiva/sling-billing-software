@@ -427,6 +427,7 @@ class billingController extends Controller
                     'name'     => $billingData['billing_name'],
                     'address'   => $billingData['billing_address'],
                     'pincode'   => $billingData['billing_pincode'] ?? null,
+                    'gst'       => $billingData['billing_gst'] ?? null,
                 ]
             );
         }

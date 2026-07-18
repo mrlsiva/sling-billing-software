@@ -199,7 +199,7 @@
 
 												<td>{{ $purchase->gross_cost }}</td>
 
-												<td>{{ \Carbon\Carbon::parse($purchase->invoice_date)->format('d M Y') }}</td>
+												<td>{{ \Carbon\Carbon::parse($purchase->invoice_date)->format('d-m-Y') }}</td>
 
 											</tr>
 
@@ -251,7 +251,7 @@
 												</td>
 
 												<td>
-												{{ \Carbon\Carbon::parse($payment->paid_on)->format('d M Y') }}
+												{{ \Carbon\Carbon::parse($payment->paid_on)->format('d-m-Y') }}
 												</td>
 
 												<td>
@@ -308,7 +308,7 @@
 
 											<td>₹ {{ number_format($refund->refund_amount,2) }}</td>
 
-											<td>{{ \Carbon\Carbon::parse($refund->refund_on)->format('d M Y') }}</td>
+											<td>{{ \Carbon\Carbon::parse($refund->refund_on)->format('d-m-Y') }}</td>
 
 											<td>{{ $refund->refundedBy->name }}</td>
 
@@ -364,7 +364,7 @@
 											{{ $order->bill_amount - ($order->is_refunded ? ($order->total_refund ?? 0) : 0) }}
 										</td>
 										<td>
-											{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}
+											{{ \Carbon\Carbon::parse($order->billed_on)->format('d-m-Y') }}
 										</td>
 										<td>
 											{{ $order->billedBy->name }}
@@ -388,7 +388,7 @@
 
 											        <br>
 
-											        {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d M Y') }}
+											        {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d-m-Y') }}
 											    </span>
 											@endif
 										</td>

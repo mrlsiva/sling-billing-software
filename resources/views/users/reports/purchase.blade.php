@@ -93,15 +93,15 @@
                                         <tr>
                                             <td>{{ $datas->firstItem() + $key }}</td>
 
-                                            <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d M Y H:i') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i') }}</td>
 
                                             <td>Purchase Ordered</td>
 
                                             <td>{{ $data->invoice_no }}</td>
 
-                                            <td>{{ \Carbon\Carbon::parse($data->invoice_date)->format('d M Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($data->invoice_date)->format('d-m-Y') }}</td>
 
-                                            <td>{{ \Carbon\Carbon::parse($data->due_date)->format('d M Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($data->due_date)->format('d-m-Y') }}</td>
 
                                             <td>{{ $data->vendor->name ?? '-' }}</td>
 

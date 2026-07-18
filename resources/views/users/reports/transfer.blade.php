@@ -104,7 +104,7 @@
                                     <tr>
                                         <td>{{ $datas->firstItem() + $key }}</td>
 
-                                        <td>{{ \Carbon\Carbon::parse($data->transfer_on)->format('d M Y H:i') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($data->transfer_on)->format('d-m-Y H:i') }}</td>
 
                                         <td>
                                             @if(request('branch') == 0)
