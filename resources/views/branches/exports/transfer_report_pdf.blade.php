@@ -65,7 +65,7 @@
             <tbody>
                 @foreach($datas as $data)
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($data->transfer_on)->format('d M Y H:i') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($data->transfer_on)->format('d-m-Y H:i') }}</td>
                     <td>
                         @if($data->to == Auth::user()->id)
                             <span class="badge bg-success">Stock_In</span>

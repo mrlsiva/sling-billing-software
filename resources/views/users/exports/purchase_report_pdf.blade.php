@@ -78,7 +78,7 @@
 
                     <tr>
                         <td>{{ $i++ }}</td>
-                        <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d M Y') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                         <td>{{ $data->invoice_no }}</td>
                         <td>{{ $data->vendor->name ?? '-' }}</td>
                         <td>{{ $data->category->name ?? '-' }}</td>

@@ -81,7 +81,7 @@ class productTransferReportController extends Controller
 
         $data = $query->get()->map(function ($item,$current_branch) {
             return [
-                'Transfer Datetime' => \Carbon\Carbon::parse($item->transfer_on)->format('d M Y H:i'),
+                'Transfer Datetime' => \Carbon\Carbon::parse($item->transfer_on)->format('d-m-Y H:i'),
                'Type' => ($current_branch == 0)
                     ? ($item->to == Auth::user()->id ? 'Stock_In' : 'Stock_Out')
                     : ($item->to == $current_branch ? 'Stock_In' : 'Stock_Out'),

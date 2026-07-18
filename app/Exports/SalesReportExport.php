@@ -77,7 +77,7 @@ class SalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize
 
                 $rows[] = [
                     $order->bill_id,
-                    \Carbon\Carbon::parse($order->billed_on)->format('d M Y H:i'),
+                    \Carbon\Carbon::parse($order->billed_on)->format('d-m-Y H:i'),
                     'User',
                     optional($order->billedBy)->name,
                     optional($order->customer)->name,

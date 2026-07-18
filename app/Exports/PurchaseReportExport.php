@@ -50,11 +50,11 @@ class PurchaseReportExport implements FromCollection, WithHeadings
             $nlc   = $qty > 0 ? ($value / $qty) : 0;
 
             $rows[] = [
-                \Carbon\Carbon::parse($data->created_at)->format('d M Y H:i'),
+                \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i'),
                 'Purchase Ordered',
                 $data->invoice_no,
-                \Carbon\Carbon::parse($data->invoice_date)->format('d M Y'),
-                \Carbon\Carbon::parse($data->due_date)->format('d M Y'),
+                \Carbon\Carbon::parse($data->invoice_date)->format('d-m-Y'),
+                \Carbon\Carbon::parse($data->due_date)->format('d-m-Y'),
                 optional($data->vendor)->name,
                 optional($data->category)->name,
                 optional($data->sub_category)->name,

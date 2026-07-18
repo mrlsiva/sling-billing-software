@@ -693,11 +693,16 @@ $(document).ready(function () {
                     $('select[name="gender"]').prop('disabled', true);
                     $("#dob").val(data.dob).prop('disabled', true);
                     $("#gst").val(data.gst).prop('disabled', true);
+                    $('#billing_gst').val(data.gst).prop('disabled');
 
                 }
             });
         }
     });
+});
+
+$('#gst').on('input', function () {
+    $('#billing_gst').val($(this).val());
 });
 
 $('#phone').on('keyup', function () {
