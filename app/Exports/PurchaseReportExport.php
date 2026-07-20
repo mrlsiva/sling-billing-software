@@ -2,10 +2,14 @@
 
 namespace App\Exports;
 
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class PurchaseReportExport implements FromCollection, WithHeadings
+class PurchaseReportExport implements FromCollection, WithHeadings, WithColumnFormatting
 {
     protected $datas;
 
@@ -50,11 +54,11 @@ class PurchaseReportExport implements FromCollection, WithHeadings
             $nlc   = $qty > 0 ? ($value / $qty) : 0;
 
             $rows[] = [
-                \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i'),
+                Date::PHPToExcel(Carbon::parse($data->created_at)),
                 'Purchase Ordered',
                 $data->invoice_no,
-                \Carbon\Carbon::parse($data->invoice_date)->format('d-m-Y'),
-                \Carbon\Carbon::parse($data->due_date)->format('d-m-Y'),
+                Date::PHPToExcel(Carbon::parse($data->invoice_date)->startOfDay()),
+                Date::PHPToExcel(Carbon::parse($data->due_date)->startOfDay()),
                 optional($data->vendor)->name,
                 optional($data->category)->name,
                 optional($data->sub_category)->name,
@@ -70,5 +74,14 @@ class PurchaseReportExport implements FromCollection, WithHeadings
         }
 
         return collect($rows);
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'A' => 'dd-mm-yyyy hh:mm',
+            'D' => 'dd-mm-yyyy',
+            'E' => 'dd-mm-yyyy',
+        ];
     }
 }

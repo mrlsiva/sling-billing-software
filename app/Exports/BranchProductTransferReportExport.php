@@ -4,8 +4,10 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class BranchProductTransferReportExport implements FromCollection, WithHeadings
+class BranchProductTransferReportExport implements FromCollection, WithHeadings, WithColumnFormatting
 {
     protected $data;
 
@@ -31,6 +33,13 @@ class BranchProductTransferReportExport implements FromCollection, WithHeadings
             'Item',
             'Item Code',
             'Quantity',
+        ];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'A' => NumberFormat::FORMAT_DATE_DDMMYYYY,
         ];
     }
 }

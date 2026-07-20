@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductTransferReportExport;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\ProductHistory;
@@ -79,19 +80,21 @@ class productTransferReportController extends Controller
             $query->whereDate('transfer_on', '<=', $request->to);
         }
 
-        $data = $query->get()->map(function ($item,$current_branch) {
+        $data = $query->get()->map(function ($item) use ($current_branch) {
             return [
-                'Transfer Datetime' => \Carbon\Carbon::parse($item->transfer_on)->format('d-m-Y H:i'),
-               'Type' => ($current_branch == 0)
+                'Transfer Datetime' => Date::PHPToExcel(
+                    Carbon::parse($item->transfer_on)
+                ),
+                'Type' => ($current_branch == 0)
                     ? ($item->to == Auth::user()->id ? 'Stock_In' : 'Stock_Out')
                     : ($item->to == $current_branch ? 'Stock_In' : 'Stock_Out'),
-                'From Branch'       => $item->transfer_from->user_name ?? '',
-                'To Branch'         => $item->transfer_to->user_name ?? '',
-                'Category'          => $item->category->name ?? '',
-                'Subcategory'       => $item->sub_category->name ?? '',
-                'Item'              => $item->product->name ?? '',
-                'Item Code'         => $item->product->code ?? '',
-                'Quantity'          => $item->quantity,
+                'From Branch' => $item->transfer_from->user_name ?? '',
+                'To Branch' => $item->transfer_to->user_name ?? '',
+                'Category' => $item->category->name ?? '',
+                'Subcategory' => $item->sub_category->name ?? '',
+                'Item' => $item->product->name ?? '',
+                'Item Code' => $item->product->code ?? '',
+                'Quantity' => $item->quantity,
             ];
         });
 

@@ -80,7 +80,7 @@
             <td>{{ $purchase->product->name }}</td>
             <td>{{ $purchase->quantity }}</td>
             <td>{{ $purchase->gross_cost }}</td>
-            <td>{{ \Carbon\Carbon::parse($purchase->invoice_date)->format('d-m-Y') }}</td>
+            <td>{{ $purchase->invoice_date }}</td>
         </tr>
         @endforeach
     </tbody>
@@ -114,7 +114,7 @@
             <td>{{ $payment->purchaseOrder->vendor->name ?? '-' }}</td>
             <td>{{ $payment->purchaseOrder->invoice_no ?? '-' }}</td>
             <td>{{ number_format($payment->amount,2) }}</td>
-            <td>{{ \Carbon\Carbon::parse($payment->paid_on)->format('d-m-Y') }}</td>
+            <td>{{ $payment->paid_on }}</td>
             <td>{{ $payment->comment ?? '-' }}</td>
         </tr>
         @endforeach
@@ -153,7 +153,7 @@
             <td>{{ $refund->purchase_order->product->name }}</td>
             <td>{{ $refund->quantity }}</td>
             <td>{{ number_format($refund->refund_amount,2) }}</td>
-            <td>{{ \Carbon\Carbon::parse($refund->refund_on)->format('d-m-Y') }}</td>
+            <td>{{ $refund->refund_on }}</td>
             <td>{{ $refund->refundedBy->name }}</td>
         </tr>
         @endforeach
@@ -254,7 +254,7 @@
             </td>
             <td>{{ $order->bill_id }}</td>
             <td>{{ $order->bill_amount - ($order->is_refunded ? ($order->total_refund ?? 0) : 0) }}</td>
-            <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d-m-Y') }}</td>
+            <td>{{ $order->billed_on) }}</td>
             <td>{{ $order->billedBy->name }}</td>
             <td>
                 @if($order->payments->count())
@@ -273,7 +273,7 @@
                             Refund 
                             (₹ {{ number_format($order->total_refund, 2) }})
                             <br>
-                            {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d-m-Y') }}
+                            {{ $order->refunds->last()->refund_on }}
                         </span>
                     @endif
                 @else
