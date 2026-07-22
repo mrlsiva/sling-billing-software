@@ -104,7 +104,7 @@
                     <td>{{ $purchase->product->name }}</td>
                     <td>{{ $purchase->quantity }}</td>
                     <td>{{ $purchase->gross_cost }}</td>
-                    <td>{{ \Carbon\Carbon::parse($purchase->invoice_date)->format('d M Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($purchase->invoice_date)->format('d-m-Y') }}</td>
                 </tr>
                 @endforeach
 
@@ -133,7 +133,7 @@
                     <td>{{ $payment->purchaseOrder->vendor->name ?? '-' }}</td>
                     <td>{{ $payment->purchaseOrder->invoice_no ?? '-' }}</td>
                     <td>{{ number_format($payment->amount,2) }}</td>
-                    <td>{{ \Carbon\Carbon::parse($payment->paid_on)->format('d M Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($payment->paid_on)->format('d-m-Y') }}</td>
                     <td>{{ $payment->comment ?? '-' }}</td>
                 </tr>
                 @endforeach
@@ -167,7 +167,7 @@
                     <td>{{ $refund->purchase_order->product->name }}</td>
                     <td>{{ $refund->quantity }}</td>
                     <td>{{ number_format($refund->refund_amount,2) }}</td>
-                    <td>{{ \Carbon\Carbon::parse($refund->refund_on)->format('d M Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($refund->refund_on)->format('d-m-Y') }}</td>
                     <td>{{ $refund->refundedBy->name }}</td>
                 </tr>
                 @endforeach
@@ -209,7 +209,7 @@
 
                 <td>{{ $order->bill_id }}</td>
                 <td>{{ $order->bill_amount - ($order->is_refunded ? ($order->total_refund ?? 0) : 0) }}</td>
-                <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d-m-Y') }}</td>
                 <td>{{ $order->billedBy->name }}</td>
                 <td>{{ $order->customer->phone }} ({{ $order->customer->name }})</td>
 
@@ -230,7 +230,7 @@
                                 Refund 
                                 (₹ {{ number_format($order->total_refund, 2) }})
                                 <br>
-                                {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d M Y') }}
+                                {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d-m-Y') }}
                             </span>
                         @endif
                     @else

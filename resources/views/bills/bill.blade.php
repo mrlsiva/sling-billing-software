@@ -302,7 +302,7 @@
                                 </tr>
                                 <tr>
                                     <td><strong>Mobile</strong></td>
-                                    <td>: {{ $order->customer->phone }}</td>
+                                    <td>: {{ $order->customer->phone }}@if($order->customer->alt_phone != null), {{ $order->customer->alt_phone }}@endif</td>
                                 </tr>
                                 @if($order->customer->gst != null)
                                 <tr>

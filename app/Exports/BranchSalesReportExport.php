@@ -5,8 +5,11 @@ namespace App\Exports;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class BranchSalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize
+class BranchSalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize, WithColumnFormatting
 {
     protected $orders;
 
@@ -77,7 +80,9 @@ class BranchSalesReportExport implements FromCollection, WithHeadings, ShouldAut
 
                 $rows[] = [
                     $order->bill_id,
-                    \Carbon\Carbon::parse($order->billed_on)->format('d M Y H:i'),
+                    Date::dateTimeToExcel(
+                        \Carbon\Carbon::parse($order->billed_on)
+                    ),
                     'User',
                     optional($order->billedBy)->name,
                     optional($order->customer)->name,
@@ -96,5 +101,12 @@ class BranchSalesReportExport implements FromCollection, WithHeadings, ShouldAut
         }
 
         return collect($rows);
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+        ];
     }
 }

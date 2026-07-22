@@ -2,11 +2,15 @@
 
 namespace App\Exports;
 
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class SalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize
+class SalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize, WithColumnFormatting
 {
     protected $orders;
 
@@ -43,7 +47,6 @@ class SalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize
         foreach ($this->orders as $order) {
             foreach ($order->details as $detail) {
 
-                // 🔁 Calculate refunded qty for this product
                 $refundedQty = 0;
 
                 if ($order->is_refunded && $order->refunds) {
@@ -56,20 +59,12 @@ class SalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize
                     }
                 }
 
-                // ✅ Final qty after refund
-                $qty = $detail->quantity - $refundedQty;
+                $qty = max(0, $detail->quantity - $refundedQty);
 
-                //(avoid negative)
-                if ($qty < 0) {
-                    $qty = 0;
-                }
-
-                // ✅ Recalculate amounts based on final qty
                 $gross = $detail->price * $qty;
                 $tax   = $detail->tax_amount * $qty;
                 $net   = ($detail->price - $detail->tax_amount) * $qty;
 
-                // 👉 format like Blade
                 $qtyDisplay = $qty;
                 if ($refundedQty > 0) {
                     $qtyDisplay .= " (Refunded: {$refundedQty})";
@@ -77,7 +72,7 @@ class SalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize
 
                 $rows[] = [
                     $order->bill_id,
-                    \Carbon\Carbon::parse($order->billed_on)->format('d M Y H:i'),
+                    Date::PHPToExcel(Carbon::parse($order->billed_on)),
                     'User',
                     optional($order->billedBy)->name,
                     optional($order->customer)->name,
@@ -96,5 +91,13 @@ class SalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize
         }
 
         return collect($rows);
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            // or simply: 'B' => 'dd-mm-yyyy hh:mm',
+        ];
     }
 }
