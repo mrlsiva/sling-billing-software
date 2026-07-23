@@ -303,7 +303,7 @@
                                 </tr>
                                 <tr>
                                     <td><strong>Mobile</strong></td>
-                                    <td>: {{ $billing_address->phone }}</td>
+                                    <td>: {{ $billing_address->phone }}@if($billing_address->alt_phone != null), {{ $billing_address->alt_phone }}@endif</td>
                                 </tr>
                             </table>
                             @endif
