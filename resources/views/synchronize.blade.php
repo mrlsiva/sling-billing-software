@@ -6,14 +6,44 @@
 
 @section('body')
 	<div class="row">
-		<div class="col-xl-12">
-			<div class="card">
-				<div class="card-header d-flex justify-content-between align-items-center">
-					<div>
-						<p class="card-title">Synchronize Stock</p>
-					</div>
+    	<div class="col-xl-12">
+        	<div class="card">
+            	<div class="card-header d-flex justify-content-between align-items-center">
+                	<div class="d-flex align-items-center gap-2">
+                    	<a href="{{ Auth::user()->hasRole('Branch') 
+                                ? route('branch.stock_transfer.transfer', ['company' => request()->route('company')]) 
+                                : route('inventory.transfer', ['company' => request()->route('company')]) }}" class="btn btn-sm">
+                        	<i class="bx bx-arrow-back me-1"></i>
+                    	</a>
 
-				</div>
+                    	<p class="card-title mb-0">Synchronize Stock</p>
+                	</div>
+
+                	{{-- Right side actions (if any) --}}
+                	
+                </div>
+
+				<ul class="nav nav-tabs nav-justified mb-3">
+				    <li class="nav-item">
+				        <a href="{{ route('synchronize_stock', ['company' => request()->route('company'), 'filter' => 'received']) }}"
+				           class="nav-link {{ request('filter', 'received') == 'received' ? 'active' : '' }}">
+				            <span class="d-block d-sm-none"><i class="ri-download-2-line"></i></span>
+				            <span class="d-none d-sm-block">
+				                <i class="ri-download-2-line me-2"></i>Received
+				            </span>
+				        </a>
+				    </li>
+
+				    <li class="nav-item">
+				        <a href="{{ route('synchronize_stock', ['company' => request()->route('company'), 'filter' => 'transfer']) }}"
+				           class="nav-link {{ request('filter') == 'transfer' ? 'active' : '' }}">
+				            <span class="d-block d-sm-none"><i class="ri-upload-2-line"></i></span>
+				            <span class="d-none d-sm-block">
+				                <i class="ri-upload-2-line me-2"></i>Transferred
+				            </span>
+				        </a>
+				    </li>
+				</ul>
 
 				@if ($errors->any())
 		            <div class="alert alert-danger">
@@ -25,26 +55,6 @@
 		                </ul>
 		            </div>
 		        @endif
-
-				<form method="GET" action="{{ route('synchronize_stock', ['company' => request()->route('company')]) }}">
-				    <div class="row mb-2 p-3">
-				        <div class="col-md-11">
-				            <select class="form-control" name="filter" id="filter">
-				                <option value="">Select</option>
-				                <option value="transfer" {{ request('filter') == 'transfer' ? 'selected' : '' }}>
-				                    Transferred
-				                </option>
-				                <option value="received" {{ request('filter', 'received') == 'received' ? 'selected' : '' }}>
-				                    Received
-				                </option>
-				            </select>
-				        </div>
-
-				        <div class="col-md-1">
-				            <button class="btn btn-primary">Search</button>
-				        </div>
-				    </div>
-				</form>
 
 				<div class="">
 					<div class="table-responsive">

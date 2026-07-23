@@ -27,7 +27,8 @@
 						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#bulkTransfer" href="javascript:void(0);">
 	    					<i class="ri-file-excel-2-line me-2"></i> Bulk Transfer
 						</a>
-						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#stockTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Stock Transfer</a>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#stockTransfer" href=""> <i class="ri-swap-box-line me-2"></i>Stock Transfer</a>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" href="{{route('synchronize_stock', ['company' => request()->route('company')])}}"> <i class="ri-p2p-fill me-2"></i>Synchronize Stock</a>
 					</div>
 				</div>
 

@@ -96,6 +96,16 @@
                         
                     </ul>
                 @endif
+
+                @php
+                    $queueStocksCount = \App\Models\QueueStock::where('to', auth()->id())
+                    ->where('status', 0)
+                    ->selectRaw('MAX(id) as id')
+                    ->groupBy('unique_id')
+                    ->get()
+                    ->count();
+                @endphp
+
                 @if(Auth::user()->hasRole('HO'))
                     <ul class="navbar-nav" id="navbar-nav">
 
@@ -176,6 +186,7 @@
                                     @if($branches->isNotEmpty())
                                         <li class="sub-menu-item">
                                             <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/transfer/*') ? 'active' : '' }}" href="{{route('inventory.transfer', ['company' => request()->route('company')])}}">Product Transfer</a>
+                                            <span class="badge bg-danger ms-2">{{ $queueStocksCount }}</span>
                                         </li>
                                     @endif
 
@@ -348,11 +359,15 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('branch.stock_transfer.transfer', ['company' => request()->route('company')])}}">
+                            <a class="menu-link" href="{{ route('branch.stock_transfer.transfer', ['company' => request()->route('company')]) }}">
                                 <span class="nav-icon">
                                     <i class="ri-stock-fill"></i>
                                 </span>
-                                <span class="nav-text"> Stock Transfer </span>
+
+                                <span class="nav-text">
+                                    Stock Transfer
+                                    <span class="badge bg-danger ms-2">{{ $queueStocksCount }}</span>
+                                </span>
                             </a>
                         </li>
 
@@ -458,16 +473,6 @@
                                     <i class="ri-sun-line fs-20 align-middle dark-mode"></i>
                             </button>
                         </div>
-
-                        @if(request()->segment(1) != 'admin')
-                        <div class="topbar-item">
-                            <a href="{{route('synchronize_stock', ['company' => request()->route('company')])}}">
-                            <button type="button" class="topbar-button" >
-                                <i class="ri-p2p-fill fs-20 align-middle" title="Synchronize Stock"></i>
-                            </button>
-                            </a>
-                        </div>
-                        @endif
 
                         <!-- Notification -->
                         <!-- <div class="dropdown topbar-item">

@@ -40,7 +40,7 @@ class synchronizeController extends Controller
     {
 
         $transfer_detail = QueueStock::where('id',$id)->first();
-        $transfer_products = QueueStock::where('unique_id',$transfer_detail->unique_id)->get();
+        $transfer_products = QueueStock::where([['unique_id',$transfer_detail->unique_id],['from',$transfer_detail->from]])->get();
 
          return view('synchronize_bill',compact('transfer_detail','transfer_products'));
     }
