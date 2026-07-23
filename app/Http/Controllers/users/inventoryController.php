@@ -490,6 +490,7 @@ class inventoryController extends Controller
 
     public function store(Request $request)
     {
+        //return $request;
         $request->validate([
             'branch'      => 'required',
             'category'      => 'required',
@@ -529,7 +530,7 @@ class inventoryController extends Controller
             'quantity'      => $request->quantity,
             'price'         => $request->price,
             'imei'          => implode(',', $imeis),
-            'variation'     => json_encode($request->variation_qty),
+            'variation' => $request->variation_id ? json_encode($request->variation_id) : null,
             'initiated_on'  => Carbon::now(),
             'initiated_by'  => auth()->id(),
             'status'        => 0,
