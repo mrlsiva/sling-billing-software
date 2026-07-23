@@ -651,29 +651,38 @@ $(document).ready(function () {
                 type: 'GET',
                 dataType: 'json',
                 data: { phone: phone },
+
                 success: function (data) {
 
                     //console.log(data);
 
                     $("#customer").val(data.id);
-                    $("#alt_phone").val(data.alt_phone).prop('disabled', true);
+
+                    $("#alt_phone").val(data.alt_phone).prop('disabled', !!data.alt_phone);
                     $("#name").val(data.name).prop('disabled', true);
                     $("#address").val(data.address).prop('disabled', true);
-                    $("#pincode").val(data.pincode).prop('disabled', true);
+                    $("#pincode").val(data.pincode).prop('disabled', !!data.pincode);
 
                     jQuery('select[name="gender"]').empty();
-                    $('select[name="gender"]').append('<option value="">' + "Select" + '</option>');
+                    $('select[name="gender"]').append('<option value="">Select</option>');
+
                     if (data.gender_id == 1) {
-                        $('select[name="gender"]').append('<option value="1" selected>' + "Female" + '</option>');
-                        $('select[name="gender"]').append('<option value="2">' + "Male" + '</option>');
+                        $('select[name="gender"]').append('<option value="1" selected>Female</option>');
+                        $('select[name="gender"]').append('<option value="2">Male</option>');
                     }
                     else if (data.gender_id == 2) {
-                        $('select[name="gender"]').append('<option value="1">' + "Female" + '</option>');
-                        $('select[name="gender"]').append('<option value="2" selected>' + "Male" + '</option>');
+                        $('select[name="gender"]').append('<option value="1">Female</option>');
+                        $('select[name="gender"]').append('<option value="2" selected>Male</option>');
                     }
-                    $('select[name="gender"]').prop('disabled', true);
-                    $("#dob").val(data.dob).prop('disabled', true);
-                    $("#gst").val(data.gst).prop('disabled', true);
+                    else {
+                        $('select[name="gender"]').append('<option value="1">Female</option>');
+                        $('select[name="gender"]').append('<option value="2">Male</option>');
+                    }
+
+                    $('select[name="gender"]').prop('disabled', !!data.gender_id);
+
+                    $("#dob").val(data.dob).prop('disabled', !!data.dob);
+                    $("#gst").val(data.gst).prop('disabled', !!data.gst);
                     $('#billing_gst').val(data.gst).prop('disabled');
 
                 }
