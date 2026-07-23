@@ -401,6 +401,13 @@
 
 						<div class="col-md-12">
 							<div class="mb-3">
+								<label for="billing_alt_phone" class="form-label">Alternate Phone</label>
+								<input type="tel" name="billing_alt_phone" id="billing_alt_phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" placeholder="Alternate Phone">
+							</div>
+						</div>
+
+						<div class="col-md-12">
+							<div class="mb-3">
 								<label for="billing_name" class="form-label">Name</label>
 								<span class="text-danger">*</span>
 								<input type="text" id="billing_name" name="billing_name" class="form-control" placeholder="Name">
@@ -893,6 +900,7 @@ $(document).ready(function () {
         if ($(this).is(':checked')) {
 
             $('#billing_phone').val($('#phone').val());
+            $('#billing_alt_phone').val($('#alt_phone').val());
             $('#billing_name').val($('#name').val());
             $('#billing_address').val($('#address').val());
             $('#billing_pincode').val($('#pincode').val());
@@ -901,6 +909,7 @@ $(document).ready(function () {
         } else {
 
             $('#billing_phone').val('');
+            $('#billing_alt_phone').val('');
             $('#billing_name').val('');
             $('#billing_address').val('');
             $('#billing_pincode').val('');

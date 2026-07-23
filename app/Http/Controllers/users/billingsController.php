@@ -293,9 +293,9 @@ class billingsController extends Controller
         }
 
         $customerData = $request->input('customer');
-        $customer = Customer::firstOrCreate(
+        $customer = Customer::updateOrCreate(
             [
-                'user_id' => $user->id, // include user_id in the unique key
+                'user_id' => $user->id,
                 'phone'   => $customerData['phone'],
             ],
             [
@@ -360,6 +360,7 @@ class billingsController extends Controller
                     'user_id'   => $user->id,
                     'order_id'  => $order->id,
                     'phone'     => $billingData['billing_phone'] ?? null,
+                    'alt_phone' => $billingData['billing_alt_phone'] ?? null,
                     'name'      => $billingData['billing_name'],
                     'address'   => $billingData['billing_address'],
                     'pincode'   => $billingData['billing_pincode'] ?? null,
