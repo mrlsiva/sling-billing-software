@@ -1743,6 +1743,7 @@ function submit() {
     // collect billing info
     let billing_customer = {
         billing_phone: $("#billing_phone").val().trim(),
+        billing_alt_phone: $("#billing_alt_phone").val().trim(),
         billing_name: $("#billing_name").val().trim(),
         billing_address: $("#billing_address").val().trim(),
         billing_pincode: $("#billing_pincode").val().trim(),
