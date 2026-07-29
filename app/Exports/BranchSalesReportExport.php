@@ -106,7 +106,8 @@ class BranchSalesReportExport implements FromCollection, WithHeadings, ShouldAut
     public function columnFormats(): array
     {
         return [
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            //'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'B' => 'dd-mm-yyyy hh:mm',
         ];
     }
 }

@@ -365,7 +365,7 @@ class billingController extends Controller
 
         $customer = Customer::updateOrCreate(
             [
-                'user_id' => $user->id,
+                'user_id' => Auth::user()->parent_id,
                 'phone'   => $customerData['phone'],
             ],
             [

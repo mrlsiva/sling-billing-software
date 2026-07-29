@@ -59,13 +59,13 @@ class BranchDailyReportExport implements FromView, WithEvents
                         $sheet->setCellValue(
                             'E' . $row,
                             Date::dateTimeToExcel(
-                                Carbon::parse($order->billed_on)->startOfDay()
+                                Carbon::parse($order->billed_on)
                             )
                         );
 
                         $sheet->getStyle('E' . $row)
                             ->getNumberFormat()
-                            ->setFormatCode('dd-mm-yyyy');
+                            ->setFormatCode('dd-mm-yyyy hh:mm AM/PM');
 
                         $row++;
                     }

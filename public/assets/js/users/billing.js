@@ -776,19 +776,19 @@ $('#phone').on('keyup', function () {
 
                     $("#alt_phone")
                         .val(data.alt_phone)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.alt_phone);
 
                     $("#name")
                         .val(data.name)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.name);
 
                     $("#address")
                         .val(data.address)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.address);
 
                     $("#pincode")
                         .val(data.pincode)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.pincode);
 
                     $('select[name="gender"]').empty();
                     $('select[name="gender"]').append('<option value="">Select</option>');
@@ -799,17 +799,24 @@ $('#phone').on('keyup', function () {
                     } else if (data.gender_id == 2) {
                         $('select[name="gender"]').append('<option value="1">Female</option>');
                         $('select[name="gender"]').append('<option value="2" selected>Male</option>');
+                    } else {
+                        $('select[name="gender"]').append('<option value="1">Female</option>');
+                        $('select[name="gender"]').append('<option value="2">Male</option>');
                     }
 
-                    $('select[name="gender"]').prop('disabled', true);
+                    $('select[name="gender"]').prop('disabled', !!data.gender_id);
 
                     $("#dob")
                         .val(data.dob)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.dob);
 
                     $("#gst")
                         .val(data.gst)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.gst);
+
+                    $("#billing_gst")
+                        .val(data.gst)
+                        .prop('disabled', !!data.gst);
                 }
             },
 

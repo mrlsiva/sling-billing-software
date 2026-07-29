@@ -96,8 +96,8 @@ class SalesReportExport implements FromCollection, WithHeadings, ShouldAutoSize,
     public function columnFormats(): array
     {
         return [
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            // or simply: 'B' => 'dd-mm-yyyy hh:mm',
+            //'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'B' => 'dd-mm-yyyy hh:mm',
         ];
     }
 }

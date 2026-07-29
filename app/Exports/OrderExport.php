@@ -37,15 +37,15 @@ class OrderExport implements FromView, WithEvents
                     $row = $index + 2; // Header is row 1
 
                     $sheet->setCellValue(
-                        'D' . $row,
+                        'E' . $row,
                         Date::dateTimeToExcel(
-                            Carbon::parse($order->billed_on)->startOfDay()
+                            Carbon::parse($order->billed_on)
                         )
                     );
 
-                    $sheet->getStyle('D' . $row)
+                    $sheet->getStyle('E' . $row)
                         ->getNumberFormat()
-                        ->setFormatCode('dd-mm-yyyy');
+                        ->setFormatCode('dd-mm-yyyy hh:mm AM/PM');
                 }
             },
         ];
