@@ -851,10 +851,30 @@ class stockController extends Controller
                 }
 
                 $grouped[$productId]['quantity'] += $row['quantity'];
-                $grouped[$productId]['variation'][$row['variation_id']] = $row['quantity'];
+
+                if (!is_null($row['variation_id'])) {
+                    $grouped[$productId]['variation'][$row['variation_id']] = $row['quantity'];
+                }
+
                 $grouped[$productId]['imeis'] = array_merge($grouped[$productId]['imeis'], $row['imeis']);
             }
 
+            foreach ($grouped as $item) {
+                QueueStock::create([
+                    'unique_id'     => $unique_id,
+                    'type'          => $type,
+                    'from'          => Auth::user()->id,
+                    'to'            => $to,
+                    'product_id'    => $item['product_id'],
+                    'quantity'      => $item['quantity'],
+                    'price'         => $item['price'],
+                    'imei'          => implode(',', $item['imeis']),
+                    'variation'     => !empty($item['variation']) ? json_encode($item['variation']) : null,
+                    'initiated_on'  => now(),
+                    'initiated_by'  => auth()->id(),
+                    'status'        => 0,
+                ]);
+            }
 
             DB::commit();
 
