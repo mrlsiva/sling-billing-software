@@ -139,7 +139,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="3" class="right">Total</th>
+                <th colspan="2" class="right">Total</th>
                 <th>{{ $transfer_products->sum('quantity') }}</th>
                 <th colspan="2"></th>
                 <th class="right">
