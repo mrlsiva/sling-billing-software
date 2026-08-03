@@ -389,7 +389,7 @@ else
                                     Route::get('/bills/get_sub_category',[billController::class, 'get_sub_category'])->name('bill.get_sub_categories');
                                     Route::get('/bills/get_product',[billController::class, 'get_product'])->name('bill.get_products');
                                     Route::get('/bills/get_product_detail',[billController::class, 'get_product_detail'])->name('bill.get_product_detail');
-                                    Route::post('/bills/update',[billController::class, 'update'])->name('bill.update');
+                                    Route::post('/{id}/bills/update',[billController::class, 'update'])->name('bill.update');
                                 });
                             });
 

@@ -14,8 +14,12 @@ use App\Models\OrderDetail;
 use App\Models\SubCategory;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\QueueStock;
 use App\Models\OrderPaymentDetail;
+use App\Models\QueueStock;
+use App\Models\OrderHistory;
+use App\Models\ShopPayment;
+use App\Models\StockVariation;
+use App\Models\Payment;
 use App\Models\Order;
 use App\Traits\Log;
 use Carbon\Carbon;
@@ -157,8 +161,10 @@ class billController extends Controller
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
         $categories = Stock::where([['shop_id',$order->shop_id],['branch_id',$order->branch_id],['quantity','>',0],['is_active',1]])->select('category_id')->get();
         $categories = Category::whereIn('id',$categories)->get();
+        $shop_payment_ids = ShopPayment::where([['shop_id', $order->shop_id],['is_active', 1]])->pluck('payment_id')->toArray();
+        $payments = Payment::whereIn('id',$shop_payment_ids)->get();
 
-        return view('users.settings.bill_edit',compact('order','order_details','order_payment_details','categories'));
+        return view('users.settings.bill_edit',compact('order','order_details','order_payment_details','categories','payments'));
     }
 
     public function get_sub_category(Request $request)
@@ -205,6 +211,130 @@ class billController extends Controller
             'queue' => $queueStock,
             'free' => $freeStock,
         ]); 
+    }
+
+    public function update(Request $request,$company,$id)
+    {
+        //return $request;
+        DB::beginTransaction();
+
+        
+
+            $order = Order::with(['details', 'payments'])->findOrFail($id);
+
+            //Save History
+
+            OrderHistory::create([
+                'order_id'        => $order->id,
+                'edited_by'       => Auth::id(),
+                'edited_on'       => now(),
+                'order'           => $order->toArray(),
+                'order_details'   => $order->details->toArray(),
+                'payment_details' => $order->payments->toArray(),
+                'remarks'         => $request->remarks,
+            ]);
+
+            foreach ($order->details as $detail) {
+
+                $stock = Stock::where([
+                    'shop_id'    => $order->shop_id,
+                    'branch_id'  => $order->branch_id,
+                    'product_id' => $detail->product_id,
+                    'is_active'  => 1,
+                ])->first();
+
+                if ($stock) {
+                    $stock->increment('quantity', $detail->quantity);
+
+                    $variation = StockVariation::where('stock_id',$stock->id)->increment('quantity', $detail->quantity);
+                }
+            }
+
+            //Delete Old Details
+
+            OrderDetail::where('order_id', $order->id)->delete();
+
+            //Save New Details
+
+            $grandTotal = 0;
+
+            foreach ($request->product_id as $key => $productId) {
+
+                $qty   = $request->qty[$key];
+                $price = $request->price[$key];
+
+                $stock = Stock::where([
+                    'shop_id'    => $order->shop_id,
+                    'branch_id'  => $order->branch_id,
+                    'product_id' => $productId,
+                    'is_active'  => 1,
+                ])->firstOrFail();
+
+                if ($stock->quantity < $qty) {
+                    throw new \Exception("Insufficient stock.");
+                }
+
+                $stock->decrement('quantity', $qty);
+
+                $variation = StockVariation::where('stock_id',$stock->id)->decrement('quantity', $qty);
+
+                $product = $stock->product;
+
+                $lineTotal = $qty * $price;
+
+                OrderDetail::create([
+                    'order_id'       => $order->id,
+                    'product_id'     => $productId,
+                    'name'           => $product->name,
+                    'quantity'       => $qty,
+                    'price'          => $request->amount[$key],
+                    'tax_amount'     => 0,
+                    'tax_percent'    => $product->tax->name,
+                    'discount_type'  => $product->discount_type,
+                    'discount'       => $product->discount,
+                    'selling_price'  => $request->amount[$key],
+                    'imei'           => null,
+                    'size_id'        => null,
+                    'colour_id'      => null,
+                ]);
+
+                $grandTotal += $lineTotal;
+            }
+
+            //Update Order
+
+            $order->update([
+                'bill_amount' => $grandTotal,
+                'billed_on'   => Carbon::parse(
+                    $request->billed_date . ' ' . $request->billed_time
+                ),
+            ]);
+
+            //Update Payments
+
+            OrderPaymentDetail::where('order_id', $order->id)->delete();
+
+            foreach ($request->payment_id as $i => $payment) {
+
+                if($request->amount[$i] > 0)
+                {
+
+                    OrderPaymentDetail::create([
+                        'order_id'   => $order->id,
+                        'payment_id' => $payment,
+                        'amount'     => $request->amount[$i],
+                        'number'     => $request->number[$i] ?? null,
+                        'card'       => $request->card[$i] ?? null,
+                        'finance_id' => $request->finance_id[$i] ?? null,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Bill updated successfully.');
+        
+
     }
 
 

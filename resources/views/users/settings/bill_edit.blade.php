@@ -32,7 +32,8 @@
             <div class="card-header pb-0">
                 <h4 class="card-title">Edit Bill</h4>
             </div>
-            <form class="row" action="{{route('setting.order.bill.update', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
+            <form class="row" action="{{route('setting.order.bill.update', ['company' => request()->route('company'),'id' => $order->id])}}" method="post" enctype="multipart/form-data">
+                @csrf
                 <div class="card-body">
                     <div class="row border-bottom pb-3 mb-4">
                         <div class="col-md-3">
@@ -324,11 +325,13 @@
                                     </tbody>
                                 </table>
 
-                                <table class="d-none">
+                                <template id="productTemplate">
                                     <tr id="productTemplate">
 
                                         <td>
                                             <div class="row g-1">
+                                                <input class="product" type="hidden">
+
                                                 <div class="col-md-4">
                                                     <select class="form-control category">
                                                         <option value="">Category</option>
@@ -353,13 +356,13 @@
                                         </td>
 
                                         <td>
-                                            <input type="number" name="qty[]" class="form-control qty" value="1" min="1" max="0" data-stock="0" data-queue="0" data-billed="0">
+                                            <input type="number"  class="form-control qty" value="1" min="1" max="0" data-stock="0" data-queue="0" data-billed="0">
 
                                             <small class="text-muted stock-info" style="font-size:11px;"></small>
                                         </td>
 
                                         <td>
-                                            <input type="number" name="price[]" class="form-control price" value="0" step="0.01" min="0">
+                                            <input type="number"  class="form-control price" value="0" step="0.01" min="0">
                                         </td>
 
                                         <td>
@@ -375,7 +378,145 @@
                                         </td>
 
                                     </tr>
-                                </table>
+                                </template>
+
+                                <div class="card mt-3">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Payment Details</h5>
+
+                                        <button type="button" class="btn btn-primary btn-sm" id="addPayment">
+                                            <i class="fa fa-plus"></i> Add Payment
+                                        </button>
+                                    </div>
+
+                                    <div class="card-body">
+
+                                        <table class="table table-bordered" id="paymentTable">
+                                            <thead>
+                                                <tr>
+                                                    <th width="35%">Payment Method</th>
+                                                    <th width="25%">Amount</th>
+                                                    <th width="30%">Card</th>
+                                                    <th width="30%">Reference No</th>
+                                                    <th width="10%">Action</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach($order_payment_details as $payment)
+
+                                                <tr>
+
+                                                    <td>
+                                                        <select name="payment_id[]" class="form-control payment">
+                                                            @foreach($payments as $item)
+                                                                <option value="{{ $item->id }}"
+                                                                    {{ $payment->payment_id == $item->id ? 'selected' : '' }}>
+                                                                    {{ $item->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="number"
+                                                               name="amount[]"
+                                                               class="form-control paymentAmount"
+                                                               step="0.01"
+                                                               value="{{ $payment->amount }}">
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="text"
+                                                               name="number[]"
+                                                               class="form-control"
+                                                               value="{{ $payment->number }}">
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="text"
+                                                               name="card[]"
+                                                               class="form-control"
+                                                               value="{{ $payment->card }}">
+                                                    </td>
+
+                                                    <td>
+                                                        <button type="button"
+                                                                class="btn btn-danger btn-sm removePayment">
+                                                            Remove
+                                                        </button>
+                                                    </td>
+
+                                                </tr>
+
+                                                @endforeach
+
+                                            </tbody>
+
+                                        </table>
+
+                                        <table class="d-none">
+                                            <tr id="paymentTemplate">
+
+                                                <td>
+                                                    <select name="payment_id[]" class="form-control payment">
+
+                                                        @foreach($payments as $payment)
+                                                            <option value="{{ $payment->id }}">
+                                                                {{ $payment->name }}
+                                                            </option>
+                                                        @endforeach
+
+                                                    </select>
+                                                </td>
+
+                                                <td>
+                                                    <input type="number"
+                                                           name="amount[]"
+                                                           class="form-control paymentAmount"
+                                                           step="0.01"
+                                                           value="0">
+                                                </td>
+
+                                                <td>
+                                                    <input type="text"
+                                                           name="number[]"
+                                                           class="form-control">
+                                                </td>
+
+                                                <td>
+                                                    <input type="text"
+                                                           name="card[]"
+                                                           class="form-control">
+                                                </td>
+
+                                                <td>
+                                                    <button type="button"
+                                                            class="btn btn-danger btn-sm removePayment">
+                                                        Remove
+                                                    </button>
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+                                </div>
+
+                                <div class="text-end mt-3">
+                                    <h5>Grand Total : ₹<span id="grandTotal">0.00</span></h5>
+
+                                    <h6>
+                                        Payment Total :
+                                        ₹<span id="paymentTotal">0.00</span>
+                                    </h6>
+
+                                    <h6 id="balanceText" class="text-danger">
+                                        Balance :
+                                        ₹<span id="balanceAmount">0.00</span>
+                                    </h6>
+                                </div>
 
                                 <div class="row justify-content-end g-2">
                                     <div class="col-md-2">
@@ -402,18 +543,19 @@
 </script>
 
 <script>
-    $('#addProduct').click(function(){
+    $('#addProduct').click(function () {
 
-        let row = $('#productTemplate').clone();
+        let row = $($('#productTemplate').html());
 
-        row.removeAttr('id');
-
-        row.removeClass('d-none');
+        row.find('.product').attr('name', 'product_id[]');
+        row.find('.qty').attr('name', 'qty[]');
+        row.find('.price').attr('name', 'price[]');
 
         $('#productTable tbody').append(row);
 
-        row.find('.productSelect').select2();
-
+        row.find('.category, .sub_category, .product').select2({
+            width: '100%'
+        });
     });
 
     $(document).on('click','.removeProduct',function(){
@@ -506,6 +648,8 @@
 
                 row.find('.taxCell').text(data.tax);
 
+                row.find('.product').val(data.id);
+
                 row.find('.qty')
                 .attr('max', data.free)
                 .data('stock', data.stock)
@@ -541,6 +685,14 @@
         });
 
         $('#grandTotal').html(grand.toFixed(2));
+
+        $('#grandTotal').text(grand.toFixed(2));
+
+        if ($('.paymentAmount').length === 1) {
+            $('.paymentAmount').val(grand.toFixed(2));
+        }
+
+        calculatePaymentTotal();
     }
 
     $(document).on('input', '.price', function () {
@@ -570,6 +722,73 @@
         $('#timeView').addClass('d-none');
         $('#billed_time').removeClass('d-none').focus();
     });
+
+    $('#addPayment').click(function () {
+
+        $('#paymentTable tbody').append(
+            $('#paymentTemplate').clone().removeAttr('id')
+        );
+
+    });
+
+    $(document).on('click', '.removePayment', function () {
+
+        if ($('#paymentTable tbody tr').length > 1) {
+            $(this).closest('tr').remove();
+        }
+
+    });
+
+    function calculatePaymentTotal() {
+
+        let grand = parseFloat($('#grandTotal').text()) || 0;
+        let paymentTotal = 0;
+
+        $('.paymentAmount').each(function () {
+            paymentTotal += parseFloat($(this).val()) || 0;
+        });
+
+        let balance = grand - paymentTotal;
+
+        $('#paymentTotal').text(paymentTotal.toFixed(2));
+        $('#balanceAmount').text(balance.toFixed(2));
+
+        if (balance == 0) {
+            $('#balanceText')
+                .removeClass('text-danger')
+                .addClass('text-success')
+                .html('Payment Matched');
+        } else if (balance > 0) {
+            $('#balanceText')
+                .removeClass('text-success')
+                .addClass('text-danger')
+                .html('Pending : ₹<span id="balanceAmount">'+balance.toFixed(2)+'</span>');
+        } else {
+            $('#balanceText')
+                .removeClass('text-success')
+                .addClass('text-danger')
+                .html('Excess : ₹<span id="balanceAmount">'+Math.abs(balance).toFixed(2)+'</span>');
+        }
+    }
+
+    $('form').submit(function(e){
+
+        calculateBill()
+
+        let grand = parseFloat($('#grandTotal').text()) || 0;
+        let payment = 0;
+
+        $('.paymentAmount').each(function(){
+            payment += parseFloat($(this).val()) || 0;
+        });
+
+        if (Math.abs(grand - payment) > 0.01) {
+            e.preventDefault();
+            alert('Payment total must equal Grand Total.');
+        }
+
+    });
+
 
 </script>
 @endsection
