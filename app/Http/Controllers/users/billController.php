@@ -218,7 +218,7 @@ class billController extends Controller
         //return $request;
         DB::beginTransaction();
 
-        
+        try {
 
             $order = Order::with(['details', 'payments'])->findOrFail($id);
 
@@ -333,6 +333,14 @@ class billController extends Controller
             DB::commit();
 
             return redirect()->back()->with('success', 'Bill updated successfully.');
+        }
+
+        catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return redirect()->back()->with('error', $e->getMessage());
+        }
         
 
     }
