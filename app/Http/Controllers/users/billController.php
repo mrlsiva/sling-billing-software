@@ -10,9 +10,16 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\BillSetup;
 use App\Models\UserDetail;
+use App\Models\OrderDetail;
+use App\Models\SubCategory;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\QueueStock;
+use App\Models\OrderPaymentDetail;
 use App\Models\Order;
 use App\Traits\Log;
 use Carbon\Carbon;
+use App\Models\Stock;
 use DB;
 
 class billController extends Controller
@@ -142,32 +149,65 @@ class billController extends Controller
         return view('users.settings.edit_bill',compact('orders','branches'));
     }
 
-    public function edit(Request $request)
+    public function edit(Request $request,$company,$id)
     {
-        $order = Order::where('bill_id', $request->bill_id)->firstOrFail();
 
-        $request->validate([
-            'invoice' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('orders', 'bill_id')
-                    ->where(function ($query) use ($order) {
-                        return $query->where('shop_id', $order->shop_id)
-                                     ->where('branch_id', $order->branch_id);
-                    })
-                    ->ignore($order->id), // ignore current order
-            ],
-            'billed_on' => 'required|date',
-        ]);
+        $order = Order::where('id', $id)->first();
+        $order_details = OrderDetail::where('order_id',$id)->get();
+        $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
+        $categories = Stock::where([['shop_id',$order->shop_id],['branch_id',$order->branch_id],['quantity','>',0],['is_active',1]])->select('category_id')->get();
+        $categories = Category::whereIn('id',$categories)->get();
 
-        $order->update([
-            'billed_on' => $request->billed_on,
-            'bill_id'   => $request->invoice,
-        ]);
+        return view('users.settings.bill_edit',compact('order','order_details','order_payment_details','categories'));
+    }
 
-        return redirect()->back()->with('toast_success', 'Bill updated successfully!');
+    public function get_sub_category(Request $request)
+    {
+
+        $sub_categories = Stock::where([['shop_id',$request->shop_id],['branch_id',$request->branch_id],['category_id',$request->category_id],['quantity','>',0],['is_active',1]])->select('sub_category_id')->get();
+        $sub_categories = SubCategory::whereIn('id',$sub_categories)->get();
+
+        return $sub_categories; 
+    }
+
+    public function get_product(Request $request)
+    {
+
+        $products = Stock::where([['shop_id',$request->shop_id],['branch_id',$request->branch_id],['category_id',$request->category_id],['sub_category_id',$request->sub_category_id],['quantity','>',0],['is_active',1]])->select('product_id')->get();
+        $products = Product::whereIn('id',$products)->get();
+
+        return $products; 
+    }
+
+    public function get_product_detail(Request $request)
+    {
+
+        $stock = Stock::where([
+            'shop_id' => $request->shop_id,
+            'branch_id' => $request->branch_id,
+            'product_id' => $request->product,
+            'is_active' => 1,
+        ])->first();
+
+        $queueStock = QueueStock::where([
+            'product_id' => $request->product,
+            'from' => $request->branch_id,
+            'status' => 0,
+        ])->sum('quantity');
+
+        $availableStock = $stock->quantity ?? 0;
+        $freeStock = max(0, $availableStock - $queueStock);
+
+        return response()->json([
+            'price' => $stock->product->discounted_price,
+            'tax' => $stock->product->tax->name,
+            'stock' => $availableStock,
+            'queue' => $queueStock,
+            'free' => $freeStock,
+        ]); 
     }
 
 
 }
+
+
