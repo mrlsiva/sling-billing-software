@@ -213,6 +213,146 @@ class billController extends Controller
         ]); 
     }
 
+    public function history(Request $request,$company,$id)
+    {
+        $order = Order::with(['customer'])->findOrFail($id);
+
+        $histories = OrderHistory::where('order_id', $id)
+            ->with('editor')
+            ->orderBy('edited_on', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $currentSnapshot = [
+            'order'           => $order->toArray(),
+            'order_details'   => OrderDetail::where('order_id', $order->id)->get()->toArray(),
+            'payment_details' => OrderPaymentDetail::where('order_id', $order->id)->get()->toArray(),
+        ];
+
+        $paymentNames = Payment::pluck('name', 'id');
+
+        $timeline = [];
+        $snapshotCount = $histories->count();
+
+        foreach ($histories as $index => $history) {
+
+            $after = $histories->get($index + 1);
+
+            $afterSnapshot = $after ? [
+                'order'           => $after->order,
+                'order_details'   => $after->order_details,
+                'payment_details' => $after->payment_details,
+            ] : $currentSnapshot;
+
+            $timeline[] = [
+                'edited_by'       => optional($history->editor)->user_name ?? '—',
+                'edited_on'       => $history->edited_on,
+                'remarks'         => $history->remarks,
+                'is_latest'       => $index === $snapshotCount - 1,
+                'order_changes'   => $this->diffOrderFields($history->order, $afterSnapshot['order']),
+                'item_changes'    => $this->diffOrderDetails($history->order_details, $afterSnapshot['order_details']),
+                'payment_changes' => $this->diffPaymentDetails($history->payment_details, $afterSnapshot['payment_details'], $paymentNames),
+            ];
+        }
+
+        // Most recent edit first
+        $timeline = array_reverse($timeline);
+
+        return view('users.settings.bill_history', compact('order', 'timeline'));
+    }
+
+    private function diffOrderFields(array $before, array $after): array
+    {
+        $fields = [
+            'bill_amount'            => 'Bill Amount',
+            'order_discount'         => 'Order Discount',
+            'total_product_discount' => 'Product Discount',
+            'billed_on'              => 'Billed On',
+        ];
+
+        $changes = [];
+
+        foreach ($fields as $key => $label) {
+            $oldVal = $before[$key] ?? null;
+            $newVal = $after[$key] ?? null;
+
+            if ((string) $oldVal !== (string) $newVal) {
+                $changes[] = ['label' => $label, 'old' => $oldVal, 'new' => $newVal];
+            }
+        }
+
+        return $changes;
+    }
+
+    private function diffOrderDetails(array $before, array $after): array
+    {
+        $beforeMap = collect($before)->keyBy('product_id');
+        $afterMap  = collect($after)->keyBy('product_id');
+
+        $productIds = $beforeMap->keys()->merge($afterMap->keys())->unique();
+
+        $changes = [];
+
+        foreach ($productIds as $productId) {
+
+            $oldItem = $beforeMap->get($productId);
+            $newItem = $afterMap->get($productId);
+
+            if ($oldItem && !$newItem) {
+                $changes[] = [
+                    'status'    => 'removed',
+                    'name'      => $oldItem['name'],
+                    'old_qty'   => $oldItem['quantity'], 'new_qty'   => null,
+                    'old_price' => $oldItem['price'],    'new_price' => null,
+                ];
+            } elseif (!$oldItem && $newItem) {
+                $changes[] = [
+                    'status'    => 'added',
+                    'name'      => $newItem['name'],
+                    'old_qty'   => null, 'new_qty'   => $newItem['quantity'],
+                    'old_price' => null, 'new_price' => $newItem['price'],
+                ];
+            } elseif ((string) $oldItem['quantity'] !== (string) $newItem['quantity']
+                   || (string) $oldItem['price'] !== (string) $newItem['price']) {
+                $changes[] = [
+                    'status'    => 'changed',
+                    'name'      => $newItem['name'],
+                    'old_qty'   => $oldItem['quantity'], 'new_qty'   => $newItem['quantity'],
+                    'old_price' => $oldItem['price'],    'new_price' => $newItem['price'],
+                ];
+            }
+        }
+
+        return $changes;
+    }
+
+    private function diffPaymentDetails(array $before, array $after, $paymentNames): array
+    {
+        $beforeMap = collect($before)->keyBy('payment_id');
+        $afterMap  = collect($after)->keyBy('payment_id');
+
+        $paymentIds = $beforeMap->keys()->merge($afterMap->keys())->unique();
+
+        $changes = [];
+
+        foreach ($paymentIds as $paymentId) {
+
+            $oldItem = $beforeMap->get($paymentId);
+            $newItem = $afterMap->get($paymentId);
+            $label   = $paymentNames[$paymentId] ?? 'Payment';
+
+            if ($oldItem && !$newItem) {
+                $changes[] = ['status' => 'removed', 'name' => $label, 'old_amount' => $oldItem['amount'], 'new_amount' => null];
+            } elseif (!$oldItem && $newItem) {
+                $changes[] = ['status' => 'added', 'name' => $label, 'old_amount' => null, 'new_amount' => $newItem['amount']];
+            } elseif ((string) $oldItem['amount'] !== (string) $newItem['amount']) {
+                $changes[] = ['status' => 'changed', 'name' => $label, 'old_amount' => $oldItem['amount'], 'new_amount' => $newItem['amount']];
+            }
+        }
+
+        return $changes;
+    }
+
     public function update(Request $request,$company,$id)
     {
         //return $request;

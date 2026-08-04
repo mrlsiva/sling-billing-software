@@ -386,6 +386,7 @@ else
                                 Route::name('order.')->group(function () {
                                     Route::get('/bills/index/{branch?}',[billController::class, 'bill'])->name('bill.index');
                                     Route::get('/{id}/bills/edit',[billController::class, 'edit'])->name('bill.edit');
+                                    Route::get('/{id}/bills/history',[billController::class, 'history'])->name('bill.history');
                                     Route::get('/bills/get_sub_category',[billController::class, 'get_sub_category'])->name('bill.get_sub_categories');
                                     Route::get('/bills/get_product',[billController::class, 'get_product'])->name('bill.get_products');
                                     Route::get('/bills/get_product_detail',[billController::class, 'get_product_detail'])->name('bill.get_product_detail');
