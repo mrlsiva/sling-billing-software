@@ -88,8 +88,12 @@
 										</td>
 										<td>
 
-                                            <a href="{{route('setting.order.bill.edit', ['company' => request()->route('company'), 'id' => $order->id ]) }}" class="text-decoration-underline text-decoration-none">
+                                            <a href="{{route('setting.order.bill.edit', ['company' => request()->route('company'), 'id' => $order->id ]) }}" class="text-decoration-underline text-decoration-none" title="Edit">
                                                 <i class="ri-edit-line fs-18"></i>
+                                            </a>
+
+                                            <a href="{{route('setting.order.bill.history', ['company' => request()->route('company'), 'id' => $order->id ]) }}" class="text-decoration-underline text-decoration-none ms-2" title="Edit History">
+                                                <i class="ri-history-line fs-18"></i>
                                             </a>
 
 										</td>
