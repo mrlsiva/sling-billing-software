@@ -215,12 +215,27 @@ class billController extends Controller
 
     public function update(Request $request,$company,$id)
     {
+        $order = Order::with(['details', 'payments'])->findOrFail($id);
+
+         $request->validate([
+            'bill_id' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('orders', 'bill_id')
+                    ->where(function ($query) use ($order) {
+                        return $query->where('shop_id', $order->shop_id)
+                                     ->where('branch_id', $order->branch_id);
+                    })
+                    ->ignore($order->id), // ignore current order
+            ],
+        ]);
+
         //return $request;
         DB::beginTransaction();
 
         try {
-
-            $order = Order::with(['details', 'payments'])->findOrFail($id);
+            
 
             //Save History
 
@@ -233,6 +248,8 @@ class billController extends Controller
                 'payment_details' => $order->payments->toArray(),
                 'remarks'         => $request->remarks,
             ]);
+
+            $order->update(['bill_id'=> $request->bill_id]);
 
             foreach ($order->details as $detail) {
 

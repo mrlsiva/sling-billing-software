@@ -38,11 +38,16 @@
                     <div class="row border-bottom pb-3 mb-4">
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label class="form-label text-muted d-flex justify-content-between align-items-center">
-                                    <span>
-                                        Invoice No  : {{$order->bill_id}}
-                                    </span>
+                                <label class="form-label text-muted">
+                                    Invoice No
+                                    <a href="javascript:void(0)" id="editInvoice">
+                                        <i class="ri-edit-line ms-1"></i>
+                                    </a>
                                 </label>
+                                <div id="invoiceView">
+                                    {{ $order->bill_id }}
+                                </div>
+                                <input type="text" id="bill_id" name="bill_id" class="form-control d-none" value="{{ $order->bill_id }}">
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -59,12 +64,7 @@
                                     {{ \Carbon\Carbon::parse($order->billed_on)->format('d-m-Y') }}
                                 </div>
 
-                                <input type="date"
-                                       id="billed_date"
-                                       name="billed_date"
-                                       class="form-control d-none"
-                                       value="{{ \Carbon\Carbon::parse($order->billed_on)->format('Y-m-d') }}">
-
+                                <input type="date" id="billed_date" name="billed_date" class="form-control d-none" value="{{ \Carbon\Carbon::parse($order->billed_on)->format('Y-m-d') }}">
                             </div>
                         </div>
 
@@ -721,6 +721,11 @@
     $('#editTime').click(function () {
         $('#timeView').addClass('d-none');
         $('#billed_time').removeClass('d-none').focus();
+    });
+
+    $('#editInvoice').click(function () {
+        $('#invoiceView').addClass('d-none');
+        $('#bill_id').removeClass('d-none').focus();
     });
 
     $('#addPayment').click(function () {
