@@ -204,16 +204,21 @@
                             </div>
                         </div>
 
-                        <div class="card mt-3">
-                            <div class="card-header d-flex align-items-center">
-                            <h5 class="mb-0">Products</h5>
+                        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
 
-                            <button
-                                type="button"
-                                class="btn btn-primary ms-auto"
-                                id="addProduct">
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                <h5 class="mb-0 me-3">Products</h5>
+
+                                <span class="badge bg-secondary">B - Billed Qty</span>
+                                <span class="badge bg-info">S - Available Stock</span>
+                                <span class="badge bg-warning text-dark">Q - Queue Stock</span>
+                                <span class="badge bg-success">F - Free Stock</span>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" id="addProduct">
                                 <i class="fa fa-plus me-1"></i> Add Product
                             </button>
+
                         </div>
 
                             <div class="card-body">
