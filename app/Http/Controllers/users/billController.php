@@ -445,7 +445,7 @@ class billController extends Controller
                     'name'           => $product->name,
                     'quantity'       => $qty,
                     'price'          => $request->amount[$key],
-                    'tax_amount'     => 0,
+                    'tax_amount'     => $product->tax_amount,
                     'tax_percent'    => $product->tax->name,
                     'discount_type'  => $product->discount_type,
                     'discount'       => $product->discount,
