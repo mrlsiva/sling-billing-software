@@ -305,7 +305,7 @@
                                             </td>
 
                                                 <td>
-                                                    <input type="number" name="price[]" class="form-control price" value="{{ $detail->product->discounted_price }}" step="0.01" min="0">
+                                                    <input type="number" name="price[]" class="form-control price" value="{{ $detail->price }}" step="0.01" min="0">
                                                 </td>
 
                                             <td>
@@ -316,7 +316,7 @@
 
                                             <td class="lineTotal">
 
-                                                {{ number_format($detail->selling_price,2) }}
+                                                {{ number_format($detail->quantity * $detail->price,2) }}
 
                                             </td>
 
