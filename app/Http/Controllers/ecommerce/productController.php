@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ecommerce;
 use App\Http\Controllers\Controller;
 use App\Traits\ResponseHelper;
 use Illuminate\Http\Request;
+use App\Models\SubCategory;
 use App\Models\Category;
 use App\Models\Stock;
 use App\Models\User;
@@ -12,6 +13,65 @@ use App\Models\User;
 class productController extends Controller
 {
     use ResponseHelper;
+
+    public function categories(Request $request, $company)
+    {
+        $user = User::where('slug_name', $company)->first();
+
+        if (!$user) {
+            return $this->errorResponse('User not found.', 404);
+        }
+
+        $userId = $user->role_id == 2 ? $user->owner_id : $user->parent_id;
+
+        $categories = Category::with(['sub_categories'])
+            ->where([
+                ['user_id', $userId],
+                ['is_active', 1],
+            ])
+            ->when($request->name, function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->name . '%');
+            })->orderBy('id', 'desc')->get();
+
+        foreach ($categories as $category) {
+            $category->image = $category->image
+                ? asset('storage/' . $category->image)
+                : asset('no-image-icon.svg');
+        }
+
+        return $this->successResponse($categories, 200, 'Category retrieved successfully.');
+    }
+
+    
+    public function sub_categories(Request $request, $company)
+    {
+        $user = User::where('slug_name', $company)->first();
+
+        if (!$user) {
+            return $this->errorResponse('User not found.', 404);
+        }
+
+        $userId = $user->role_id == 2 ? $user->owner_id : $user->parent_id;
+
+        $sub_categories = SubCategory::with('category')
+            ->where([
+                ['user_id', $userId],
+                ['category_id', $request->category],
+                ['is_active', 1],
+            ])
+            ->when($request->name, function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->name . '%');
+            })->orderBy('id', 'desc')->get();
+
+        foreach ($sub_categories as $sub_category) {
+            $sub_category->image = $sub_category->image
+                ? asset('storage/' . $sub_category->image)
+                : asset('no-image-icon.svg');
+        }
+
+        return $this->successResponse($sub_categories, 200, 'Sub Category retrieved successfully.');
+    }
+
 
     public function list(Request $request, $company)
     {
@@ -67,12 +127,25 @@ class productController extends Controller
 
         //return $query->sum('quantity');
 
-        $stocks = $query->orderBy('category_id')
-                        ->orderBy('sub_category_id')
-                        ->orderBy('product_id')
-                        ->paginate(10)
-                        ->withQueryString();
+        $stocks = $query->orderBy('category_id')->orderBy('sub_category_id')->orderBy('product_id')->paginate(10)->withQueryString();
+
+        // Product image URL
+        foreach ($stocks as $stock) {
+            if ($stock->product) {
+                $stock->product->image = $stock->product->image
+                    ? asset('storage/' . $stock->product->image)
+                    : asset('no-image-icon.svg');
+                $stock->product->category->image = $stock->product->category->image
+                    ? asset('storage/' . $stock->product->category->image)
+                    : asset('no-image-icon.svg');
+                $stock->product->sub_category->image = $stock->product->sub_category->image
+                    ? asset('storage/' . $stock->product->sub_category->image)
+                    : asset('no-image-icon.svg');
+            }
+        }
 
         return $this->successResponse(compact('stocks', 'categories'), 200, 'Stock retrieved successfully.');
     }
+
+
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\ecommerce;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Models\OrderPaymentDetail;
 use App\Models\ProductImeiNumber;
 use App\Models\BillingAddress;
@@ -16,16 +18,150 @@ use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Credit;
+use App\Traits\common;
 use App\Models\Order;
 use App\Models\Stock;
 use App\Models\User;
-
+use DB;
 
 
 class orderController extends Controller
 {
+    use ResponseHelper,common;
+
     public function store(Request $request,$company)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Validation
+        |--------------------------------------------------------------------------
+        */
+
+        $validator = Validator::make($request->all(), [
+            'customer' => [
+                'nullable',
+                'integer',
+                'exists:customers,id',
+            ],
+
+            'billed_by' => [
+                'nullable',
+                'integer',
+                'exists:users,id',
+            ],
+
+            'discount' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+
+            'cart' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'cart.*.product_id' => [
+                'required',
+                'integer',
+                'exists:products,id',
+            ],
+
+            'cart.*.qty' => [
+                'required',
+                'numeric',
+                'min:1',
+            ],
+
+            'cart.*.price' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
+
+            'cart.*.tax_amount' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+
+            'cart.*.variation_id' => [
+                'nullable',
+                'integer',
+                'exists:stock_variations,id',
+            ],
+
+            'cart.*.imeis' => [
+                'nullable',
+                'array',
+            ],
+
+            'cart.*.imeis.*' => [
+                'nullable',
+                'string',
+            ],
+
+            'billing_customer' => [
+                'nullable',
+                'array',
+            ],
+
+            'billing_customer.billing_phone' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
+            'billing_customer.billing_name' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'billing_customer.billing_address' => [
+                'nullable',
+                'string',
+            ],
+
+            'billing_customer.billing_pincode' => [
+                'nullable',
+                'string',
+                'max:10',
+            ],
+
+            'payments' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'payments.*.method' => [
+                'required',
+                'string',
+            ],
+
+            'payments.*.amount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+            ],
+
+            'payments.*.extra' => [
+                'nullable',
+                'array',
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            DB::rollBack();
+
+            return $this->errorResponse(
+                $validator->errors(),
+                422,
+                'Validation failed'
+            );
+        }
 
         DB::beginTransaction();
 
@@ -36,7 +172,7 @@ class orderController extends Controller
         }
         if($user->role_id = 3)
         {
-            $billSetup = BillSetup::where([['branch_id', $user->id], ['is_active', 1]])->first();
+            $billSetup = BillSetup::where([['shop_id', $user->parent_id],['branch_id', $user->id], ['is_active', 1]])->first();
         }
 
 
@@ -55,7 +191,7 @@ class orderController extends Controller
         }
         if($user->role_id = 3)
         {
-            $lastOrder = Order::where('branch_id', $user->id)->orderBy('id', 'desc')->first();
+            $lastOrder = Order::where([['shop_id', $user->parent_id],['branch_id', $user->id]])->orderBy('id', 'desc')->first();
         }
 
 
@@ -113,7 +249,7 @@ class orderController extends Controller
         $billAmount = $auth->able_to_round_price == 1 ? round($billAmount) : $billAmount;
 
         $order = Order::create([
-            'shop_id'                   => $user->role_id = 2 ? $user->owner_id : $user->id,
+            'shop_id'                   => $user->role_id = 2 ? $user->owner_id : $user->parent_id,
             'branch_id'                 => $user->role_id = 2 ? null : $user->id,
             'bill_id'                   => $newBillNo,
             'billed_by'                 => $request->billed_by,
@@ -161,7 +297,15 @@ class orderController extends Controller
                 'colour_id'     => $variation?->colour_id,
             ]);
 
-            $stock = Stock::where([['shop_id',$user->id],['branch_id',null],['product_id',$item['product_id']]])->first();
+            if($user->role_id = 2)
+            {
+
+                $stock = Stock::where([['shop_id',$user->owner_id],['branch_id',null],['product_id',$item['product_id']]])->first();
+            }
+            if($user->role_id = 3)
+            {
+                $stock = Stock::where([['shop_id',$user->parent_id],['branch_id',$user->id],['product_id',$item['product_id']]])->first();
+            }
 
             // Reduce variation stock FIRST
             if ($variation) {
@@ -235,8 +379,16 @@ class orderController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
 
-        //Notifiction
-        $this->notification(Auth::user()->id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, 'HO ' . $user->name . ' placed an order for customer ' . $customer->name . ' with an amount of ' . $billAmount. '.',null, null,14);
+        if($user->role_id = 2)
+        {
+            //Notifiction
+            $this->notification($user->owner_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, Auth::user()->name.' placed order in shop '. $user->name . ' with an amount of ' . $billAmount. 'via e-commerce site.',null, null,14);
+        }
+        else
+        {
+            //Notifiction
+            $this->notification($user->parent_id, $user->id,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, Auth::user()->name.' placed order in shop '. $user->name . ' with an amount of ' . $billAmount. 'via e-commerce site.',null, null,14);
+        }
 
         DB::commit();
         
