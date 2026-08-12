@@ -19,9 +19,17 @@ Route::middleware(['is_url_valid'])->group(function () {
 
 		Route::middleware('auth:sanctum')->group(function () {
 
+			Route::prefix('profile')->group(function () {
+
+				Route::get('/view', 'App\Http\Controllers\ecommerce\authController@view');
+				Route::post('/update', 'App\Http\Controllers\ecommerce\authController@update');
+			});
+
 			Route::prefix('orders')->group(function () {
 
 				Route::post('/store', 'App\Http\Controllers\ecommerce\orderController@store');
+				Route::get('/list', 'App\Http\Controllers\ecommerce\orderController@list');
+				Route::get('/view/{id}', 'App\Http\Controllers\ecommerce\orderController@view');
 			});
 
 		});

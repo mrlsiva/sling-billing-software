@@ -8,4 +8,5 @@ return [
     'sub_category' => 'sub_categories',
     'product' => 'products',
     'branch' => 'branches',
+    'profile' => 'profile',
 ];

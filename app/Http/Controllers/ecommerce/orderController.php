@@ -10,9 +10,11 @@ use App\Models\ProductImeiNumber;
 use App\Models\BillingAddress;
 use App\Traits\ResponseHelper;
 use App\Models\StockVariation;
+use App\Traits\Notifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\OrderDetail;
+use App\Models\UserDetail;
 use App\Models\BillSetup;
 use App\Models\Customer;
 use App\Models\Payment;
@@ -22,12 +24,14 @@ use App\Traits\common;
 use App\Models\Order;
 use App\Models\Stock;
 use App\Models\User;
+use App\Traits\Log;
+use Carbon\Carbon;
 use DB;
 
 
 class orderController extends Controller
 {
-    use ResponseHelper,common;
+    use Log,Notifications,ResponseHelper,common;
 
     public function store(Request $request,$company)
     {
@@ -166,15 +170,15 @@ class orderController extends Controller
         DB::beginTransaction();
 
         $user = User::where('slug_name',$company)->first();
-        if($user->role_id = 2)
+        //return $user;
+        if($user->role_id == 2)
         {
-            $billSetup = BillSetup::where([['shop_id', $user->owner_id],['branch_id', null],['is_active',1]])->first();
+            $billSetup = BillSetup::where([['shop_id', $user->owner_id],['branch_id',null],['is_active',1]])->first();
         }
-        if($user->role_id = 3)
+        if($user->role_id == 3)
         {
             $billSetup = BillSetup::where([['shop_id', $user->parent_id],['branch_id', $user->id], ['is_active', 1]])->first();
         }
-
 
         if (!$billSetup) {
 
@@ -184,12 +188,12 @@ class orderController extends Controller
         // Active bill prefix
         $billPrefix = $billSetup->bill_number;
 
-        if($user->role_id = 2)
+        if($user->role_id == 2)
         {
             // Get last order with this branch
             $lastOrder = Order::where([['shop_id', $user->owner_id],['branch_id', null]])->orderBy('id', 'desc')->first();
         }
-        if($user->role_id = 3)
+        if($user->role_id == 3)
         {
             $lastOrder = Order::where([['shop_id', $user->parent_id],['branch_id', $user->id]])->orderBy('id', 'desc')->first();
         }
@@ -237,11 +241,11 @@ class orderController extends Controller
             return $discount;
         });
 
-        if($user->role_id = 2)
+        if($user->role_id == 2)
         {
-            $auth = UserDetail::where('user_id',$user->owner_id)->first();
+            $auth = UserDetail::where('user_id',$user->id)->first();
         }
-        if($user->role_id = 3)
+        if($user->role_id == 3)
         {
             $auth = UserDetail::where('user_id',$user->id)->first();
         }
@@ -249,8 +253,8 @@ class orderController extends Controller
         $billAmount = $auth->able_to_round_price == 1 ? round($billAmount) : $billAmount;
 
         $order = Order::create([
-            'shop_id'                   => $user->role_id = 2 ? $user->owner_id : $user->parent_id,
-            'branch_id'                 => $user->role_id = 2 ? null : $user->id,
+            'shop_id'                   => $user->role_id == 2 ? $user->owner_id : $user->parent_id,
+            'branch_id'                 => $user->role_id == 2 ? null : $user->id,
             'bill_id'                   => $newBillNo,
             'billed_by'                 => $request->billed_by,
             'customer_id'               => $request->customer,
@@ -258,6 +262,7 @@ class orderController extends Controller
             'total_product_discount'    => $totalProductDiscount,
             'bill_amount'               => $billAmount,
             'billed_on'                 => Carbon::now(),
+            'is_online_order'           => 1,
         ]);
 
         $billingData = $request->input('billing_customer');
@@ -297,15 +302,19 @@ class orderController extends Controller
                 'colour_id'     => $variation?->colour_id,
             ]);
 
-            if($user->role_id = 2)
+            //return $user;
+
+            if($user->role_id == 2)
             {
 
                 $stock = Stock::where([['shop_id',$user->owner_id],['branch_id',null],['product_id',$item['product_id']]])->first();
             }
-            if($user->role_id = 3)
+            if($user->role_id == 3)
             {
                 $stock = Stock::where([['shop_id',$user->parent_id],['branch_id',$user->id],['product_id',$item['product_id']]])->first();
             }
+
+            //return $stock;
 
             // Reduce variation stock FIRST
             if ($variation) {
@@ -379,7 +388,7 @@ class orderController extends Controller
         //Log
         $this->addToLog($this->unique(),Auth::id(),'Order','App/Models/Order','orders',$order->id,'Insert',null,null,'Success','Order Created Successfully');
 
-        if($user->role_id = 2)
+        if($user->role_id == 2)
         {
             //Notifiction
             $this->notification($user->owner_id, null,'App/Models/Order', $order->id, null, json_encode($request->all()), now(), Auth::user()->id, Auth::user()->name.' placed order in shop '. $user->name . ' with an amount of ' . $billAmount. 'via e-commerce site.',null, null,14);
@@ -391,12 +400,60 @@ class orderController extends Controller
         }
 
         DB::commit();
-        
-        return response()->json([
-            'status'   => 'success',
-            'message'  => 'Order saved successfully',
-            'order_id' => $order->id
-        ]);
 
+        return $this->successResponse($order->id, 200, 'Order saved successfully');
+
+    }
+
+    public function list(Request $request,$company)
+    {
+        $user = User::where('slug_name',$company)->first();
+        //return $user;
+        if($user->role_id == 2)
+        {
+            $orders = Order::where([['shop_id',$user->owner_id],['branch_id',null],['customer_id',Auth::user()->customer_id],['is_online_order',1]])
+            ->when(request('order'), function ($query) {
+                $search = request('order');
+                $query->where(function ($q) use ($search) {
+                    // search by bill id
+                    $q->where('bill_id', 'like', "%{$search}%")
+                    // customer name / phone
+                    ->orWhereHas('customer', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('gst', 'like', "%{$search}%");
+                    });
+                });
+            })->orderBy('id','desc')->paginate(10);
+        }
+
+        if($user->role_id == 3)
+        {
+            $orders = Order::where([['shop_id',$user->parent_id],['branch_id',$user->id],['customer_id',Auth::user()->customer_id],['is_online_order',1]])
+            ->when(request('order'), function ($query) {
+                $search = request('order');
+                $query->where(function ($q) use ($search) {
+                    // search by bill id
+                    $q->where('bill_id', 'like', "%{$search}%")
+                    // customer name / phone
+                    ->orWhereHas('customer', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('gst', 'like', "%{$search}%");
+                    });
+                });
+            })->orderBy('id','desc')->paginate(10);
+        }
+
+        return $this->successResponse($orders, 200, 'Successfully return all orders.');
+    }
+
+    public function view(Request $request,$company,$id)
+    {
+        $order = Order::with('customer','billingAddress')->where('id',$id)->first();
+        $order_details = OrderDetail::where('order_id',$id)->get();
+        $order_payment_details = OrderPaymentDetail::with('payment','finance')->where('order_id',$id)->get();
+
+        return $this->successResponse(compact('order', 'order_details', 'order_payment_details'), 200, 'Order retrieved successfully.');
     }
 }

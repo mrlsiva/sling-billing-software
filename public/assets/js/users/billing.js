@@ -1810,24 +1810,24 @@ function submit() {
         billing_pincode: $("#billing_pincode").val().trim(),
     };
 
-    // console.log(customer);
-    // console.log(billing_customer);
-    // console.log(cartData);
-    // console.log(paymentData);
+
+    let requestData = {
+        _token: $('meta[name="csrf-token"]').attr("content"),
+        cart: cartData,
+        payments: paymentData,
+        customer: customer,
+        billing_customer: billing_customer,
+        billed_by: billed_by,
+        discount: discount
+    };
+
+    console.log(JSON.stringify(requestData, null, 2));
 
     // ajax submit
     $.ajax({
         url: "store",
         method: "POST",
-        data: {
-            _token: $('meta[name="csrf-token"]').attr("content"),
-            cart: cartData,
-            payments: paymentData,
-            customer: customer,
-            billing_customer: billing_customer,
-            billed_by: billed_by,
-            discount: discount
-        },
+        data: requestData,
         success: function (data) {
             //console.log("Order stored:", data);
 
