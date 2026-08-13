@@ -625,22 +625,21 @@ class stockController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'category'      => 'required',
-            'sub_category'  => 'required',
-            'product'       => 'required',
-            'price'         => 'required',
-            'quantity'      => 'required|numeric|min:0',
+            'items'                   => 'required|array|min:1',
+            'items.*.product_id'      => 'required',
+            'items.*.quantity'        => 'required|numeric|min:1',
+            'items.*.price'           => 'required|numeric|min:1',
         ], [
-            'category.required'     => 'Category is required.',
-            'sub_category.required' => 'Sub Category is required.',
-            'product.required'      => 'Product is required.',
-            'quantity.required'     => 'Quantity is required.',
-            'quantity.numeric'      => 'Quantity must be a number.',
-            'quantity.min'          => 'Quantity cannot be negative.',
+            'items.required'              => 'Add at least one product to transfer.',
+            'items.*.product_id.required' => 'Product is required.',
+            'items.*.quantity.required'   => 'Quantity is required.',
+            'items.*.quantity.numeric'    => 'Quantity must be a number.',
+            'items.*.quantity.min'        => 'Quantity must be greater than 0.',
+            'items.*.price.required'      => 'Price is required.',
         ]);
 
         // If transfer to branch
-        if ($request->transfer_to == 1) 
+        if ($request->transfer_to == 1)
         {
             $request->validate([
                 'branch' => 'required',
@@ -650,9 +649,6 @@ class stockController extends Controller
         }
 
         DB::beginTransaction();
-
-        // IMEIs selected by user
-        $imeis = $request->imeis ?? [];
 
         $uniqueId = QueueStock::where('from',Auth::user()->id)->lockForUpdate()->max('unique_id');
 
@@ -668,23 +664,27 @@ class stockController extends Controller
             $to = Auth::user()->parent_id;
         }
 
-        $queue_stock = QueueStock::create([
-            'unique_id'     => $unique_id,
-            'type'          => $type,
-            'from'          => Auth::user()->id,
-            'to'            => $to,
-            'product_id'    => $request->product,
-            'quantity'      => $request->quantity,
-            'price'         => $request->price,
-            'imei'          => implode(',', $imeis),
-            'variation'     => $request->variation_id ? json_encode($request->variation_id) : null,
-            'initiated_on'  => Carbon::now(),
-            'initiated_by'  => auth()->id(),
-            'status'        => 0,
-        ]);
+        $queue_stock = null;
+
+        foreach ($request->items as $item) {
+            $queue_stock = QueueStock::create([
+                'unique_id'     => $unique_id,
+                'type'          => $type,
+                'from'          => Auth::user()->id,
+                'to'            => $to,
+                'product_id'    => $item['product_id'],
+                'quantity'      => $item['quantity'],
+                'price'         => $item['price'],
+                'imei'          => implode(',', $item['imeis'] ?? []),
+                'variation'     => !empty($item['variation_qty']) ? json_encode($item['variation_qty']) : null,
+                'initiated_on'  => Carbon::now(),
+                'initiated_by'  => auth()->id(),
+                'status'        => 0,
+            ]);
+        }
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Stock Transfer Initiated','App/Models/QueueStock','queue_stocks',$queue_stock->id,'Insert',null,$request,'Success','Stock Transfer Initiated');
+        $this->addToLog($this->unique(),Auth::user()->id,'Stock Transfer Initiated','App/Models/QueueStock','queue_stocks',$queue_stock->id,'Insert',null,$request,'Success','Stock Transfer Initiated ('.count($request->items).' products)');
 
         DB::commit();
 

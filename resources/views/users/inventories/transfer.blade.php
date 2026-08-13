@@ -146,7 +146,7 @@
 	                <div class="modal-body">
 
 	                    <div class="row">
-	                        <div class="col-md-6">
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Branch</label>
                                 <select class="form-control transfer-branch-select" name="branch" id="branch">
@@ -157,8 +157,8 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                    
-	                        <div class="col-md-6">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Category</label>
 	                                <select class="form-control" name="category" id="category">
@@ -169,8 +169,8 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                   
-	                        <div class="col-md-6">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Sub Category</label>
 	                                <select class="form-control" name="sub_category" id="sub_category">
@@ -178,8 +178,8 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                   
-	                        <div class="col-md-6">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Product</label>
 	                                <select class="form-control" name="product" id="product">
@@ -187,52 +187,59 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                        <div class="col-md-6">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Matrics</label>
 	                                <input type="text" id="unit" name="unit" class="form-control" disabled="">
 	                            </div>
 	                        </div>
-	                    
-	                        <div class="col-md-6">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Available</label>
 	                                <input disabled="" type="text" id="available" name="available" class="form-control" placeholder="0">
 	                                <small id="queueQtyText" class="text-danger d-none"></small>
 	                            </div>
 	                        </div>
-	                    
-	                        <div class="col-md-6">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Enter Price (Per Quantity)</label>
-	                                <input type="number" id="price" name="price" class="form-control" min="1" required>
+	                                <input type="number" id="price" name="price" class="form-control" min="1">
 	                            </div>
 	                        </div>
-	                    
-	                        <div class="col-md-6">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Enter Quantity</label>
 	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1" readonly="">
+	                            </div>
+	                        </div>
+
+	                        <div class="col-md-4 d-flex align-items-end">
+	                            <div class="mb-3 w-100">
+	                                <button type="button" id="add_to_transfer_list" class="btn btn-outline-primary w-100">
+	                                    <i class="ri-add-line"></i> Add to List
+	                                </button>
 	                            </div>
 	                        </div>
 	                    </div>
 
 	                    <input type="hidden" name="queue_stock" id="queue_stock" >
 
-	                    
-
 	                    @php
 		                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
 		                @endphp
-                
+
 	                    @if($user_detail->is_imei_required == 1)
-	                    <div class="row mt-3" id="imei_section" style="display:none;">
+	                    <div class="row mt-2" id="imei_section" style="display:none;">
 						    <div class="col-md-12">
 						        <label class="form-label text-muted">Select IMEI Numbers</label>
 
 						        <div id="imei_list"
 						             class="border rounded p-2 d-flex flex-wrap gap-3"
-						             style="max-height:250px; overflow-y:auto;">
+						             style="max-height:150px; overflow-y:auto;">
 						        </div>
 						    </div>
 						</div>
@@ -241,10 +248,30 @@
 						<div id="variations_section"></div>
 						<input type="hidden" name="variation_id" id="variation_id">
 
+						<div class="row mt-2 d-none" id="transfer_cart_section">
+							<div class="col-md-12">
+								<label class="form-label text-muted">Products to Transfer</label>
+								<div class="table-responsive border rounded" style="max-height:180px; overflow-y:auto;">
+									<table class="table table-bordered table-sm align-middle mb-0">
+										<thead class="bg-light-subtle">
+											<tr>
+												<th>Product</th>
+												<th>Qty</th>
+												<th>Price</th>
+												<th>Amount</th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody id="transfer_cart_body"></tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
 	                </div>
 	                <div class="modal-footer">
 	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-	                    <button type="submit" id="transfer" class="btn btn-primary">Transfer</button>
+	                    <button type="submit" id="transfer" class="btn btn-primary" disabled>Transfer All</button>
 	                </div>
 	            </form>
 	        </div>

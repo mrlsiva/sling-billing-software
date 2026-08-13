@@ -490,30 +490,24 @@ class inventoryController extends Controller
 
     public function store(Request $request)
     {
-        //return $request;
         $request->validate([
-            'branch'      => 'required',
-            'category'      => 'required',
-            'sub_category'  => 'required',
-            'product'       => 'required',
-            'quantity'      => 'required|numeric|min:0',
-            'price'       => 'required',
-        ], 
+            'branch'                  => 'required',
+            'items'                   => 'required|array|min:1',
+            'items.*.product_id'      => 'required',
+            'items.*.quantity'        => 'required|numeric|min:1',
+            'items.*.price'           => 'required|numeric|min:1',
+        ],
         [
-            'branch.required'       => 'Branch is required.',
-            'category.required'     => 'Category is required.',
-            'sub_category.required' => 'Sub Category is required.',
-            'product.required'      => 'Product is required.',
-            'quantity.required'     => 'Quantity is required.',
-            'quantity.numeric'      => 'Quantity must be a number.',
-            'quantity.min'          => 'Quantity cannot be negative.',
-            'price.required'        => 'Price is required.',
+            'branch.required'             => 'Branch is required.',
+            'items.required'              => 'Add at least one product to transfer.',
+            'items.*.product_id.required' => 'Product is required.',
+            'items.*.quantity.required'   => 'Quantity is required.',
+            'items.*.quantity.numeric'    => 'Quantity must be a number.',
+            'items.*.quantity.min'        => 'Quantity must be greater than 0.',
+            'items.*.price.required'      => 'Price is required.',
         ]);
 
         DB::beginTransaction();
-
-        // IMEIs selected by user
-        $imeis = $request->imeis ?? [];
 
         $uniqueId = QueueStock::where('from',Auth::user()->owner_id)->lockForUpdate()->max('unique_id');
 
@@ -521,23 +515,27 @@ class inventoryController extends Controller
 
         $unique_id = str_pad($next, 5, '0', STR_PAD_LEFT);
 
-        $queue_stock = QueueStock::create([
-            'unique_id'     => $unique_id,
-            'type'          => 1,
-            'from'          => Auth::user()->owner_id,
-            'to'            => $request->branch,
-            'product_id'       => $request->product,
-            'quantity'      => $request->quantity,
-            'price'         => $request->price,
-            'imei'          => implode(',', $imeis),
-            'variation' => $request->variation_id ? json_encode($request->variation_id) : null,
-            'initiated_on'  => Carbon::now(),
-            'initiated_by'  => auth()->id(),
-            'status'        => 0,
-        ]);
+        $queue_stock = null;
+
+        foreach ($request->items as $item) {
+            $queue_stock = QueueStock::create([
+                'unique_id'     => $unique_id,
+                'type'          => 1,
+                'from'          => Auth::user()->owner_id,
+                'to'            => $request->branch,
+                'product_id'    => $item['product_id'],
+                'quantity'      => $item['quantity'],
+                'price'         => $item['price'],
+                'imei'          => implode(',', $item['imeis'] ?? []),
+                'variation'     => !empty($item['variation_qty']) ? json_encode($item['variation_qty']) : null,
+                'initiated_on'  => Carbon::now(),
+                'initiated_by'  => auth()->id(),
+                'status'        => 0,
+            ]);
+        }
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Stock Transfer Initiated','App/Models/QueueStock','queue_stocks',$queue_stock->id,'Insert',null,$request,'Success','Stock Transfer Initiated');
+        $this->addToLog($this->unique(),Auth::user()->id,'Stock Transfer Initiated','App/Models/QueueStock','queue_stocks',$queue_stock->id,'Insert',null,$request,'Success','Stock Transfer Initiated ('.count($request->items).' products)');
 
         DB::commit();
 
