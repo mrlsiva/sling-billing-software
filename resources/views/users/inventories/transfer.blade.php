@@ -327,11 +327,11 @@
 <script>
 $(document).ready(function () {
     $('.filter-branch-select').select2({ width: '100%', placeholder: 'Select Branch' });
-    $('.transfer-branch-select').select2({ width: '100%', placeholder: 'Select' });
-    $('.bulk-branch-select').select2({ width: '100%', placeholder: 'Select' });
-    $('#category').select2({ width: '100%', placeholder: 'Select' });
-    $('#sub_category').select2({ width: '100%', placeholder: 'Select' });
-    $('#product').select2({ width: '100%', placeholder: 'Select' });
+    $('.transfer-branch-select').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
+    $('.bulk-branch-select').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#bulkTransfer') });
+    $('#category').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
+    $('#sub_category').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
+    $('#product').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
 });
 </script>
 <script>

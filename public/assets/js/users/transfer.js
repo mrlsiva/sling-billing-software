@@ -22,7 +22,7 @@ jQuery(document).ready(function ()
 
 					var subCategorySelect = $('select[name="sub_category"]');
 					if (subCategorySelect.data('select2')) subCategorySelect.select2('destroy');
-					subCategorySelect.select2({ width: '100%', placeholder: 'Select' });
+					subCategorySelect.select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
 				}
 			});
 		}
@@ -54,7 +54,7 @@ jQuery(document).ready(function ()
 
 					var productSelect = $('select[name="product"]');
 					if (productSelect.data('select2')) productSelect.select2('destroy');
-					productSelect.select2({ width: '100%', placeholder: 'Select' });
+					productSelect.select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
 				}
 			});
 		}

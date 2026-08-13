@@ -126,7 +126,9 @@ class synchronizeController extends Controller
                     ]);
                 }
 
-                if($transfer_detail->variation == null)
+                $variations = json_decode($transfer_detail->variation, true);
+
+                if (empty($variations))
                 {
                     $HoV = StockVariation::where([['stock_id',$HoStock->id],['product_id',$transfer_detail->product->id]])->first();
                     $HoV->update([
@@ -145,7 +147,7 @@ class synchronizeController extends Controller
                         $branchV->update([
                             'quantity' => $branchV->quantity + $transfer_detail->quantity
                         ]);
-                    } 
+                    }
                     else {
                         StockVariation::create([
                             'stock_id'  => $branchStock->id,
@@ -159,9 +161,7 @@ class synchronizeController extends Controller
                 }
                 else
                 {
-                    $variations = json_decode($transfer_detail->variation, true);
-
-                    foreach ($variations as $variation_id => $qty) 
+                    foreach ($variations as $variation_id => $qty)
                     {
                         if ($qty > 0) {
 
@@ -300,7 +300,9 @@ class synchronizeController extends Controller
                     'transfer_by'    => $transfer_detail->initiated_by,
                 ]);
 
-                if($transfer_detail->variation == null)
+                $variations = json_decode($transfer_detail->variation, true);
+
+                if (empty($variations))
                 {
                     $HoStockVariation = StockVariation::where([['stock_id',$HoStock->id],['product_id',$transfer_detail->product_id],['size_id',null],['colour_id',null]])->first();
                     if($HoStockVariation)
@@ -320,9 +322,7 @@ class synchronizeController extends Controller
                 }
                 else
                 {
-                    $variations = json_decode($transfer_detail->variation, true);
-
-                    foreach ($variations as $variation_id => $qty) 
+                    foreach ($variations as $variation_id => $qty)
                     {
                         if ($qty > 0) {
 
@@ -452,7 +452,9 @@ class synchronizeController extends Controller
                     'transfer_by'    => $transfer_detail->initiated_by,
                 ]);
 
-                if($transfer_detail->variation == null)
+                $variations = json_decode($transfer_detail->variation, true);
+
+                if (empty($variations))
                 {
                     $transferBranchStockVariation = StockVariation::where([['stock_id',$transferBranchStock->id],['product_id',$transfer_detail->product_id],['size_id',null],['colour_id',null]])->first();
                     if($transferBranchStockVariation)
@@ -482,9 +484,7 @@ class synchronizeController extends Controller
                 }
                 else
                 {
-                    $variations = json_decode($transfer_detail->variation, true);
-
-                    foreach ($variations as $variation_id => $qty) 
+                    foreach ($variations as $variation_id => $qty)
                     {
                         if ($qty > 0) {
 
