@@ -440,13 +440,16 @@ class billController extends Controller
 
                 $lineTotal = $qty * $price;
 
+                $taxPercent = (float) $product->tax->name;
+                $taxAmount = ((float) $price) * $taxPercent / (100 + $taxPercent);
+
                 OrderDetail::create([
                     'order_id'       => $order->id,
                     'product_id'     => $productId,
                     'name'           => $product->name,
                     'quantity'       => $qty,
                     'price'          => $price,
-                    'tax_amount'     => $product->tax_amount,
+                    'tax_amount'     => $taxAmount,
                     'tax_percent'    => $product->tax->name,
                     'discount_type'  => $product->discount_type,
                     'discount'       => $product->discount,
