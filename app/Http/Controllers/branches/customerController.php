@@ -160,7 +160,7 @@ class customerController extends Controller
         // return view('branches.orders.index',compact('orders'));
 
         $customer = Customer::where('id',$id)->first();
-        $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id]])
+        $orders = Order::where([['customer_id',$id],['branch_id',Auth::user()->id],['is_online_order',0]])
         ->when(request('order'), function ($query) {
             $search = request('order');
             $query->where(function ($q) use ($search) {

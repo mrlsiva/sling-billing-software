@@ -33,7 +33,7 @@ class posController extends Controller
 
         if($branch != 0)
         {
-            $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->owner_id]])
+            $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->owner_id],['is_online_order',0]])
             ->when(request('order'), function ($query) {
                 $search = request('order');
                 $query->where(function ($q) use ($search) {
@@ -56,7 +56,7 @@ class posController extends Controller
         }
         else
         {
-            $orders = Order::where('shop_id',Auth::user()->owner_id)->where('branch_id',null)
+            $orders = Order::where('shop_id',Auth::user()->owner_id)->where('branch_id',null)->where('is_online_order',0)
             ->when(request('order'), function ($query) {
                 $search = request('order');
                 $query->where(function ($q) use ($search) {

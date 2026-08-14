@@ -48,11 +48,11 @@ class orderController extends Controller
                 'exists:customers,id',
             ],
 
-            'billed_by' => [
-                'nullable',
-                'integer',
-                'exists:users,id',
-            ],
+            // 'billed_by' => [
+            //     'nullable',
+            //     'integer',
+            //     'exists:users,id',
+            // ],
 
             'discount' => [
                 'nullable',
@@ -134,27 +134,27 @@ class orderController extends Controller
                 'max:10',
             ],
 
-            'payments' => [
-                'required',
-                'array',
-                'min:1',
-            ],
+            // 'payments' => [
+            //     'required',
+            //     'array',
+            //     'min:1',
+            // ],
 
-            'payments.*.method' => [
-                'required',
-                'string',
-            ],
+            // 'payments.*.method' => [
+            //     'required',
+            //     'string',
+            // ],
 
-            'payments.*.amount' => [
-                'required',
-                'numeric',
-                'min:0.01',
-            ],
+            // 'payments.*.amount' => [
+            //     'required',
+            //     'numeric',
+            //     'min:0.01',
+            // ],
 
-            'payments.*.extra' => [
-                'nullable',
-                'array',
-            ],
+            // 'payments.*.extra' => [
+            //     'nullable',
+            //     'array',
+            // ],
         ]);
 
         if ($validator->fails()) {
@@ -256,13 +256,15 @@ class orderController extends Controller
             'shop_id'                   => $user->role_id == 2 ? $user->owner_id : $user->parent_id,
             'branch_id'                 => $user->role_id == 2 ? null : $user->id,
             'bill_id'                   => $newBillNo,
-            'billed_by'                 => $request->billed_by,
+            //'billed_by'                 => $request->billed_by,
             'customer_id'               => $request->customer,
             'order_discount'            => $request->discount,
             'total_product_discount'    => $totalProductDiscount,
             'bill_amount'               => $billAmount,
             'billed_on'                 => Carbon::now(),
             'is_online_order'           => 1,
+            'is_paid'                   => $request->is_paid,
+            'status'                    => 0,
         ]);
 
         $billingData = $request->input('billing_customer');
@@ -304,84 +306,84 @@ class orderController extends Controller
 
             //return $user;
 
-            if($user->role_id == 2)
-            {
+            // if($user->role_id == 2)
+            // {
 
-                $stock = Stock::where([['shop_id',$user->owner_id],['branch_id',null],['product_id',$item['product_id']]])->first();
-            }
-            if($user->role_id == 3)
-            {
-                $stock = Stock::where([['shop_id',$user->parent_id],['branch_id',$user->id],['product_id',$item['product_id']]])->first();
-            }
+            //     $stock = Stock::where([['shop_id',$user->owner_id],['branch_id',null],['product_id',$item['product_id']]])->first();
+            // }
+            // if($user->role_id == 3)
+            // {
+            //     $stock = Stock::where([['shop_id',$user->parent_id],['branch_id',$user->id],['product_id',$item['product_id']]])->first();
+            // }
 
-            //return $stock;
+            // //return $stock;
 
-            // Reduce variation stock FIRST
-            if ($variation) {
-                $variation->quantity -= $item['qty'];
-                $variation->save();
-            }
-            else
-            {
-                $variation = StockVariation::where('stock_id',$stock->id)->first();
-                $variation->quantity -= $item['qty'];
-                $variation->save();
-            }
+            // // Reduce variation stock FIRST
+            // if ($variation) {
+            //     $variation->quantity -= $item['qty'];
+            //     $variation->save();
+            // }
+            // else
+            // {
+            //     $variation = StockVariation::where('stock_id',$stock->id)->first();
+            //     $variation->quantity -= $item['qty'];
+            //     $variation->save();
+            // }
 
-            // Reduce Quantity
-            $stock->quantity = $stock->quantity - $item['qty'];
+            // // Reduce Quantity
+            // $stock->quantity = $stock->quantity - $item['qty'];
 
-            // Remove sold IMEI numbers from stock
-            if (!empty($item['imeis'])) {
+            // // Remove sold IMEI numbers from stock
+            // if (!empty($item['imeis'])) {
 
-                // Convert comma-separated IMEI string to array
-                $existingImeis = !empty($stock->imei) ? explode(',', $stock->imei) : [];
+            //     // Convert comma-separated IMEI string to array
+            //     $existingImeis = !empty($stock->imei) ? explode(',', $stock->imei) : [];
 
-                // Remove sold IMEIs
-                $remainingImeis = array_values(array_diff($existingImeis, $item['imeis']));
+            //     // Remove sold IMEIs
+            //     $remainingImeis = array_values(array_diff($existingImeis, $item['imeis']));
 
-                // Convert back to comma-separated string
-                $stock->imei = implode(',', $remainingImeis);
-            }
+            //     // Convert back to comma-separated string
+            //     $stock->imei = implode(',', $remainingImeis);
+            // }
 
 
-            $stock->save();
+            // $stock->save();
 
-            if (!empty($item['imeis'])) {
-                ProductImeiNumber::where('product_id', $item['product_id'])
-                    ->whereIn('name', $item['imeis'])
-                    ->update(['is_sold' => 1]);
-            }
+            // if (!empty($item['imeis'])) {
+            //     ProductImeiNumber::where('product_id', $item['product_id'])
+            //         ->whereIn('name', $item['imeis'])
+            //         ->update(['is_sold' => 1]);
+            // }
 
 
             //$stock->update(['quantity' => $stock->quantity - $item['qty'] ]);
 
         }
 
-        $payments = $request->input('payments', []);
-        foreach ($payments as $payment) {
+        // $payments = $request->input('payments', []);
+        // foreach ($payments as $payment) {
 
-            $payment_id = Payment::where('name',$payment['method'])->first()->id;
-            $extra = $payment['extra'] ?? [];
+        //     $payment_id = Payment::where('name',$payment['method'])->first()->id;
+        //     $extra = $payment['extra'] ?? [];
 
-            $order_payment = OrderPaymentDetail::create([
-                'order_id'   => $order->id,
-                'payment_id' => $payment_id,
-                'amount'     => $payment['amount'],
-                'number'     => $extra['cheque_number'] ?? $extra['upi_id'] ?? $extra['card_number'] ?? $extra['finance_card'] ?? null,
-                'card'       => $extra['card_name'] ?? null,
-                'finance_id' => $extra['finance_type'] ?? null,
-            ]);
+        //     $order_payment = OrderPaymentDetail::create([
+        //         'order_id'   => $order->id,
+        //         'payment_id' => $payment_id,
+        //         'amount'     => $payment['amount'],
+        //         'number'     => $extra['cheque_number'] ?? $extra['upi_id'] ?? $extra['card_number'] ?? $extra['finance_card'] ?? null,
+        //         'card'       => $extra['card_name'] ?? null,
+        //         'finance_id' => $extra['finance_type'] ?? null,
+        //     ]);
 
-            if($payment_id == 6)
-            {
-                Credit::create([
-                    'order_payment_detail_id' => $order_payment->id,
-                    'amount'     => $payment['amount'],
-                    'remaining_amount'     => $payment['amount'],
-                ]);
-            }
-        }
+        //     if($payment_id == 6)
+        //     {
+        //         Credit::create([
+        //             'order_payment_detail_id' => $order_payment->id,
+        //             'amount'     => $payment['amount'],
+        //             'remaining_amount'     => $payment['amount'],
+        //         ]);
+        //     }
+        // }
 
         
 

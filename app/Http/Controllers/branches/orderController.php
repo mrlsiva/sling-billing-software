@@ -27,7 +27,7 @@ class orderController extends Controller
 
     public function index(Request $request)
     {
-        $orders = Order::where('branch_id',Auth::user()->id)
+        $orders = Order::where('branch_id',Auth::user()->id)->where('is_online_order',0)
         ->when(request('order'), function ($query) {
             $search = request('order');
             $query->where(function ($q) use ($search) {

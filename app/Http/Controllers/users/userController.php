@@ -142,7 +142,7 @@ class userController extends Controller
     {
 
         $customer = Customer::where('id',$id)->first();
-        $orders = Order::where('customer_id',$id)
+        $orders = Order::where('customer_id',$id)->where('is_online_order',0)
         ->when(request('order'), function ($query) {
             $search = request('order');
             $query->where(function ($q) use ($search) {
