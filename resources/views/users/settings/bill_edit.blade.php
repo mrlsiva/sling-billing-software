@@ -335,7 +335,7 @@
 
                                         <td>
                                             <div class="row g-1">
-                                                <input class="product" type="hidden">
+                                                <input class="product-id" type="hidden">
 
                                                 <div class="col-md-4">
                                                     <select class="form-control category">
@@ -353,7 +353,7 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    <select class="form-control product">
+                                                    <select class="form-control product-select">
                                                         <option value="">Product</option>
                                                     </select>
                                                 </div>
@@ -461,8 +461,8 @@
 
                                         </table>
 
-                                        <table class="d-none">
-                                            <tr id="paymentTemplate">
+                                        <template id="paymentTemplate">
+                                            <tr>
 
                                                 <td>
                                                     <select name="payment_id[]" class="form-control payment">
@@ -504,7 +504,7 @@
                                                 </td>
 
                                             </tr>
-                                        </table>
+                                        </template>
 
                                     </div>
                                 </div>
@@ -552,13 +552,13 @@
 
         let row = $($('#productTemplate').html());
 
-        row.find('.product').attr('name', 'product_id[]');
+        row.find('.product-id').attr('name', 'product_id[]');
         row.find('.qty').attr('name', 'qty[]');
         row.find('.price').attr('name', 'price[]');
 
         $('#productTable tbody').append(row);
 
-        row.find('.category, .sub_category, .product').select2({
+        row.find('.category, .sub_category, .product-select').select2({
             width: '100%'
         });
     });
@@ -598,7 +598,7 @@
                 });
 
                 row.find('.sub_category').html(html);
-                row.find('.product').html('<option value="">Select Product</option>');
+                row.find('.product-select').html('<option value="">Select Product</option>');
             }
         });
 
@@ -625,7 +625,7 @@
                     html += '<option value="' + item.id + '">' + item.name + '</option>';
                 });
 
-                row.find('.product').html(html);
+                row.find('.product-select').html(html);
             }
         });
 
@@ -633,7 +633,7 @@
 
 
 
-    $(document).on('change', '.product', function () {
+    $(document).on('change', '.product-select', function () {
 
         let row = $(this).closest('tr');
 
@@ -653,7 +653,7 @@
 
                 row.find('.taxCell').text(data.tax);
 
-                row.find('.product').val(data.id);
+                row.find('.product-id').val(data.id);
 
                 row.find('.qty')
                 .attr('max', data.free)
@@ -693,8 +693,8 @@
 
         $('#grandTotal').text(grand.toFixed(2));
 
-        if ($('.paymentAmount').length === 1) {
-            $('.paymentAmount').val(grand.toFixed(2));
+        if ($('#paymentTable tbody .paymentAmount').length === 1) {
+            $('#paymentTable tbody .paymentAmount').val(grand.toFixed(2));
         }
 
         calculatePaymentTotal();
@@ -735,9 +735,9 @@
 
     $('#addPayment').click(function () {
 
-        $('#paymentTable tbody').append(
-            $('#paymentTemplate').clone().removeAttr('id')
-        );
+        let row = $($('#paymentTemplate').html());
+
+        $('#paymentTable tbody').append(row);
 
     });
 
@@ -754,7 +754,7 @@
         let grand = parseFloat($('#grandTotal').text()) || 0;
         let paymentTotal = 0;
 
-        $('.paymentAmount').each(function () {
+        $('#paymentTable tbody .paymentAmount').each(function () {
             paymentTotal += parseFloat($(this).val()) || 0;
         });
 
@@ -788,7 +788,7 @@
         let grand = parseFloat($('#grandTotal').text()) || 0;
         let payment = 0;
 
-        $('.paymentAmount').each(function(){
+        $('#paymentTable tbody .paymentAmount').each(function(){
             payment += parseFloat($(this).val()) || 0;
         });
 

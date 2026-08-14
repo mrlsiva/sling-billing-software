@@ -205,12 +205,13 @@ class billController extends Controller
         $freeStock = max(0, $availableStock - $queueStock);
 
         return response()->json([
+            'id' => $stock->product_id,
             'price' => $stock->product->discounted_price,
             'tax' => $stock->product->tax->name,
             'stock' => $availableStock,
             'queue' => $queueStock,
             'free' => $freeStock,
-        ]); 
+        ]);
     }
 
     public function history(Request $request,$company,$id)
@@ -489,14 +490,14 @@ class billController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Bill updated successfully.');
+            return redirect()->back()->with('toast_success', 'Bill updated successfully.');
         }
 
         catch (\Exception $e) {
 
             DB::rollBack();
 
-            return redirect()->back()->with('error', $e->getMessage());
+            return redirect()->back()->with('toast_error', $e->getMessage());
         }
         
 
