@@ -148,7 +148,7 @@ class billController extends Controller
         });
 
         // Final result
-        $orders = $query->orderBy('id', 'desc')->paginate(10);
+        $orders = $query->withCount('histories')->orderBy('id', 'desc')->paginate(10);
 
         return view('users.settings.edit_bill',compact('orders','branches'));
     }

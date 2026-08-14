@@ -92,9 +92,11 @@
                                                 <i class="ri-edit-line fs-18"></i>
                                             </a>
 
+                                            @if($order->histories_count > 0)
                                             <a href="{{route('setting.order.bill.history', ['company' => request()->route('company'), 'id' => $order->id ]) }}" class="text-decoration-underline text-decoration-none ms-2" title="Edit History">
                                                 <i class="ri-history-line fs-18"></i>
                                             </a>
+                                            @endif
 
 										</td>
 									</tr>

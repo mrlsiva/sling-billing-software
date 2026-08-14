@@ -122,7 +122,7 @@ class synchronizeController extends Controller
 
                     $HoStock->update([
                         'quantity' => $HoStock->quantity - $transfer_detail->quantity,
-                        'imei' => implode(',', explode(',', $transfer_detail->imei))
+                        'imei' => implode(',', $remainingImeis)
                     ]);
                 }
 
@@ -189,10 +189,10 @@ class synchronizeController extends Controller
                                 StockVariation::create([
                                     'stock_id'  => $branchStock->id,
                                     'product_id'=> $transfer_detail->product_id,
-                                    'size_id'   => $mainV->size_id,
-                                    'colour_id' => $mainV->colour_id,
+                                    'size_id'   => $hoV->size_id,
+                                    'colour_id' => $hoV->colour_id,
                                     'quantity'  => $qty,
-                                    'price'     => $mainV->price
+                                    'price'     => $transfer_detail->price
                                 ]);
                             }
                         }
