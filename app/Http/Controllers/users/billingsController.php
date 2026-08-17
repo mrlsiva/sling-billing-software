@@ -434,7 +434,7 @@ class billingsController extends Controller
     {
         $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
         $order = Order::where('id',$id)->first();
-        $order_details = OrderDetail::where('order_id',$id)->get();
+        $order_details = OrderDetail::where([['order_id',$id],['status',1]])->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
         $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();
@@ -446,7 +446,7 @@ class billingsController extends Controller
     {
         $user = User::with('user_detail','bank_detail')->where('id',Auth::user()->owner_id)->first();
         $order = Order::where('id',$id)->first();
-        $order_details = OrderDetail::where('order_id',$id)->get();
+        $order_details = OrderDetail::where([['order_id',$id],['status',1]])->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
         $user_detail = UserDetail::where('user_id',Auth::user()->owner_id)->first();

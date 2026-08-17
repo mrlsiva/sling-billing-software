@@ -273,6 +273,9 @@ else
                             Route::get('/{order}/destroy',[posController::class, 'delete'])->name('destroy');
                             Route::get('/online/{branch}/index',[posController::class, 'online'])->name('online.index');
                             Route::get('/online/{branch}/{id}/edit',[posController::class, 'edit'])->name('online.edit');
+                            Route::post('/online/detail/status_update',[posController::class, 'detail_status_update'])->name('online.detail.status.update');
+                            Route::post('/online/{id}/update',[posController::class, 'update'])->name('online.update');
+                            Route::post('/online/status_update',[posController::class, 'status_update'])->name('online.status.update');
                         });
                     });
 

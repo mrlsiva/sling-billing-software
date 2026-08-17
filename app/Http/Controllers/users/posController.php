@@ -12,7 +12,9 @@ use App\Models\OrderDetail;
 use App\Models\OrderPaymentDetail;
 use App\Models\ProductImeiNumber;
 use App\Models\StockVariation;
+use App\Models\ShopPayment;
 use App\Models\Payment;
+use App\Models\Finance;
 use App\Models\User;
 use App\Models\UserDetail;
 use App\Models\Refund;
@@ -91,7 +93,7 @@ class posController extends Controller
         }
         
         $order = Order::where('id',$id)->first();
-        $order_details = OrderDetail::where('order_id',$id)->get();
+        $order_details = OrderDetail::where([['order_id',$id],['status',1]])->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
         if($branch == 0)
@@ -118,7 +120,7 @@ class posController extends Controller
             $user = User::with('user_detail','bank_detail')->where('id',$branch)->first();
         }
         $order = Order::where('id',$id)->first();
-        $order_details = OrderDetail::where('order_id',$id)->get();
+        $order_details = OrderDetail::where([['order_id',$id],['status',1]])->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
         if($branch == 0)
         {
@@ -350,10 +352,331 @@ class posController extends Controller
 
     public function edit(Request $request,$company,$branch,$id)
     {
+        $shop_payment_ids = ShopPayment::where([['shop_id', Auth::user()->owner_id],['is_active', 1]])->pluck('payment_id')->toArray();
+        $payments = Payment::whereIn('id',$shop_payment_ids)->get();
+        $finances = Finance::where([['shop_id',Auth::user()->owner_id],['is_active',1]])->get();
         $order = Order::where('id',$id)->first();
         $order_details = OrderDetail::where('order_id',$id)->get();
         $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
 
-        return view('users.orders.edit',compact('order','order_details','order_payment_details'));
+        return view('users.orders.edit',compact('order','order_details','order_payment_details','payments','finances'));
+    }
+
+    public function detail_status_update(Request $request)
+    {
+        $request->validate([
+            'detail_id' => 'required|integer|exists:order_details,id',
+            'status'    => 'required|integer|in:0,1,2',
+        ]);
+
+        $detail = OrderDetail::findOrFail($request->detail_id);
+
+        // $currentStatus = (int) $detail->status;
+        // $newStatus = (int) $request->status;
+
+        // $allowedStatuses = [
+        //     0 => [1, 2], // Placed -> Approved / Declined
+        //     1 => [],     // Approved -> no further change
+        //     2 => [],     // Declined -> no further change
+        // ];
+
+        // if (!in_array($newStatus, $allowedStatuses[$currentStatus] ?? [])) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Invalid status change.'
+        //     ], 422);
+        // }
+
+        $detail->status = $request->status;
+        $detail->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order detail status updated successfully.'
+        ]);
+    }
+
+    public function update(Request $request, $company, $id)
+    {
+        //return $request;
+        DB::beginTransaction();
+
+        try {
+
+            $order = Order::findOrFail($id);
+
+            //Validate Order Status
+
+            $request->validate([
+                'status' => 'required|in:1,5',
+            ]);
+
+            $status = (int) $request->status;
+
+            //Get Order Details
+
+            $orderDetails = OrderDetail::where('order_id', $order->id)
+                ->get();
+
+            if ($orderDetails->isEmpty()) {
+
+                return back()
+                    ->with('error', 'No products found for this order.');
+            }
+
+            //DECLINED
+
+            if ($status === 5) {
+
+                OrderDetail::where('order_id', $order->id)->update(['status' => 2]);
+
+                // Order status
+                $order->status = 5;
+
+                //Save Order
+
+                $order->save();
+
+                DB::commit();
+
+                return redirect()->back()->with('toast_success', 'Order updated successfully.');
+            }
+
+            //APPROVED
+
+            elseif ($status === 1) {
+
+                // Validate product statuses
+                foreach ($orderDetails as $detail) {
+
+                    if (!in_array((int) $detail->status, [1, 2])) {
+
+                        DB::rollBack();
+
+                        return back()->with('error','All products must be either Approved or Declined.');
+                    }
+                }
+
+                // At least one product must be approved
+                $approvedDetails = $orderDetails->where('status', 1);
+
+                if ($approvedDetails->isEmpty()) {
+
+                    DB::rollBack();
+
+                    return back()->with('error','At least one order product must be approved.');
+                }
+
+                // PAYMENT VALIDATION
+
+                $payments = $request->input('payments', []);
+
+                // If payments comes as JSON from hidden input
+                if (is_string($payments)) {
+                    $payments = json_decode($payments, true) ?? [];
+                }
+
+                $paymentTotal = collect($payments)->sum(function ($payment) {
+                    return (float) ($payment['amount'] ?? 0);
+                });
+
+                $billAmount = (float) $order->bill_amount;
+
+                if (round($paymentTotal, 2) != round($billAmount, 2)) {
+
+                    DB::rollBack();
+
+                    return back()->with('error','Payment amount must be exactly ₹' . number_format($billAmount, 2) . '. Received ₹' . number_format($paymentTotal, 2));
+                }
+
+                // CHECK STOCK FOR ALL APPROVED PRODUCTS FIRST
+
+                foreach ($approvedDetails as $detail) {
+
+                    $stock = Stock::where([
+                        ['shop_id', $order->shop_id],
+                        ['branch_id', $order->branch_id],
+                        ['product_id', $detail->product_id],
+                    ])->lockForUpdate()->first();
+
+                    if (!$stock) {
+
+                        DB::rollBack();
+
+                        return back()->with('error','Stock not found for product: ' . $detail->name);
+                    }
+
+                    // Check main stock
+
+                    if ($stock->quantity < $detail->quantity) {
+
+                        DB::rollBack();
+
+                        return back()->with('error', 'Insufficient stock for ' . $detail->name . '. Available: ' . $stock->quantity . ', Required: ' . $detail->quantity);
+                    }
+
+                    // Find variation
+
+                    $variation = null;
+
+                    
+                    $variation = StockVariation::where('stock_id', $stock->id)->lockForUpdate()->first();
+
+                    if (!$variation) {
+
+                        DB::rollBack();
+
+                        return back()->with('error','Stock variation not found for product: ' .$detail->name);
+                    }
+
+                    // Check variation stock
+
+                    if ($variation->quantity < $detail->quantity) {
+
+                        DB::rollBack();
+
+                        return back()->with('error','Insufficient variation stock for ' .$detail->name . '. Available: ' . $variation->quantity . ', Required: ' . $detail->quantity);
+                    }
+                }
+
+                // ALL STOCK VALIDATION PASSED
+                // Now deduct stock
+
+                foreach ($approvedDetails as $detail) {
+
+                    $stock = Stock::where([
+                        ['shop_id', $order->shop_id],
+                        ['branch_id', $order->branch_id],
+                        ['product_id', $detail->product_id],
+                    ])->lockForUpdate()->first();
+
+                    // Deduct variation stock
+
+                    $variation = StockVariation::where('stock_id', $stock->id)->lockForUpdate()->first();
+
+                    $variation->quantity -= $detail->quantity;
+                    $variation->save();
+
+                    // Deduct main stock
+
+                    $stock->quantity -= $detail->quantity;
+
+                    // Remove IMEI numbers
+
+                    if (!empty($detail->imei)) {
+
+                        $orderImeis = array_filter(
+                            array_map('trim', explode(',', $detail->imei))
+                        );
+
+                        $existingImeis = !empty($stock->imei)
+                            ? array_filter(
+                                array_map('trim', explode(',', $stock->imei))
+                            )
+                            : [];
+
+                        $remainingImeis = array_values(
+                            array_diff($existingImeis, $orderImeis)
+                        );
+
+                        $stock->imei = implode(',', $remainingImeis);
+
+
+                        // Mark IMEI as sold
+                        ProductImeiNumber::where('product_id', $detail->product_id)
+                            ->whereIn('name', $orderImeis)
+                            ->update([
+                                'is_sold' => 1
+                            ]);
+                    }
+
+                    $stock->save();
+                }
+
+                // SAVE PAYMENT DETAILS
+
+                foreach ($payments as $payment) {
+
+                    $paymentModel = Payment::where('name', $payment['method'])->first();
+
+                    if (!$paymentModel) {
+
+                        DB::rollBack();
+
+                        return back()->with('error','Payment method not found: ' .($payment['method'] ?? ''));
+                    }
+
+                    $extra = $payment['extra'] ?? [];
+
+                    $orderPayment = OrderPaymentDetail::create([
+                        'order_id'   => $order->id,
+                        'payment_id' => $paymentModel->id,
+                        'amount'     => $payment['amount'],
+                        'number'     =>
+                            $extra['cheque_number']
+                            ?? $extra['upi_id']
+                            ?? $extra['card_number']
+                            ?? $extra['finance_card']
+                            ?? null,
+                        'card'       => $extra['card_name'] ?? null,
+                        'finance_id' => $extra['finance_type'] ?? null,
+                    ]);
+
+
+                    // Credit payment
+                    if ($paymentModel->id == 6) {
+
+                        Credit::create([
+                            'order_payment_detail_id' => $orderPayment->id,
+                            'amount' => $payment['amount'],
+                            'remaining_amount' => $payment['amount'],
+                        ]);
+                    }
+                }
+                // UPDATE ORDER
+
+                $order->status = 1;
+                $order->save();
+
+
+                DB::commit();
+
+                return redirect()->back()->with('toast_success', 'Order approved and stock updated successfully.');
+            }
+        } 
+        catch (\Throwable $e) 
+        {
+
+            DB::rollBack();
+
+            return back()
+                ->with('error', $e->getMessage());
+        }
+    }
+
+    public function status_update(Request $request, $company)
+    {
+        $request->validate([
+            'id' => 'required|exists:orders,id',
+            'status' => 'required|in:1,2,3,4',
+        ]);
+
+        $order = Order::findOrFail($request->id);
+
+        // Prevent going backwards
+        // if ((int) $request->status < (int) $order->status) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Order status cannot be moved backwards.'
+        //     ], 422);
+        // }
+
+        $order->status = $request->status;
+        $order->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order status updated successfully.'
+        ]);
     }
 }
