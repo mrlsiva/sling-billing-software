@@ -271,6 +271,8 @@ else
                             Route::get('/{id}/refund',[posController::class, 'refund'])->name('refund');
                             Route::post('/refund',[posController::class, 'refunded'])->name('refunded');
                             Route::get('/{order}/destroy',[posController::class, 'delete'])->name('destroy');
+                            Route::get('/online/{branch}/index',[posController::class, 'online'])->name('online.index');
+                            Route::get('/online/{branch}/{id}/edit',[posController::class, 'edit'])->name('online.edit');
                         });
                     });
 

@@ -302,6 +302,7 @@ class orderController extends Controller
                 // Variation support
                 'size_id'       => $variation?->size_id,
                 'colour_id'     => $variation?->colour_id,
+                'status'        => 0,
             ]);
 
             //return $user;

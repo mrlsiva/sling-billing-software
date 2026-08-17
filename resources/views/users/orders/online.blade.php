@@ -17,7 +17,7 @@
                 <ul class="nav nav-tabs nav-justified">
 
                 	 <li class="nav-item">
-                        <a href="{{route('order.index', ['company' => request()->route('company'),'branch' => 0])}}" class="nav-link {{ request()->route('branch') == 0 ? 'active' : '' }}" id="{{Auth::user()->id}}">
+                        <a href="{{route('order.online.index', ['company' => request()->route('company'),'branch' => 0])}}" class="nav-link {{ request()->route('branch') == 0 ? 'active' : '' }}" id="{{Auth::user()->id}}">
                             <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
                             <span class="d-none d-sm-block"><i class="ri-store-2-line me-2"></i>{{Auth::user()->user_name}}</span>
                         </a>
@@ -26,7 +26,7 @@
                    
                     @foreach($branches as $branch)
                     	<li class="nav-item">
-	                        <a href="{{route('order.index', ['company' => request()->route('company'),'branch' => $branch->id])}}" class="nav-link {{ request()->route('branch') == $branch->id ? 'active' : '' }}" id="{{$branch->id}}">
+	                        <a href="{{route('order.online.index', ['company' => request()->route('company'),'branch' => $branch->id])}}" class="nav-link {{ request()->route('branch') == $branch->id ? 'active' : '' }}" id="{{$branch->id}}">
 	                            <span class="d-block d-sm-none"><i class="bx bx-home"></i></span>
 	                            <span class="d-none d-sm-block"><i class="ri-store-2-line me-2"></i></i>{{$branch->user_name}}</span>
 	                        </a>
@@ -35,7 +35,7 @@
 
                 </ul>
 
-                <form method="get" action="{{route('order.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}">
+                <form method="get" action="{{route('order.online.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}">
                     <div class="row mb-2 p-3">
                         <div class="col-md-11">
                             <div class="input-group">
@@ -55,12 +55,6 @@
                     <div class="tab-pane show active" id="homeTabsJustified">
                         <div class="table-responsive">
 
-                            <div class="d-flex justify-content-end mb-3">
-                                <a href="{{route('order.online.index', ['company' => request()->route('company'),'branch' => request()->route('branch')])}}">
-                                <button class="btn btn-warning"> Online </button>
-                                </a>
-                            </div>
-
                             <table class="table align-middle mb-0 table-hover table-centered">
                                 <thead class="bg-light-subtle">
                                     <tr>
@@ -69,9 +63,9 @@
 										<th>Bill ID</th>
 										<th>Amount (In ₹)</th>
 										<th>Billed On</th>
-										<th>Billed By</th>
 										<th>Customer</th>
                                         <th>Customer GST</th>
+                                        <th>Status</th>
 										<th>Action</th>
                                     </tr>
                                 </thead> 
@@ -98,9 +92,6 @@
 											{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}
 										</td>
 										<td>
-											{{ $order->billedBy->name }}
-										</td>
-										<td>
 											{{ $order->customer->phone }} ({{ $order->customer->name }})
 										</td>
                                         <td>
@@ -110,28 +101,33 @@
                                                 -
                                             @endif
                                         </td>
+                                        <td>
+                                        	@if($order->status == 0)
+                                        		<span class="badge bg-soft-success text-success">Order Placed</span>
+                                            @elseif($order->status == 1)
+                                                <span class="badge bg-soft-success text-success">Order Approved</span>
+                                            @elseif($order->status == 2)
+                                                <span class="badge bg-soft-success text-success">Order Packed</span>
+                                            @elseif($order->status == 3)
+                                                <span class="badge bg-soft-success text-success">Order In-Transit</span>
+                                            @elseif($order->status == 4)
+                                                <span class="badge bg-soft-success text-success">Order Delivered</span>
+                                            @elseif($order->status == 5)
+                                                <span class="badge bg-soft-success text-success">Order Declined</span>
+                                            @endif
+                                        </td>
 										<td>
 
-                                            <a href="{{ route('order.view_bill', ['company' => request()->route('company'), 'branch' => request()->route('branch'), 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-eye-line align-middle fs-20" title="View Bill"></i></a>
+
+                                            <a href="{{ route('order.online.edit', ['company' => request()->route('company'), 'branch' => request()->route('branch'), 'id' => $order->id]) }}" class="link-dark"><i class="ri-edit-line align-middle fs-20" title="View Bill"></i></a>
+
+                                            @if($order->status != 0)
+                                                <a href="{{ route('order.view_bill', ['company' => request()->route('company'), 'branch' => request()->route('branch'), 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-eye-line align-middle fs-20" title="View Bill"></i></a>
                                             
-											<a href="{{ route('order.get_bill', ['company' => request()->route('company'), 'branch' => request()->route('branch'), 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
-
-                                            @if($order->branch_id == null && $order->is_refunded == 0)
-                                                <a href="{{ route('order.refund', ['company' => request()->route('company'),'id' => $order->id ]) }}" class="link-dark"><i class="ri-p2p-fill align-middle fs-20" title="Refund"></i></a>
+                                                <a href="{{ route('order.get_bill', ['company' => request()->route('company'), 'branch' => request()->route('branch'), 'id' => $order->id]) }}" class="link-dark" target="_blank"><i class="ri-printer-line align-middle fs-20" title="Print Bill"></i></a>
                                             @endif
 
-                                            @php
-                                                $auth = App\Models\UserDetail::where('user_id', Auth::user()->owner_id)->first();
-                                            @endphp
-
-                                            @if($order->is_refunded == 0 && $auth->able_to_delete_order == 1)
-                                                <a href="{{ route('order.destroy', ['company' => request()->route('company'), 'order' => $order->id]) }}" class="link-dark delete-order"> <i class="ri-close-circle-line align-middle fs-20" title="Delete"></i> </a>
-                                            @endif
-
-                                            @if(collect($order->payments)->contains('payment_id', 6))
-                                            @endif
-                                            
-										</td>
+                                        </td>
 									</tr>
 								@endforeach
                                 </tbody>
@@ -173,27 +169,6 @@
 
         // Run on typing
         searchInput.addEventListener("input", toggleClear);
-    });
-</script>
-
-<script>
-    $(document).on('click', '.delete-order', function(e) {
-        e.preventDefault();
-
-        let url = $(this).attr('href');
-
-        Swal.fire({
-            title: 'Delete Order?',
-            text: 'This action cannot be undone.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = url;
-            }
-        });
     });
 </script>
 @endsection

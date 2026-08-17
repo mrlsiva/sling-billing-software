@@ -294,4 +294,66 @@ class posController extends Controller
             return redirect()->back()->with('toast_error', $e->getMessage());
         }
     }
+
+    public function online(Request $request,$company,$branch)
+    {
+
+        $branches = User::where([['parent_id',Auth::user()->owner_id],['is_active',1],['is_lock',0],['is_delete',0]])->get();
+
+        if($branch != 0)
+        {
+            $orders = Order::where([['branch_id',$branch],['shop_id',Auth::user()->owner_id],['is_online_order',1]])
+            ->when(request('order'), function ($query) {
+                $search = request('order');
+                $query->where(function ($q) use ($search) {
+                    // search by bill id
+                    $q->where('bill_id', 'like', "%{$search}%")
+                      // branch name / username
+                      ->orWhereHas('branch', function ($q1) use ($search) {
+                          $q1->where('name', 'like', "%{$search}%")
+                             ->orWhere('user_name', 'like', "%{$search}%");
+                      })
+                      // customer name / phone
+                      ->orWhereHas('customer', function ($q2) use ($search) {
+                          $q2->where('name', 'like', "%{$search}%")
+                             ->orWhere('phone', 'like', "%{$search}%")
+                             ->orWhere('gst', 'like', "%{$search}%");
+                      });
+                });
+            })->orderBy('id','desc')->paginate(10);
+
+        }
+        else
+        {
+            $orders = Order::where('shop_id',Auth::user()->owner_id)->where('branch_id',null)->where('is_online_order',1)
+            ->when(request('order'), function ($query) {
+                $search = request('order');
+                $query->where(function ($q) use ($search) {
+                    // search by bill id
+                    $q->where('bill_id', 'like', "%{$search}%")
+                      // branch name / username
+                      ->orWhereHas('branch', function ($q1) use ($search) {
+                          $q1->where('name', 'like', "%{$search}%")
+                             ->orWhere('user_name', 'like', "%{$search}%");
+                      })
+                      // customer name / phone
+                      ->orWhereHas('customer', function ($q2) use ($search) {
+                          $q2->where('name', 'like', "%{$search}%")
+                             ->orWhere('phone', 'like', "%{$search}%")
+                             ->orWhere('gst', 'like', "%{$search}%");;
+                      });
+                });
+            })->orderBy('id','desc')->paginate(10);
+        }
+        return view('users.orders.online',compact('orders','branches'));
+    }
+
+    public function edit(Request $request,$company,$branch,$id)
+    {
+        $order = Order::where('id',$id)->first();
+        $order_details = OrderDetail::where('order_id',$id)->get();
+        $order_payment_details = OrderPaymentDetail::where('order_id',$id)->get();
+
+        return view('users.orders.edit',compact('order','order_details','order_payment_details'));
+    }
 }
