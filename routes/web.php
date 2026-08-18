@@ -551,6 +551,13 @@ else
                                     Route::get('/index',[orderController::class, 'index'])->name('index');
                                     Route::get('/{id}/refund',[orderController::class, 'refund'])->name('refund');
                                     Route::post('/refund',[orderController::class, 'refunded'])->name('refunded');
+
+                                    Route::get('/online/index',[orderController::class, 'online'])->name('online.index');
+                                    Route::get('/online/{id}/edit',[orderController::class, 'edit'])->name('online.edit');
+                                    Route::post('/online/detail/status_update',[orderController::class, 'detail_status_update'])->name('online.detail.status.update');
+                                    Route::post('/online/{id}/update',[orderController::class, 'update'])->name('online.update');
+                                    Route::post('/online/status_update',[orderController::class, 'status_update'])->name('online.status.update');
+
                                 });
                             });
 

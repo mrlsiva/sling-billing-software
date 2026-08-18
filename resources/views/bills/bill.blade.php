@@ -330,10 +330,12 @@
                         </td>
                         <td style="width:50%; border-right:1px solid #000;">
                             <table class="inner">
+                                @if($order->billedBy != null)
                                 <tr>
                                     <td style="width:42%;"><strong>Sales Person</strong></td>
                                     <td>: {{ $order->billedBy->name }}</td>
                                 </tr>
+                                @endif
                                 <tr>
                                     <td><strong>Terms of Pay</strong></td>
                                     <td>: &#x2014;</td>

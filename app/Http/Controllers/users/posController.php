@@ -658,7 +658,7 @@ class posController extends Controller
     {
         $request->validate([
             'id' => 'required|exists:orders,id',
-            'status' => 'required|in:1,2,3,4',
+            'order_status' => 'required|in:1,2,3,4',
         ]);
 
         $order = Order::findOrFail($request->id);
@@ -671,7 +671,7 @@ class posController extends Controller
         //     ], 422);
         // }
 
-        $order->status = $request->status;
+        $order->status = $request->order_status;
         $order->save();
 
         return response()->json([

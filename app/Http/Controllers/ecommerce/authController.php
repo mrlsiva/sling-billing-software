@@ -41,7 +41,15 @@ class authController extends Controller
             return $this->validationFailed($validator->errors());
         }
 
-        $customer = Customer::where([['user_id',$shop->owner_id],['phone',$request->phone]])->first();
+        if($shop->role_id == 2)
+        {
+            $customer = Customer::where([['user_id',$shop->owner_id],['phone',$request->phone]])->first();
+        }
+        elseif($shop->role_id == 3)
+        {
+            $customer = Customer::where([['user_id',$shop->parent_id],['phone',$request->phone]])->first();
+        }
+
         if($customer)
         {
             $user = User::where('customer_id',$customer->id)->first();
@@ -61,7 +69,7 @@ class authController extends Controller
         if(!$customer)
         {
             $customer = Customer::create([ 
-                'user_id' => $shop->owner_id,
+                'user_id' => $shop->role_id == 2 ? $shop->owner_id : $shop->parent_id,
                 'name' => Str::ucfirst($request->name),
                 'phone' => $request->phone,
                 'alt_phone' => $request->alt_phone,
@@ -78,7 +86,7 @@ class authController extends Controller
         {
             $user = User::create([ 
                 'role_id' => 4,
-                'owner_id' => $shop->owner_id,
+                'owner_id' => $shop->role_id == 2 ? $shop->owner_id : $shop->parent_id,
                 'unique_id' => $this->userUnique(),
                 'customer_id' => $customer->id,
                 'name' => Str::ucfirst($request->name),
@@ -115,7 +123,15 @@ class authController extends Controller
         }
         
         $shop = User::where('slug_name',$company)->first();
-        $customer = Customer::where([['user_id',$shop->id],['phone',$request->phone]])->first();
+
+        if($shop->role_id == 2)
+        {
+            $customer = Customer::where([['user_id',$shop->owner_id],['phone',$request->phone]])->first();
+        }
+        elseif($shop->role_id == 3)
+        {
+            $customer = Customer::where([['user_id',$shop->parent_id],['phone',$request->phone]])->first();
+        }
         
         $user = User::with('customer')->where('customer_id', $customer->id)->first();
 
