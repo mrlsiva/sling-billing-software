@@ -29,6 +29,7 @@ use App\Models\User;
 use App\Models\Staff;
 use App\Models\BillSetup;
 use App\Models\ProductImeiNumber;
+use App\Models\QueueStock;
 use App\Models\Credit;
 use App\Traits\Log;
 use Carbon\Carbon;
@@ -133,6 +134,15 @@ class billingController extends Controller
             })
             ->paginate($pagination);
 
+        foreach ($stocks as $stock) {
+            $queueQuantity = QueueStock::where('product_id', $stock->product_id)
+                ->where('from', Auth::id())
+                ->where('status', 0)
+                ->sum('quantity');
+
+            $stock->quantity = $stock->quantity - $queueQuantity;
+        }
+
         // If AJAX request → return JSON
         return response()->json([
             'data' => $stocks->items(),
@@ -159,6 +169,20 @@ class billingController extends Controller
         ])
         ->where('id', $request->id)
         ->first();
+        $queueVariations = [];
+
+        $queueStocks = QueueStock::where('product_id', $product->id)
+            ->where('from', Auth::user()->id)
+            ->where('status', 0)
+            ->get();
+
+        foreach ($queueStocks as $queue) {
+            $variations = json_decode($queue->variation, true) ?? [];
+
+            foreach ($variations as $variationId => $qty) {
+                $queueVariations[$variationId] = ($queueVariations[$variationId] ?? 0) + $qty;
+            }
+        }
 
         return response()->json([
             'id'             => $product->id,
@@ -170,12 +194,16 @@ class billingController extends Controller
             'category'       => $product->category,
             'sub_category'   => $product->sub_category,
             'stock'          => $product->stock,
-            'variations'     => $product->stock ? $product->stock->variations->map(function ($v) {
+            'variations' => $product->stock ? $product->stock->variations->map(function ($v) use ($queueVariations) {
+
+                $queueQty = $queueVariations[$v->id] ?? 0;
+
                 return [
                     'id'          => $v->id,
                     'size_name'   => optional($v->size)->name,
                     'colour_name' => optional($v->colour)->name,
-                    'quantity'    => $v->quantity,
+                    'quantity'    => max(0, $v->quantity - $queueQty),
+                    'queue_qty'   => $queueQty,
                     'price'       => $v->price,
                 ];
             }) : []
@@ -203,6 +231,21 @@ class billingController extends Controller
         ->where('id', $variation->product->id)
         ->first();
 
+        $queueQty = 0;
+
+        $queueStocks = QueueStock::where('product_id', $variation->product_id)
+            ->where('from', Auth::user()->id)
+            ->where('status', 0)
+            ->get();
+
+        foreach ($queueStocks as $queue) {
+            $variations = json_decode($queue->variation, true) ?? [];
+
+            if (isset($variations[$variation->id])) {
+                $queueQty += $variations[$variation->id];
+            }
+        }
+
         return response()->json([
             'id'            => $variation->id,
             'product_id'    => $variation->product_id,
@@ -212,7 +255,8 @@ class billingController extends Controller
             'stock'         => $product->stock,
             'size_name'     => $variation->size->name ?? '',
             'colour_name'   => $variation->colour->name ?? '',
-            'quantity'      => $variation->quantity,
+            'quantity'      => max(0, $variation->quantity - $queueQty),
+            'queue_qty'  => $queueQty,
 
             // MANDATORY FOR JS
             'base_price'     => (float) $product->price,
@@ -319,12 +363,13 @@ class billingController extends Controller
         // Customer Creation -------------------------
         $customerData = $request->customer;
 
-        $customer = Customer::firstOrCreate(
+        $customer = Customer::updateOrCreate(
             [
-                'user_id' => $user->parent_id,
+                'user_id' => Auth::user()->parent_id,
                 'phone'   => $customerData['phone'],
             ],
             [
+                'branch_id' => null,
                 'alt_phone' => $customerData['alt_phone'] ?? null,
                 'name'      => $customerData['name'],
                 'address'   => $customerData['address'],
@@ -377,12 +422,14 @@ class billingController extends Controller
         {
             $billing_customer = BillingAddress::create(
                 [
-                    'user_id'  => $user->id,
-                    'order_id' => $order->id,
-                    'phone'    => $billingData['billing_phone'] ?? null,
-                    'name'     => $billingData['billing_name'],
+                    'user_id'   => $user->id,
+                    'order_id'  => $order->id,
+                    'phone'     => $billingData['billing_phone'] ?? null,
+                    'alt_phone' => $billingData['billing_alt_phone'] ?? null,
+                    'name'      => $billingData['billing_name'],
                     'address'   => $billingData['billing_address'],
                     'pincode'   => $billingData['billing_pincode'] ?? null,
+                    'gst'       => $billingData['billing_gst'] ?? null,
                 ]
             );
         }

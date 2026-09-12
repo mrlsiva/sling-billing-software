@@ -69,7 +69,7 @@ class salesReportsController extends Controller
         $from = $request->from;
         $to   = $request->to;
 
-        $orders = Order::with(['customer','billedBy','details.product.category','details.product.sub_category'])
+        $orders = Order::with(['customer','billedBy','details.product.category','details.product.sub_category','refunds.details'])
             ->where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)
 
             ->when($from && $to, function ($q) use ($from, $to) {

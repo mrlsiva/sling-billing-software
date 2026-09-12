@@ -86,7 +86,7 @@
 											{{ $order->bill_amount - ($order->is_refunded ? ($order->total_refund ?? 0) : 0) }}
 										</td>
 										<td>
-											{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}
+											{{ \Carbon\Carbon::parse($order->billed_on)->format('d-m-Y') }}
 										</td>
 										<td>
 											{{ $order->billedBy->name }}

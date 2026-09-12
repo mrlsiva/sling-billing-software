@@ -4,6 +4,17 @@
 <title>{{ config('app.name')}} | Stock Transfer</title>
 @endsection
 
+@section('style')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+		.select2-dropdown { z-index: 1056; }
+
+</style>
+@endsection
+
 @section('body')
 	<div class="row">
 		<div class="col-xl-12">
@@ -12,7 +23,13 @@
 					<div>
 						<p class="card-title">Stock Transfer</p>
 					</div>
-					<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#stockTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Stock Transfer</a>
+					<div>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#bulkTransfer" href="javascript:void(0);">
+	    					<i class="ri-file-excel-2-line me-2"></i> Bulk Transfer
+						</a>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#stockTransfer" href=""> <i class="ri-swap-box-line me-2"></i>Stock Transfer</a>
+						<a class="btn btn-outline-primary btn-sm fw-semibold" href="{{route('synchronize_stock', ['company' => request()->route('company')])}}"> <i class="ri-p2p-fill me-2"></i>Synchronize Stock</a>
+					</div>
 				</div>
 
 				<form method="get" action="{{route('branch.stock_transfer.transfer', ['company' => request()->route('company')])}}">
@@ -28,7 +45,7 @@
 				    		@php
 						        $user = App\Models\User::where('id', Auth::user()->parent_id)->first();
 						    @endphp
-				    		<select class="form-control" name="branch" id="branch">
+				    		<select class="form-control branch" name="branch" id="branch">
 				    			<option value=""> Select Branch </option>
 				    			<option value="{{$user->id}}" {{ request('branch') == $user->id ? 'selected' : '' }}> {{$user->user_name}} </option>
 				    			@foreach($branches as $branch)
@@ -126,7 +143,7 @@
 						    <div class="col-md-12">
 						        <div class="mb-3">
 						            <label for="transfer_to" class="form-label text-muted">Transfer to</label>
-						            <select class="form-control" id="transfer_to" name="transfer_to">
+						            <select class="form-control transfer-to-select" id="transfer_to" name="transfer_to">
 						                <option value="">Select</option>
 						                <option value="1">Branch</option>
 						                <option value="2">HO</option>
@@ -139,7 +156,7 @@
 						    <div class="col-md-12">
 						        <div class="mb-3">
 						            <label for="branch_select" class="form-label text-muted">To</label>
-						            <select class="form-control" id="branch_select" name="branch">
+						            <select class="form-control branch-select" id="branch_select" name="branch">
 						                <option value="">Select</option>
 						                @foreach($branches as $branch)
 						                    <option value="{{ $branch->id }}">{{ $branch->user_name }}</option>
@@ -151,10 +168,10 @@
 
 
 	                    <div class="row">
-	                        <div class="col-md-6">
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Category</label>
-	                                <select class="form-control" data-choices name="category" id="category">
+	                                <select class="form-control category-select" name="category" id="category">
 	                                    <option value=""> Select </option>
 	                                    @foreach($categories as $category)
 	                                    <option value="{{$category->id}}">{{$category->name}}</option>
@@ -163,60 +180,169 @@
 	                            </div>
 	                        </div>
 
-	                        <div class="col-md-6">
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Sub Category</label>
-	                                <select class="form-control" name="sub_category" id="sub_category">
+	                                <select class="form-control sub_category-select" name="sub_category" id="sub_category">
 	                                    <option value=""> Select </option>
 	                                </select>
 	                            </div>
 	                        </div>
 
-	                        <div class="col-md-6">
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Product</label>
-	                                <select class="form-control" name="product" id="product">
+	                                <select class="form-control product-select" name="product" id="product">
 	                                    <option value=""> Select </option>
 	                                </select>
 	                            </div>
 	                        </div>
 
-	                        <div class="col-md-6">
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Matrics</label>
 	                                <input type="text" id="unit" name="unit" class="form-control" disabled="">
 	                            </div>
 	                        </div>
 
-	                        <div class="col-md-6">
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Available</label>
 	                                <input disabled="" type="text" id="available" name="available" class="form-control" placeholder="0">
+	                                <small id="queueQtyText" class="text-danger d-none"></small>
 	                            </div>
 	                        </div>
 
-	                        <div class="col-md-6">
+	                        <div class="col-md-4">
+	                            <div class="mb-3">
+	                                <label for="choices-single-groups" class="form-label text-muted">Enter Price</label>
+	                                <input type="number" id="price" name="price" class="form-control" min="1">
+	                            </div>
+	                        </div>
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Enter Quantity</label>
 	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1">
 	                            </div>
 	                        </div>
+
+	                        <div class="col-md-4 d-flex align-items-end">
+	                            <div class="mb-3 w-100">
+	                                <button type="button" id="add_to_transfer_list" class="btn btn-outline-primary w-100">
+	                                    <i class="ri-add-line"></i> Add to List
+	                                </button>
+	                            </div>
+	                        </div>
+
+	                        <input type="hidden" name="queue_stock" id="queue_stock" >
+
 	                    </div>
 	                </div>
 
-	                <div class="row mt-3" id="imei_section" style="display:none;">
+	                <div class="row mt-2" id="imei_section" style="display:none;">
 						    <div class="col-md-12">
 						        <label class="form-label text-muted">Select IMEI Numbers</label>
 
 						        <div id="imei_list"
 						             class="border rounded p-2 d-flex flex-wrap gap-3"
-						             style="max-height:250px; overflow-y:auto;">
+						             style="max-height:150px; overflow-y:auto;">
 						        </div>
 						    </div>
 						</div>
 
 						<div id="variations_section"></div>
-						
+
+						<div class="row mt-2 d-none" id="transfer_cart_section">
+							<div class="col-md-12">
+								<label class="form-label text-muted">Products to Transfer</label>
+								<div class="table-responsive border rounded" style="max-height:180px; overflow-y:auto;">
+									<table class="table table-bordered table-sm align-middle mb-0">
+										<thead class="bg-light-subtle">
+											<tr>
+												<th>Product</th>
+												<th>Qty</th>
+												<th>Price</th>
+												<th>Amount</th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody id="transfer_cart_body"></tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+	                    <button type="submit" id="transfer" class="btn btn-primary" disabled>Transfer All</button>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+	</div>
+
+	<div class="modal fade" id="bulkTransfer" tabindex="-1" aria-labelledby="bulkTransferLabel" aria-hidden="true">
+	    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="bulkTransferLabel">Bulk Transfer</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	            </div>
+	            <form class="row" action="{{ route('branch.stock_transfer.bulk_transfer', ['company' => request()->route('company')]) }}" method="post" enctype="multipart/form-data" id="transfer_submit">
+
+	                @csrf
+	                <div class="modal-body">
+
+	                    <div class="row">
+	                        <div class="col-md-12">
+	                            <div class="mb-3">
+	                                <label for="choices-single-groups" class="form-label text-muted">Select Branch</label>
+                                	<select class="form-control bulk-branch-select" name="branch" id="branch">
+	                                    <option value=""> Select </option>
+	                                    <option value="0">HO</option>
+	                                    @foreach($branches as $branch)
+	                                    <option value="{{$branch->id}}">{{$branch->user_name}}</option>
+	                                    @endforeach
+	                                </select>
+	                            </div>
+	                        </div>
+	                    </div>
+
+	                    @php
+		                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->id)->first();
+		                @endphp
+
+	                    @if($user_detail->is_imei_required == 1)
+
+	                    <div class="row">
+		                    <div class="col-md-12 d-flex justify-content-end">
+		                    	<a href="{{ asset('assets/templates/bulk_transfer.xlsx') }}" download="Bulk_Transfer.xlsx">Download Template</a>
+		                    </div>
+		                </div>
+
+		                @else
+
+		                <div class="row">
+		                    <div class="col-md-12 d-flex justify-content-end">
+		                    	<a href="{{ asset('assets/templates/bulk_transfer_without_imei.xlsx') }}" download="Bulk_Transfer.xlsx">Download Template</a>
+		                    </div>
+		                </div>
+		                
+		                @endif
+
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="mb-3">
+		                            <label for="name" class="form-label">Upload File</label>
+	                                <div class="input-group">
+	                                    <input type="file" name="file" id="file" class="form-control" accept=".xlsx">
+	                                </div>
+		                        </div>
+		                    </div>
+	                   </div>
+
+	                </div>
 	                <div class="modal-footer">
 	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	                    <button type="submit" id="transfer" class="btn btn-primary">Transfer</button>
@@ -229,5 +355,15 @@
 @endsection
 
 @section('script')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{{asset('assets/js/branches/transfer.js?' . $version)}}"></script>
+<script>
+	$(document).on('input', '#price', function () {
+	    let value = parseFloat($(this).val());
+
+	    if (!isNaN(value) && value <= 0) {
+	        $(this).val(1);
+	    }
+	});
+</script>
 @endsection

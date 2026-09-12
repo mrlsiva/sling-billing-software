@@ -104,7 +104,7 @@
 
                         <tr>
                             <td>{{ $order->bill_id }}</td>
-                            <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y H:i') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d-m-Y H:i') }}</td>
                             <td>User</td>
                             <td>{{ $order->billedBy->name ?? '' }}</td>
                             <td>{{ $order->customer->name ?? '' }}</td>
@@ -113,7 +113,7 @@
                             <td>{{ $detail->product->category->name ?? '' }}</td>
                             <td>{{ $detail->product->sub_category->name ?? '' }}</td>
                             <td>{{ $detail->name }}</td>
-                            <td>{{ $detail->product->code }}</td>
+                            <td>{{ $detail->product->code ?? '' }}</td>
                             <td>
                                 {{ $finalQty }}
                                 @if($refundedQty > 0)

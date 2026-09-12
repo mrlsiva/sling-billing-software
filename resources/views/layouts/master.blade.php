@@ -19,10 +19,10 @@
 	<meta name="author" content="FoxPixel" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="shortcut icon" href="assets/images/favicon.ico">
-	<link rel="stylesheet" href="{{ asset('assets/css/vendor.min.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/css/icons.min.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/vendor.min.css?' . $version) }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/icons.min.css?' . $version) }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/app.min.css?' . $version) }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/app.css?' . $version) }}">
     <script src="{{ asset('assets/js/config.min.js?' . $version) }}"></script>
     <link rel="icon" type="image/png" href="{{ $user->fav_icon ? asset('storage/' . $user->fav_icon) : asset('assets/images/favicon.png') }}">
 
@@ -96,6 +96,16 @@
                         
                     </ul>
                 @endif
+
+                @php
+                    $queueStocksCount = \App\Models\QueueStock::where('to', auth()->id())
+                    ->where('status', 0)
+                    ->selectRaw('MAX(id) as id')
+                    ->groupBy('unique_id')
+                    ->get()
+                    ->count();
+                @endphp
+
                 @if(Auth::user()->hasRole('HO'))
                     <ul class="navbar-nav" id="navbar-nav">
 
@@ -176,6 +186,7 @@
                                     @if($branches->isNotEmpty())
                                         <li class="sub-menu-item">
                                             <a class="sub-menu-link {{ request()->is(Auth::user()->slug_name . '/inventories/transfer/*') ? 'active' : '' }}" href="{{route('inventory.transfer', ['company' => request()->route('company')])}}">Product Transfer</a>
+                                            <span class="badge bg-danger ms-2">{{ $queueStocksCount }}</span>
                                         </li>
                                     @endif
 
@@ -348,11 +359,15 @@
                         </li>
 
                         <li class="menu-item">
-                            <a class="menu-link" href="{{route('branch.stock_transfer.transfer', ['company' => request()->route('company')])}}">
+                            <a class="menu-link" href="{{ route('branch.stock_transfer.transfer', ['company' => request()->route('company')]) }}">
                                 <span class="nav-icon">
                                     <i class="ri-stock-fill"></i>
                                 </span>
-                                <span class="nav-text"> Stock Transfer </span>
+
+                                <span class="nav-text">
+                                    Stock Transfer
+                                    <span class="badge bg-danger ms-2">{{ $queueStocksCount }}</span>
+                                </span>
                             </a>
                         </li>
 

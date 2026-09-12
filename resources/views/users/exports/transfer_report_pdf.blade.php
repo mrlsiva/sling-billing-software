@@ -65,7 +65,7 @@
             <tbody>
                 @foreach($datas as $data)
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($data->transfer_on)->format('d M Y H:i') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($data->transfer_on)->format('d-m-Y H:i') }}</td>
                     <td>
                         @if($current_branch == 0)
                             {{ $data->to == Auth::user()->id ? 'Stock_In' : 'Stock_Out' }}

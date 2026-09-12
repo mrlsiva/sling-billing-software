@@ -50,4 +50,9 @@ class Order extends Model
     {
         return $this->hasOne(BillingAddress::class, 'order_id');
     }
+
+    public function histories()
+    {
+        return $this->hasMany(OrderHistory::class);
+    }
 }

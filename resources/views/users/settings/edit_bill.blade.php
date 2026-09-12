@@ -88,15 +88,15 @@
 										</td>
 										<td>
 
-                                            <a href="javascript:void(0)"
-                                               class="text-decoration-underline text-decoration-none editBill"
-                                               data-id="{{ $order->id }}"
-                                               data-bill="{{ $order->bill_id }}"
-                                               data-date="{{ \Carbon\Carbon::parse($order->billed_on)->format('Y-m-d\TH:i') }}"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#billEdit">
+                                            <a href="{{route('setting.order.bill.edit', ['company' => request()->route('company'), 'id' => $order->id ]) }}" class="text-decoration-underline text-decoration-none" title="Edit">
                                                 <i class="ri-edit-line fs-18"></i>
-                                            </a> 
+                                            </a>
+
+                                            @if($order->histories_count > 0)
+                                            <a href="{{route('setting.order.bill.history', ['company' => request()->route('company'), 'id' => $order->id ]) }}" class="text-decoration-underline text-decoration-none ms-2" title="Edit History">
+                                                <i class="ri-history-line fs-18"></i>
+                                            </a>
+                                            @endif
 
 										</td>
 									</tr>
@@ -117,45 +117,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="billEdit" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Bill Edit</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form class="row" action="{{route('setting.order.bill.edit', ['company' => request()->route('company')])}}" method="post" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
-                    <input type="hidden" name="bill_id" id="bill_id">
 
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="mb-3">
-                                <label for="choices-single-groups" class="form-label text-muted">Billed On</label>
-                                <input type="datetime-local" name="billed_on" id="billed_on" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="mb-3">
-                                <label for="choices-single-groups" class="form-label text-muted">Invoice Number</label>
-                                <input type="text" name="invoice" id="invoice" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 
 

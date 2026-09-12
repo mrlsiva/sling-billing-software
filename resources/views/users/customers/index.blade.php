@@ -4,6 +4,15 @@
 <title>{{ config('app.name')}} | Customers</title>
 @endsection
 
+@section('style')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+</style>
+@endsection
+
 @section('body')
 	<div class="row">
 		<div class="col-xl-12">
@@ -190,7 +199,7 @@
 		                	<div class="col-md-12">
 		                		<div class="mb-3">
 		                			 <label for="payment_method" class="form-label">Gender</label>
-                                    <select class="form-control" data-choices name="gender" id="gender">
+                                    <select class="form-control" name="gender" id="gender">
                                         <option value="">Select</option>
                                         @foreach($genders as $gender)
                                         	<option value="{{$gender->id}}">{{$gender->name}}</option>
@@ -270,6 +279,12 @@
 @endsection
 
 @section('script')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function () {
+    $('#gender').select2({ width: '100%', placeholder: 'Select' });
+});
+</script>
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function () {
         let searchInput = document.getElementById("searchInput");

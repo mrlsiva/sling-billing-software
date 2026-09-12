@@ -4,6 +4,15 @@
 <title>{{ config('app.name')}} | Billing</title>
 @endsection
 
+@section('style')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+</style>
+@endsection
+
 @section('body')
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -28,7 +37,7 @@
 				<div class="col-md-12">
 					<div class="mb-3">
 						<label for="choices-single-groups" class="form-label text-muted">Billed By</label>
-						<select class="form-control" data-choices name="billed_by" id="billed_by">
+						<select class="form-control" name="billed_by" id="billed_by">
 							<option value=""> Select </option>
 							@foreach($staffs as $staff)
 							<option value="{{$staff->id}}">{{$staff->name}}</option>
@@ -51,7 +60,7 @@
 				<div class="col-md-4">
 					<div class="">
 						<label for="choices-single-groups" class="form-label text-muted">Category</label>
-						<select class="form-control" data-choices name="category" id="category">
+						<select class="form-control" name="category" id="category">
 							<option value=""> Select </option>
 							@foreach($categories as $category)
 							<option value="{{$category->id}}"
@@ -347,7 +356,7 @@
 						<div class="col-md-12">
 							<div class="mb-3">
 								<label for="payment_method" class="form-label">Gender</label>
-								<select class="form-control" name="gender" id="gender">
+								<select class="form-control gender-select" name="gender" id="gender">
 									<option value="">Select</option>
 									@foreach($genders as $gender)
 									<option value="{{$gender->id}}">{{$gender->name}}</option>
@@ -392,6 +401,13 @@
 
 						<div class="col-md-12">
 							<div class="mb-3">
+								<label for="billing_alt_phone" class="form-label">Alternate Phone</label>
+								<input type="tel" name="billing_alt_phone" id="billing_alt_phone" class="form-control" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" placeholder="Alternate Phone">
+							</div>
+						</div>
+
+						<div class="col-md-12">
+							<div class="mb-3">
 								<label for="billing_name" class="form-label">Name</label>
 								<span class="text-danger">*</span>
 								<input type="text" id="billing_name" name="billing_name" class="form-control" placeholder="Name">
@@ -413,6 +429,13 @@
 							</div>
 						</div>
 
+						<div class="col-md-12">
+							<div class="mb-3">
+								<label for="billing_gst" class="form-label">GST</label>
+								<input type="text" id="billing_gst" name="billing_gst" class="form-control" placeholder="GST">
+							</div>
+						</div>
+
 					</div>
 
 					<div class=" gap-1 hstack mt-3">
@@ -429,7 +452,7 @@
 					<div class="row g-2">
 						<div class="col-md-12">
 							<div class="mb-3">
-								<select class="form-control" data-choices name="payment" id="payment">
+								<select class="form-control" name="payment" id="payment">
 									<option value="">Select</option>
 									@foreach($payments as $payment)
 									<option value="{{$payment->id}}">{{$payment->name}}</option>
@@ -519,7 +542,7 @@
 							<div class="mb-3">
 								<label for="finance_type" class="form-label">Finance</label>
 								<span class="text-danger">*</span>
-								<select class="form-control" data-choices name="finance_type" id="finance_type">
+								<select class="form-control" name="finance_type" id="finance_type">
 									<option value="">Select</option>
 									@foreach($finances as $finance)
 									<option value="{{$finance->id}}">{{$finance->name}}</option>
@@ -765,7 +788,7 @@
 						<div class="col-md-12">
 							<div class="mb-3">
 								<label for="payment_method" class="form-label">Gender</label>
-								<select class="form-control" data-choices name="gender" id="gender">
+								<select class="form-control gender-select" name="gender" id="gender">
 									<option value="">Select</option>
 									@foreach($genders as $gender)
 									<option value="{{$gender->id}}">{{$gender->name}}</option>
@@ -857,7 +880,19 @@
 @section('script')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{{asset('assets/js/users/billing.js?' . $version)}}"></script>
+
+<script>
+$(document).ready(function () {
+    $('#billed_by').select2({ width: '100%', placeholder: 'Select' });
+    $('#category').select2({ width: '100%', placeholder: 'Select' });
+    $('#sub_category').select2({ width: '100%', placeholder: 'Select' });
+    $('.gender-select').select2({ width: '100%', placeholder: 'Select' });
+    $('#payment').select2({ width: '100%', placeholder: 'Select' });
+    $('#finance_type').select2({ width: '100%', placeholder: 'Select' });
+});
+</script>
 
 <script>
     $('#same_as_address').on('change', function () {
@@ -865,16 +900,20 @@
         if ($(this).is(':checked')) {
 
             $('#billing_phone').val($('#phone').val());
+            $('#billing_alt_phone').val($('#alt_phone').val());
             $('#billing_name').val($('#name').val());
             $('#billing_address').val($('#address').val());
             $('#billing_pincode').val($('#pincode').val());
+            $('#billing_gst').val($('#gst').val());
 
         } else {
 
             $('#billing_phone').val('');
+            $('#billing_alt_phone').val('');
             $('#billing_name').val('');
             $('#billing_address').val('');
             $('#billing_pincode').val('');
+            $('#billing_gst').val('');
 
         }
 

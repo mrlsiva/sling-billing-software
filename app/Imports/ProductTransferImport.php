@@ -4,12 +4,15 @@ namespace App\Imports;
 
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Collection;
+use App\Models\StockVariation;
 use App\Models\SubCategory;
+use App\Models\QueueStock;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Size;
 use App\Models\Colour;
-use App\Models\StockVariation;
+use App\Models\Stock;
+use App\Models\Size;
+use App\Models\User;
 
 class ProductTransferImport implements ToCollection
 {
@@ -83,8 +86,12 @@ class ProductTransferImport implements ToCollection
 
                 $row = $row->toArray();
 
+                $headers = array_map(fn($h) => strtolower(trim($h)), $rows[0]->toArray());
+
+                $hasImei = in_array('imei', $headers);
+
                 // Excel WITH IMEI column
-                if (count($row) >= 7) {
+                if ($hasImei) {
 
                     $categoryName    = $row[0] ?? null;
                     $subCategoryName = $row[1] ?? null;
@@ -93,6 +100,7 @@ class ProductTransferImport implements ToCollection
                     $sizeName        = $row[4] ?? null;
                     $colourName      = $row[5] ?? null;
                     $quantity        = $row[6] ?? null;
+                    $price        = $row[7] ?? null;
 
                 }
                 // Excel WITHOUT IMEI column
@@ -105,6 +113,7 @@ class ProductTransferImport implements ToCollection
                     $sizeName        = $row[3] ?? null;
                     $colourName      = $row[4] ?? null;
                     $quantity        = $row[5] ?? null;
+                    $price        = $row[6] ?? null;
                 }
                 $categoryKey = strtolower(trim($categoryName));
 
@@ -151,11 +160,30 @@ class ProductTransferImport implements ToCollection
                     }
                 }
 
+                // Calculate queued product quantity
+                $queueProductQty = QueueStock::where('product_id', $product['id'])
+                    ->where('from', $this->ownerId)
+                    ->where('status', 0)
+                    ->sum('quantity');
+
+                $user = User::where('id',$this->ownerId)->first();
+                if($user->role_id == 2)
+                {
+                    $stock = Stock::where('shop_id',$this->ownerId)->where('branch_id',null)->where('product_id', $product['id'])->first();
+                }
+                else
+                {
+                    $stock = Stock::where('shop_id',$user->parent_id)->where('branch_id',$this->ownerId)->where('product_id', $product['id'])->first();
+                }
+
+                $availableProductQty = ($stock->quantity ?? 0) - $queueProductQty;
+
                 $variation = null;
 
                 if ($size || $colour) {
 
                     $variation = StockVariation::where([
+                        ['stock_id',$stock->id],
                         ['product_id', $product['id']],
                         ['size_id', $size['id'] ?? null],
                         ['colour_id', $colour['id'] ?? null],
@@ -164,6 +192,41 @@ class ProductTransferImport implements ToCollection
                     if (!$variation) {
                         throw new \Exception("Variation not found for Size '{$sizeName}' and Colour '{$colourName}'");
                     }
+
+                    if ($variation) {
+
+                        $queueVariationQty = 0;
+
+                        $queueStocks = QueueStock::where('product_id', $product['id'])
+                            ->where('from', $this->ownerId)
+                            ->where('status', 0)
+                            ->get();
+
+                        foreach ($queueStocks as $queue) {
+
+                            $variationData = json_decode($queue->variation, true) ?? [];
+
+                            if (isset($variationData[$variation->id])) {
+                                $queueVariationQty += $variationData[$variation->id];
+                            }
+                        }
+
+                        $availableVariationQty = $variation->quantity - $queueVariationQty;
+
+                        if ($quantity > $availableVariationQty) {
+                            throw new \Exception(
+                                "Requested quantity ({$quantity}) exceeds available variation quantity ({$availableVariationQty})."
+                            );
+                        }
+
+                    } else {
+
+                        if ($quantity > $availableProductQty) {
+                            throw new \Exception(
+                                "Requested quantity ({$quantity}) exceeds available quantity ({$availableProductQty})."
+                            );
+                        }
+                    }
                 }
 
                 $this->validRows[] = [
@@ -171,6 +234,7 @@ class ProductTransferImport implements ToCollection
                     'sub_category_id' => $subCategory['id'],
                     'product_id'      => $product['id'],
                     'quantity'        => (int) $quantity,
+                    'price'        => (float) $price,
                     'imeis'           => $imei ? explode(',', $imei) : [],
 
                     // ✅ ADD THESE

@@ -4,6 +4,15 @@
 	<title>{{ config('app.name')}} | GST Bill Create</title>
 @endsection
 
+@section('style')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+</style>
+@endsection
+
 @section('body')
      <div class="row">
         @if ($errors->any())
@@ -95,7 +104,7 @@
                                 <div class="mb-3">
                                     <label for="choices-single-groups" class="form-label text-muted">Category</label>
                                     <span class="text-danger">*</span>
-                                    <select class="form-control" data-choices name="category" id="category">
+                                    <select class="form-control" name="category" id="category">
                                         <option value=""> Select </option>
                                         @foreach($categories as $category)
                                             <option value="{{$category->id}}">{{$category->name}}</option>
@@ -180,9 +189,19 @@
 
 <!-- Optional additional methods (if you need pattern, equalTo, etc.) -->
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+	function reinitSelect2(el, placeholder) {
+		if (el.data('select2')) el.select2('destroy');
+		el.select2({ width: '100%', placeholder: placeholder });
+	}
+
 	jQuery(document).ready(function () {
+	    reinitSelect2($('#category'), 'Select Category');
+	    reinitSelect2($('#sub_category'), 'Select Sub Category');
+	    reinitSelect2($('#product'), 'Select Product');
+
 	    jQuery('select[name="category"]').on('change', function () {
 	        var category = jQuery(this).val();
 	        if (category) {
@@ -201,6 +220,7 @@
 	                        $('select[name="sub_category"]').append('<option value="' + value.id + '">' + value.name + '</option>');
 	                    });
 
+	                    reinitSelect2($('select[name="sub_category"]'), 'Select Sub Category');
 	                }
 	            });
 	        }
@@ -228,8 +248,9 @@
 						jQuery.each(data, function(key,value){
 							console.log(value.name)
 							$('select[name="product"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
-						});					
-						
+						});
+
+						reinitSelect2($('select[name="product"]'), 'Select Product');
 					}
 				});
 			}

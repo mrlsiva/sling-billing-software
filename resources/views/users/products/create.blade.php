@@ -4,6 +4,15 @@
 	<title>{{ config('app.name')}} | Product Create</title>
 @endsection
 
+@section('style')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+</style>
+@endsection
+
 @section('body')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="metrics-store-url" content="{{ route('setting.metric.store', ['company' => request()->route('company')]) }}">
@@ -39,4 +48,14 @@
 <script src="{{asset('assets/js/users/metric.js?' . $version)}}"></script>
 <script src="{{asset('assets/js/users/size.js?' . $version)}}"></script>
 <script src="{{asset('assets/js/users/colour.js?' . $version)}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function () {
+    $('#category').select2({ width: '100%', placeholder: 'Select' });
+    $('#sub_category').select2({ width: '100%', placeholder: 'Select' });
+    $('#tax').select2({ width: '100%', placeholder: 'Select' });
+    $('#metric').select2({ width: '100%', placeholder: 'Select' });
+    $('#discount_type').select2({ width: '100%', placeholder: 'Select' });
+});
+</script>
 @endsection

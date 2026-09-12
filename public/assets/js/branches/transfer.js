@@ -1,3 +1,51 @@
+$(document).ready(function () {
+    $('.branch').select2({
+        width: '100%',
+        placeholder: 'Select'
+    });
+
+    $('.transfer-to-select').select2({
+        width: '100%',
+        placeholder: 'Select',
+        dropdownParent: $('#stockTransfer')
+    });
+
+    $('.branch-select').select2({
+        width: '100%',
+        placeholder: 'Select',
+        dropdownParent: $('#stockTransfer')
+    });
+
+    $('.category-select').select2({
+        width: '100%',
+        placeholder: 'Select',
+        dropdownParent: $('#stockTransfer')
+    });
+
+    $('.sub_category-select').select2({
+        width: '100%',
+        placeholder: 'Select',
+        dropdownParent: $('#stockTransfer')
+    });
+
+    $('.product-select').select2({
+        width: '100%',
+        placeholder: 'Select',
+        dropdownParent: $('#stockTransfer')
+    });
+
+    $('#transfer_to').on('change', function () {
+        if ($(this).val() == '1') {
+            $('#branch_field').show();
+        } else {
+            $('#branch_field').hide();
+        }
+    });
+
+    // Trigger on page load
+    $('#transfer_to').trigger('change');
+});
+
 jQuery(document).ready(function ()
 {
 	jQuery('select[name="category"]').on('change',function(){
@@ -18,8 +66,11 @@ jQuery(document).ready(function ()
 					jQuery.each(data, function(key,value){
 						//console.log(value.name)
 						$('select[name="sub_category"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
-					});					
-					
+					});
+
+					var subCategorySelect = $('select[name="sub_category"]');
+					if (subCategorySelect.data('select2')) subCategorySelect.select2('destroy');
+					subCategorySelect.select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#stockTransfer') });
 				}
 			});
 		}
@@ -46,9 +97,12 @@ jQuery(document).ready(function ()
 					$('select[name="product"]').append('<option value="">'+ "Select" +'</option>');
 					jQuery.each(data, function(key,value){
 						//console.log(value.name)
-						$('select[name="product"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
-					});					
-					
+						$('select[name="product"]').append('<option value="'+ value.id +'">'+ value.name +' - '+ value.code +'</option>');
+					});
+
+					var productSelect = $('select[name="product"]');
+					if (productSelect.data('select2')) productSelect.select2('destroy');
+					productSelect.select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#stockTransfer') });
 				}
 			});
 		}
@@ -74,18 +128,32 @@ jQuery(document).ready(function () {
 
                 success: function (data) {
 
+                    console.log(data);
+                    
                     $("#unit").val(data.product.product.metric.name);
                     $("#available").val(data.quantity);
+                    $("#price").val(data.product.product.discounted_price);
+                    $("#queue_stock").val(data.totalQueueQuantity);
 
-                    // ENABLE / DISABLE TRANSFER BUTTON
+                    if (data.totalQueueQuantity > 0) {
+                        $("#queueQtyText")
+                            .removeClass("d-none")
+                            .text("Queued Quantity: " + data.totalQueueQuantity);
+                    } else {
+                        $("#queueQtyText")
+                            .addClass("d-none")
+                            .text("");
+                    }
+
+                    // ENABLE / DISABLE ADD-TO-LIST BUTTON
                     if (data.quantity == 0) {
-                        $('#transfer').prop('disabled', true)
+                        $('#add_to_transfer_list').prop('disabled', true)
                             .attr('data-bs-original-title', 'You can’t transfer a product with 0 quantity.')
                             .tooltip('dispose').tooltip('show');
 
                     } else {
-                        $('#transfer').prop('disabled', false)
-                            .attr('data-bs-original-title', 'Click to transfer this product')
+                        $('#add_to_transfer_list').prop('disabled', false)
+                            .attr('data-bs-original-title', 'Click to add this product to the transfer list')
                             .tooltip('dispose').tooltip();
                     }
 
@@ -103,10 +171,17 @@ jQuery(document).ready(function () {
                                     <div class="col-md-3"><strong>Colour:</strong> ${v.colour?.name ?? "-"}</div>
                                     <div class="col-md-6">
                                         <input type="number" class="form-control variation-qty"
-                                            data-max="${v.quantity}"
-                                            max="${v.quantity}" min="0"
+                                            data-max="${v.quantity - v.queue_qty}"
+                                            max="${v.quantity - v.queue_qty}" min="0"
                                             name="variation_qty[${v.id}]"
                                             placeholder="Available: ${v.quantity}">
+                                        <small class="text-muted">
+                                            Stock: ${v.quantity}
+                                            ${v.queue_qty > 0
+                                                ? ` | <span class="text-danger">Queued: ${v.queue_qty}</span>`
+                                                : ''
+                                            }
+                                        </small>
                                     </div>
                                 </div>
                             `);
@@ -143,6 +218,15 @@ jQuery(document).ready(function () {
 
                 }
             });
+        }
+    });
+
+    $(document).on('input', '.variation-qty', function () {
+        let max = parseInt($(this).attr('max')) || 0;
+        let value = parseInt($(this).val()) || 0;
+
+        if (value > max) {
+            $(this).val(max);
         }
     });
 
@@ -223,30 +307,193 @@ function updateMainQuantity() {
     $("#quantity").val(total);
 }
 
+function transferToast(message) {
+    const event = new CustomEvent("toast", {
+        detail: {
+            text: message,
+            gravity: "top",
+            position: "right",
+            className: "success",
+            duration: 5000,
+            close: true,
+        }
+    });
+
+    document.dispatchEvent(event);
+}
+
+function resetTransferPicker() {
+    $('select[name="product"]').val(null).trigger('change');
+    $('#unit').val('');
+    $('#available').val('');
+    $('#price').val('');
+    $('#quantity').val('').prop('readOnly', false);
+    $('#queue_stock').val('');
+    $('#queueQtyText').addClass('d-none').text('');
+    $('#variations_section').html('');
+    $('#imei_list').html('');
+    $('#imei_section').hide();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('transfer_submit');
+    const cartBody = document.getElementById('transfer_cart_body');
+    const cartSection = document.getElementById('transfer_cart_section');
+    const transferBtn = document.getElementById('transfer');
 
-    form.addEventListener('submit', function (e) {
-        const available = parseInt(document.getElementById('available').value, 10) || 0;
-        const quantity  = parseInt(document.getElementById('quantity').value, 10) || 0;
+    function updateCartVisibility() {
+        const hasItems = cartBody.children.length > 0;
+        cartSection.classList.toggle('d-none', !hasItems);
+        transferBtn.disabled = !hasItems;
+        $('.transfer-to-select').prop('disabled', hasItems);
+        $('.branch-select').prop('disabled', hasItems);
+    }
+
+    document.getElementById('add_to_transfer_list').addEventListener('click', function () {
+
+        const transferTo = $('.transfer-to-select').val();
+        const branch = $('.branch-select').val();
+        const productSelect = $('select[name="product"]');
+        const productId = productSelect.val();
+        const productName = productSelect.find('option:selected').text();
+
+        if (!transferTo) {
+            transferToast('Please select where to transfer to.');
+            return;
+        }
+
+        if (transferTo == '1' && !branch) {
+            transferToast('Please select a branch.');
+            return;
+        }
+
+        if (!productId) {
+            transferToast('Please select a product.');
+            return;
+        }
+
+        const existing = cartBody.querySelector('tr[data-product-id="' + productId + '"]');
+        if (existing) {
+            transferToast('This product is already in the list. Remove it first to change quantity or price.');
+            return;
+        }
+
+        const available      = parseInt(document.getElementById('available').value, 10) || 0;
+        const queue_quantity = parseInt(document.getElementById('queue_stock').value, 10) || 0;
+        const quantity        = parseInt(document.getElementById('quantity').value, 10) || 0;
+        const price           = parseFloat(document.getElementById('price').value) || 0;
+        const remainingStock  = available - queue_quantity;
+
+        if (quantity <= 0) {
+            transferToast("Quantity must be greater than 0.");
+            return;
+        }
+
+        if (!price || price <= 0) {
+            transferToast("Please enter a valid price.");
+            return;
+        }
 
         if (quantity > available) {
-            e.preventDefault();
-            const event = new CustomEvent("toast", {
-                detail: {
-                    text: "Quantity can’t be greater than stock.",
-                    gravity: "top",
-                    position: "right",
-                    className: "success",
-                    duration: 5000,
-                    close: true,
+            transferToast("Quantity can't be greater than available stock.");
+            return;
+        }
+
+        if (quantity > remainingStock) {
+            transferToast(`Only ${remainingStock} items are available after considering queued stock.`);
+            return;
+        }
+
+        const variationQty = {};
+        $('.variation-qty').each(function () {
+            const val = parseInt($(this).val(), 10) || 0;
+            if (val > 0) {
+                const match = /variation_qty\[(\d+)\]/.exec($(this).attr('name'));
+                if (match) {
+                    variationQty[match[1]] = val;
                 }
+            }
+        });
+
+        const imeis = $('.imei-checkbox:checked').map(function () { return $(this).val(); }).get();
+
+        if ($('#imei_section').is(':visible') && imeis.length !== quantity) {
+            transferToast('Please select exactly ' + quantity + ' IMEI number(s).');
+            return;
+        }
+
+        const amount = quantity * price;
+
+        const row = document.createElement('tr');
+        row.setAttribute('data-product-id', productId);
+        row.innerHTML = '<td>' + $('<div>').text(productName).html() + '</td>' +
+            '<td>' + quantity + '</td>' +
+            '<td>' + price.toFixed(2) + '</td>' +
+            '<td>' + amount.toFixed(2) + '</td>' +
+            '<td><button type="button" class="btn btn-sm btn-outline-danger remove-cart-item"><i class="ri-delete-bin-line"></i></button></td>';
+
+        $(row).data('item', {
+            product_id: productId,
+            quantity: quantity,
+            price: price,
+            imeis: imeis,
+            variation_qty: variationQty
+        });
+
+        cartBody.appendChild(row);
+        updateCartVisibility();
+        resetTransferPicker();
+    });
+
+    cartBody.addEventListener('click', function (e) {
+        const btn = e.target.closest('.remove-cart-item');
+        if (!btn) return;
+
+        btn.closest('tr').remove();
+        updateCartVisibility();
+    });
+
+    form.addEventListener('submit', function (e) {
+
+        if (cartBody.children.length === 0) {
+            e.preventDefault();
+            transferToast('Add at least one product to the transfer list.');
+            return;
+        }
+
+        // Disabled fields are excluded from form submission, so re-enable
+        // these (locked for UX once the cart has items) right before the
+        // native submit reads the form's values.
+        $('.transfer-to-select').prop('disabled', false);
+        $('.branch-select').prop('disabled', false);
+
+        form.querySelectorAll('input[data-cart-input]').forEach(function (el) { el.remove(); });
+
+        Array.from(cartBody.children).forEach(function (row, index) {
+            const item = $(row).data('item');
+
+            appendHiddenInput(form, `items[${index}][product_id]`, item.product_id);
+            appendHiddenInput(form, `items[${index}][quantity]`, item.quantity);
+            appendHiddenInput(form, `items[${index}][price]`, item.price);
+
+            item.imeis.forEach(function (imei) {
+                appendHiddenInput(form, `items[${index}][imeis][]`, imei);
             });
 
-            document.dispatchEvent(event);
-        }
-        // else { no need to call form.submit() because the form will submit naturally }
+            Object.keys(item.variation_qty).forEach(function (variationId) {
+                appendHiddenInput(form, `items[${index}][variation_qty][${variationId}]`, item.variation_qty[variationId]);
+            });
+        });
     });
+
+    function appendHiddenInput(form, name, value) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.setAttribute('data-cart-input', '1');
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    }
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -266,18 +513,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Run on typing
     searchInput.addEventListener("input", toggleClear);
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    const transferTo = document.getElementById('transfer_to');
-    const branchField = document.getElementById('branch_field');
-
-    transferTo.addEventListener('change', function() {
-        if (this.value === '1') {
-            branchField.style.display = 'block'; // show when "Branch" is selected
-        } else {
-            branchField.style.display = 'none'; // hide otherwise
-        }
-    });
 });

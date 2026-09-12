@@ -302,7 +302,7 @@
                                 </tr>
                                 <tr>
                                     <td><strong>Mobile</strong></td>
-                                    <td>: {{ $order->customer->phone }}</td>
+                                    <td>: {{ $order->customer->phone }}@if($order->customer->alt_phone != null), {{ $order->customer->alt_phone }}@endif</td>
                                 </tr>
                                 @if($order->customer->gst != null)
                                 <tr>
@@ -323,8 +323,14 @@
                                 </tr>
                                 <tr>
                                     <td><strong>Mobile</strong></td>
-                                    <td>: {{ $billing_address->phone }}</td>
+                                    <td>: {{ $billing_address->phone }}@if($billing_address->alt_phone != null), {{ $billing_address->alt_phone }}@endif</td>
                                 </tr>
+                                @if($billing_address->gst != null)
+                                <tr>
+                                    <td><strong>GSTIN</strong></td>
+                                    <td>: {{ $billing_address->gst }}</td>
+                                </tr>
+                                @endif
                             </table>
                             @endif
                         </td>

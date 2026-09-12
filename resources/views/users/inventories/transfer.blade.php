@@ -4,6 +4,16 @@
 <title>{{ config('app.name')}} | Product Transfer</title>
 @endsection
 
+@section('style')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+	.select2-dropdown { z-index: 1056; }
+</style>
+@endsection
+
 @section('body')
 	<div class="row">
 		<div class="col-xl-12">
@@ -18,6 +28,8 @@
 						</a>
 
 						<a class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#productTransfer" href=""> <i class="ri-swap-box-fill me-2"></i>Product Transfer</a>
+
+						<a class="btn btn-outline-primary btn-sm fw-semibold" href="{{route('synchronize_stock', ['company' => request()->route('company')])}}"> <i class="ri-p2p-fill me-2"></i>Synchronize Stock</a>
 					</div>
 				</div>
 
@@ -53,7 +65,7 @@
 				    		</div>
 				    	</div>
 				    	<div class="col-md-5">
-				    		<select class="form-control" name="branch" id="branch">
+				    		<select class="form-control filter-branch-select" name="branch" id="branch">
 				    			<option value=""> Select Branch </option>
 				    			@foreach($branches as $branch)
 				    			<option value="{{$branch->id}}" {{ request('branch') == $branch->id ? 'selected' : '' }}>{{$branch->user_name}}</option>
@@ -134,10 +146,10 @@
 	                <div class="modal-body">
 
 	                    <div class="row">
-	                        <div class="col-md-12">
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Branch</label>
-	                                <select class="form-control" data-choices name="branch" id="branch">
+                                <select class="form-control transfer-branch-select" name="branch" id="branch">
 	                                    <option value=""> Select </option>
 	                                    @foreach($branches as $branch)
 	                                    <option value="{{$branch->id}}">{{$branch->user_name}}</option>
@@ -145,12 +157,11 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Category</label>
-	                                <select class="form-control" data-choices name="category" id="category">
+	                                <select class="form-control" name="category" id="category">
 	                                    <option value=""> Select </option>
 	                                    @foreach($categories as $category)
 	                                    <option value="{{$category->id}}">{{$category->name}}</option>
@@ -158,9 +169,8 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Sub Category</label>
 	                                <select class="form-control" name="sub_category" id="sub_category">
@@ -168,9 +178,8 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Product</label>
 	                                <select class="form-control" name="product" id="product">
@@ -178,44 +187,59 @@
 	                                </select>
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Matrics</label>
 	                                <input type="text" id="unit" name="unit" class="form-control" disabled="">
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Available</label>
 	                                <input disabled="" type="text" id="available" name="available" class="form-control" placeholder="0">
+	                                <small id="queueQtyText" class="text-danger d-none"></small>
 	                            </div>
 	                        </div>
-	                    </div>
-	                    <div class="row">
-	                        <div class="col-md-12">
+
+	                        <div class="col-md-4">
+	                            <div class="mb-3">
+	                                <label for="choices-single-groups" class="form-label text-muted">Enter Price (Per Quantity)</label>
+	                                <input type="number" id="price" name="price" class="form-control" min="1">
+	                            </div>
+	                        </div>
+
+	                        <div class="col-md-4">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Enter Quantity</label>
 	                                <input type="number" id="quantity" name="quantity" class="form-control" min="1" readonly="">
 	                            </div>
 	                        </div>
+
+	                        <div class="col-md-4 d-flex align-items-end">
+	                            <div class="mb-3 w-100">
+	                                <button type="button" id="add_to_transfer_list" class="btn btn-outline-primary w-100">
+	                                    <i class="ri-add-line"></i> Add to List
+	                                </button>
+	                            </div>
+	                        </div>
 	                    </div>
+
+	                    <input type="hidden" name="queue_stock" id="queue_stock" >
 
 	                    @php
 		                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
 		                @endphp
-                
+
 	                    @if($user_detail->is_imei_required == 1)
-	                    <div class="row mt-3" id="imei_section" style="display:none;">
+	                    <div class="row mt-2" id="imei_section" style="display:none;">
 						    <div class="col-md-12">
 						        <label class="form-label text-muted">Select IMEI Numbers</label>
 
 						        <div id="imei_list"
 						             class="border rounded p-2 d-flex flex-wrap gap-3"
-						             style="max-height:250px; overflow-y:auto;">
+						             style="max-height:150px; overflow-y:auto;">
 						        </div>
 						    </div>
 						</div>
@@ -224,10 +248,30 @@
 						<div id="variations_section"></div>
 						<input type="hidden" name="variation_id" id="variation_id">
 
+						<div class="row mt-2 d-none" id="transfer_cart_section">
+							<div class="col-md-12">
+								<label class="form-label text-muted">Products to Transfer</label>
+								<div class="table-responsive border rounded" style="max-height:180px; overflow-y:auto;">
+									<table class="table table-bordered table-sm align-middle mb-0">
+										<thead class="bg-light-subtle">
+											<tr>
+												<th>Product</th>
+												<th>Qty</th>
+												<th>Price</th>
+												<th>Amount</th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody id="transfer_cart_body"></tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
 	                </div>
 	                <div class="modal-footer">
 	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-	                    <button type="submit" id="transfer" class="btn btn-primary">Transfer</button>
+	                    <button type="submit" id="transfer" class="btn btn-primary" disabled>Transfer All</button>
 	                </div>
 	            </form>
 	        </div>
@@ -250,7 +294,7 @@
 	                        <div class="col-md-12">
 	                            <div class="mb-3">
 	                                <label for="choices-single-groups" class="form-label text-muted">Select Branch</label>
-	                                <select class="form-control" data-choices name="branch" id="branch">
+                                <select class="form-control bulk-branch-select" name="branch" id="branch">
 	                                    <option value=""> Select </option>
 	                                    @foreach($branches as $branch)
 	                                    <option value="{{$branch->id}}">{{$branch->user_name}}</option>
@@ -263,7 +307,7 @@
 	                    @php
 		                    $user_detail = App\Models\UserDetail::where('user_id',Auth::user()->owner_id)->first();
 		                @endphp
-                
+
 	                    @if($user_detail->is_imei_required == 1)
 
 	                    <div class="row">
@@ -305,5 +349,25 @@
 @endsection
 
 @section('script')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{{asset('assets/js/users/transfer.js?' . $version)}}"></script>
+<script>
+$(document).ready(function () {
+    $('.filter-branch-select').select2({ width: '100%', placeholder: 'Select Branch' });
+    $('.transfer-branch-select').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
+    $('.bulk-branch-select').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#bulkTransfer') });
+    $('#category').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
+    $('#sub_category').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
+    $('#product').select2({ width: '100%', placeholder: 'Select', dropdownParent: $('#productTransfer') });
+});
+</script>
+<script>
+	$(document).on('input', '#price', function () {
+	    let value = parseFloat($(this).val());
+
+	    if (!isNaN(value) && value <= 0) {
+	        $(this).val(1);
+	    }
+	});
+</script>
 @endsection

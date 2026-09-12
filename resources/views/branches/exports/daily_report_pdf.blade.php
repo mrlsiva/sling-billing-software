@@ -106,7 +106,7 @@
                 </td>
                 <td>{{ $order->bill_id }}</td>
                 <td>{{ $order->bill_amount - ($order->is_refunded ? ($order->total_refund ?? 0) : 0) }}</td>
-                <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d M Y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($order->billed_on)->format('d-m-Y') }}</td>
                 <td>{{ $order->billedBy->name }}</td>
                 <td>
                     @if($order->payments->count())
@@ -124,7 +124,7 @@
                                 Refund 
                                 ₹ {{ number_format($order->total_refund, 2) }}
                                 <br>
-                                {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d M Y') }}
+                                {{ \Carbon\Carbon::parse($order->refunds->last()->refund_on)->format('d-m-Y') }}
                             </span>
                         @endif
                     @else

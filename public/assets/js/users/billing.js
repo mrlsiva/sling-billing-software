@@ -17,6 +17,9 @@ jQuery(document).ready(function () {
                         $('select[name="sub_category"]').append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
 
+                    var subCategorySelect = $('select[name="sub_category"]');
+                    if (subCategorySelect.data('select2')) subCategorySelect.select2('destroy');
+                    subCategorySelect.select2({ width: '100%', placeholder: 'Select' });
                 }
             });
         }
@@ -664,34 +667,54 @@ $(document).ready(function () {
                 type: 'GET',
                 dataType: 'json',
                 data: { phone: phone },
+
                 success: function (data) {
 
-                    //console.log(data);
-
                     $("#customer").val(data.id);
-                    $("#alt_phone").val(data.alt_phone).prop('disabled', true);
+
+                    // Alt Phone
+                    $("#alt_phone")
+                    .val(data.alt_phone)
+                    .prop('disabled', !!data.alt_phone);
+
+                    // Name & Address (always disabled)
                     $("#name").val(data.name).prop('disabled', true);
                     $("#address").val(data.address).prop('disabled', true);
-                    $("#pincode").val(data.pincode).prop('disabled', true);
 
-                    jQuery('select[name="gender"]').empty();
-                    $('select[name="gender"]').append('<option value="">' + "Select" + '</option>');
-                    if (data.gender_id == 1) {
-                        $('select[name="gender"]').append('<option value="1" selected>' + "Female" + '</option>');
-                        $('select[name="gender"]').append('<option value="2">' + "Male" + '</option>');
-                    }
-                    else if (data.gender_id == 2) {
-                        $('select[name="gender"]').append('<option value="1">' + "Female" + '</option>');
-                        $('select[name="gender"]').append('<option value="2" selected>' + "Male" + '</option>');
-                    }
-                    $('select[name="gender"]').prop('disabled', true);
-                    $("#dob").val(data.dob).prop('disabled', true);
-                    $("#gst").val(data.gst).prop('disabled', true);
+                    // Pincode
+                    $("#pincode")
+                    .val(data.pincode)
+                    .prop('disabled', !!data.pincode);
 
+                    // Gender
+                    $('select[name="gender"]').empty().append('<option value="">Select</option>');
+                    $('select[name="gender"]').append('<option value="1">Female</option>');
+                    $('select[name="gender"]').append('<option value="2">Male</option>');
+                    $('select[name="gender"]').val(data.gender_id);
+
+                    $('select[name="gender"]').prop('disabled', !!data.gender_id);
+
+                    // DOB
+                    $("#dob")
+                    .val(data.dob)
+                    .prop('disabled', !!data.dob);
+
+                    // GST
+                    $("#gst")
+                    .val(data.gst)
+                    .prop('disabled', !!data.gst);
+
+                    $("#billing_gst")
+                    .val(data.gst)
+                    .prop('disabled', !!data.gst);
                 }
             });
         }
     });
+});
+
+$('#gst').on('input', function () {
+    $('#billing_gst').val($(this).val());
 });
 
 $('#phone').on('keyup', function () {
@@ -750,19 +773,19 @@ $('#phone').on('keyup', function () {
 
                     $("#alt_phone")
                         .val(data.alt_phone)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.alt_phone);
 
                     $("#name")
                         .val(data.name)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.name);
 
                     $("#address")
                         .val(data.address)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.address);
 
                     $("#pincode")
                         .val(data.pincode)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.pincode);
 
                     $('select[name="gender"]').empty();
                     $('select[name="gender"]').append('<option value="">Select</option>');
@@ -773,17 +796,24 @@ $('#phone').on('keyup', function () {
                     } else if (data.gender_id == 2) {
                         $('select[name="gender"]').append('<option value="1">Female</option>');
                         $('select[name="gender"]').append('<option value="2" selected>Male</option>');
+                    } else {
+                        $('select[name="gender"]').append('<option value="1">Female</option>');
+                        $('select[name="gender"]').append('<option value="2">Male</option>');
                     }
 
-                    $('select[name="gender"]').prop('disabled', true);
+                    $('select[name="gender"]').prop('disabled', !!data.gender_id);
 
                     $("#dob")
                         .val(data.dob)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.dob);
 
                     $("#gst")
                         .val(data.gst)
-                        .prop('disabled', true);
+                        .prop('disabled', !!data.gst);
+
+                    $("#billing_gst")
+                        .val(data.gst)
+                        .prop('disabled', !!data.gst);
                 }
             },
 
@@ -1559,6 +1589,7 @@ function submit() {
     let billing_name = $("#billing_name").val().trim();
     let billing_address = $("#billing_address").val().trim();
     let billing_pincode = $("#billing_pincode").val().trim();
+    let billing_gst = $("#billing_gst").val().trim();
 
     // --- Customer validation ---
     if (!/^[0-9]{10}$/.test(phone)) {
@@ -1805,9 +1836,11 @@ function submit() {
     // collect billing info
     let billing_customer = {
         billing_phone: $("#billing_phone").val().trim(),
+        billing_alt_phone: $("#billing_alt_phone").val().trim(),
         billing_name: $("#billing_name").val().trim(),
         billing_address: $("#billing_address").val().trim(),
         billing_pincode: $("#billing_pincode").val().trim(),
+        billing_gst: $("#billing_gst").val().trim(),
     };
 
 

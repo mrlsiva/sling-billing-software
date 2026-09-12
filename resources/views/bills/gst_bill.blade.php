@@ -134,7 +134,7 @@
                     {{ $gst_bill_detail->product }}
                     @if(!empty($gst_bill_detail->imie))
                         <br>
-                        <small class="text-muted">IMEI: {{ $$gst_bill_detail->imie }}</small>
+                        <small class="text-muted">IMEI: {{ $gst_bill_detail->imie }}</small>
                     @endif
                 </td>
                 <td>{{$gst_bill_detail->quantity}}</td>

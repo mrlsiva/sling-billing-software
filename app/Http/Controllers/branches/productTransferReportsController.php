@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BranchProductTransferReportExport;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\ProductHistory;
@@ -60,8 +61,10 @@ class productTransferReportsController extends Controller
 
         $data = $query->get()->map(function ($item,$current_branch) {
             return [
-                'Transfer Datetime' => \Carbon\Carbon::parse($item->transfer_on)->format('d M Y H:i'),
-               'Type' => ($current_branch == 0)
+                'Transfer Datetime' => Date::dateTimeToExcel(
+                    \Carbon\Carbon::parse($item->transfer_on)
+                ),
+                'Type' => ($current_branch == 0)
                     ? ($item->to == Auth::user()->id ? 'Stock_In' : 'Stock_Out')
                     : ($item->to == $current_branch ? 'Stock_In' : 'Stock_Out'),
                 'From Branch'       => $item->transfer_from->user_name ?? '',

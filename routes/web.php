@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\notificationController;
+use App\Http\Controllers\synchronizeController;
 
 //Version
 use App\Http\Controllers\versionController;
@@ -113,6 +114,11 @@ else
                 Route::post('/my_profile/change_password',[loginController::class, 'change_password'])->name('my_profile.change_password');
 
                 Route::get('/notifications',[notificationController::class, 'notification'])->name('notification');
+
+                Route::get('/synchronize_stock',[synchronizeController::class, 'synchronize_stock'])->name('synchronize_stock');
+                Route::get('/synchronize_stock/{id}/view',[synchronizeController::class, 'synchronize_view_stock'])->name('synchronize_stock.view');
+                Route::get('/synchronize_stock/{id}/approve',[synchronizeController::class, 'approve'])->name('synchronize_stock.approve');
+                Route::get('/synchronize_stock/{id}/reject',[synchronizeController::class, 'reject'])->name('synchronize_stock.reject');
                 
                 Route::group(['middleware' => ['role:HO']], function () {
 
@@ -384,7 +390,12 @@ else
                             Route::prefix('orders')->group(function () {
                                 Route::name('order.')->group(function () {
                                     Route::get('/bills/index/{branch?}',[billController::class, 'bill'])->name('bill.index');
-                                    Route::post('/bills/edit',[billController::class, 'edit'])->name('bill.edit');
+                                    Route::get('/{id}/bills/edit',[billController::class, 'edit'])->name('bill.edit');
+                                    Route::get('/{id}/bills/history',[billController::class, 'history'])->name('bill.history');
+                                    Route::get('/bills/get_sub_category',[billController::class, 'get_sub_category'])->name('bill.get_sub_categories');
+                                    Route::get('/bills/get_product',[billController::class, 'get_product'])->name('bill.get_products');
+                                    Route::get('/bills/get_product_detail',[billController::class, 'get_product_detail'])->name('bill.get_product_detail');
+                                    Route::post('/{id}/bills/update',[billController::class, 'update'])->name('bill.update');
                                 });
                             });
 
@@ -525,6 +536,7 @@ else
                                     Route::get('/get_product_detail',[stockController::class, 'get_product_detail'])->name('get_product_detail');
                                     Route::post('/store',[stockController::class, 'store'])->name('store');
                                     Route::get('/{id}/get_bill',[stockController::class, 'get_bill'])->name('get_bill');
+                                    Route::post('/bulk_transfer',[stockController::class, 'bulk'])->name('bulk_transfer');
                                 });
                             });
 
