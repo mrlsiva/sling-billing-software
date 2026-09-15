@@ -50,8 +50,18 @@
         <table class="summary">
 
             <tr>
+                <td>Opening Balance</td>
+                <td>{{ $cash_summary['seeded'] ? '₹ ' . number_format($cash_summary['opening_balance'],2) : 'Not Set' }}</td>
+            </tr>
+
+            <tr>
                 <td>Today Sales</td>
                 <td>₹ {{ number_format($totalSales,2) }}</td>
+            </tr>
+
+            <tr>
+                <td>Monthly Sales</td>
+                <td>₹ {{ number_format($monthly_sales,2) }}</td>
             </tr>
 
             <tr>
@@ -65,6 +75,36 @@
             </tr>
 
             <tr>
+                <td>Cash</td>
+                <td>₹ {{ number_format($paymentSummary->firstWhere('payment_id', 1)?->total_amount ?? 0, 2) }}</td>
+            </tr>
+
+            <tr>
+                <td>Card</td>
+                <td>₹ {{ number_format($paymentSummary->firstWhere('payment_id', 2)?->total_amount ?? 0, 2) }}</td>
+            </tr>
+
+            <tr>
+                <td>Cheque/Bank Trf</td>
+                <td>₹ {{ number_format($paymentSummary->firstWhere('payment_id', 7)?->total_amount ?? 0, 2) }}</td>
+            </tr>
+
+            <tr>
+                <td>Paytm/Gpay/Phonepe</td>
+                <td>₹ {{ number_format($paymentSummary->firstWhere('payment_id', 3)?->total_amount ?? 0, 2) }}</td>
+            </tr>
+
+            <tr>
+                <td>Finance</td>
+                <td>₹ {{ number_format($paymentSummary->firstWhere('payment_id', 5)?->total_amount ?? 0, 2) }}</td>
+            </tr>
+
+            <tr>
+                <td>Exchange</td>
+                <td>₹ {{ number_format($paymentSummary->firstWhere('payment_id', 4)?->total_amount ?? 0, 2) }}</td>
+            </tr>
+
+            <tr>
                 <td>Credit Amount</td>
                 <td>₹ {{ number_format($credit_amount, 2) }}</td>
             </tr>
@@ -72,6 +112,28 @@
             <tr>
                 <td>Discount Amount</td>
                 <td>₹ {{ number_format($orders->sum('order_discount'), 2) }}</td>
+            </tr>
+
+            @foreach($os_recd_summary as $os)
+            <tr>
+                <td>OS Recd in {{ $os->name }}</td>
+                <td>₹ {{ number_format($os->amount, 2) }}</td>
+            </tr>
+            @endforeach
+
+            <tr>
+                <td>Expenses</td>
+                <td>₹ {{ number_format($expense_amount, 2) }}</td>
+            </tr>
+
+            <tr>
+                <td>Cash Given to HO</td>
+                <td>₹ {{ number_format($cash_summary['handover_today'], 2) }}</td>
+            </tr>
+
+            <tr>
+                <td>Cash Balance</td>
+                <td>{{ $cash_summary['seeded'] ? '₹ ' . number_format($cash_summary['closing_balance'],2) : 'Not Set' }}</td>
             </tr>
 
         </table>
@@ -194,6 +256,30 @@
             <tr>
                 <td colspan="3"><b>Total</b></td>
                 <td><b>{{ $productOutAmount }}</b></td>
+            </tr>
+        </table>
+        @endif
+
+        @if(!$expenses_list->isEmpty())
+        <h5>Expenses</h5>
+        <table>
+            <tr>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Time</th>
+            </tr>
+
+            @foreach($expenses_list as $expense)
+            <tr>
+                <td>{{ $expense->title }}</td>
+                <td>₹ {{ number_format($expense->amount, 2) }}</td>
+                <td>{{ $expense->created_at->format('h:i A') }}</td>
+            </tr>
+            @endforeach
+
+            <tr>
+                <td><b>Total</b></td>
+                <td colspan="2"><b>₹ {{ number_format($expense_amount, 2) }}</b></td>
             </tr>
         </table>
         @endif

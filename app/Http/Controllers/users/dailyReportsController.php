@@ -66,13 +66,17 @@ class dailyReportsController extends Controller
 
         $orderQuery->whereDate('billed_on', $date);
 
-        $orders = $orderQuery
-            ->with(['branch','shop','customer','billedBy','payments.payment','refunds'])
-            ->withSum('refunds as total_refund', 'refund_amount')
-            ->orderByDesc('id')
-            ->get();
+        // Day-wide aggregates computed before pagination, so they reflect the
+        // whole day's orders, not just the current page.
+        $totalSales = (clone $orderQuery)->sum('bill_amount');
+        $discount_amount = (clone $orderQuery)->sum('order_discount');
+        $allOrderIds = (clone $orderQuery)->pluck('id');
 
-        $refund = $orderQuery->where('is_refunded', 1)->pluck('id');
+        $refund = Order::where('shop_id', Auth::user()->owner_id)
+            ->when($branch != 0, fn($q) => $q->where('branch_id', $branch))
+            ->whereDate('billed_on', $date)
+            ->where('is_refunded', 1)
+            ->pluck('id');
 
         $totalRefund = 0;
 
@@ -81,19 +85,23 @@ class dailyReportsController extends Controller
                 ->sum('refund_amount');
         }
 
-        $totalSales = $orders->sum('bill_amount');
-
         $totalSales = $totalSales - $totalRefund;
-
-        $orderIds = $orders->pluck('id');
 
         $paymentSummary = OrderPaymentDetail::select(
                 'payment_id',
                 DB::raw('SUM(amount) as total_amount')
             )
-            ->whereIn('order_id', $orderIds)
+            ->whereIn('order_id', $allOrderIds)
             ->groupBy('payment_id')
+            ->with('payment')
             ->get();
+
+        $orders = $orderQuery
+            ->with(['branch','shop','customer','billedBy','payments.payment','refunds'])
+            ->withSum('refunds as total_refund', 'refund_amount')
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
 
         /*
         |--------------------------------------------------
@@ -200,7 +208,8 @@ class dailyReportsController extends Controller
             'productInAmount',
             'productOutAmount',
             'paymentSummary',
-            'credit_amount'
+            'credit_amount',
+            'discount_amount'
         ));
     }
 

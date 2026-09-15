@@ -22,11 +22,12 @@
 					<div>
 						<p class="card-title">All Credit</p>
 					</div>
-					@if(!request()->is('*credits/index'))
 					<div>
-						<a href="{{route('branch.report.daily', ['company' => request()->route('company')])}}" class="btn btn-outline-primary btn-sm fw-semibold">Back</a>
+						<a href="{{route('branch.credit.history', ['company' => request()->route('company')])}}" class="btn btn-outline-primary btn-sm fw-semibold"><i class="ri-history-line"></i> History</a>
+						@if(!request()->is('*credits/index'))
+							<a href="{{route('branch.report.daily', ['company' => request()->route('company')])}}" class="btn btn-outline-primary btn-sm fw-semibold">Back</a>
+						@endif
 					</div>
-					@endif
 				</div>
 
 				@if ($errors->any())
@@ -186,6 +187,11 @@
 	                    </div>
 
 	                    <div class="mb-2">
+	                        <label>Remaining Amount</label>
+	                        <input type="text" id="remaining_amount" class="form-control fw-bold text-danger" readonly>
+	                    </div>
+
+	                    <div class="mb-2">
 	                        <label>Payment Method</label>
 	                        <select name="payment_id" id="payment_id" class="form-control" required>
 	                            <option value="">Select</option>
@@ -218,7 +224,11 @@
 	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 	<script>
 	$(document).ready(function () {
-		$('#payment_id').select2({ width: '100%', placeholder: 'Select' });
+		$('#payment_id').select2({
+			width: '100%',
+			placeholder: 'Select',
+			dropdownParent: $('#payCreditModal')
+		});
 	});
 	</script>
 	<script>
@@ -268,6 +278,7 @@
 		    $('#credit_id').val(creditId);
 		    $('#customer_name').val(name);
 		    $('#invoice').val(invoice);
+		    $('#remaining_amount').val('₹ ' + maxAmount.toFixed(2));
 		    $('#amount').val('');
 		    $('#amount-error').addClass('d-none');
 

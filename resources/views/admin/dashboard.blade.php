@@ -50,6 +50,10 @@
                     </div>
                 @endforeach
             </div>
+            @if($shops->isEmpty())
+                @include('no-data')
+            @endif
+            {{ $shops->links('pagination::bootstrap-5') }}
         </div>
     </div>
 @endsection

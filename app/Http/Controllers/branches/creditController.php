@@ -52,6 +52,34 @@ class creditController extends Controller
         return response()->json($credit->creditPayments);
     }
 
+    public function history(Request $request)
+    {
+        $payments = CreditPayment::whereHas('credit.order_payment_detail.order', function ($q) use ($request) {
+
+            $q->where('shop_id', Auth::user()->parent_id)
+              ->where('branch_id', Auth::user()->id);
+
+            if ($request->filled('customer')) {
+                $search = $request->customer;
+
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('bill_id', 'like', "%{$search}%")
+                       ->orWhereHas('customer', function ($q3) use ($search) {
+                           $q3->where('name', 'like', "%{$search}%")
+                              ->orWhere('phone', 'like', "%{$search}%");
+                       });
+                });
+            }
+
+        })
+        ->with(['payment', 'credit.order_payment_detail.order.customer'])
+        ->orderByDesc('paid_on')
+        ->paginate(10)
+        ->withQueryString();
+
+        return view('branches.credit.history', compact('payments'));
+    }
+
     public function store(Request $request,$company)
     {
         $request->validate([

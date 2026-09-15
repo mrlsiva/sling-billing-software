@@ -156,7 +156,7 @@
 						    	<div class="card border shadow-sm">
 						    		<div class="card-body text-center">
 						    			<h6 class="text-muted">Discount Amount</h6>
-						    			<h4 class="text-warning">₹ {{ number_format($orders->sum('order_discount'), 2) }} </h4>
+						    			<h4 class="text-warning">₹ {{ number_format($discount_amount, 2) }} </h4>
 						    		</div>
 						    	</div>
 						    </div>
@@ -403,6 +403,7 @@
                                 @include('no-data')
                             @endif
                         </div>
+                        {{ $orders->links('pagination::bootstrap-5') }}
                         @endif
 
                         @if(!$productIn->isEmpty())

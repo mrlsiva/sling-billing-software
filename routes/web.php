@@ -41,6 +41,7 @@ use App\Http\Controllers\users\productTransferReportController;
 use App\Http\Controllers\users\salesReportController;
 use App\Http\Controllers\users\creditsController;
 use App\Http\Controllers\users\discountController;
+use App\Http\Controllers\users\expenseController as HoExpenseController;
 
 
 use App\Http\Controllers\branches\customerController;
@@ -59,6 +60,8 @@ use App\Http\Controllers\branches\productTransferReportsController;
 use App\Http\Controllers\branches\salesReportsController;
 use App\Http\Controllers\branches\creditController;
 use App\Http\Controllers\branches\orderDiscountController;
+use App\Http\Controllers\branches\expenseController;
+use App\Http\Controllers\branches\cashHandoverController;
 use App\Http\Controllers\DemoRequestController;
 
 Route::get('/clear', function() {
@@ -265,6 +268,15 @@ else
                             Route::get('/{id}/get_bill',[billingsController::class, 'get_bill'])->name('get_bill');
                             Route::get('/{id}/view_bill',[billingsController::class, 'view_bill'])->name('view_bill');
                             Route::get('/get_imei_product',[billingsController::class, 'get_imei_product'])->name('get_imei_product');
+                        });
+                    });
+
+                    Route::prefix('expenses')->group(function () {
+                        Route::name('expense.')->group(function () {
+
+                            Route::get('/index',[HoExpenseController::class, 'index'])->name('index');
+                            Route::post('/store',[HoExpenseController::class, 'store'])->name('store');
+                            Route::post('/{id}/delete',[HoExpenseController::class, 'destroy'])->name('destroy');
                         });
                     });
 
@@ -516,6 +528,25 @@ else
                                 });
                             });
 
+                            Route::prefix('expenses')->group(function () {
+                                Route::name('expense.')->group(function () {
+
+                                    Route::get('/index',[expenseController::class, 'index'])->name('index');
+                                    Route::post('/store',[expenseController::class, 'store'])->name('store');
+                                    Route::post('/{id}/delete',[expenseController::class, 'destroy'])->name('destroy');
+                                });
+                            });
+
+                            Route::prefix('cash_handovers')->group(function () {
+                                Route::name('cash_handover.')->group(function () {
+
+                                    Route::get('/index',[cashHandoverController::class, 'index'])->name('index');
+                                    Route::post('/store',[cashHandoverController::class, 'store'])->name('store');
+                                    Route::post('/{id}/delete',[cashHandoverController::class, 'destroy'])->name('destroy');
+                                    Route::post('/seed',[cashHandoverController::class, 'storeSeed'])->name('seed');
+                                });
+                            });
+
                             Route::prefix('products')->group(function () {
                                 Route::name('product.')->group(function () {
 
@@ -641,6 +672,8 @@ else
                                      Route::get('/index',[creditController::class, 'index'])->name('.index');
                                 });
                             });
+
+                            Route::get('/credits/history', [creditController::class, 'history'])->name('credit.history');
 
                             Route::get('/credits/{date}',[creditController::class, 'credit'])->name('credit');
                             Route::get('/credits/payments/{id}', [creditController::class, 'getCreditPayments']);

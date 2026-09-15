@@ -10,7 +10,12 @@ class adminController extends Controller
 {
     public function dashboard(Request $request)
     {
-        $shops = User::where([['role_id',2],['is_active',1]])->orderBy('id','desc')->get();
+        $shops = User::where([['role_id',2],['is_active',1]])
+            ->with('user_detail')
+            ->orderBy('id','desc')
+            ->paginate(12)
+            ->withQueryString();
+
         return view('admin.dashboard',compact('shops'));
         
     }

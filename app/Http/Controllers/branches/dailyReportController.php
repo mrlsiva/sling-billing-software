@@ -11,8 +11,11 @@ use App\Models\ProductHistory;
 use App\Models\OrderPaymentDetail;
 use Illuminate\Http\Request;
 use App\Models\Refund;
+use App\Models\Expense;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\Payment;
+use App\Services\CashLedgerService;
 use App\Traits\Log;
 use Carbon\Carbon;
 use DB;
@@ -21,7 +24,7 @@ class dailyReportController extends Controller
 {
     use Log;
 
-    public function daily(Request $request, $company)
+    public function daily(Request $request, $company, CashLedgerService $cashLedger)
     {
         $date = $request->date ?? Carbon::today()->toDateString();
 
@@ -50,6 +53,19 @@ class dailyReportController extends Controller
 
         $totalSales = $totalSales - $totalRefund;
 
+        $discount_amount = (clone $orderQuery)->sum('order_discount');
+
+        // Monthly Sales (calendar month containing the selected date)
+        $monthly_sales = $this->calculateMonthlySales($date);
+
+        // Day-wide payment mode summary (independent of pagination below)
+        $allOrderIds = (clone $orderQuery)->pluck('id');
+        $paymentSummary = OrderPaymentDetail::select('payment_id', DB::raw('SUM(amount) as total_amount'))
+            ->whereIn('order_id', $allOrderIds)
+            ->groupBy('payment_id')
+            ->with('payment')
+            ->get();
+
         $orders = $orderQuery
             ->with([
                 'branch',
@@ -60,7 +76,8 @@ class dailyReportController extends Controller
             ])
             ->withSum('refunds as total_refund', 'refund_amount')
             ->orderByDesc('id')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         /*
         |--------------------------------------------------
@@ -92,22 +109,43 @@ class dailyReportController extends Controller
             return ($item->product->price ?? 0) * $item->quantity;
         });
 
-        //Credit 
+        //Credit
         $order_id = Order::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('billed_on', $date)->pluck('id');
         $credit_amount = OrderPaymentDetail::whereIn('order_id',$order_id)->where('payment_id', 6)->sum('amount');
+
+        //Expenses
+        $expensesQuery = Expense::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('created_at', $date);
+        $expense_amount = (clone $expensesQuery)->sum('amount');
+        $expenses_list = $expensesQuery->orderBy('id', 'desc')->paginate(10, ['*'], 'expenses_page')->withQueryString();
+
+        //Cash Ledger (Opening Balance / Cash Balance / Cash Given to HO)
+        $cash_summary = $cashLedger->summary(Auth::user()->parent_id, Auth::user()->id, $date);
+
+        //Outstanding dues collected today via UPI (Cash is already in cash_summary)
+        $os_recd_summary = $cashLedger->collectedByAllModes(Auth::user()->parent_id, Auth::user()->id, $date);
+
+        $paymentModes = Payment::where('id', '!=', 6)->where('is_active', 1)->get();
 
         return view('branches.reports.daily', compact(
             'orders',
             'totalSales',
+            'monthly_sales',
             'productIn',
             'productOut',
             'productInAmount',
             'productOutAmount',
-            'credit_amount'
+            'expenses_list',
+            'os_recd_summary',
+            'paymentModes',
+            'credit_amount',
+            'expense_amount',
+            'cash_summary',
+            'discount_amount',
+            'paymentSummary'
         ));
     }
 
-    public function download_excel(Request $request, $company)
+    public function download_excel(Request $request, $company, CashLedgerService $cashLedger)
     {
         $date = $request->date ?? Carbon::today()->toDateString();
 
@@ -155,9 +193,25 @@ class dailyReportController extends Controller
         $productInAmount = $productIn->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
         $productOutAmount = $productOut->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
 
-        //Credit 
+        //Credit
         $order_id = Order::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('billed_on', $date)->pluck('id');
         $credit_amount = OrderPaymentDetail::whereIn('order_id',$order_id)->where('payment_id', 6)->sum('amount');
+
+        //Expenses
+        $expense_amount = Expense::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('created_at', $date)->sum('amount');
+        $expenses_list = Expense::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('created_at', $date)->orderBy('id', 'desc')->get();
+
+        //Cash Ledger (Opening Balance / Cash Balance / Cash Given to HO)
+        $cash_summary = $cashLedger->summary(Auth::user()->parent_id, Auth::user()->id, $date);
+
+        //Monthly Sales
+        $monthly_sales = $this->calculateMonthlySales($date);
+
+        //Outstanding dues collected today, broken down by every payment mode
+        $os_recd_summary = $cashLedger->collectedByAllModes(Auth::user()->parent_id, Auth::user()->id, $date);
+
+        //Payment mode breakdown, built from the already-loaded orders (no extra query)
+        $paymentSummary = $this->buildPaymentSummary($orders);
 
         return Excel::download(
             new BranchDailyReportExport(
@@ -168,14 +222,22 @@ class dailyReportController extends Controller
                 $productOutAmount,
                 $totalSales,
                 $date,
-                $credit_amount
+                $credit_amount,
+                $expense_amount,
+                $cash_summary,
+                [
+                    'monthly_sales' => $monthly_sales,
+                    'os_recd_summary' => $os_recd_summary,
+                    'paymentSummary' => $paymentSummary,
+                    'expenses_list' => $expenses_list,
+                ]
 
             ),
             'daily_report_' . now()->format('d-m-Y_h-i A') . '.xlsx'
         );
     }
 
-    public function download_pdf(Request $request)
+    public function download_pdf(Request $request, CashLedgerService $cashLedger)
     {
         $date = $request->date ?? Carbon::today()->toDateString();
 
@@ -216,20 +278,75 @@ class dailyReportController extends Controller
         $productInAmount = $productIn->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
         $productOutAmount = $productOut->sum(fn($i) => ($i->product->price ?? 0) * $i->quantity);
 
-        //Credit 
+        //Credit
         $order_id = Order::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('billed_on', $date)->pluck('id');
         $credit_amount = OrderPaymentDetail::whereIn('order_id',$order_id)->where('payment_id', 6)->sum('amount');
+
+        //Expenses
+        $expense_amount = Expense::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('created_at', $date)->sum('amount');
+        $expenses_list = Expense::where('shop_id', Auth::user()->parent_id)->where('branch_id', Auth::user()->id)->whereDate('created_at', $date)->orderBy('id', 'desc')->get();
+
+        //Cash Ledger (Opening Balance / Cash Balance / Cash Given to HO)
+        $cash_summary = $cashLedger->summary(Auth::user()->parent_id, Auth::user()->id, $date);
+
+        //Monthly Sales
+        $monthly_sales = $this->calculateMonthlySales($date);
+
+        //Outstanding dues collected today, broken down by every payment mode
+        $os_recd_summary = $cashLedger->collectedByAllModes(Auth::user()->parent_id, Auth::user()->id, $date);
+
+        //Payment mode breakdown, built from the already-loaded orders (no extra query)
+        $paymentSummary = $this->buildPaymentSummary($orders);
 
         $pdf = Pdf::loadView('branches.exports.daily_report_pdf', compact(
             'orders',
             'totalSales',
+            'monthly_sales',
             'productIn',
             'productOut',
             'productInAmount',
             'productOutAmount',
-            'date','credit_amount'
+            'expenses_list',
+            'os_recd_summary',
+            'paymentSummary',
+            'date','credit_amount','expense_amount','cash_summary'
         ))->setPaper('a4','landscape');
 
         return $pdf->download('daily_report_' . now()->format('d-m-Y_h-i A') . '.pdf');
+    }
+
+    private function calculateMonthlySales($date)
+    {
+        $monthStart = Carbon::parse($date)->startOfMonth()->toDateString();
+        $monthEnd = Carbon::parse($date)->endOfMonth()->toDateString();
+
+        $monthlyOrderQuery = Order::where('shop_id', Auth::user()->parent_id)
+            ->where('branch_id', Auth::user()->id)
+            ->whereDate('billed_on', '>=', $monthStart)
+            ->whereDate('billed_on', '<=', $monthEnd);
+
+        $monthlySales = (clone $monthlyOrderQuery)->sum('bill_amount');
+
+        $monthlyRefundIds = (clone $monthlyOrderQuery)->where('is_refunded', 1)->pluck('id');
+
+        if ($monthlyRefundIds->isNotEmpty()) {
+            $monthlySales -= Refund::whereIn('order_id', $monthlyRefundIds)->sum('refund_amount');
+        }
+
+        return $monthlySales;
+    }
+
+    private function buildPaymentSummary($orders)
+    {
+        return $orders->flatMap(fn($order) => $order->payments)
+            ->groupBy('payment_id')
+            ->map(function ($group) {
+                return (object) [
+                    'payment_id' => $group->first()->payment_id,
+                    'total_amount' => $group->sum('amount'),
+                    'payment' => $group->first()->payment,
+                ];
+            })
+            ->values();
     }
 }
