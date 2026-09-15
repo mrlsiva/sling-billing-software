@@ -14,4 +14,9 @@ class CreditPayment extends Model
     {
         return $this->belongsTo('App\Models\Payment','payment_id');
     }
+
+    public function credit()
+    {
+        return $this->belongsTo(Credit::class, 'credit_id');
+    }
 }

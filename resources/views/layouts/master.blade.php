@@ -232,6 +232,15 @@
                                 </a>
                             </li>
 
+                            <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/expenses/*') ? 'active' : '' }}">
+                                <a class="menu-link" href="{{route('expense.index', ['company' => request()->route('company')])}}">
+                                    <span class="nav-icon">
+                                        <i class="ri-wallet-3-line"></i>
+                                    </span>
+                                    <span class="nav-text"> Expenses </span>
+                                </a>
+                            </li>
+
                         @endif
 
                         <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/reports/*') ? 'active' : '' }}">
@@ -377,6 +386,15 @@
                                     <i class="ri-shopping-basket-line"></i>
                                 </span>
                                 <span class="nav-text"> Orders </span>
+                            </a>
+                        </li>
+
+                        <li class="menu-item {{ request()->is(Auth::user()->slug_name . '/branches/expenses/*') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{route('branch.expense.index', ['company' => request()->route('company')])}}">
+                                <span class="nav-icon">
+                                    <i class="ri-wallet-3-line"></i>
+                                </span>
+                                <span class="nav-text"> Expenses </span>
                             </a>
                         </li>
 
