@@ -286,6 +286,47 @@
                 </div>
                 <div class="card">
                     <div class="card-header pb-0">
+                        <h4 class="card-title">Payment Gateway (Online Orders)</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="payment_gateway" class="form-label">Gateway</label>
+                                    <select id="payment_gateway" name="payment_gateway" class="form-control">
+                                        <option value="">None</option>
+                                        <option value="razorpay" {{ old('payment_gateway') == 'razorpay' ? 'selected' : '' }}>Razorpay</option>
+                                        <option value="payu" {{ old('payment_gateway') == 'payu' ? 'selected' : '' }}>PayU</option>
+                                        <option value="stripe" {{ old('payment_gateway') == 'stripe' ? 'selected' : '' }}>Stripe</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="payment_gateway_key_id" class="form-label">Key ID</label>
+                                    <input type="text" id="payment_gateway_key_id" name="payment_gateway_key_id" class="form-control" placeholder="e.g. rzp_test_xxxxxxxx" value="{{old('payment_gateway_key_id')}}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="payment_gateway_key_secret" class="form-label">Key Secret</label>
+                                    <input type="password" id="payment_gateway_key_secret" name="payment_gateway_key_secret" class="form-control" placeholder="Enter Key Secret" autocomplete="new-password">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="payment_gateway_webhook_secret" class="form-label">Webhook Secret</label>
+                                    <input type="password" id="payment_gateway_webhook_secret" name="payment_gateway_webhook_secret" class="form-control" placeholder="Enter Webhook Secret (optional for now)" autocomplete="new-password">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <small class="text-muted">Key ID &amp; Key Secret are required only if a gateway is selected. Values are stored encrypted and never shown again once saved.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header pb-0">
                         <h4 class="card-title">Bank details</h4>
                     </div>
                     <div class="card-body">

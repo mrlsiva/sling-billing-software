@@ -17,6 +17,10 @@ Route::middleware(['is_url_valid'])->group(function () {
 		Route::get('/sub_categories', 'App\Http\Controllers\ecommerce\productController@sub_categories');
 		Route::get('/products', 'App\Http\Controllers\ecommerce\productController@list');
 
+		// Public: Razorpay calls this directly, verified via webhook signature
+		// (not Sanctum) since it's an external server-to-server call.
+		Route::post('/webhooks/razorpay', 'App\Http\Controllers\ecommerce\paymentController@webhook');
+
 		Route::middleware('auth:sanctum')->group(function () {
 
 			Route::prefix('profile')->group(function () {
@@ -28,6 +32,7 @@ Route::middleware(['is_url_valid'])->group(function () {
 			Route::prefix('orders')->group(function () {
 
 				Route::post('/store', 'App\Http\Controllers\ecommerce\orderController@store');
+				Route::post('/checkout', 'App\Http\Controllers\ecommerce\paymentController@checkout');
 				Route::get('/list', 'App\Http\Controllers\ecommerce\orderController@list');
 				Route::get('/view/{id}', 'App\Http\Controllers\ecommerce\orderController@view');
 			});

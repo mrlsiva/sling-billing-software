@@ -68,7 +68,12 @@ class shopController extends Controller
             'ifsc_code' => 'nullable|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/i',
             'bill_type' => 'required',
             'payment_method' => 'required',
-        ], 
+
+            'payment_gateway' => 'nullable|in:razorpay,payu,stripe',
+            'payment_gateway_key_id' => 'required_with:payment_gateway',
+            'payment_gateway_key_secret' => 'required_with:payment_gateway',
+            'payment_gateway_webhook_secret' => 'nullable|string',
+        ],
         [
             'logo.required' => 'Logo is required.',
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
@@ -106,6 +111,9 @@ class shopController extends Controller
             'ifsc_code.regex' => 'Invalid IFSC code format.',
             'bill_type.required' => 'Bill Type is required.',
             'payment_method.required' => 'Payment Method is required.',
+
+            'payment_gateway_key_id.required_with' => 'Key ID is required when a payment gateway is selected.',
+            'payment_gateway_key_secret.required_with' => 'Key Secret is required when a payment gateway is selected.',
         ]);
 
         DB::beginTransaction();
@@ -204,10 +212,14 @@ class shopController extends Controller
             'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
             'able_to_delete_order' => $request->has('able_to_delete_order') ? 1 : 0,
             'able_to_round_price' => $request->has('able_to_round_price') ? 1 : 0,
+            'payment_gateway' => $request->payment_gateway,
+            'payment_gateway_key_id' => $request->payment_gateway_key_id,
+            'payment_gateway_key_secret' => $request->payment_gateway_key_secret,
+            'payment_gateway_webhook_secret' => $request->payment_gateway_webhook_secret,
         ]);
 
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Shop Create','App/Models/UserDetail','user_details',$user_detail->id,'Insert',null,$request,'Success','Shop Created Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Shop Create','App/Models/UserDetail','user_details',$user_detail->id,'Insert',null,json_encode($request->except(['payment_gateway_key_secret','payment_gateway_webhook_secret'])),'Success','Shop Created Successfully');
 
         $bank_detail = BankDetail::create([
             'user_id' => $user->id,
@@ -319,7 +331,12 @@ class shopController extends Controller
             'bill_type' => 'required',
             'payment_method' => 'required',
             'payment_date'   => 'required|date|before_or_equal:today',
-        ], 
+
+            'payment_gateway' => 'nullable|in:razorpay,payu,stripe',
+            'payment_gateway_key_id' => 'required_with:payment_gateway',
+            'payment_gateway_key_secret' => 'nullable|string',
+            'payment_gateway_webhook_secret' => 'nullable|string',
+        ],
         [
             'logo.mimes' => 'Logo must be a JPG, JPEG or PNG file.',
             'logo.max' => 'Logo size must not exceed 2MB.',
@@ -352,6 +369,8 @@ class shopController extends Controller
             'confirm_account_number.same' => 'Account numbers do not match.',
             'ifsc_code.regex' => 'Invalid IFSC code format.',
             'bill_type.required' => 'Bill Type is required.',
+
+            'payment_gateway_key_id.required_with' => 'Key ID is required when a payment gateway is selected.',
         ]);
 
         $user = User::where('id',$request->id)->first();
@@ -445,11 +464,24 @@ class shopController extends Controller
             'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
             'able_to_delete_order' => $request->has('able_to_delete_order') ? 1 : 0,
             'able_to_round_price' => $request->has('able_to_round_price') ? 1 : 0,
-            
+            'payment_gateway' => $request->payment_gateway,
+            'payment_gateway_key_id' => $request->payment_gateway_key_id,
+
         ]);
 
+        // Only overwrite the secrets if the admin actually typed new ones —
+        // same pattern as password above, so re-saving the form doesn't
+        // require re-entering them every time.
+        if ($request->payment_gateway_key_secret) {
+            $user_detail->update(['payment_gateway_key_secret' => $request->payment_gateway_key_secret]);
+        }
+
+        if ($request->payment_gateway_webhook_secret) {
+            $user_detail->update(['payment_gateway_webhook_secret' => $request->payment_gateway_webhook_secret]);
+        }
+
         //Log
-        $this->addToLog($this->unique(),Auth::user()->id,'Branch Update','App/Models/UserDetail','user_details',$user_detail->id,'Update',null,$request,'Success','Branch Updated Successfully');
+        $this->addToLog($this->unique(),Auth::user()->id,'Branch Update','App/Models/UserDetail','user_details',$user_detail->id,'Update',null,json_encode($request->except(['payment_gateway_key_secret','payment_gateway_webhook_secret'])),'Success','Branch Updated Successfully');
 
         $bank_detail->update([
             'name' => $request->bank,
