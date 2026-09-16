@@ -12,6 +12,11 @@
                 <div>
                     <p class="card-title">Order History</p>
                 </div>
+                <div>
+                    <a href="{{route('branch.order.index', ['company' => request()->route('company')])}}" class="btn btn-sm btn-outline-secondary">
+                        <i class="ri-arrow-left-line me-1"></i> Back
+                    </a>
+                </div>
             </div>
             <div class="card-body pt-2 ">
 

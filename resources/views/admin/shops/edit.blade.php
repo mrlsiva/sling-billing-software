@@ -302,7 +302,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" id="paymentGatewaySection" {{ $user->able_to_login == 1 ? '' : 'hidden' }}>
                     <div class="card-header pb-0">
                         <h4 class="card-title">Payment Gateway (Online Orders)</h4>
                     </div>
@@ -431,6 +431,25 @@
 $(document).ready(function () {
     $('#payment_method').select2({ width: '100%', placeholder: 'Choose Payment' });
     $('#bill_type').select2({ width: '100%', placeholder: 'Choose Bill Type' });
+});
+</script>
+<script>
+// Payment Gateway only makes sense for a shop that can actually log in.
+document.addEventListener('DOMContentLoaded', function () {
+    let ableToLogin = document.getElementById('able_to_login');
+    let gatewaySection = document.getElementById('paymentGatewaySection');
+    let gatewayInputs = gatewaySection.querySelectorAll('input, select');
+
+    function toggleGatewaySection() {
+        let enabled = ableToLogin.checked;
+        gatewaySection.hidden = !enabled;
+        // Disabled fields are excluded from form submission, so a shop that
+        // can't log in never silently saves/keeps gateway config either.
+        gatewayInputs.forEach(function (el) { el.disabled = !enabled; });
+    }
+
+    toggleGatewaySection();
+    ableToLogin.addEventListener('change', toggleGatewaySection);
 });
 </script>
 @endsection

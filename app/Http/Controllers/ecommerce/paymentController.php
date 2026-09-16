@@ -250,7 +250,12 @@ class paymentController extends Controller
                 'billed_on' => Carbon::now(),
                 'is_online_order' => 1,
                 'is_paid' => 1,
-                'status' => 0,
+                // Gateway payment already confirms + "approves" this order —
+                // starting at status 0 would put it through the admin's manual
+                // approve-and-enter-payment screen, which would try to
+                // decrement stock a second time (we already did it below) and
+                // fail with "Insufficient stock" once an item sells out.
+                'status' => 1,
             ]);
 
             $billingData = $pending->billing_customer;
@@ -284,7 +289,7 @@ class paymentController extends Controller
                     'imei' => isset($item['imeis']) ? implode(',', $item['imeis']) : null,
                     'size_id' => $variation?->size_id,
                     'colour_id' => $variation?->colour_id,
-                    'status' => 0,
+                    'status' => 1, // Approved — payment is already confirmed
                 ]);
 
                 // Stock is decremented only now — payment is confirmed.
