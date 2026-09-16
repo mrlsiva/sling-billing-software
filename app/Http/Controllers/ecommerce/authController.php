@@ -25,7 +25,7 @@ class authController extends Controller
             'name' => 'required|string|max:50',
             'email' => 'nullable|email',
 
-            'phone' => 'required','digits:10','different:alt_phone',
+            'phone' => 'required|digits:10|different:alt_phone',
 
             'alt_phone' => 'nullable|digits:10|different:phone',
             'address' => 'required|string|max:200',
