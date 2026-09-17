@@ -212,6 +212,7 @@ class shopController extends Controller
             'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
             'able_to_delete_order' => $request->has('able_to_delete_order') ? 1 : 0,
             'able_to_round_price' => $request->has('able_to_round_price') ? 1 : 0,
+            'online_paid_order_confirmation' => $request->has('online_paid_order_confirmation') ? 1 : 0,
             'payment_gateway' => $request->payment_gateway,
             'payment_gateway_key_id' => $request->payment_gateway_key_id,
             'payment_gateway_key_secret' => $request->payment_gateway_key_secret,
@@ -274,6 +275,7 @@ class shopController extends Controller
 
     public function update(Request $request)
     {
+        //return $request;
         $ownerId = $request->id;
 
         $request->validate([
@@ -464,6 +466,7 @@ class shopController extends Controller
             'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
             'able_to_delete_order' => $request->has('able_to_delete_order') ? 1 : 0,
             'able_to_round_price' => $request->has('able_to_round_price') ? 1 : 0,
+            'online_paid_order_confirmation' => $request->has('online_paid_order_confirmation') ? 1 : 0,
             'payment_gateway' => $request->payment_gateway,
             'payment_gateway_key_id' => $request->payment_gateway_key_id,
 
