@@ -23,9 +23,11 @@ use App\Models\User;
 use App\Imports\CategoryImport;
 use App\Imports\SubCategoryImport;
 use App\Imports\ProductImport;
+use App\Imports\AdminCatalogImport;
 use App\Exports\CategoriesExport;
 use App\Exports\SubCategoryExport;
 use App\Exports\ProductExport;
+use App\Exports\CatalogRowsExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class shopSetupController extends Controller
@@ -220,14 +222,6 @@ class shopSetupController extends Controller
 
         $plan = $this->currentDemoDraft($shop);
         $action = $request->input('action');
-        $productRules = [
-            'name' => 'required|string|max:100',
-            'code' => 'required|string|max:50',
-            'price' => 'required|numeric|min:1',
-            'tax' => ['required', Rule::in($plan['taxes'])],
-            'unit' => ['required', Rule::in($plan['units'])],
-            'stock' => 'required|integer|min:0|max:100000',
-        ];
 
         if ($action === 'reset') {
             $plan = $this->demoPlan($shop);
@@ -239,82 +233,6 @@ class shopSetupController extends Controller
             $data = $request->validate(['i' => 'required|integer']);
             abort_unless(isset($plan['staff'][$data['i']]), 404, 'That staff is no longer in the demo preview. Refresh the page.');
             array_splice($plan['staff'], $data['i'], 1);
-        } elseif ($action === 'add_category') {
-            $data = $request->validate(['name' => 'required|string|max:100']);
-            $plan['categories'][] = ['name' => $data['name'], 'sub_categories' => []];
-        } elseif ($action === 'add_sub_category') {
-            $data = $request->validate(['c' => 'required|integer', 'name' => 'required|string|max:100']);
-            $this->abortUnlessIndex($plan, $data['c']);
-            $plan['categories'][$data['c']]['sub_categories'][] = ['name' => $data['name'], 'products' => []];
-        } elseif ($action === 'delete_category') {
-            $data = $request->validate(['c' => 'required|integer']);
-            $this->abortUnlessIndex($plan, $data['c']);
-            array_splice($plan['categories'], $data['c'], 1);
-        } elseif ($action === 'delete_sub_category') {
-            $data = $request->validate(['c' => 'required|integer', 's' => 'required|integer']);
-            $this->abortUnlessIndex($plan, $data['c'], $data['s']);
-            array_splice($plan['categories'][$data['c']]['sub_categories'], $data['s'], 1);
-        } elseif ($action === 'add_product') {
-            $data = $request->validate(array_merge(['c' => 'required|integer', 's' => 'required|integer'], $productRules));
-            $this->abortUnlessIndex($plan, $data['c'], $data['s']);
-            $this->assertCodeFree($plan, $data['code']);
-            $plan['categories'][$data['c']]['sub_categories'][$data['s']]['products'][] = $this->productFromInput($data);
-        } elseif ($action === 'update_all') {
-            $data = $request->validate([
-                'categories' => 'required|array',
-                'categories.*.name' => 'required|string|max:100',
-                'categories.*.sub_categories' => 'array',
-                'categories.*.sub_categories.*.name' => 'required|string|max:100',
-                'categories.*.sub_categories.*.products' => 'array',
-                'categories.*.sub_categories.*.products.*.name' => 'required|string|max:100',
-                'categories.*.sub_categories.*.products.*.code' => 'required|string|max:50',
-                'categories.*.sub_categories.*.products.*.price' => 'required|numeric|min:1',
-                'categories.*.sub_categories.*.products.*.tax' => ['required', Rule::in($plan['taxes'])],
-                'categories.*.sub_categories.*.products.*.unit' => ['required', Rule::in($plan['units'])],
-                'categories.*.sub_categories.*.products.*.stock' => 'required|integer|min:0|max:100000',
-            ]);
-
-            // Every code must be unique across the whole submitted set.
-            $seenCodes = [];
-            foreach ($data['categories'] as $categoryInput) {
-                foreach ($categoryInput['sub_categories'] ?? [] as $subInput) {
-                    foreach ($subInput['products'] ?? [] as $productInput) {
-                        $codeKey = strtolower(trim($productInput['code']));
-                        if (isset($seenCodes[$codeKey])) {
-                            throw \Illuminate\Validation\ValidationException::withMessages([
-                                'code' => "Product code {$productInput['code']} is used more than once.",
-                            ]);
-                        }
-                        $seenCodes[$codeKey] = true;
-                    }
-                }
-            }
-
-            // Only edits existing items by position; add/remove go through their own actions.
-            foreach ($data['categories'] as $ci => $categoryInput) {
-                if (!isset($plan['categories'][$ci])) {
-                    continue;
-                }
-                $plan['categories'][$ci]['name'] = $categoryInput['name'];
-
-                foreach ($categoryInput['sub_categories'] ?? [] as $si => $subInput) {
-                    if (!isset($plan['categories'][$ci]['sub_categories'][$si])) {
-                        continue;
-                    }
-                    $plan['categories'][$ci]['sub_categories'][$si]['name'] = $subInput['name'];
-
-                    foreach ($subInput['products'] ?? [] as $pi => $productInput) {
-                        if (!isset($plan['categories'][$ci]['sub_categories'][$si]['products'][$pi])) {
-                            continue;
-                        }
-                        $plan['categories'][$ci]['sub_categories'][$si]['products'][$pi] = $this->productFromInput($productInput);
-                    }
-                }
-            }
-        } elseif ($action === 'delete_product') {
-            $data = $request->validate(['c' => 'required|integer', 's' => 'required|integer', 'p' => 'required|integer']);
-            $this->abortUnlessIndex($plan, $data['c'], $data['s'], $data['p']);
-            array_splice($plan['categories'][$data['c']]['sub_categories'][$data['s']]['products'], $data['p'], 1);
         } else {
             abort(400, 'Unknown demo action.');
         }
@@ -325,54 +243,181 @@ class shopSetupController extends Controller
             ->with('toast_success', $action === 'reset' ? 'Demo preview reset.' : 'Demo preview updated.');
     }
 
-    private function productFromInput(array $data): array
+    /**
+     * The categories/sub-categories/products part of the draft, flattened to
+     * one row per sub-category: Category | Sub Category | Products (comma list).
+     */
+    private function catalogRows(array $plan): array
     {
-        return [
-            'name' => $data['name'],
-            'code' => $data['code'],
-            'price' => $data['price'],
-            'tax' => (int) $data['tax'],
-            'unit' => $data['unit'],
-            'stock' => (int) $data['stock'],
+        $rows = [];
+
+        foreach ($plan['categories'] as $category) {
+            foreach ($category['sub_categories'] as $sub) {
+                $rows[] = [
+                    'category' => $category['name'],
+                    'sub_category' => $sub['name'],
+                    'products' => collect($sub['products'])->pluck('name')->implode(', '),
+                ];
+            }
+        }
+
+        return $rows;
+    }
+
+    public function demoCatalogTemplate($id)
+    {
+        $shop = $this->findShop($id);
+        $name = trim($shop->name);
+
+        $rows = [
+            ['category' => "{$name} Category 1", 'sub_category' => 'Electrical Parts', 'products' => 'Capacitor, Contactor'],
+            ['category' => "{$name} Category 1", 'sub_category' => 'Mechanical Parts', 'products' => 'Fan Blade, Service Valve'],
         ];
+
+        return Excel::download(new CatalogRowsExport($rows), 'Catalog_Template.xlsx');
+    }
+
+    public function demoCatalogCurrent($id)
+    {
+        $shop = $this->findShop($id);
+        $plan = $this->currentDemoDraft($shop);
+
+        return Excel::download(new CatalogRowsExport($this->catalogRows($plan)), $shop->slug_name.'_Catalog_Draft.xlsx');
     }
 
     /**
-     * Product codes must be unique across the draft. $ignore is the position being edited.
+     * Replaces the draft's categories, sub-categories and products with what's in the
+     * uploaded file. A product already in the draft under the same category and
+     * sub-category keeps its existing code, price, GST and unit; a new product name
+     * gets those assigned automatically, the same way the generated demo does.
      */
-    private function assertCodeFree(array $plan, string $code, ?array $ignore = null): void
+    public function demoCatalogImport(Request $request, $id)
     {
-        foreach ($plan['categories'] as $c => $category) {
-            foreach ($category['sub_categories'] as $s => $sub) {
-                foreach ($sub['products'] as $p => $product) {
-                    if ($ignore == [$c, $s, $p]) {
-                        continue;
-                    }
-                    if (strcasecmp($product['code'], $code) === 0) {
-                        throw \Illuminate\Validation\ValidationException::withMessages([
-                            'code' => "Product code {$code} is already used in this demo setup.",
-                        ]);
+        $shop = $this->findShop($id);
+
+        if ($this->hasSetup($shop->id)) {
+            return redirect()->route('admin.shop_setup.show', ['id' => $shop->id])
+                ->with('toast_error', 'This shop already has setup data. Demo setup was not loaded.');
+        }
+
+        $request->validate(['file' => 'required|mimes:xlsx|max:10000']);
+
+        $plan = $this->currentDemoDraft($shop);
+
+        $import = new AdminCatalogImport();
+        Excel::import($import, $request->file('file'));
+
+        // Index existing products by category + sub-category + name so re-uploading
+        // an edited file doesn't reset fields on products that didn't change.
+        $existingProducts = [];
+        $maxProductNo = 0;
+        foreach ($plan['categories'] as $category) {
+            foreach ($category['sub_categories'] as $sub) {
+                foreach ($sub['products'] as $product) {
+                    $key = strtolower($category['name']).'|'.strtolower($sub['name']).'|'.strtolower($product['name']);
+                    $existingProducts[$key] = $product;
+                    if (preg_match('/-(\d+)$/', $product['code'], $m)) {
+                        $maxProductNo = max($maxProductNo, (int) $m[1]);
                     }
                 }
             }
         }
-    }
 
-    /**
-     * Stops a stale page from pointing at an item that no longer exists in the draft.
-     */
-    private function abortUnlessIndex(array $plan, int $c, ?int $s = null, ?int $p = null): void
-    {
-        $ok = isset($plan['categories'][$c]);
+        $taxRates = $plan['taxes'];
+        $units = $plan['units'];
+        $codePrefix = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $shop->name), 0, 3));
+        $productNo = $maxProductNo;
 
-        if ($ok && $s !== null) {
-            $ok = isset($plan['categories'][$c]['sub_categories'][$s]);
+        $newCategories = [];
+        $skipped = [];
+
+        foreach ($import->rows as $i => $row) {
+            $rowNo = $i + 2; // heading row is row 1
+
+            $categoryName = trim($row['category'] ?? '');
+            $subCategoryName = trim($row['sub_category'] ?? '');
+            $productsCell = trim($row['products'] ?? '');
+
+            if ($categoryName === '' || $subCategoryName === '' || $productsCell === '') {
+                $skipped[] = "Row {$rowNo}: category, sub category and products are all required.";
+                continue;
+            }
+
+            $productNames = array_values(array_filter(array_map('trim', explode(',', $productsCell))));
+            if (empty($productNames)) {
+                $skipped[] = "Row {$rowNo}: no product names found in the products column.";
+                continue;
+            }
+
+            $products = [];
+            foreach ($productNames as $name) {
+                $key = strtolower($categoryName).'|'.strtolower($subCategoryName).'|'.strtolower($name);
+
+                if (isset($existingProducts[$key])) {
+                    $products[] = array_merge($existingProducts[$key], ['name' => $name]);
+                    continue;
+                }
+
+                $productNo++;
+                $products[] = [
+                    'name' => $name,
+                    'code' => sprintf('%s-%03d', $codePrefix, $productNo),
+                    'price' => 100 + ($productNo * 10),
+                    'tax' => $taxRates[($productNo - 1) % count($taxRates)],
+                    'unit' => $units[($productNo - 1) % count($units)],
+                    'stock' => 6,
+                ];
+            }
+
+            $catIndex = null;
+            foreach ($newCategories as $idx => $existingCategory) {
+                if (strcasecmp($existingCategory['name'], $categoryName) === 0) {
+                    $catIndex = $idx;
+                    break;
+                }
+            }
+            if ($catIndex === null) {
+                $newCategories[] = ['name' => $categoryName, 'sub_categories' => []];
+                $catIndex = count($newCategories) - 1;
+            }
+
+            $subIndex = null;
+            foreach ($newCategories[$catIndex]['sub_categories'] as $idx => $existingSub) {
+                if (strcasecmp($existingSub['name'], $subCategoryName) === 0) {
+                    $subIndex = $idx;
+                    break;
+                }
+            }
+            if ($subIndex === null) {
+                $newCategories[$catIndex]['sub_categories'][] = ['name' => $subCategoryName, 'products' => []];
+                $subIndex = count($newCategories[$catIndex]['sub_categories']) - 1;
+            }
+
+            // A category/sub-category pair repeated on another row adds to the same sub-category.
+            $newCategories[$catIndex]['sub_categories'][$subIndex]['products'] = array_merge(
+                $newCategories[$catIndex]['sub_categories'][$subIndex]['products'],
+                $products
+            );
         }
-        if ($ok && $p !== null) {
-            $ok = isset($plan['categories'][$c]['sub_categories'][$s]['products'][$p]);
+
+        if (empty($newCategories)) {
+            return redirect()->route('admin.shop_setup.demo_preview', ['id' => $shop->id])
+                ->with('toast_error', 'Nothing could be imported. '.implode(' | ', $skipped));
         }
 
-        abort_unless($ok, 404, 'That item is no longer in the demo preview. Refresh the page.');
+        $plan['categories'] = $newCategories;
+        session()->put($this->demoDraftKey($shop), $plan);
+
+        $productCount = collect($newCategories)->sum(fn ($c) => collect($c['sub_categories'])->sum(fn ($s) => count($s['products'])));
+        $message = "Catalog updated: ".count($newCategories)." categories, {$productCount} products.";
+
+        if (!empty($skipped)) {
+            return redirect()->route('admin.shop_setup.demo_preview', ['id' => $shop->id])
+                ->with('toast_error', $message.' Skipped: '.implode(' | ', $skipped));
+        }
+
+        return redirect()->route('admin.shop_setup.demo_preview', ['id' => $shop->id])
+            ->with('toast_success', $message);
     }
 
     /**

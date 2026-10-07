@@ -72,6 +72,9 @@ Route::group(['middleware' => ['auth','role:Super Admin']], function () {
 			Route::get('/{id}/demo',[shopSetupController::class, 'previewDemo'])->name('demo_preview');
 			Route::post('/{id}/demo',[shopSetupController::class, 'loadDemo'])->name('demo');
 			Route::post('/{id}/demo/draft',[shopSetupController::class, 'demoDraftAction'])->name('demo_draft');
+			Route::get('/{id}/demo/catalog/template',[shopSetupController::class, 'demoCatalogTemplate'])->name('demo_catalog_template');
+			Route::get('/{id}/demo/catalog/current',[shopSetupController::class, 'demoCatalogCurrent'])->name('demo_catalog_current');
+			Route::post('/{id}/demo/catalog/import',[shopSetupController::class, 'demoCatalogImport'])->name('demo_catalog_import');
 			Route::get('/{id}/categories/export',[shopSetupController::class, 'exportCategories'])->name('category_export');
 			Route::get('/{id}/sub-categories/export',[shopSetupController::class, 'exportSubCategories'])->name('sub_category_export');
 			Route::get('/{id}/products/export',[shopSetupController::class, 'exportProducts'])->name('product_export');

@@ -65,6 +65,15 @@ class loginController extends Controller
 
                 $company = request()->route('company');
 
+                // A shop with no branches bills directly, so it goes straight to POS, same as a branch login.
+                // A shop that runs branches still lands on the dashboard, since it manages them from there.
+                $hasBranches = User::where([['parent_id', auth()->user()->id], ['role_id', 3]])->exists();
+
+                if (!$hasBranches)
+                {
+                    return redirect()->route('billing.pos', ['company' => $company]);
+                }
+
                 return redirect()->route('dashboard', ['company' => $company]);
             }
             else if (auth()->user()->role_id == 3)
