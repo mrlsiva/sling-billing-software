@@ -20,10 +20,17 @@ class SubCategoryImport implements ToModel, WithHeadingRow, WithValidation, Skip
     protected $currentRow = [];
     private int $rowCount = 0;
     private int $runId;
+    private ?int $ownerId;
 
-    public function __construct(int $runId)
+    public function __construct(int $runId, ?int $ownerId = null)
     {
         $this->runId = $runId;
+        $this->ownerId = $ownerId;
+    }
+
+    private function userId(): int
+    {
+        return $this->ownerId ?? Auth::id();
     }
 
     public function prepareForValidation($data, $index)
@@ -37,7 +44,7 @@ class SubCategoryImport implements ToModel, WithHeadingRow, WithValidation, Skip
         $categoryName    = trim($row['category'] ?? '');
         $subCategoryName = trim($row['name'] ?? '');
 
-        $category = Category::where('user_id', Auth::id())
+        $category = Category::where('user_id', $this->userId())
             ->whereRaw('LOWER(name) = ?', [strtolower($categoryName)])
             ->first();
 
@@ -48,7 +55,7 @@ class SubCategoryImport implements ToModel, WithHeadingRow, WithValidation, Skip
             return null;
         }
 
-        $exists = SubCategory::where('user_id', Auth::id())
+        $exists = SubCategory::where('user_id', $this->userId())
             ->where('category_id', $category->id)
             ->whereRaw('LOWER(name) = ?', [strtolower($subCategoryName)])
             ->exists();
@@ -58,7 +65,7 @@ class SubCategoryImport implements ToModel, WithHeadingRow, WithValidation, Skip
         }
 
         return new SubCategory([
-            'user_id'     => Auth::id(),
+            'user_id'     => $this->userId(),
             'category_id' => $category->id,
             'name'        => Str::ucfirst($subCategoryName),
             'is_active'   => 1,
@@ -73,7 +80,7 @@ class SubCategoryImport implements ToModel, WithHeadingRow, WithValidation, Skip
             'category' => [
                 'required',
                 function ($attribute, $value, $fail) {
-                    $exists = Category::where('user_id', Auth::id())
+                    $exists = Category::where('user_id', $this->userId())
                         ->whereRaw('LOWER(name) = ?', [strtolower(trim($value))])
                         ->exists();
                     if (!$exists) {
@@ -87,12 +94,12 @@ class SubCategoryImport implements ToModel, WithHeadingRow, WithValidation, Skip
                 'max:50',
                 function ($attribute, $value, $fail) {
                     $categoryName = trim($this->currentRow['category'] ?? '');
-                    $category = Category::where('user_id', Auth::id())
+                    $category = Category::where('user_id', $this->userId())
                         ->whereRaw('LOWER(name) = ?', [strtolower($categoryName)])
                         ->first();
 
                     if ($category) {
-                        $exists = SubCategory::where('user_id', Auth::id())
+                        $exists = SubCategory::where('user_id', $this->userId())
                             ->where('category_id', $category->id)
                             ->whereRaw('LOWER(name) = ?', [strtolower($value)])
                             ->exists();

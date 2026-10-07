@@ -78,7 +78,9 @@ class posController extends Controller
                 });
             })->orderBy('id','desc')->paginate(10);
         }
-        return view('users.orders.index',compact('orders','branches'));
+        $ableToLogin = User::where('id', Auth::user()->owner_id)->value('able_to_login');
+
+        return view('users.orders.index',compact('orders','branches','ableToLogin'));
     }
 
     public function get_bill(Request $request,$company,$branch,$id)

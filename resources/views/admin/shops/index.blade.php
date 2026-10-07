@@ -13,7 +13,11 @@
 					<div>
 							<p class="card-title">All Shops</p>
 					</div>
-					<a href="{{route('admin.shop.create')}}" class="btn btn-outline-primary btn-sm fw-semibold"><i class='bx bxs-folder-plus'></i> Create Shop</a>
+					<div class="d-flex gap-2">
+						<a href="{{route('admin.shop.export', ['shop' => request('shop')])}}" class="btn btn-outline-secondary btn-sm fw-semibold"><i class="ri-download-2-line"></i> Export</a>
+						<button type="button" class="btn btn-outline-secondary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#importShopsModal"><i class="ri-upload-2-line"></i> Import</button>
+						<a href="{{route('admin.shop.create')}}" class="btn btn-outline-primary btn-sm fw-semibold"><i class='bx bxs-folder-plus'></i> Create Shop</a>
+					</div>
 				</div>
 
 				<form method="get" action="{{route('admin.shop.index')}}">
@@ -129,6 +133,37 @@
 				<div class="card-footer border-0">
 					{!! $shops->withQueryString()->links('pagination::bootstrap-5') !!}
 				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="importShopsModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Import Shops</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form method="post" action="{{ route('admin.shop.bulk_import') }}" enctype="multipart/form-data">
+					@csrf
+					<div class="modal-body">
+						<div class="d-flex justify-content-end mb-2">
+							<a href="{{ asset('assets/templates/shop.xlsx') }}" download="Shop_Template.xlsx">Download Template</a>
+						</div>
+						<p class="text-muted fs-12">
+							Name, Slug Name, User Name and Phone are required. Bill Type must match an existing bill type
+							({{ \App\Models\PrinterType::where('is_active',1)->pluck('name')->implode(', ') }}).
+							Payment Method is Monthly, Quarterly, Semi-Yearly or Yearly (defaults to Monthly).
+							Each shop gets a placeholder logo and a generated password &mdash; shown once on the result page, so save them there.
+						</p>
+						<label class="form-label">Upload File</label>
+						<input type="file" name="file" class="form-control" accept=".xlsx" required>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary">Import</button>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>

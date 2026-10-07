@@ -19,11 +19,19 @@ class CategoryImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
 
     private int $rowCount = 0;
     private int $runId;
+    private ?int $ownerId;
 
-    // 👇 accept run_id in constructor
-    public function __construct(int $runId)
+    // 👇 accept run_id in constructor, and optionally the shop to import into
+    // (defaults to the logged-in user, for the shop owner's own bulk upload)
+    public function __construct(int $runId, ?int $ownerId = null)
     {
         $this->runId = $runId;
+        $this->ownerId = $ownerId;
+    }
+
+    private function userId(): int
+    {
+        return $this->ownerId ?? Auth::id();
     }
 
     public function model(array $row)
@@ -31,7 +39,7 @@ class CategoryImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
         ++$this->rowCount;
 
         return new Category([
-            'user_id'        => Auth::id(),
+            'user_id'        => $this->userId(),
             'name'           => Str::ucfirst(trim($row['name'])),
             'is_active'      => 1,
             'is_bulk_upload' => 1,
@@ -47,7 +55,7 @@ class CategoryImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
                 'string',
                 'max:50',
                 Rule::unique('categories', 'name')->where(function ($query) {
-                    return $query->where('user_id', Auth::id());
+                    return $query->where('user_id', $this->userId());
                 }),
             ],
         ];

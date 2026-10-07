@@ -43,7 +43,10 @@ class orderController extends Controller
                   });
             });
         })->orderBy('id','desc')->paginate(10);
-        return view('branches.orders.index',compact('orders'));
+
+        $ableToLogin = User::where('id', Auth::user()->parent_id)->value('able_to_login');
+
+        return view('branches.orders.index',compact('orders','ableToLogin'));
     }
 
     public function refund(Request $request,$company,$id)

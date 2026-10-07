@@ -29,6 +29,7 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
 
     private int $rowCount = 0;
     private int $runId;
+    private ?int $ownerId;
     private array $currentRow = [];
 
     // In-memory caches to avoid repeated DB lookups per row
@@ -39,9 +40,17 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
     private array $sizeCache   = [];
     private array $colourCache = [];
 
-    public function __construct(int $runId)
+    // $ownerId optionally targets a specific shop instead of the logged-in user
+    // (used by the admin shop-setup import; the owner's own bulk upload leaves it null).
+    public function __construct(int $runId, ?int $ownerId = null)
     {
         $this->runId = $runId;
+        $this->ownerId = $ownerId;
+    }
+
+    private function userId(): int
+    {
+        return $this->ownerId ?? Auth::id();
     }
 
     private function getCategory(int $userId, string $name): ?object
@@ -121,7 +130,7 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
     public function model(array $row)
     {
         $this->rowCount++;
-        $userId = Auth::id();
+        $userId = $this->userId();
 
         $category = $this->getCategory($userId, $row['category']);
         if (!$category) return null;
@@ -172,7 +181,7 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             }
         }
 
-        $auth = UserDetail::where('user_id',Auth::user()->owner_id)->first();
+        $auth = UserDetail::where('user_id', $userId)->first();
 
         $price = $auth->able_to_round_price == 1 ? round($price) : $price;
         $taxAmount = $auth->able_to_round_price == 1 ? round($taxAmount) : $taxAmount;
@@ -302,7 +311,7 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
 
     public function rules(): array
     {
-        $userId = Auth::id();
+        $userId = $this->userId();
         $row = $this->currentRow;
 
         return [

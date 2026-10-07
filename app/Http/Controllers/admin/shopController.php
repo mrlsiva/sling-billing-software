@@ -18,6 +18,10 @@ use App\Traits\common;
 use App\Models\User;
 use App\Traits\Log;
 use Carbon\Carbon;
+use App\Exports\ShopsExport;
+use App\Imports\AdminShopImport;
+use App\Models\BulkUploadLog;
+use Maatwebsite\Excel\Facades\Excel;
 use DB;
 
 class shopController extends Controller
@@ -43,6 +47,232 @@ class shopController extends Controller
     {
         $printer_types = PrinterType::where('is_active',1)->get();
         return view('admin.shops.create',compact('printer_types'));
+    }
+
+    public function export(Request $request)
+    {
+        $shops = User::with('user_detail')->where('role_id',2)
+            ->when(request('shop'), function ($query) {
+                $search = request('shop');
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('user_name', 'like', "%{$search}%")
+                      ->orWhere('slug_name', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })->orderBy('id','desc')->get();
+
+        return Excel::download(new ShopsExport($shops), 'Shops_'.now()->format('d-m-Y_h-i_A').'.xlsx');
+    }
+
+    /**
+     * A password that satisfies the same strength rule the shop create form uses.
+     */
+    private function generateShopPassword(): string
+    {
+        $upper = chr(rand(65, 90));
+        $lower = Str::lower(Str::random(4));
+        $digit = (string) rand(0, 9);
+        $special = collect(['@', '$', '!', '%', '*', '#', '?', '&'])->random();
+        $filler = Str::random(3);
+
+        return $upper.$lower.$digit.$special.$filler;
+    }
+
+    public function bulkImport(Request $request)
+    {
+        $request->validate(['file' => 'required|mimes:xlsx|max:10000']);
+
+        $import = new AdminShopImport();
+        Excel::import($import, $request->file('file'));
+
+        $billTypes = PrinterType::where('is_active', 1)->get()->keyBy(fn ($t) => strtolower($t->name));
+        $paymentCycles = ['monthly' => 1, 'quarterly' => 2, 'semi-yearly' => 3, 'semiyearly' => 3, 'yearly' => 4];
+
+        $created = [];
+        $skipped = [];
+        $seenSlugs = [];
+        $seenPhones = [];
+
+        foreach ($import->rows as $i => $row) {
+            $rowNo = $i + 2; // heading row is row 1
+
+            $name = trim($row['name'] ?? '');
+            $slug = trim($row['slug_name'] ?? '');
+            $userName = trim($row['user_name'] ?? '');
+            $phone = trim((string) ($row['phone'] ?? ''));
+            $altPhone = trim((string) ($row['alternate_phone'] ?? '')) ?: null;
+            $email = trim($row['email'] ?? '') ?: null;
+            $gst = trim($row['gst'] ?? '') ?: null;
+            $address = trim($row['address'] ?? '') ?: null;
+            $billTypeName = strtolower(trim($row['bill_type'] ?? ''));
+            $paymentCycleName = strtolower(trim($row['payment_method'] ?? '')) ?: 'monthly';
+
+            if ($name === '' || $slug === '' || $userName === '' || $phone === '') {
+                $skipped[] = "Row {$rowNo}: name, slug name, user name and phone are required.";
+                continue;
+            }
+            if (!preg_match('/^[a-zA-Z0-9_-]+$/', $slug) || !preg_match('/^[a-zA-Z0-9_-]+$/', $userName)) {
+                $skipped[] = "Row {$rowNo}: slug name and user name may only contain letters, numbers, dashes and underscores.";
+                continue;
+            }
+            if (!preg_match('/^[0-9]{10}$/', $phone)) {
+                $skipped[] = "Row {$rowNo}: phone must be exactly 10 digits.";
+                continue;
+            }
+            if (in_array($slug, $seenSlugs) || in_array($phone, $seenPhones)) {
+                $skipped[] = "Row {$rowNo}: duplicate slug name or phone earlier in this file.";
+                continue;
+            }
+            if (User::where('slug_name', $slug)->exists()) {
+                $skipped[] = "Row {$rowNo}: slug name '{$slug}' is already taken.";
+                continue;
+            }
+            if (User::where('phone', $phone)->exists()) {
+                $skipped[] = "Row {$rowNo}: phone '{$phone}' is already used.";
+                continue;
+            }
+            if ($email && User::where('email', $email)->exists()) {
+                $skipped[] = "Row {$rowNo}: email '{$email}' is already used.";
+                continue;
+            }
+            if ($gst && \App\Models\UserDetail::where('gst', $gst)->exists()) {
+                $skipped[] = "Row {$rowNo}: GST '{$gst}' is already used.";
+                continue;
+            }
+            if (!isset($billTypes[$billTypeName])) {
+                $skipped[] = "Row {$rowNo}: bill type '{$row['bill_type']}' does not match an existing bill type.";
+                continue;
+            }
+
+            $seenSlugs[] = $slug;
+            $seenPhones[] = $phone;
+            $billType = $billTypes[$billTypeName];
+            $paymentCycle = $paymentCycles[$paymentCycleName] ?? 1;
+            $password = $this->generateShopPassword();
+
+            DB::beginTransaction();
+            try {
+                $user = User::create([
+                    'role_id' => 2,
+                    'unique_id' => $this->userUnique(),
+                    'name' => Str::ucfirst($name),
+                    'email' => $email,
+                    'slug_name' => $slug,
+                    'user_name' => $userName,
+                    'phone' => $phone,
+                    'alt_phone' => $altPhone,
+                    'password' => \Hash::make($password),
+                    'is_active' => 1,
+                    'is_lock' => 0,
+                    'is_delete' => 0,
+                    'able_to_login' => 0,
+                ]);
+                $user->update(['owner_id' => $user->id, 'created_by' => Auth::user()->id]);
+
+                // Placeholder logo/icon — a shop imported this way has no uploaded image yet.
+                // The admin can replace both from the shop's edit page.
+                $logoDir = config('path.root').'/'.$slug.'/'.config('path.logo');
+                $iconDir = config('path.root').'/'.$slug.'/'.config('path.fav_icon');
+                $logoPath = $logoDir.'/placeholder.png';
+                $iconPath = $iconDir.'/placeholder.png';
+                Storage::disk('public')->put($logoPath, file_get_contents(public_path('assets/images/sling-logo.png')));
+                Storage::disk('public')->put($iconPath, file_get_contents(public_path('assets/images/favicon.png')));
+                $user->update(['logo' => $logoPath, 'fav_icon' => $iconPath]);
+
+                $user->assignRole(Role::where('id', 2)->first()->name);
+
+                $paymentDate = Carbon::now();
+                $nextPaymentDate = match ($paymentCycle) {
+                    1 => $paymentDate->copy()->addMonth(),
+                    2 => $paymentDate->copy()->addMonths(3),
+                    3 => $paymentDate->copy()->addMonths(6),
+                    4 => $paymentDate->copy()->addYear(),
+                    default => null,
+                };
+
+                UserDetail::create([
+                    'user_id' => $user->id,
+                    'address' => $address,
+                    'gst' => $gst,
+                    'payment_method' => $paymentCycle,
+                    'payment_date' => $paymentDate,
+                    'plan_start' => $paymentDate,
+                    'plan_end' => $nextPaymentDate,
+                    'bill_type' => $billType->id,
+                ]);
+
+                BankDetail::create(['user_id' => $user->id]);
+
+                foreach (Payment::where('is_active', 1)->get() as $payment) {
+                    ShopPayment::create(['shop_id' => $user->id, 'payment_id' => $payment->id]);
+                }
+
+                $this->addToLog($this->unique(), Auth::user()->id, 'Shop Bulk Import', 'App/Models/User', 'users', $user->id, 'Insert', null, null, 'Success', 'Shop "'.$user->name.'" created via bulk import');
+
+                DB::commit();
+
+                $created[] = ['name' => $user->name, 'slug_name' => $slug, 'user_name' => $userName, 'phone' => $phone, 'password' => $password];
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                $skipped[] = "Row {$rowNo}: could not be created ({$e->getMessage()}).";
+            }
+        }
+
+        // Run log + file copy, same pattern as the other bulk uploads. No passwords are written here.
+        do {
+            $runId = rand(100000, 999999);
+        } while (BulkUploadLog::where('run_id', $runId)->exists());
+
+        $directory = "bulk_uploads/shops/{$runId}";
+        if (!Storage::disk('public')->exists($directory)) {
+            Storage::disk('public')->makeDirectory($directory);
+        }
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $excelPath = $uploadedFile->storeAs($directory, $originalName, 'public');
+
+        $logContent = "======================".PHP_EOL
+            ."Shop Bulk Import Report".PHP_EOL
+            ."Uploaded On: ".now().PHP_EOL
+            ."Run ID: {$runId}".PHP_EOL
+            ."Uploaded File: {$originalName}".PHP_EOL
+            ."Created: ".count($created).PHP_EOL
+            ."Skipped: ".count($skipped).PHP_EOL;
+        if (!empty($skipped)) {
+            $logContent .= "Skipped Details:".PHP_EOL;
+            foreach ($skipped as $line) {
+                $logContent .= "- {$line}".PHP_EOL;
+            }
+        }
+        $logContent .= "======================".PHP_EOL;
+        $logFile = "{$directory}/log.txt";
+        Storage::disk('public')->put($logFile, $logContent);
+
+        BulkUploadLog::create([
+            'user_id' => Auth::user()->id,
+            'run_id' => $runId,
+            'run_on' => now(),
+            'module' => 'Shop',
+            'total_record' => count($created) + count($skipped),
+            'successfull_record' => count($created),
+            'error_record' => count($skipped),
+            'excel' => $excelPath,
+            'log' => $logFile,
+        ]);
+
+        // Passwords are shown once here and never written to the log file or database.
+        return redirect()->route('admin.shop.bulk_import_result')
+            ->with('bulk_shop_created', $created)
+            ->with('bulk_shop_skipped', $skipped);
+    }
+
+    public function bulkImportResult(Request $request)
+    {
+        $created = session('bulk_shop_created', []);
+        $skipped = session('bulk_shop_skipped', []);
+
+        return view('admin.shops.bulk_import_result', compact('created', 'skipped'));
     }
 
     public function store(Request $request)

@@ -85,6 +85,22 @@
                                 <span class="nav-text"> Shop </span>
                             </a>
                         </li>
+                        <li class="menu-item {{(request()->is('admin/shop-setup*')) ? 'active':''}}">
+                            <a class="menu-link {{(request()->is('admin/shop-setup*')) ? 'ative':''}}" href="{{route('admin.shop_setup.index')}}">
+                                <span class="nav-icon">
+                                    <i class="ri-store-2-line"></i>
+                                </span>
+                                <span class="nav-text"> Shop Setup </span>
+                            </a>
+                        </li>
+                        <li class="menu-item {{(request()->is('admin/orders*')) ? 'active':''}}">
+                            <a class="menu-link {{(request()->is('admin/orders*')) ? 'ative':''}}" href="{{route('admin.order.index')}}">
+                                <span class="nav-icon">
+                                    <i class="ri-shopping-bag-3-line"></i>
+                                </span>
+                                <span class="nav-text"> Orders </span>
+                            </a>
+                        </li>
                         <li class="menu-item {{(request()->is('admin/error_logs*')) ? 'active':''}}">
                             <a class="menu-link {{(request()->is('admin/error_logs*')) ? 'ative':''}}" href="{{route('admin.error_log.index')}}">
                                 <span class="nav-icon">

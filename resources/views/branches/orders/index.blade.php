@@ -35,11 +35,13 @@
 				<div class="">
 					<div class="table-responsive">
 
-						<div class="d-flex justify-content-end mb-3">
-							<a href="{{route('branch.order.online.index', ['company' => request()->route('company')])}}">
-								<button class="btn btn-warning"> Online </button>
-							</a>
-						</div>
+						@if($ableToLogin)
+							<div class="d-flex justify-content-end mb-3">
+								<a href="{{route('branch.order.online.index', ['company' => request()->route('company')])}}">
+									<button class="btn btn-warning"> Online </button>
+								</a>
+							</div>
+						@endif
 
 						<table class="table align-middle mb-0 table-hover table-centered">
 							<thead class="bg-light-subtle">
