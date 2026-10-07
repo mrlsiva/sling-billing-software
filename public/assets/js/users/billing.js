@@ -260,11 +260,11 @@ function add_to_cart(element) {
                 var maxQty = parseInt(data.stock.quantity);
 
                 $("#cart_item").append(`
-                    <div class="border border-light mt-3 p-2 rounded" 
-                        data-product-id="${data.id}" 
+                    <div class="border-0 shadow-sm mt-2 p-3 rounded-3 bg-white"
+                        data-product-id="${data.id}"
                         data-price="${data.discount_price}"
-                        data-tax_amount="${data.tax_amount}" 
-                        data-tax-id="${data.tax_id}" 
+                        data-tax_amount="${data.tax_amount}"
+                        data-tax-id="${data.tax_id}"
                         data-tax="${data.tax.name}"
                         data-stock-qty="${maxQty}">
 
@@ -384,12 +384,12 @@ function addVariationToCart(productId, variationId) {
             let hasImei = v.stock.imei && v.stock.imei.trim() !== "";
 
             $("#cart_item").append(`
-                    <div class="border border-light mt-3 p-2 rounded" 
-                        data-product-id="${productId}" 
+                    <div class="border-0 shadow-sm mt-2 p-3 rounded-3 bg-white"
+                        data-product-id="${productId}"
                         data-variation-id="${variationId}"
                         data-price="${v.discount_price}"
-                        data-tax_amount="${v.tax_amount}" 
-                        data-tax-id="${v.tax_id}" 
+                        data-tax_amount="${v.tax_amount}"
+                        data-tax-id="${v.tax_id}"
                         data-tax="${v.tax}"
                         data-stock-qty="${v.quantity}">
 

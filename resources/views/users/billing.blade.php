@@ -10,6 +10,88 @@
     .select2-container .select2-selection--single { height: 38px; border: 1px solid #ced4da; border-radius: 4px; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px; color: #495057; padding-left: 10px; }
     .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+
+    /* ── POS restyle ── */
+    .pos-product-card {
+        background: #fff;
+        border: 1px solid #eef0f4;
+        border-radius: 12px;
+        padding: 12px;
+        cursor: pointer;
+        transition: border-color .15s ease, box-shadow .15s ease;
+        height: 100%;
+    }
+    .pos-product-card:hover {
+        border-color: #7c9cf0;
+        box-shadow: 0 2px 10px rgba(16,24,40,.06);
+    }
+    .pos-product-card.out-of-stock { opacity: .55; cursor: not-allowed; }
+    .pos-icon-tile {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        border-radius: 10px;
+        background: repeating-linear-gradient(135deg, #f3f4f7, #f3f4f7 6px, #eceef2 6px, #eceef2 12px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        position: relative;
+    }
+    .pos-icon-dot {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 16px;
+        position: absolute;
+        top: 8px;
+        left: 8px;
+    }
+    .pos-product-name { font-size: 13px; font-weight: 600; color: #1f2430; margin-bottom: 2px; }
+    .pos-product-meta { font-size: 10.5px; color: #8a92a3; }
+    .pos-product-price { font-size: 13px; font-weight: 700; color: #1f2430; }
+
+    .payment-pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .payment-pill {
+        flex: 1 1 auto;
+        min-width: 78px;
+        text-align: center;
+        border: 1px solid #d8dce6;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #475467;
+        background: #fff;
+        cursor: pointer;
+        user-select: none;
+        transition: all .12s ease;
+    }
+    .payment-pill:hover { border-color: #7c9cf0; }
+    .payment-pill.active {
+        background: #eef2ff;
+        border-color: #4f6ef7;
+        color: #3049d1;
+    }
+
+    .charge-btn {
+        width: 100%;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(135deg, #2b3a67, #1a2547);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .charge-btn:hover { color: #fff; opacity: .95; }
 </style>
 @endsection
 
@@ -123,45 +205,39 @@
 
 		<div id="productContainer">
 			<div class="row">
+				@php
+					$posPalette = ['#2563eb','#16a34a','#dc2626','#7c3aed','#0d9488','#d97706','#e11d48'];
+				@endphp
 				@foreach($stocks as $stock)
 				@php
 				if ($stock->quantity === 0) {
-				$cardClass = 'bg-soft-danger';
 				$badgeClass = 'bg-danger';
-				$showButton = false;
-				} elseif ($stock->quantity <= 5) { $cardClass='bg-soft-warning' ; $badgeClass='bg-warning' ;
-					$showButton=true; } else { $cardClass='' ; $badgeClass='bg-soft-success' ; $showButton=true; }
-					@endphp <div class="col-md-4">
-					<div class="card {{ $cardClass }}" onclick="add_to_cart(this)"
-						data-system_id="{{ $stock->product_id }}" style="cursor:pointer;">
-						<div class="card-body p-2">
-							<div class="d-flex flex-column">
-								<a href="#!" class="w-100 text-dark fs-12 fw-semibold text-truncate">
-									{{ $stock->product->category->name }} - {{ $stock->product->sub_category->name }}
-								</a>
-								<a class="fs-10 text-dark fw-normal mb-0 w-100 text-truncate">
-									{{ $stock->product->name }}
-								</a>
-							</div>
-							<div class="d-flex align-items-center justify-content-between mt-2">
-								<div>
-									<p class="text-dark fw-semibold fs-12 mb-0">Rs {{ $stock->product->price }}</p>
-								</div>
-								<div class="d-flex align-content-center gap-1">
-									<p class="mb-0 fs-12">{{ $stock->quantity }}</p>
-									<p class="badge {{ $badgeClass }} fs-10 mb-1 text-dark py-1 px-2">Qty</p>
-									<!-- @if($showButton)
-					                            <button type="button"class="bg-light text-dark border-0 rounded fs-20 lh-1 h-100" onclick="add_to_cart(this)" data-system_id="{{ $stock->product_id }}">
-					                                +
-					                            </button>
-					                        @endif -->
-								</div>
-							</div>
+				$outOfStock = true;
+				} elseif ($stock->quantity <= 5) { $badgeClass='bg-warning' ; $outOfStock=false; }
+					else { $badgeClass='bg-soft-success' ; $outOfStock=false; }
+					$tileColor = $posPalette[$stock->product->category_id % count($posPalette)];
+					@endphp
+				<div class="col-md-4 mb-3">
+					<div class="pos-product-card {{ $outOfStock ? 'out-of-stock' : '' }}" {{ $outOfStock ? '' : 'onclick=add_to_cart(this)' }}
+						data-system_id="{{ $stock->product_id }}">
+						<div class="pos-icon-tile">
+							<span class="pos-icon-dot" style="background:{{ $tileColor }};">
+								<i class="ri-shopping-bag-3-line"></i>
+							</span>
+						</div>
+						<p class="pos-product-name text-truncate mb-0">{{ $stock->product->name }}</p>
+						<p class="pos-product-meta text-truncate mb-2">
+							{{ $stock->product->category->name }} - {{ $stock->product->sub_category->name }}
+						</p>
+						<div class="d-flex align-items-center justify-content-between">
+							<span class="pos-product-price">₹{{ number_format($stock->product->price, 0) }}</span>
+							<span class="badge {{ $badgeClass }} fs-10">{{ $stock->quantity }} Qty</span>
 						</div>
 					</div>
-			</div>
-			@endforeach
+				</div>
+				@endforeach
 
+			</div>
 		</div>
 	</div>
 
@@ -219,7 +295,7 @@
 							</div>
 						</div>
 						<div class="table-responsive">
-							<table class="table table-bordered bg-light-subtle billing-table-pos">
+							<table class="table table-borderless bg-light-subtle billing-table-pos mb-0">
 								<tbody>
 									<tr>
 										<td>
@@ -247,22 +323,22 @@
 										</td>
 										<td class="text-end text-success fw-semibold" id="order_discount">₹0.00</td>
 									</tr>
-									<tr>
+									<tr class="border-top">
 										<td>
-											<p class="d-flex mb-0 align-items-center gap-1 fw-semibold text-danger">
-												Payable Amount : </p>
+											<p class="d-flex mb-0 align-items-center gap-1 fw-bold">
+												Total : </p>
 										</td>
-										<td class="text-end text-success fw-semibold" id="amount">₹0.00</td>
+										<td class="text-end fs-16 fw-bold" id="amount" style="color:#2b3a67;">₹0.00</td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
-						<div class=" gap-1 hstack mt-3">
-							<a href="#!" class="btn btn-danger w-100" id="clear_cart"><i
-									class="ri-close-circle-line"></i> Clear</a>
-							<a href="#!" id="next_tab_user_info" class="btn btn-primary w-100"><i
+						<div class="gap-2 vstack mt-3">
+							<a href="#!" id="next_tab_user_info" class="charge-btn"><i
 									class="ri-arrow-right-circle-line"></i>
 								Next</a>
+							<a href="#!" class="btn btn-outline-secondary w-100" id="clear_cart"><i
+									class="ri-close-circle-line"></i> Clear</a>
 						</div>
 					</div>
 					<div id="empty_order_detail" class="">
@@ -452,12 +528,17 @@
 					<div class="row g-2">
 						<div class="col-md-12">
 							<div class="mb-3">
-								<select class="form-control" name="payment" id="payment">
+								<select class="form-control d-none" name="payment" id="payment">
 									<option value="">Select</option>
 									@foreach($payments as $payment)
 									<option value="{{$payment->id}}">{{$payment->name}}</option>
 									@endforeach
 								</select>
+								<div class="payment-pill-row" id="payment_pill_row">
+									@foreach($payments as $payment)
+									<div class="payment-pill" data-payment-id="{{$payment->id}}">{{$payment->name}}</div>
+									@endforeach
+								</div>
 							</div>
 						</div>
 					</div>
@@ -708,12 +789,12 @@
 							</tfoot>
 						</table>
 					</div>
-					<div class=" gap-1 hstack mt-3">
-						<a href="#!" class="btn btn-danger w-100" id="previous_tab_user_info"><i
-								class="ri-close-circle-line"></i> Previous</a>
-						<a href="#!" onclick="submit()" class="btn btn-primary w-100"><i
+					<div class="gap-2 vstack mt-3">
+						<a href="#!" onclick="submit()" class="charge-btn"><i
 								class="ri-shopping-basket-2-line"></i>
-							Proceed</a>
+							Charge</a>
+						<a href="#!" class="btn btn-outline-secondary w-100" id="previous_tab_user_info"><i
+								class="ri-close-circle-line"></i> Previous</a>
 					</div>
 				</div>
 
@@ -889,8 +970,18 @@ $(document).ready(function () {
     $('#category').select2({ width: '100%', placeholder: 'Select' });
     $('#sub_category').select2({ width: '100%', placeholder: 'Select' });
     $('.gender-select').select2({ width: '100%', placeholder: 'Select' });
-    $('#payment').select2({ width: '100%', placeholder: 'Select' });
     $('#finance_type').select2({ width: '100%', placeholder: 'Select' });
+});
+</script>
+
+<script>
+// Payment pills just drive the existing (now hidden) #payment select — every
+// other payment handler in billing.js keeps working untouched, since it only
+// ever listens for that select's 'change' event.
+$(document).on('click', '.payment-pill', function () {
+    $('.payment-pill').removeClass('active');
+    $(this).addClass('active');
+    $('#payment').val($(this).data('payment-id')).trigger('change');
 });
 </script>
 
