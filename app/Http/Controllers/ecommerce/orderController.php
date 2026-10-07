@@ -167,6 +167,46 @@ class orderController extends Controller
             );
         }
 
+        $stockErrors = [];
+
+        foreach ($cart as $item) {
+
+            $product = Product::find($item['product_id']);
+
+            if (!$product) {
+                continue;
+            }
+
+            $stock = Stock::where('product_id', $product->id)
+                ->first();
+
+            $variationId = $item['variation_id'] ?? null;
+
+            if (!empty($variationId)) {
+
+                $variation = StockVariation::where('id', $variationId)
+                    ->where('stock_id', $stock?->id)
+                    ->where('product_id', $product->id)
+                    ->first();
+
+                if (!$variation || $variation->quantity <= 0) {
+                    $stockErrors[] = $product->name;
+                }
+
+            } else {
+
+                if (!$stock || $stock->quantity <= 0) {
+                    $stockErrors[] = $product->name;
+                }
+            }
+        }
+
+        if (!empty($stockErrors)) {
+            return $this->errorResponse('The following products have 0 stock: '
+                    . implode(', ', array_unique($stockErrors)), 400, 'Validation failed');
+        }
+
+
         DB::beginTransaction();
 
         $user = User::where('slug_name',$company)->first();
@@ -287,6 +327,7 @@ class orderController extends Controller
 
             $product = Product::where('id',$item['product_id'])->first();
             $variation = !empty($item['variation_id'])? StockVariation::find($item['variation_id']) : null;
+
             OrderDetail::create([
                 'order_id'      => $order->id,
                 'product_id'    => $item['product_id'],
