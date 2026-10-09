@@ -33,6 +33,50 @@ class orderController extends Controller
 {
     use Log,Notifications,ResponseHelper,common;
 
+    public function payment_gateway_detail(Request $request,$company)
+    {
+        $user = User::where('slug_name',$company)->first();
+        if (!$user) 
+        {
+            return $this->errorResponse('User not found', 404, 'Not Found');
+        }
+
+        $payment_detail = UserDetail::where('user_id', $user->id)->first();
+
+        if($payment_detail->payment_gateway == 'razorpay')
+        {
+            $payment_details = [
+                'payment_gateway' => $payment_detail->payment_gateway,
+                'key_id' => $payment_detail->payment_gateway_key_id,
+                'key_secret' => $payment_detail->payment_gateway_key_secret,
+                'webhook_secret' => $payment_detail->payment_gateway_webhook_secret,
+            ];
+        }
+        if($payment_detail->payment_gateway == 'payu')
+        {
+            $payment_details = [
+                'payment_gateway' => $payment_detail->payment_gateway,
+                'key' => $payment_detail->payu_key,
+                'salt' => $payment_detail->payu_salt,
+                'webhook_secret' => $payment_detail->payu_webhook_secret,
+            ];
+            
+        }
+        if($payment_detail->payment_gateway == 'stripe')
+        {
+            $payment_details = [
+                'payment_gateway' => $payment_detail->payment_gateway,
+                'publishable_key' => $payment_detail->stripe_publishable_key,
+                'secret_key' => $payment_detail->stripe_secret_key,
+                'webhook_secret' => $payment_detail->stripe_webhook_secret,
+            ];
+        }
+
+        return $this->successResponse($payment_details ?? [],200,'Payment gateway details retrieved successfully.'
+    );
+
+    }
+
     public function store(Request $request,$company)
     {
         /*

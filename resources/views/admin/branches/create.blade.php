@@ -243,6 +243,117 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card" id="paymentGatewaySection" hidden>
+                    <div class="card-header pb-0">
+                        <h4 class="card-title">Payment Gateway (Online Orders)</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+
+                            <!-- Gateway Selection -->
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="payment_gateway" class="form-label">Gateway</label>
+                                    <select id="payment_gateway" name="payment_gateway" class="form-control">
+                                        <option value="">None</option>
+                                        <option value="razorpay" {{ old('payment_gateway') == 'razorpay' ? 'selected' : '' }}>Razorpay</option>
+                                        <option value="payu" {{ old('payment_gateway') == 'payu' ? 'selected' : '' }}>PayU</option>
+                                        <option value="stripe" {{ old('payment_gateway') == 'stripe' ? 'selected' : '' }}>Stripe</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Razorpay Fields -->
+                            <div class="col-12 gateway-fields" id="razorpay_fields" style="display:none;">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Razorpay Key ID</label>
+                                        <input type="text" name="payment_gateway_key_id"
+                                               class="form-control" placeholder="rzp_test_xxxxxxxx"
+                                               value="{{ old('payment_gateway') == 'razorpay' ? old('payment_gateway_key_id') : '' }}">
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Razorpay Key Secret</label>
+                                        <input type="password" name="payment_gateway_key_secret"
+                                               class="form-control" autocomplete="new-password"
+                                               placeholder="Enter Razorpay Key Secret">
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Razorpay Webhook Secret</label>
+                                        <input type="password" name="payment_gateway_webhook_secret"
+                                               class="form-control" autocomplete="new-password"
+                                               placeholder="Webhook Secret (optional)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PayU Fields -->
+                            <div class="col-12 gateway-fields" id="payu_fields" style="display:none;">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">PayU Merchant Key</label>
+                                        <input type="text" name="payu_key"
+                                               class="form-control" placeholder="Enter PayU Merchant Key"
+                                               value="{{ old('payu_key') }}">
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">PayU Merchant Salt</label>
+                                        <input type="password" name="payu_salt"
+                                               class="form-control" autocomplete="new-password"
+                                               placeholder="Enter PayU Merchant Salt">
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">PayU Webhook Secret (if applicable)</label>
+                                        <input type="password" name="payu_webhook_secret"
+                                               class="form-control" autocomplete="new-password"
+                                               placeholder="Webhook Secret (optional)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stripe Fields -->
+                            <div class="col-12 gateway-fields" id="stripe_fields" style="display:none;">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Stripe Publishable Key</label>
+                                        <input type="text" name="stripe_publishable_key"
+                                               class="form-control" placeholder="pk_test_xxxxxxxx"
+                                               value="{{ old('stripe_publishable_key') }}">
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Stripe Secret Key</label>
+                                        <input type="password" name="stripe_secret_key"
+                                               class="form-control" autocomplete="new-password"
+                                               placeholder="sk_test_xxxxxxxx">
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Stripe Webhook Signing Secret</label>
+                                        <input type="password" name="stripe_webhook_secret"
+                                               class="form-control" autocomplete="new-password"
+                                               placeholder="whsec_xxxxxxxx">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <small class="text-muted">
+                                    Select a gateway to configure its credentials. Store secret values encrypted
+                                    and never expose them in the frontend.
+                                </small>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                
                 <div class="card">
                     <div class="card-header pb-0">
                         <h4 class="card-title">Bank details</h4>
@@ -332,5 +443,49 @@ $(document).ready(function () {
     $('#payment_method').select2({ width: '100%', placeholder: 'Choose Payment' });
     $('#bill_type').select2({ width: '100%', placeholder: 'Choose Bill Type' });
 });
+</script>
+<script>
+// Payment Gateway only makes sense for a shop that can actually log in.
+document.addEventListener('DOMContentLoaded', function () {
+    let ableToLogin = document.getElementById('able_to_login');
+    let gatewaySection = document.getElementById('paymentGatewaySection');
+    let gatewayInputs = gatewaySection.querySelectorAll('input, select');
+
+    function toggleGatewaySection() {
+        let enabled = ableToLogin.checked;
+        gatewaySection.hidden = !enabled;
+        // Disabled fields are excluded from form submission, so a shop that
+        // can't log in never silently saves/keeps gateway config either.
+        gatewayInputs.forEach(function (el) { el.disabled = !enabled; });
+    }
+
+    toggleGatewaySection();
+    ableToLogin.addEventListener('change', toggleGatewaySection);
+});
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        function toggleGatewayFields() {
+            let gateway = $('#payment_gateway').val();
+
+            // Hide all gateway sections
+            $('.gateway-fields').hide();
+
+            // Show the selected gateway section
+            if (gateway) {
+                $('#' + gateway + '_fields').show();
+            }
+        }
+
+        // When gateway selection changes
+        $('#payment_gateway').on('change', function () {
+            toggleGatewayFields();
+        });
+
+        // Show the correct fields on page load
+        toggleGatewayFields();
+    });
 </script>
 @endsection

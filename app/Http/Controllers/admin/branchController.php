@@ -93,6 +93,16 @@ class branchController extends Controller
             ],
 
             'payment_method' => 'required',
+            'payment_gateway' => 'nullable|in:razorpay,payu,stripe',
+
+            'payment_gateway_key_id' => 'required_if:payment_gateway,razorpay|string',
+            'payment_gateway_key_secret' => 'required_if:payment_gateway,razorpay|string',
+
+            'payu_key' => 'required_if:payment_gateway,payu|string',
+            'payu_salt' => 'required_if:payment_gateway,payu|string',
+
+            'stripe_publishable_key' => 'required_if:payment_gateway,stripe|string',
+            'stripe_secret_key' => 'required_if:payment_gateway,stripe|string',
             'bill_type' => 'required',
             'bank' => 'nullable|string|max:50',
             'name' => 'nullable|string|max:50',
@@ -257,6 +267,16 @@ class branchController extends Controller
             'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
             'able_to_delete_order' => $request->has('able_to_delete_order') ? 1 : 0,
             'able_to_round_price' => $request->has('able_to_round_price') ? 1 : 0,
+            'payment_gateway' => $request->payment_gateway,
+            'payment_gateway_key_id' => $request->payment_gateway_key_id,
+            'payment_gateway_key_secret' => $request->payment_gateway_key_secret,
+            'payment_gateway_webhook_secret' => $request->payment_gateway_webhook_secret,
+            'payu_key' => $request->payu_key,
+            'payu_salt' => $request->payu_salt,
+            'payu_webhook_secret' => $request->payu_webhook_secret,
+            'stripe_publishable_key' => $request->stripe_publishable_key,
+            'stripe_secret_key' => $request->stripe_secret_key,
+            'stripe_webhook_secret' => $request->stripe_webhook_secret,
         ]);
 
         //Log
@@ -340,6 +360,16 @@ class branchController extends Controller
 
             'payment_method' => 'required',
             'payment_date'   => 'required|date|before_or_equal:today',
+            'payment_gateway' => 'nullable|in:razorpay,payu,stripe',
+
+            'payment_gateway_key_id' => 'required_if:payment_gateway,razorpay|string',
+            'payment_gateway_key_secret' => 'required_if:payment_gateway,razorpay|string',
+
+            'payu_key' => 'required_if:payment_gateway,payu|string',
+            'payu_salt' => 'required_if:payment_gateway,payu|string',
+
+            'stripe_publishable_key' => 'required_if:payment_gateway,stripe|string',
+            'stripe_secret_key' => 'required_if:payment_gateway,stripe|string',
             'bill_type' => 'required',
 
             'bank' => 'nullable|string|max:50',
@@ -477,6 +507,16 @@ class branchController extends Controller
             'is_gst_bill_avaiable' => $request->has('is_gst_bill_avaiable') ? 1 : 0,
             'able_to_delete_order' => $request->has('able_to_delete_order') ? 1 : 0,
             'able_to_round_price' => $request->has('able_to_round_price') ? 1 : 0,
+            'payment_gateway' => $request->payment_gateway,
+            'payment_gateway_key_id' => $request->payment_gateway_key_id,
+            'payment_gateway_key_secret' => $request->payment_gateway_key_secret,
+            'payment_gateway_webhook_secret' => $request->payment_gateway_webhook_secret,
+            'payu_key' => $request->payu_key,
+            'payu_salt' => $request->payu_salt,
+            'payu_webhook_secret' => $request->payu_webhook_secret,
+            'stripe_publishable_key' => $request->stripe_publishable_key,
+            'stripe_secret_key' => $request->stripe_secret_key,
+            'stripe_webhook_secret' => $request->stripe_webhook_secret,
         ]);
 
         //Log

@@ -8,7 +8,7 @@ class UserDetail extends Model
 {
     protected $fillable = [
         'user_id','address','gst','payment_method','payment_date','primary_colour','secondary_colour','bill_type','is_scan_avaiable','is_bill_enabled','plan_start','plan_end','is_size_differentiation_available','is_colour_differentiation_available','able_to_edit_bill','is_imei_required','is_gst_bill_avaiable','able_to_delete_order','able_to_round_price','online_paid_order_confirmation',
-        'payment_gateway','payment_gateway_key_id','payment_gateway_key_secret','payment_gateway_webhook_secret'
+        'payment_gateway','payment_gateway_key_id','payment_gateway_key_secret','payment_gateway_webhook_secret','payu_key','payu_salt','payu_webhook_secret','stripe_publishable_key','stripe_secret_key','stripe_webhook_secret'
     ];
 
     protected $casts = [

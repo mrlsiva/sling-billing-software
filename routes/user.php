@@ -29,6 +29,8 @@ Route::middleware(['is_url_valid'])->group(function () {
 				Route::post('/update', 'App\Http\Controllers\ecommerce\authController@update');
 			});
 
+			Route::get('/payment_gateway_detail', 'App\Http\Controllers\ecommerce\orderController@payment_gateway_detail');
+
 			Route::prefix('orders')->group(function () {
 
 				Route::post('/store', 'App\Http\Controllers\ecommerce\orderController@store');
